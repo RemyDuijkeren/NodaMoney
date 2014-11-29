@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{96BD7E4A-8487-47D7-8459-814BA8288701}"
 	ProjectSection(SolutionItems) = preProject
 		CodeAnalysisDictionary.xml = CodeAnalysisDictionary.xml
+		NodaMoney\NodaMoney.nuspec = NodaMoney\NodaMoney.nuspec
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
 		SolutionInfo.cs = SolutionInfo.cs

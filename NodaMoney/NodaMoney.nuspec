@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+	<owners>$author$</owners>
+    <authors>Rémy van Duijkeren</authors>
+	<summary>$description$</summary>
+	<description>$description$</description>
+	<licenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/remyvd/NodaMoney</projectUrl>
+    <iconUrl>https://github.com/remyvd/NodaMoney/Tools/logo_nodamoney.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/</releaseNotes>
+    <copyright>Copyright 2014-2015</copyright>
+    <tags>JodaMoney Money Currency ExchangeRate</tags>
+	<language>en-US</language>
+  </metadata>
+</package>
