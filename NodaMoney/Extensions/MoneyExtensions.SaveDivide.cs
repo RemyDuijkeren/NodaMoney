@@ -75,7 +75,6 @@ namespace NodaMoney.Extensions
             if (ratios.Sum() <= 1)
                 throw new ArgumentOutOfRangeException("ratios", "Sum of ratios must be greater than 1");
 
-            decimal shareAmount = Math.Round(money.Amount / ratios.Sum(), (int)money.Currency.DecimalDigits, rounding);
             decimal remainder = money.Amount;
 
             for (int i = 0; i < ratios.Length - 1; i++)
