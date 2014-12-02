@@ -25,17 +25,19 @@ At the moment there are three classes:
 - ExchangeRate: A stucture that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
 
-##initalizing money
-'''C#
+**initalizing money**
+
+```C#
 var euros = new Money(6.54m, Currency.FromCode("EUR")); // define money explicit
 var euros = Money.Euro(6.54m); // define money explicit using helper method for most used currencies in the world
 Money money = 6.54m; // define money implicit using currency of current culture/region
 Money money = (Money)6.54; // define money with double values works, but you need to explict cast because of ronding issues. 
-'''
+```
 
-##money operations
-'''C#
+**money operations**
+
+```C#
 var euro10 = Money.Euro(10);
 var euro20 = Money.Euro(20);
 var euro30 = euro10 + euro20;
-'''
+```

@@ -948,24 +948,26 @@ namespace NodaMoney
         {
             // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
             // TODO: Move to Currency? Currency.GetNumberFormatInfo()
+            //TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
             // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and  CurrencyDecimalDigits.
-            if (formatProvider == null)
-            {
-                if (RegionInfo.CurrentRegion.ISOCurrencySymbol == Currency.Code)
-                {
-                    formatProvider = NumberFormatInfo.CurrentInfo;
-                }
-                else
-                {
-                    var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
-                    numberFormatInfo.CurrencySymbol = Currency.Sign;
-                    numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
+            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
+            var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
-                    formatProvider = numberFormatInfo;
-                }
+            if (formatProvider != null)
+            {
+                var ci = formatProvider as CultureInfo;
+                if (ci != null)
+                    numberFormatInfo = ci.NumberFormat;
+
+                var nfi = formatProvider as NumberFormatInfo;
+                if (nfi != null)
+                    numberFormatInfo = nfi;
             }
 
-            return Amount.ToString(format ?? "C", formatProvider);
+            numberFormatInfo.CurrencySymbol = Currency.Sign;
+            numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
+
+            return Amount.ToString(format ?? "C", numberFormatInfo);            
         }
     }
 }

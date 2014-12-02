@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -704,118 +705,138 @@ namespace NodaMoney.UnitTests
             }
         }
 
-        [TestMethod]
-        public void ShouldConvertToStringWithCorrectDecimals()
+
+        [TestClass]
+        public class GivenIWantToConvertMoneyToString
         {
-            //123.456 ("C", en-US) -> $123.46
-            //123.456 ("C", fr-FR) -> 123,46 €
-            //123.456 ("C", ja-JP) -> ¥123
-            //-123.456 ("C3", en-US) -> ($123.456)
-            //-123.456 ("C3", fr-FR) -> -123,456 €
-            //-123.456 ("C3", ja-JP) -> -¥123.456
+            private Money yen = new Money(765.4321m, Currency.FromCode("JPY"));
+            private Money euro = new Money(765.4321m, Currency.FromCode("EUR"));
+            private Money dollar = new Money(765.4321m, Currency.FromCode("USD"));
+            private Money dinar = new Money(765.4321m, Currency.FromCode("BHD"));
 
-            Money euro11 = new Money(10.9999m, "EUR");
-            Money dollar11 = new Money(10.9999m, "USD");
-            Money yen11 = new Money(10.9999m, "JPY");
-
-            // with implicit number of decimals (default of Currency)
-            using (var culture = new SwitchCulture("nl-NL"))
+            [TestMethod]
+            public void WhenImplicitConversion_ThenNumberOfDecimalsShouldBeDefaultOfCurrency()
             {
-                Assert.AreEqual("€ 11,00", euro11.ToString());
-                Assert.AreEqual("$ 11,00", dollar11.ToString());
-                Assert.AreEqual("¥ 11", yen11.ToString());
-
-                // with explicit number of decimals
-                Assert.AreEqual("€ 11,0", euro11.ToString("C1"));
-                Assert.AreEqual("$ 11,0", dollar11.ToString("C1"));
-                Assert.AreEqual("¥ 11,0", yen11.ToString("C1"));
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString().Should().Be("¥765");
+                    euro.ToString().Should().Be("€765.43");
+                    dollar.ToString().Should().Be("$765.43");
+                    dinar.ToString().Should().Be("BD765.432");
+                }
             }
 
-            using (var culture = new SwitchCulture("en-US"))
+            [TestMethod]
+            public void WhenExplicitToZeroDecimals_ThenThisShouldSucceed()
             {
-                Assert.AreEqual("€11.00", euro11.ToString());
-                Assert.AreEqual("$11.00", dollar11.ToString());
-                Assert.AreEqual("¥11", yen11.ToString());
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString("C0").Should().Be("¥765");
+                    euro.ToString("C0").Should().Be("€765");
+                    dollar.ToString("C0").Should().Be("$765");
+                    dinar.ToString("C0").Should().Be("BD765");
+                }
             }
 
-            using (var culture = new SwitchCulture("nl-BE"))
+            [TestMethod]
+            public void WhenExplicitToOneDecimals_ThenThisShouldSucceed()
             {
-                Assert.AreEqual("€ 11,00", euro11.ToString());
-                Assert.AreEqual("$ 11,00", dollar11.ToString());
-                Assert.AreEqual("¥ 11", yen11.ToString());
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString("C1").Should().Be("¥765.0");
+                    euro.ToString("C1").Should().Be("€765.4");
+                    dollar.ToString("C1").Should().Be("$765.4");
+                    dinar.ToString("C1").Should().Be("BD765.4");
+                }
             }
 
-            using (var culture = new SwitchCulture("fr-BE"))
+            [TestMethod]
+            public void WhenExplicitToTwoDecimals_ThenThisShouldSucceed()
             {
-                Assert.AreEqual("11,00 €", euro11.ToString());
-                Assert.AreEqual("11,00 $", dollar11.ToString());
-                Assert.AreEqual("11 ¥", yen11.ToString());
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString("C2").Should().Be("¥765.00");
+                    euro.ToString("C2").Should().Be("€765.43");
+                    dollar.ToString("C2").Should().Be("$765.43");
+                    dinar.ToString("C2").Should().Be("BD765.43");
+                }
             }
 
-            //    Money money1 = new Money(CurrencyCodeKind.USD, 2.499m);
-            //    Assert.AreEqual("USD 2,50", money1.ToString(_cultureNL));
+            [TestMethod]
+            public void WhenExplicitToThreeDecimals_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString("C3").Should().Be("¥765.000");
+                    euro.ToString("C3").Should().Be("€765.430");
+                    dollar.ToString("C3").Should().Be("$765.430");
+                    dinar.ToString("C3").Should().Be("BD765.432");
+                }
+            }
 
-            //    Money money2 = new Money(CurrencyCodeKind.USD, 2.495m);
-            //    Assert.AreEqual("USD 2,50", money2.ToString(_cultureNL));
+            [TestMethod]
+            public void WhenExplicitToFourDecimals_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    yen.ToString("C4").Should().Be("¥765.0000");
+                    euro.ToString("C4").Should().Be("€765.4300");
+                    dollar.ToString("C4").Should().Be("$765.4300");
+                    dinar.ToString("C4").Should().Be("BD765.4320");
+                }
+            }
 
-            //    Money money3 = new Money(CurrencyCodeKind.USD, 2.494m);
-            //    Assert.AreEqual("USD 2,49", money3.ToString(_cultureNL));
+            [TestMethod]
+            public void WhenSpecificCultureIsUsed_ThenCurrencySymbolAndDecimalsOfMoneyShouldStillBeLeading()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    var ci = new CultureInfo("nl-NL");
 
-            //    Money money4 = new Money(CurrencyCodeKind.BIF, 2.6m);
-            //    Assert.AreEqual("BIF 3", money4.ToString(_cultureNL));
+                    yen.ToString(ci).Should().Be("¥ 765");
+                    euro.ToString(ci).Should().Be("€ 765,43");
+                    dollar.ToString(ci).Should().Be("$ 765,43");
+                    dinar.ToString(ci).Should().Be("BD 765,432");
+                }
+            }
 
-            //    Money money5 = new Money(CurrencyCodeKind.BIF, 2.49m);
-            //    Assert.AreEqual("BIF 2", money5.ToString(_cultureNL));
+            [TestMethod]
+            public void WhenSpecificNumberFormatIsUsed_ThenCurrencySymbolAndDecimalsOfMoneyShouldStillBeLeading()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    var nfi = new CultureInfo("nl-NL").NumberFormat;
 
-            //    Money money6 = new Money(CurrencyCodeKind.BIF, -2.49m);
-            //    Assert.AreEqual("BIF -2", money6.ToString(_cultureNL));
+                    yen.ToString(nfi).Should().Be("¥ 765");
+                    euro.ToString(nfi).Should().Be("€ 765,43");
+                    dollar.ToString(nfi).Should().Be("$ 765,43");
+                    dinar.ToString(nfi).Should().Be("BD 765,432");
+                }
+            }
 
-            //    Money money7 = new Money(CurrencyCodeKind.BIF, -2.5m);
-            //    Assert.AreEqual("BIF -3", money7.ToString(_cultureNL));
+            [TestMethod]
+            public void WhenShowingMoneyInBelgiumDutchSpeaking_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-BE"))
+                {
+                    yen.ToString().Should().Be("¥ 765");
+                    euro.ToString().Should().Be("€ 765,43");
+                    dollar.ToString().Should().Be("$ 765,43");
+                    dinar.ToString().Should().Be("BD 765,432");
+                }
+            }
 
-            //    Money money8 = new Money(CurrencyCodeKind.BHD, 2.4499m);
-            //    Assert.AreEqual("BHD 2.450", money8.ToString(_cultureUS));
-        }
-
-        [TestMethod]
-        public void ShouldConvertToStringWithCorrectCultureFormatting()
-        {
-            // TODO: Fix test
-            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
-            // NumberFormat Should Respect Current Culture
-
-            //Money euro = new Money("EUR", 18123.91m);
-            //Money dollar = new Money("USD", 18123.91m);
-            //Money yen = new Money("JPY", 18123.91m);
-            Money euro = new Money(10.9999m, "EUR");
-            Money dollar = new Money(10.9999m, "USD");
-            Money yen = new Money(10.9999m, "JPY");
-
-            //euro ierland €9.38
-
-            //CultureInfo _cultureNL = new CultureInfo("nl-NL");
-            //CultureInfo _cultureUS = new CultureInfo("en-US");
-            //CultureInfo _cultureCH = new CultureInfo("fr-CH");
-
-            //Money money1 = new Money(CurrencyCodeKind.EUR, 2000.1234567m);
-            //Assert.AreEqual("€ 2.000,12", money1.ToString(_cultureNL, true), "Money1, cultureNL");
-            //Assert.AreEqual("€2,000.12", money1.ToString(_cultureUS, true), "Money1, cultureUS");
-            //Assert.AreEqual("EUR 2'000.12", money1.ToString(_cultureCH), "Money3, cultureCH");
-
-            // implicit 
-            Assert.AreEqual("€ 11,00", euro.ToString());
-            Assert.AreEqual("$ 11,00", dollar.ToString());
-            Assert.AreEqual("¥ 11", yen.ToString());
-
-            //ToString(IFormatProvider) TODO: Is this the response that we want? Use a CurrencyFormatInfo? http://weblogs.asp.net/pgreborio/archive/2005/03/08/389830.aspx
-            Assert.AreEqual(euro.ToString(Thread.CurrentThread.CurrentCulture.NumberFormat), "€ 11,00");
-            Assert.AreEqual(dollar.ToString(Thread.CurrentThread.CurrentCulture.NumberFormat), "€ 11,00");
-            Assert.AreEqual(yen.ToString(Thread.CurrentThread.CurrentCulture.NumberFormat), "€ 11,00");
-
-            //ToString(format, IFormatProvider) TODO: Is this the response that we want? Use a CurrencyFormatInfo? http://weblogs.asp.net/pgreborio/archive/2005/03/08/389830.aspx
-            //Assert.That(euro11.ToString("C1", Thread.CurrentThread.CurrentCulture.NumberFormat), Is.EqualTo("€ 11,00"));
-            //Assert.That(dollar11.ToString("C1", Thread.CurrentThread.CurrentCulture.NumberFormat), Is.EqualTo("€ 11,00"));
-            //Assert.That(yen11.ToString("C1", Thread.CurrentThread.CurrentCulture.NumberFormat), Is.EqualTo("€ 11,00"));
+            [TestMethod]
+            public void WhenShowingMoneyInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("fr-BE"))
+                {
+                    yen.ToString().Should().Be("765 ¥");
+                    euro.ToString().Should().Be("765,43 €");
+                    dollar.ToString().Should().Be("765,43 $");
+                    dinar.ToString().Should().Be("765,432 BD");
+                }
+            }
         }
 
         [TestMethod]
