@@ -11,7 +11,7 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [DataContract] // , ComVisible(true)]
-    public struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable // , IConvertible
+    public struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible
     {
         /// <summary>Initializes a new instance of the Money structure.</summary>        
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -456,6 +456,34 @@ namespace NodaMoney
         ////    return money - new Money(money.Currency, minValue);
         ////}
         
+        #endregion
+
+        #region Unary operators and there friendly named alternative methods
+
+        /// <summary>
+        /// Implements the operator +.
+        /// </summary>
+        /// <param name="money">The money.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Money operator +(Money money)
+        {
+            return money;
+        }
+
+        /// <summary>
+        /// Implements the operator -.
+        /// </summary>
+        /// <param name="money">The money.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Money operator -(Money money)
+        {
+            return new Money(-money.Amount, money.Currency);
+        }
+
         #endregion
 
         #region IEquatable<Money> implementation
@@ -948,7 +976,7 @@ namespace NodaMoney
         {
             // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
             // TODO: Move to Currency? Currency.GetNumberFormatInfo()
-            //TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
+            // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
             // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and  CurrencyDecimalDigits.
             // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
             var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();

@@ -243,6 +243,24 @@ namespace NodaMoney.UnitTests
 
                 Money result = euro10 - dollar10;
             }
+
+            [TestMethod]
+            public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
+            {
+                var m = +euro10;
+
+                m.Amount.Should().Be(10.00m);
+                m.Currency.Code.Should().Be("EUR");
+            }
+
+            [TestMethod]
+            public void WhenUsingUnaryMinOperator_ThenThisSucceed()
+            {
+                var m = -euro10;
+
+                m.Amount.Should().Be(-10.00m);
+                m.Currency.Code.Should().Be("EUR");
+            }
         }
 
         [TestClass]
@@ -704,7 +722,6 @@ namespace NodaMoney.UnitTests
                 Assert.AreEqual(money2.Amount, 10.00m);
             }
         }
-
 
         [TestClass]
         public class GivenIWantToConvertMoneyToString
