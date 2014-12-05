@@ -60,7 +60,7 @@ namespace NodaMoney
             ExchangeRate fx;
             if (!TryParse(s, out fx))
                 throw new FormatException("s is not in the correct format! Currencies are the same or the rate is not a number.");
-            
+
             return fx;
         }
 

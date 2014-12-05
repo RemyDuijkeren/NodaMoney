@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -10,6 +11,7 @@ namespace NodaMoney
     /// various types of Currency. Money will hold the <see cref="Currency" /> and Amount of money,
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
+    [StructLayout(LayoutKind.Sequential)]
     [DataContract] // , ComVisible(true)]
     public struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible
     {
@@ -25,7 +27,7 @@ namespace NodaMoney
                 Amount = Math.Round(amount);
             if (Currency.DecimalDigits == Currency.Z07)
                 Amount = Math.Round(amount, 1);             // TODO: Currency.Z07 and Currency.DOT edge case handeling!
-
+            
             Amount = Math.Round(amount, (int)Currency.DecimalDigits, MidpointRounding.ToEven);
         }
 
@@ -460,28 +462,56 @@ namespace NodaMoney
 
         #region Unary operators and there friendly named alternative methods
 
-        /// <summary>
-        /// Implements the operator +.
-        /// </summary>
+        /// <summary>Pluses the specified money.</summary>
         /// <param name="money">The money.</param>
-        /// <returns>
-        /// The result of the operator.
-        /// </returns>
-        public static Money operator +(Money money)
+        /// <returns>The result.</returns>
+        public static Money Plus(Money money)
         {
             return money;
         }
 
-        /// <summary>
-        /// Implements the operator -.
-        /// </summary>
+        /// <summary>Negates the specified money.</summary>
         /// <param name="money">The money.</param>
-        /// <returns>
-        /// The result of the operator.
-        /// </returns>
-        public static Money operator -(Money money)
+        /// <returns>The result.</returns>
+        public static Money Negate(Money money)
         {
             return new Money(-money.Amount, money.Currency);
+        }
+
+        public static Money Increment(Money money)
+        {
+            return Add(money, new Money(money.Currency.MinorUnit, money.Currency));
+        }
+
+        public static Money Decrement(Money money)
+        {
+            return Subtract(money, new Money(money.Currency.MinorUnit, money.Currency));
+        }
+
+        /// <summary>Implements the operator +.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result of the operator.</returns>
+        public static Money operator +(Money money)
+        {
+            return Plus(money);
+        }
+
+        /// <summary>Implements the operator -.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result of the operator.</returns>
+        public static Money operator -(Money money)
+        {
+            return Negate(money);
+        }
+
+        public static Money operator ++(Money money)
+        {
+            return Increment(money);
+        }
+
+        public static Money operator --(Money money)
+        {
+            return Decrement(money);
         }
 
         #endregion

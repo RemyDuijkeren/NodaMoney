@@ -856,6 +856,33 @@ namespace NodaMoney.UnitTests
             }
         }
 
+        [TestClass]
+        public class GivenIWantToIncrementMoney
+        {
+            private Money yen = new Money(765m, Currency.FromCode("JPY"));
+            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+            private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
+            private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+
+            [TestMethod]
+            public void WhenIncrementing_ThenAmountShouldIncrementWithMinorUnit()
+            {
+                var y = ++yen;
+                var e = ++euro;
+                var d = ++dollar;
+                var di = ++dinar;
+
+                y.Amount.Should().Be(766m);
+                y.Currency.Should().Be(yen.Currency);
+                e.Amount.Should().Be(765.44m);
+                e.Currency.Should().Be(euro.Currency);
+                d.Amount.Should().Be(765.44m);
+                d.Currency.Should().Be(dollar.Currency);
+                di.Amount.Should().Be(765.433m);
+                di.Currency.Should().Be(dinar.Currency);
+            }
+        }
+
         [TestMethod]
         public void ShouldConvertToDecimal()
         {
