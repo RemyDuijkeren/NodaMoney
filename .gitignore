@@ -23,7 +23,7 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-#NUNIT
+# NUnit
 *.VisualState.xml
 TestResult.xml
 
@@ -187,3 +187,6 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+
+# (Generated) Specs
+Specs.txt
