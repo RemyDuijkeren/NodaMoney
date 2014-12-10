@@ -28,10 +28,21 @@ from one currency to another currency.
 **Initalizing money**
 
 ```C#
-var euros = new Money(6.54m, Currency.FromCode("EUR")); // define money explicit
-var euros = Money.Euro(6.54m); // define money explicit using helper method for most used currencies in the world
-Money money = 6.54m; // define money implicit using currency of current culture/region
-Money money = (Money)6.54; // define money with double values works, but you need to explict cast because of ronding issues. 
+// define money explicit
+var euros = new Money(6.54m, Currency.FromCode("EUR"));
+var euros = new Money(6.54m, "EUR");
+
+// define money explicit using helper method for most used currencies in the world
+var euros = Money.Euro(6.54m);
+var euros = Money.USDollar(6.54m);
+var euros = Money.PoundSterling(6.54m);
+var euros = Money.Yen(6);
+
+// define money implicit using currency of current culture/region
+var money = new Money(6.54m);
+Money money = 6.54m;
+Money money = 6;
+Money money = (Money)6.54; // need explict cast from double data type  
 ```
 
 **Money operations**
@@ -39,5 +50,26 @@ Money money = (Money)6.54; // define money with double values works, but you nee
 ```C#
 var euro10 = Money.Euro(10);
 var euro20 = Money.Euro(20);
+var dollar10 = Money.USDollar(10);
+
+// add and substract
 var euro30 = euro10 + euro20;
+var euro10 = euro20 - euro10;
+var m = euro10 + dollar10; // will throw exception!
+euro10 += euro20;
+euro10 -= euro20;
+
+// compare money
+euro10 == euro20; // false
+euro10 != euro20; // true;
+euro10 == dollar10; // false;
+euro20 >= euro10; // true;
+
+// decrement and increment by minor unit
+var yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
+var euro = new Money(765.43m, "EUR");
+++yen; // JPY 766
+--yen; // JPY 765
+++euro; // EUR 765.44
+--euro; // EUR 765.43
 ```

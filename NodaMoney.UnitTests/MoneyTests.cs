@@ -883,6 +883,33 @@ namespace NodaMoney.UnitTests
             }
         }
 
+        [TestClass]
+        public class GivenIWantToDecrementMoney
+        {
+            private Money yen = new Money(765m, Currency.FromCode("JPY"));
+            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+            private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
+            private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+
+            [TestMethod]
+            public void WhenDecrementing_ThenAmountShouldDecrementWithMinorUnit()
+            {
+                var y = --yen;
+                var e = --euro;
+                var d = --dollar;
+                var di = --dinar;
+
+                y.Amount.Should().Be(764m);
+                y.Currency.Should().Be(yen.Currency);
+                e.Amount.Should().Be(765.42m);
+                e.Currency.Should().Be(euro.Currency);
+                d.Amount.Should().Be(765.42m);
+                d.Currency.Should().Be(dollar.Currency);
+                di.Amount.Should().Be(765.431m);
+                di.Currency.Should().Be(dinar.Currency);
+            }
+        }
+
         [TestMethod]
         public void ShouldConvertToDecimal()
         {
@@ -975,46 +1002,11 @@ namespace NodaMoney.UnitTests
             //}
         }
 
-        //[TestMethod]
-        //public void ShouldIncrement()
-        //{
-        //    Money euros = Money.Euro(10);
-        //    Assert.AreEqual(Money.Euro(10.01m), ++euros);
-
-        //    Money yens = Money.Yen(10.00m);
-        //    Assert.AreEqual(Money.Yen(11), ++yens);
-        //}
-
-        //[TestMethod]
-        //public void ShouldDecrement()
-        //{
-        //    Money euros = Money.Euro(10);
-        //    Assert.AreEqual(Money.Euro(9.99m), --euros);
-
-        //    Money yens = Money.Yen(10.00m);
-        //    Assert.AreEqual(Money.Yen(9), --yens);
-        //}
-
-        //public void testMinimumIncrement()
-        //{
-        //    assertEquals(Money.valueOf(0.01, USD), d100.minimumIncrement());
-        //    assertEquals(Money.valueOf(1, JPY), y50.minimumIncrement());
-        //}
-
         //public void testCloseNumbersNotEqual()
         //{
         //    Money d2_51a = Money.dollars(2.515);
         //    Money d2_51b = Money.dollars(2.5149);
         //    assertTrue(!d2_51a.equals(d2_51b));
-        //}
-
-        //public void setUp()
-        //{
-        //    d15 = Money.valueOf(new BigDecimal("15.0"), USD);
-        //    d2_51 = Money.valueOf(new BigDecimal("2.51"), USD);
-        //    e2_51 = Money.valueOf(new BigDecimal("2.51"), EUR);
-        //    y50 = Money.valueOf(new BigDecimal("50"), JPY);
-        //    d100 = Money.valueOf(new BigDecimal("100.0"), USD);
         //}
 
         //public void testRound()
