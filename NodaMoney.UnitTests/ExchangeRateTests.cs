@@ -145,13 +145,29 @@ namespace NodaMoney.UnitTests
                 // Assert
                 action.ShouldThrow<ArgumentException>();
             }
+        }
+
+        [TestClass]
+        public class GivenIWantToConvertExchangeRateToString
+        {
+            ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
 
             [TestMethod]
-            public void WhenConvertingToString_ThenReturnCurrencyPair()
+            public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()
             {
-                var fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
+                using (new SwitchCulture("en-US"))
+                {
+                    fx.ToString().Should().Be("EUR/USD 1.2524");
+                }
+            }
 
-                fx.ToString().Should().Be("EUR/USD 1,2524");
+            [TestMethod]
+            public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    fx.ToString().Should().Be("EUR/USD 1,2524");
+                }
             }
         }
     }
