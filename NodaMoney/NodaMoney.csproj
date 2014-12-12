@@ -47,6 +47,7 @@
     <Compile Include="Currency.cs" />
     <Compile Include="ExchangeRate.cs" />
     <Compile Include="Extensions\MoneyExtensions.SaveDivide.cs" />
+    <Compile Include="InvalidCurrencyException.cs" />
     <Compile Include="Money.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

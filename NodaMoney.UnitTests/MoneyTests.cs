@@ -160,17 +160,19 @@ namespace NodaMoney.UnitTests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void WhenCurrencyIsDifferent_ThenComparingShouldFail()
             {
-                var result = euro10.CompareTo(dollar10);
+                Action action = () => euro10.CompareTo(dollar10);
+
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void WhenComparingToString_ThenComparingShouldFail()
             {
-                var result = euro10.CompareTo("10.00");
+                Action action = () => euro10.CompareTo("10.00");
+
+                action.ShouldThrow<ArgumentException>().WithMessage("obj is not the same type as this instance*");
             }
         }
 
@@ -225,23 +227,19 @@ namespace NodaMoney.UnitTests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void WhenCurrencyIsDifferent_ThenAdditionShouldFail()
             {
-                Money euro10 = new Money(10.00m, "EUR");
-                Money dollar10 = new Money(10.00m, "USD");
+                Action action = () => { var result = euro10 + dollar10; };
 
-                Money result = euro10 + dollar10;
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void WhenCurrencyIsDifferent_ThenSubtractionShouldFail()
             {
-                Money euro10 = new Money(10.00m, "EUR");
-                Money dollar10 = new Money(10.00m, "USD");
+                Action action = () => { var result = euro10 - dollar10; };
 
-                Money result = euro10 - dollar10;
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
 
             [TestMethod]
@@ -598,10 +596,11 @@ namespace NodaMoney.UnitTests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void WhenUnknownIsoCurrencySymbol_ThenCreatingShouldFail()
             {
-                var money = new Money(123.25M, "XYZ");
+                Action action = () => new Money(123.25M, "XYZ");
+
+                action.ShouldThrow<ArgumentException>();
             }
         }
 

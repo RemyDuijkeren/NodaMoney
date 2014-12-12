@@ -478,21 +478,21 @@ namespace NodaMoney
         }
 
         ///// <summary>Increments the specified money.</summary>
-        ///// <param name="money1">The money1.</param>
-        ///// <param name="money2">The money2.</param>
+        ///// <param name="left">The left.</param>
+        ///// <param name="right">The right.</param>
         ///// <returns>The incremented money.</returns>
-        ////public static Money Increment(Money money1, Money money2)
+        ////public static Money Increment(Money left, Money right)
         ////{
-        ////    return money1 + money2;
+        ////    return left + right;
         ////}
 
         ///// <summary>Decrements the specified money.</summary>
-        ///// <param name="money1">The money1.</param>
-        ///// <param name="money2">The money2.</param>
+        ///// <param name="left">The left.</param>
+        ///// <param name="right">The right.</param>
         ///// <returns>The decremented money.</returns>
-        ////public static Money Decrement(Money money1, Money money2)
+        ////public static Money Decrement(Money left, Money right)
         ////{
-        ////    return money1 - money2;
+        ////    return left - right;
         ////}
 
         /// <summary>Adds two specified <see cref="Money"/> values.</summary>
@@ -1110,10 +1110,10 @@ namespace NodaMoney
             return ConvertToString(format, formatProvider);
         }
 
-        private static void AssertIsSameCurrency(Money money1, Money money2)
+        private static void AssertIsSameCurrency(Money left, Money right)
         {
-            if (money1.Currency != money2.Currency)
-                throw new ArgumentException(string.Format("{0} and {1} don't have the same Currency! Use ExchangeRate to convert Money into the correct currency.", money1, money2));
+            if (left.Currency != right.Currency)
+                throw new InvalidCurrencyException(string.Format("{0} and {1} don't have the same Currency! Use ExchangeRate to convert Money into the correct currency.", left, right));
         }
 
         private string ConvertToString(string format, IFormatProvider formatProvider)

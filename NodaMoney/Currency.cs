@@ -25,7 +25,7 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException("code");
-            if (string.IsNullOrWhiteSpace(number)) 
+            if (string.IsNullOrWhiteSpace(number))
                 throw new ArgumentNullException("number");
             if (string.IsNullOrWhiteSpace(englishName)) 
                 throw new ArgumentNullException("englishName");
