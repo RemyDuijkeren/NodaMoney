@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,10 +10,8 @@ using NodaMoney.UnitTests.Helpers;
 
 namespace NodaMoney.UnitTests
 {
-    [TestClass]
     public class MoneyTests
     {
-        //// TODO: Test serializing http://stackoverflow.com/questions/236599/how-to-unit-test-if-my-object-is-really-serializable
         [TestClass]
         public class GivenIWantToExplicitCastMoneyToANumericType
         {
@@ -909,96 +910,151 @@ namespace NodaMoney.UnitTests
             }
         }
 
-        [TestMethod]
-        public void ShouldConvertToDecimal()
+        [TestClass]
+        public class GivenIWantToSerializeMoney
         {
-            Money euro = new Money(10.999m, "EUR");
-            Assert.AreEqual(Money.ToDecimal(euro), 11.00m);
+            //private Money yen = new Money(765m, Currency.FromCode("JPY"));
+            //private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+            //private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
+            //private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+
+            //[TestMethod]
+            //public void WhenSerializing_ThenThisShouldSucceed()
+            //{
+            //    yen.Should().Be(Clone<Money>(yen));
+            //}
+
+            //public static Stream Serialize(object source)
+            //{
+            //    IFormatter formatter = new BinaryFormatter();
+            //    Stream stream = new MemoryStream();
+            //    formatter.Serialize(stream, source);
+            //    return stream;
+            //}
+
+            //public static T Deserialize<T>(Stream stream)
+            //{
+            //    IFormatter formatter = new BinaryFormatter();
+            //    stream.Position = 0;
+            //    return (T)formatter.Deserialize(stream);
+            //}
+
+            //public static T Clone<T>(object source)
+            //{
+            //    return Deserialize<T>(Serialize(source));
+            //}
         }
 
-        [TestMethod]
-        public void ShouldConvertToDouble()
+        [TestClass]
+        public class GivenIWantToConvertMoney
         {
-            Money euro = new Money(10.999m, "EUR");
-            Assert.AreEqual(Money.ToDouble(euro), 11.00d);
+            readonly Money _euro = new Money(765.43m, "EUR");
+
+            [TestMethod]
+            public void WhenConvertingToDecimal_ThenThisShouldSucceed()
+            {
+                decimal result = Money.ToDecimal(_euro);
+
+                result.Should().Be(765.43m);                
+            }
+
+            [TestMethod]
+            public void WhenConvertingToDouble_ThenThisShouldSucceed()
+            {
+                double result = Money.ToDouble(_euro);
+
+                result.Should().BeApproximately(765.43d, 0.001d);
+            }
+
+            [TestMethod]
+            public void WhenConvertingToSingle_ThenThisShouldSucceed()
+            {
+                float result = Money.ToSingle(_euro);
+
+                result.Should().BeApproximately(765.43f, 0.001f);
+            }
         }
 
-        [TestMethod]
-        public void ShouldMultiplyCorrectly()
+        [TestClass]
+        public class GivenIWantToMultiplyAndDivideMoney
         {
-            Money money1 = new Money(100.12);
-            Assert.AreEqual(new Money(50.06m), money1 * 0.5m); // decimal
-            //Assert.AreEqual(new Money(50.0625m), money1 * 0.5); // double
-            Assert.AreEqual(new Money(500.60m), money1 * 5); // int
+            [TestMethod]
+            public void ShouldMultiplyCorrectly()
+            {
+                Money money1 = new Money(100.12);
+                Assert.AreEqual(new Money(50.06m), money1 * 0.5m); // decimal
+                //Assert.AreEqual(new Money(50.0625m), money1 * 0.5); // double
+                Assert.AreEqual(new Money(500.60m), money1 * 5); // int
 
-            Assert.AreEqual(new Money(50.06m), Money.Multiply(money1, 0.5m));
-            //Assert.AreEqual(new Money(50.0625m), Money.Multiply(money1, 0.5));
-            Assert.AreEqual(new Money(500.60m), Money.Multiply(money1, 5));
-            
-            Money money2 = new Money(-100.12);
-            Assert.AreEqual(new Money(-50.06m), money2 * 0.5m);
-            //Assert.AreEqual(new Money(-50.0625m), money2 * 0.5);
-            Assert.AreEqual(new Money(-500.60m), money2 * 5);
-            
-            // multiplier first
-            Assert.AreEqual(new Money(-50.06m), 0.5m * money2);
-            //Assert.AreEqual(new Money(-50.0625m), 0.5 * money2);
-            Assert.AreEqual(new Money(-500.60m), 5 * money2);
+                Assert.AreEqual(new Money(50.06m), Money.Multiply(money1, 0.5m));
+                //Assert.AreEqual(new Money(50.0625m), Money.Multiply(money1, 0.5));
+                Assert.AreEqual(new Money(500.60m), Money.Multiply(money1, 5));
 
-            Money money3 = new Money(15);
-            Money money4 = new Money(100);
-            Assert.AreEqual(new Money(150), money3 * 10);
-            //Assert.AreEqual(new Money(1.5), money3 * 0.1);
-            //Assert.AreEqual(new Money(70), money4 * 0.7);
+                Money money2 = new Money(-100.12);
+                Assert.AreEqual(new Money(-50.06m), money2 * 0.5m);
+                //Assert.AreEqual(new Money(-50.0625m), money2 * 0.5);
+                Assert.AreEqual(new Money(-500.60m), money2 * 5);
 
-            //assertEquals(Money.dollars(66.67), d100.times(0.66666667));
-            //assertEquals(Money.dollars(66.66), d100.times(0.66666667, Rounding.DOWN));
+                // multiplier first
+                Assert.AreEqual(new Money(-50.06m), 0.5m * money2);
+                //Assert.AreEqual(new Money(-50.0625m), 0.5 * money2);
+                Assert.AreEqual(new Money(-500.60m), 5 * money2);
 
-            //assertEquals(Money.dollars(66.67), d100.times(new BigDecimal("0.666666"), Rounding.HALF_EVEN));
-            //assertEquals(Money.dollars(66.66), d100.times(new BigDecimal("0.666666"), Rounding.DOWN));
-            //assertEquals(Money.dollars(-66.66), d100.negated().times(new BigDecimal("0.666666"), Rounding.DOWN));
-        }
+                Money money3 = new Money(15);
+                Money money4 = new Money(100);
+                Assert.AreEqual(new Money(150), money3 * 10);
+                //Assert.AreEqual(new Money(1.5), money3 * 0.1);
+                //Assert.AreEqual(new Money(70), money4 * 0.7);
 
-        [TestMethod]
-        public void ShouldDivideCorrectly()
-        {
-            Money money1 = new Money(100.12);
-            Assert.AreEqual(new Money(50.06m), money1 / 2); // int
-            Assert.AreEqual(new Money(200.24m), money1 / 0.5m); // decimal
-            //Assert.AreEqual(new Money(200.25m), money1 / 0.5); // double
+                //assertEquals(Money.dollars(66.67), d100.times(0.66666667));
+                //assertEquals(Money.dollars(66.66), d100.times(0.66666667, Rounding.DOWN));
 
-            Assert.AreEqual(new Money(50.06m), Money.Divide(money1, 2));
-            Assert.AreEqual(new Money(200.24m), Money.Divide(money1, 0.5m));
-            //Assert.AreEqual(new Money(200.25m), Money.Divide(money1, 0.5));
+                //assertEquals(Money.dollars(66.67), d100.times(new BigDecimal("0.666666"), Rounding.HALF_EVEN));
+                //assertEquals(Money.dollars(66.66), d100.times(new BigDecimal("0.666666"), Rounding.DOWN));
+                //assertEquals(Money.dollars(-66.66), d100.negated().times(new BigDecimal("0.666666"), Rounding.DOWN));
+            }
 
-            Money money3 = new Money(-100.12);
-            Assert.AreEqual(new Money(-50.06m), money3 / 2);
-            Assert.AreEqual(new Money(-200.24m), money3 / 0.5m);
-            //Assert.AreEqual(new Money(-200.25m), money3 / 0.5);
+            [TestMethod]
+            public void ShouldDivideCorrectly()
+            {
+                Money money1 = new Money(100.12);
+                Assert.AreEqual(new Money(50.06m), money1 / 2); // int
+                Assert.AreEqual(new Money(200.24m), money1 / 0.5m); // decimal
+                //Assert.AreEqual(new Money(200.25m), money1 / 0.5); // double
 
-            Money money4 = new Money(100);
-            Assert.AreEqual(new Money(33.33), money4 / 3);
-            Assert.AreEqual(new Money(16.67), money4 / 6);
+                Assert.AreEqual(new Money(50.06m), Money.Divide(money1, 2));
+                Assert.AreEqual(new Money(200.24m), Money.Divide(money1, 0.5m));
+                //Assert.AreEqual(new Money(200.25m), Money.Divide(money1, 0.5));
 
-            //assertEquals(new BigDecimal(2.50), Money.dollars(5.00).dividedBy(Money.dollars(2.00)).decimalValue(1, Rounding.UNNECESSARY));
-            //assertEquals(new BigDecimal(1.25), Money.dollars(5.00).dividedBy(Money.dollars(4.00)).decimalValue(2, Rounding.UNNECESSARY));
-            //assertEquals(new BigDecimal(5), Money.dollars(5.00).dividedBy(Money.dollars(1.00)).decimalValue(0, Rounding.UNNECESSARY));
-            //try
-            //{
-            //    Money.dollars(5.00).dividedBy(Money.dollars(2.00)).decimalValue(0, Rounding.UNNECESSARY);
-            //    fail("dividedBy(Money) does not allow rounding.");
-            //}
-            //catch (ArithmeticException correctBehavior)
-            //{
-            //}
-            //try
-            //{
-            //    Money.dollars(10.00).dividedBy(Money.dollars(3.00)).decimalValue(5, Rounding.UNNECESSARY);
-            //    fail("dividedBy(Money) does not allow rounding.");
-            //}
-            //catch (ArithmeticException correctBehavior)
-            //{
-            //}
+                Money money3 = new Money(-100.12);
+                Assert.AreEqual(new Money(-50.06m), money3 / 2);
+                Assert.AreEqual(new Money(-200.24m), money3 / 0.5m);
+                //Assert.AreEqual(new Money(-200.25m), money3 / 0.5);
+
+                Money money4 = new Money(100);
+                Assert.AreEqual(new Money(33.33), money4 / 3);
+                Assert.AreEqual(new Money(16.67), money4 / 6);
+
+                //assertEquals(new BigDecimal(2.50), Money.dollars(5.00).dividedBy(Money.dollars(2.00)).decimalValue(1, Rounding.UNNECESSARY));
+                //assertEquals(new BigDecimal(1.25), Money.dollars(5.00).dividedBy(Money.dollars(4.00)).decimalValue(2, Rounding.UNNECESSARY));
+                //assertEquals(new BigDecimal(5), Money.dollars(5.00).dividedBy(Money.dollars(1.00)).decimalValue(0, Rounding.UNNECESSARY));
+                //try
+                //{
+                //    Money.dollars(5.00).dividedBy(Money.dollars(2.00)).decimalValue(0, Rounding.UNNECESSARY);
+                //    fail("dividedBy(Money) does not allow rounding.");
+                //}
+                //catch (ArithmeticException correctBehavior)
+                //{
+                //}
+                //try
+                //{
+                //    Money.dollars(10.00).dividedBy(Money.dollars(3.00)).decimalValue(5, Rounding.UNNECESSARY);
+                //    fail("dividedBy(Money) does not allow rounding.");
+                //}
+                //catch (ArithmeticException correctBehavior)
+                //{
+                //}
+            }
         }
 
         //public void testCloseNumbersNotEqual()

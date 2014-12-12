@@ -1041,7 +1041,7 @@ namespace NodaMoney
         /// </remarks>
         public static float ToSingle(Money money)
         {
-            return (float)money;
+            return Convert.ToSingle(money.Amount);
         }
 
         /// <summary>Converts the value of this instance to an <see cref="Double"/>.</summary>
@@ -1053,7 +1053,7 @@ namespace NodaMoney
         /// </remarks>
         public static double ToDouble(Money money)
         {
-            return (double)money;
+            return Convert.ToDouble(money.Amount);
         }
 
         /// <summary>Converts the value of this instance to an <see cref="Decimal"/>.</summary>
@@ -1062,7 +1062,7 @@ namespace NodaMoney
         /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
         public static decimal ToDecimal(Money money)
         {
-            return (decimal)money;
+            return money.Amount;
         }
 
         #endregion

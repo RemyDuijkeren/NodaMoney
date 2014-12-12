@@ -63,7 +63,8 @@ euro10 -= euro20;
 euro10 == euro20; // false
 euro10 != euro20; // true;
 euro10 == dollar10; // false;
-euro20 >= euro10; // true;
+euro20 > euro10; // true;
+euro10 <= dollar10; // will throw exception!
 
 // decrement and increment by minor unit
 var yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
