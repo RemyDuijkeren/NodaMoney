@@ -13,7 +13,7 @@ namespace NodaMoney
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
     [DataContract] // , ComVisible(true)]
-    public struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible
+    public partial struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible (not supported in PCL)
     {
         /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -25,6 +25,14 @@ namespace NodaMoney
         /// </remarks>
         public Money(decimal amount)
             : this(amount, Currency.CurrentCurrency)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="rounding">The rounding mode.</param>        
+        public Money(decimal amount, MidpointRounding rounding)
+            : this(amount, Currency.CurrentCurrency, rounding)
         {
         }
 
@@ -56,6 +64,15 @@ namespace NodaMoney
         {
         }
 
+        /// <summary>Initializes a new instance of the Money structure, based on a ISO 4217 Currency code.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        public Money(decimal amount, string code, MidpointRounding rounding)
+            : this(amount, Currency.FromCode(code), rounding)
+        {
+        }
+
         /// <summary>Initializes a new instance of the Money structure.</summary>        
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <param name="currency">The Currency of the money.</param>
@@ -76,46 +93,13 @@ namespace NodaMoney
 
         #region Other constructors
 
+        // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
+
         /// <summary>Initializes a new instance of the Money structure.</summary>        
         /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly casted to double).</param>
         /// <param name="currency">The Currency of the money.</param>
         /// <param name="rounding">The rounding mode.</param>
         public Money(double amount, Currency currency, MidpointRounding rounding)
-            : this((decimal)amount, currency, rounding)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the Money structure.</summary>
-        /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or <see cref="byte"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        /// <param name="rounding">The rounding mode.</param>
-        /// <remarks>
-        /// The integral types are implicitly converted to long and the result evaluates
-        /// to decimal. Therefore you can initialize a Money object using an integer literal,
-        /// without the suffix, as follows:
-        /// <code>
-        /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
-        /// </code>
-        /// </remarks>
-        public Money(long amount, Currency currency, MidpointRounding rounding)
-            : this((decimal)amount, currency, rounding)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the Money structure.</summary>
-        /// <param name="amount">The Amount of money as <see langword="ulong"/>, <see langword="uint"/>, <see langword="ushort"/> or <see cref="byte"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        /// <param name="rounding">The rounding mode.</param>
-        /// <remarks>
-        /// The integral types are implicitly converted to long and the result evaluates
-        /// to decimal. Therefore you can initialize a Money object using an integer literal,
-        /// without the suffix, as follows:
-        /// <code>
-        /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
-        /// </code>
-        /// </remarks>
-        [CLSCompliant(false)]
-        public Money(ulong amount, Currency currency, MidpointRounding rounding)
             : this((decimal)amount, currency, rounding)
         {
         }
@@ -281,6 +265,7 @@ namespace NodaMoney
             : this((decimal)amount)
         {
         }
+        
         #endregion
 
         /// <summary>Gets the amount of money.</summary>
@@ -288,142 +273,6 @@ namespace NodaMoney
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
         public Currency Currency { get; private set; }
-
-        #region Special methods for the four most used currencies in the world.
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money Euro(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money USDollar(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money Yen(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money PoundSterling(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        #endregion
 
         #region Binary operators and there friendly named alternative methods
 
