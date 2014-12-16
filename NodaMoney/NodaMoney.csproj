@@ -47,6 +47,7 @@
     <Compile Include="Currency.cs" />
     <Compile Include="ExchangeRate.cs" />
     <Compile Include="Extensions\MoneyExtensions.SaveDivide.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="InvalidCurrencyException.cs" />
     <Compile Include="Money.cs" />
     <Compile Include="Money.FourMostUsedCurrencies.cs" />

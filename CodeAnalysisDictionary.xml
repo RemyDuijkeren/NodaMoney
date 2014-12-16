@@ -7,7 +7,6 @@
     <Recognized>
       <Word>NodaMoney</Word>
       <Word>DynamicHands</Word>
-      <Word>Postcondition</Word>
     </Recognized>
     <Deprecated>
       <Term PreferredAlternate="EnterpriseServices">ComPlus</Term>

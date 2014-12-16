@@ -75,6 +75,7 @@ namespace NodaMoney
         public double DecimalDigits { get; private set; }
 
         /// <summary>Gets the major currency unit.</summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type!")]
         public decimal MajorUnit
         {
             get { return 1; }
@@ -100,7 +101,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(code)) 
                 throw new ArgumentNullException("code");
             if (!Currencies.ContainsKey(code.ToUpperInvariant())) 
-                throw new ArgumentException(string.Format("{0} is an unknown ISO 4217 currency code!", code));
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown ISO 4217 currency code!", code));
 
             return Currencies[code.ToUpperInvariant()];
         }

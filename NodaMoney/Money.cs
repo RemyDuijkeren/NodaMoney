@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
@@ -712,7 +713,7 @@ namespace NodaMoney
         /// <returns>A <see cref="T:System.Decimal"/> number equivalent to the value of this instance.</returns>
         public decimal ToDecimal(IFormatProvider provider)
         {
-            return Amount;
+            return Convert.ToDecimal(Amount, provider);
         }
 
         /// <summary>Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.</summary>
@@ -961,10 +962,12 @@ namespace NodaMoney
             return ConvertToString(format, formatProvider);
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])",
+            Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
         private static void AssertIsSameCurrency(Money left, Money right)
         {
-            if (left.Currency != right.Currency)
-                throw new InvalidCurrencyException(string.Format("{0} and {1} don't have the same Currency! Use ExchangeRate to convert Money into the correct currency.", left, right));
+            if (left.Currency != right.Currency)         
+                throw new InvalidCurrencyException(string.Format("{0} and {1} don't have the same Currency!", left, right));
         }
 
         private string ConvertToString(string format, IFormatProvider formatProvider)
@@ -972,7 +975,7 @@ namespace NodaMoney
             // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
             // TODO: Move to Currency? Currency.GetNumberFormatInfo()
             // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
-            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and  CurrencyDecimalDigits.
+            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
             // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
             var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
@@ -990,7 +993,7 @@ namespace NodaMoney
             numberFormatInfo.CurrencySymbol = Currency.Sign;
             numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
 
-            return Amount.ToString(format ?? "C", numberFormatInfo);            
+            return Amount.ToString(format ?? "C", numberFormatInfo);
         }
     }
 }

@@ -11,5 +11,6 @@ using System.Runtime.InteropServices;
 //// this assembly from COM, set the ComVisible attribute to true on that type.
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
+
 //// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("4f453a37-095c-4d43-8345-00dcae2d6f02")]

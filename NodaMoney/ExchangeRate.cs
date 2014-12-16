@@ -52,41 +52,54 @@ namespace NodaMoney
         public decimal Value { get; private set; }
 
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
-        /// <param name="s">The string representation of the exchange rate to convert.</param>
-        /// <returns>The equivalent to the exchange rate contained in s.</returns>
-        /// <exception cref="System.FormatException">s is not in the correct format!</exception>
-        public static ExchangeRate Parse(string s)
+        /// <param name="rate">The string representation of the exchange rate to convert.</param>
+        /// <returns>The equivalent to the exchange rate contained in rate.</returns>
+        /// <exception cref="System.FormatException">rate is not in the correct format!</exception>
+        public static ExchangeRate Parse(string rate)
         {
             ExchangeRate fx;
-            if (!TryParse(s, out fx))
-                throw new FormatException("s is not in the correct format! Currencies are the same or the rate is not a number.");
+            if (!TryParse(rate, out fx))
+                throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
 
             return fx;
         }
 
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
-        /// <param name="s">The string representation of the exchange rate to convert.</param>
-        /// <param name="result">When this method returns, contains the <see cref="ExchangeRate"/> that is equivalent to the exchange rate contained in s, if the conversion succeeded,
-        /// or is zero if the conversion failed. The conversion fails if the s parameter is null, is not a exchange rate in a valid format, or represents a number less than MinValue 
+        /// <param name="rate">The string representation of the exchange rate to convert.</param>
+        /// <param name="result">When this method returns, contains the <see cref="ExchangeRate"/> that is equivalent to the exchange rate contained in rate, if the conversion succeeded,
+        /// or is zero if the conversion failed. The conversion fails if the rate parameter is null, is not a exchange rate in a valid format, or represents a number less than MinValue 
         /// or greater than MaxValue. This parameter is passed uninitialized.</param>
-        /// <returns><b>true</b> if s was converted successfully; otherwise, <b>false</b>.</returns>
-        public static bool TryParse(string s, out ExchangeRate result)
+        /// <returns><b>true</b> if rate was converted successfully; otherwise, <b>false</b>.</returns>
+        public static bool TryParse(string rate, out ExchangeRate result)
         {
             try
             {
-                s = s.Trim();
-                var baseCurrency = Currency.FromCode(s.Substring(0, 3));
-                int index = s.Substring(3, 1) == "/" ? 4 : 3;
-                var quoteCurrency = Currency.FromCode(s.Substring(index, 3));
-                var rate = decimal.Parse(s.Remove(0, index + 3));
+                if (string.IsNullOrWhiteSpace(rate))
+                    throw new ArgumentNullException("rate");
 
-                result = new ExchangeRate(baseCurrency, quoteCurrency, rate);
+                rate = rate.Trim();
+                var baseCurrency = Currency.FromCode(rate.Substring(0, 3));
+                int index = rate.Substring(3, 1) == "/" ? 4 : 3;
+                var quoteCurrency = Currency.FromCode(rate.Substring(index, 3));
+                var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
+                
+                result = new ExchangeRate(baseCurrency, quoteCurrency, value);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                result = new ExchangeRate { BaseCurrency = Currency.FromCode("XXX"), QuoteCurrency = Currency.FromCode("XXX"), Value = 0 };
-                return false;
+                if (ex is FormatException || ex is OverflowException || ex is ArgumentException)
+                {
+                    result = new ExchangeRate
+                    {
+                        BaseCurrency = Currency.FromCode("XXX"),
+                        QuoteCurrency = Currency.FromCode("XXX"),
+                        Value = 0
+                    };
+                    return false;
+                }
+
+                throw;
             }
         }
 
