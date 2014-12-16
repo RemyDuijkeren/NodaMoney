@@ -269,9 +269,11 @@ namespace NodaMoney
         #endregion
 
         /// <summary>Gets the amount of money.</summary>
+        [DataMember]
         public decimal Amount { get; private set; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
+        [DataMember]
         public Currency Currency { get; private set; }
 
         #region Binary operators and there friendly named alternative methods
