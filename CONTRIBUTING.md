@@ -12,7 +12,8 @@ chance of keeping on top of things.
 * Fork the repository on GitHub (we use the [fork & pull model](https://help.github.com/articles/using-pull-requests))
 
 ## Making Changes
-* Don't working directly on the `master` branch! Only target the `develop` branch.
+* We use as branching strategy the [Gitflow Workflow](http://nvie.com/posts/a-successful-git-branching-model/). so don't
+  work directly on the `master` branch! Only target the `develop` branch.
 * Make commits of logical units
 * Make sure your commit messages have a good description.
 * Make sure you have added the necessary tests for your changes.

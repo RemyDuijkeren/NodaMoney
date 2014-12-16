@@ -28,7 +28,7 @@ from one currency to another currency.
 **Initalizing money**
 
 ```C#
-// define money explicit
+// define money with explicit currency
 var euros = new Money(6.54m, Currency.FromCode("EUR"));
 var euros = new Money(6.54m, "EUR");
 
@@ -43,6 +43,11 @@ var money = new Money(6.54m);
 Money money = 6.54m;
 Money money = 6;
 Money money = (Money)6.54; // need explict cast from double data type  
+
+// auto-rounding to the minor unit will take place with MidpointRounding.ToEven
+// also known as banker's rounding 
+var euro = new Money(765.425m, "EUR"); // EUR 765.42
+var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
 ```
 
 **Money operations**
@@ -73,4 +78,45 @@ var euro = new Money(765.43m, "EUR");
 --yen; // JPY 765
 ++euro; // EUR 765.44
 --euro; // EUR 765.43
+```
+
+**Money formatting**
+
+```C#
+var yen = new Money(765m, "JPY");
+var euro = new Money(765.43m, "EUR");
+var dollar = new Money(765.43m, "USD");
+var dinar = new Money(765.432m, "BHD");
+
+// Implicit when current culture is 'en-US'
+yen.ToString();    // "¥765"
+euro.ToString();   // "€765.43"
+dollar.ToString(); // "$765.43"
+dinar.ToString();  // "BD765.432"
+
+yen.ToString("C2");    // "¥765.00"
+euro.ToString("C2");   // "€765.43"
+dollar.ToString("C2"); // "$765.43"
+dinar.ToString("C2");  // "BD765.43"
+
+// Implicit when current culture is 'nl-BE'
+yen.ToString();    // "¥ 765"
+euro.ToString();   // "€ 765,43"
+dollar.ToString(); // "$ 765,43"
+dinar.ToString();  // "BD 765,432"
+
+// Implicit when current culture is 'fr-BE'
+yen.ToString();    // "765 ¥"
+euro.ToString();   // "765,43 €"
+dollar.ToString(); // "765,43 $"
+dinar.ToString();  // "765,432 BD"
+}
+
+// Explicit format for culture 'nl-NL'
+var ci = new CultureInfo("nl-NL");
+
+yen.ToString(ci);    // "¥ 765"
+euro.ToString(ci);   // "€ 765,43"
+dollar.ToString(ci); // "$ 765,43"
+dinar.ToString(ci);  // "BD 765,432"
 ```
