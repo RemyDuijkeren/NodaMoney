@@ -72,8 +72,8 @@ namespace NodaMoney.Extensions
         /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
         public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios, MidpointRounding rounding)
         {
-            if (ratios.Sum() <= 1)
-                throw new ArgumentOutOfRangeException("ratios", "Sum of ratios must be greater than 1");
+            if (ratios.Any(ratio => ratio < 1))
+                throw new ArgumentOutOfRangeException("ratios", "All ratios must be greater or equal than 1");
 
             decimal remainder = money.Amount;
 

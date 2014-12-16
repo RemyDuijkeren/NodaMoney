@@ -10,14 +10,16 @@ namespace NodaMoney.Extensions.UnitTests
         [TestClass]
         public class GivenIWantToSafelyDivideMoney
         {
+            private Money _eurocent5 = new Money(0.05m, "EUR");
+            private Money _euro1 = new Money(1.0m, "EUR");
+
             [TestMethod]
             public void WhenDividing5CentsByTwo_ThenDivisionShouldNotLoseCents()
             {
                 // Foemmel's Conundrum test (see PEAA, page 495)
                 // http://thierryroussel.free.fr/java/books/martinfowler/www.martinfowler.com/isa/money.html
-                var euro = new Money(0.05m, "EUR");
 
-                var enumerable = euro.SafeDivide(2).ToList();
+                var enumerable = _eurocent5.SafeDivide(2).ToList();
 
                 enumerable.Should().NotBeNullOrEmpty()
                     .And.HaveCount(2)
@@ -28,15 +30,13 @@ namespace NodaMoney.Extensions.UnitTests
                         new Money(0.03m, "EUR")
                     });
 
-                enumerable.Sum(m => m.Amount).Should().Be(0.05m);
+                enumerable.Sum(m => m.Amount).Should().Be(_eurocent5.Amount);
             }
 
             [TestMethod]
             public void WhenDividing5CentsByThree_ThenDivisionShouldNotLoseCents()
             {
-                var euro = new Money(0.05m, "EUR");
-
-                var enumerable = euro.SafeDivide(3).ToList();
+                var enumerable = _eurocent5.SafeDivide(3).ToList();
 
                 enumerable.Should().NotBeNullOrEmpty()
                     .And.HaveCount(3)
@@ -48,15 +48,13 @@ namespace NodaMoney.Extensions.UnitTests
                         new Money(0.01m, "EUR")
                     });
 
-                enumerable.Sum(m => m.Amount).Should().Be(0.05m);
+                enumerable.Sum(m => m.Amount).Should().Be(_eurocent5.Amount);
             }
 
             [TestMethod]
             public void WhenDividing1EuroByGivenRatios_ThenDivisionShouldNotLoseCents()
-            {
-                var euro = new Money(1m, "EUR");
-
-                var enumerable = euro.SafeDivide(new[] { 2, 3, 3 }).ToList();
+            {             
+                var enumerable = _euro1.SafeDivide(new[] { 2, 3, 3 }).ToList();
 
                 enumerable.Should().NotBeNullOrEmpty()
                     .And.HaveCount(3)
@@ -68,15 +66,13 @@ namespace NodaMoney.Extensions.UnitTests
                         new Money(0.37m, "EUR")
                     });
 
-                enumerable.Sum(m => m.Amount).Should().Be(1m);
+                enumerable.Sum(m => m.Amount).Should().Be(_euro1.Amount);
             }
 
             [TestMethod]
             public void WhenDividing1EuroByGivenRatiosWhereOneIsVerySmall_ThenDivisionShouldNotLoseCents()
             {
-                var euro = new Money(1.0m, "EUR");
-
-                var enumerable = euro.SafeDivide(new[] { 200, 300, 1 }).ToList();
+                var enumerable = _euro1.SafeDivide(new[] { 200, 300, 1 }).ToList();
 
                 enumerable.Should().NotBeNullOrEmpty()
                     .And.HaveCount(3)
@@ -88,7 +84,24 @@ namespace NodaMoney.Extensions.UnitTests
                         new Money(0.0m, "EUR")
                     });
 
-                enumerable.Sum(m => m.Amount).Should().Be(1.0m);
+                enumerable.Sum(m => m.Amount).Should().Be(_euro1.Amount);
+            }
+
+            [TestMethod]
+            public void WhenDividingByMinus1_ThenAnExceptionShouldBeThrowed()
+            {               
+                Action action = () => _euro1.SafeDivide(-1).ToList();
+
+                action.ShouldThrow<ArgumentOutOfRangeException>();
+            }
+
+            [TestMethod]
+            public void WhenDividingByGivenRatiosWithMinus1_ThenAnExceptionShouldBeThrowed()
+            {
+                Action action = () => _euro1.SafeDivide(new[] { 2, -1, 3 }).ToList();
+
+                action.ShouldThrow<ArgumentOutOfRangeException>()
+                    .WithMessage("*1*");
             }
         }
     }
