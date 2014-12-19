@@ -132,6 +132,6 @@ dinar.ToString(ci);  // "BD 765,432"
 Support & Contributing
 ----------------------
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
-[guidelines](CONTRIBUTING.md) for contributing to the driver.
+[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
 Build status: [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9/branch/develop?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney/branch/develop)
