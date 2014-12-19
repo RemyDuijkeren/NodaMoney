@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,12 +12,12 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToExplicitCastMoneyToANumericType
         {
-            Money euro10 = new Money(10.00m, "EUR");
+            readonly Money _euros = new Money(10.00m, "EUR");
 
             [TestMethod]
             public void WhenExplicitCastingToDecimal_ThenCastingShouldSucceed()
             {
-                var m = (decimal)euro10;
+                var m = (decimal)_euros;
 
                 m.Should().Be(10.00m);
             }
@@ -28,7 +25,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenExplicitCastingToDouble_ThenCastingShouldSucceed()
             {
-                var d = (double)euro10;
+                var d = (double)_euros;
 
                 d.Should().Be(10.00d);
             }
@@ -36,7 +33,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenExplicitCastingToFloat_ThenCastingShouldSucceed()
             {
-                var f = (float)euro10;
+                var f = (float)_euros;
 
                 f.Should().Be(10.00f);
             }
@@ -44,7 +41,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenExplicitCastingToLong_ThenCastingShouldSucceed()
             {
-                var l = (long)euro10;
+                var l = (long)_euros;
 
                 l.Should().Be(10L);
             }
@@ -52,23 +49,23 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenExplicitCastingToByte_ThenCastingShouldSucceed()
             {
-                var b = (byte)euro10;
+                var b = (byte)_euros;
 
-                b.Should().Be((byte)10);
+                b.Should().Be(10);
             }
 
             [TestMethod]
             public void WhenExplicitCastingToShort_ThenCastingShouldSucceed()
             {
-                var s = (short)euro10;
+                var s = (short)_euros;
 
-                s.Should().Be((short)10);
+                s.Should().Be(10);
             }
 
             [TestMethod]
             public void WhenExplicitCastingToInt_ThenCastingShouldSucceed()
             {
-                var i = (int)euro10;
+                var i = (int)_euros;
 
                 i.Should().Be(10);
             }
@@ -77,93 +74,93 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToCompareMoney
         {
-            private Money euro10 = new Money(10.00m, "EUR");
-            private Money euro10_1 = new Money(10.00m, "EUR");
-            private Money euro20 = new Money(20.00m, "EUR");
-            private Money dollar10 = new Money(10.00m, "USD");
+            private Money _tenEuro1 = new Money(10.00m, "EUR");
+            private Money _tenEuro2 = new Money(10.00m, "EUR");
+            private Money _twentyEuro = new Money(20.00m, "EUR");
+            private Money _tenDollar = new Money(10.00m, "USD");
 
             [TestMethod]
             public void WhenCurrencyAndValueAreEqual_ThenMoneyShouldBeEqual()
             {
-                Assert.AreEqual(euro10, euro10_1);
-                Assert.IsTrue(euro10.Equals(euro10_1)); //using Equal()
-                Assert.IsTrue(Money.Equals(euro10, euro10_1)); //using static Equals()            
-                Assert.IsTrue(euro10 == euro10_1); //using Euality operators
-                Assert.IsFalse(euro10 != euro10_1); //using Euality operators
-                Assert.AreEqual(euro10.GetHashCode(), euro10_1.GetHashCode()); //using GetHashCode()
+                Assert.AreEqual(_tenEuro1, _tenEuro2);
+                Assert.IsTrue(_tenEuro1.Equals(_tenEuro2)); //using Equal()
+                Assert.IsTrue(Equals(_tenEuro1, _tenEuro2)); //using static Equals()            
+                Assert.IsTrue(_tenEuro1 == _tenEuro2); //using Euality operators
+                Assert.IsFalse(_tenEuro1 != _tenEuro2); //using Euality operators
+                Assert.AreEqual(_tenEuro1.GetHashCode(), _tenEuro2.GetHashCode()); //using GetHashCode()
             }
 
             [TestMethod]
             public void WhenValueIsDifferent_ThenMoneyShouldNotBeEqual()
             {
-                Assert.AreNotEqual(euro10, dollar10);
-                Assert.IsFalse(euro10.Equals(dollar10)); //using Equal()
-                Assert.IsFalse(Money.Equals(euro10, dollar10)); //using static Equals()
-                Assert.IsFalse(euro10 == dollar10); //using Euality operators
-                Assert.IsTrue(euro10 != dollar10); //using Euality operators
-                Assert.AreNotEqual(euro10.GetHashCode(), euro20.GetHashCode()); //using GetHashCode()
+                Assert.AreNotEqual(_tenEuro1, _tenDollar);
+                Assert.IsFalse(_tenEuro1.Equals(_tenDollar)); //using Equal()
+                Assert.IsFalse(Equals(_tenEuro1, _tenDollar)); //using static Equals()
+                Assert.IsFalse(_tenEuro1 == _tenDollar); //using Euality operators
+                Assert.IsTrue(_tenEuro1 != _tenDollar); //using Euality operators
+                Assert.AreNotEqual(_tenEuro1.GetHashCode(), _twentyEuro.GetHashCode()); //using GetHashCode()
             }
 
             [TestMethod]
             public void WhenCurrencyIsDifferent_ThenMoneyShouldNotBeEqual()
             {
-                Assert.AreNotEqual(euro10, dollar10);
-                Assert.IsFalse(euro10.Equals(dollar10)); //using Equal()
-                Assert.IsFalse(Money.Equals(euro10, dollar10)); //using static Equals()
-                Assert.IsFalse(euro10 == dollar10); //using Euality operators
-                Assert.IsTrue(euro10 != dollar10); //using Euality operators            
-                Assert.AreNotEqual(euro10.GetHashCode(), dollar10.GetHashCode());//using GetHashCode()
+                Assert.AreNotEqual(_tenEuro1, _tenDollar);
+                Assert.IsFalse(_tenEuro1.Equals(_tenDollar)); //using Equal()
+                Assert.IsFalse(Equals(_tenEuro1, _tenDollar)); //using static Equals()
+                Assert.IsFalse(_tenEuro1 == _tenDollar); //using Euality operators
+                Assert.IsTrue(_tenEuro1 != _tenDollar); //using Euality operators            
+                Assert.AreNotEqual(_tenEuro1.GetHashCode(), _tenDollar.GetHashCode());//using GetHashCode()
             }
 
             [TestMethod]
             public void WhenComparingWithNull_ThenMoneyShouldNotBeEqual()
             {
-                Assert.AreNotEqual(euro10, null);
+                Assert.AreNotEqual(_tenEuro1, null);
             }
 
             [TestMethod]
             public void WhenComparingWithDifferentObject_ThenMoneyShouldNotBeEqual()
             {
-                Assert.AreNotEqual(euro10, new object(), "Comparing Currency to a different object should fail!");
+                Assert.AreNotEqual(_tenEuro1, new object(), "Comparing Currency to a different object should fail!");
             }
 
             [TestMethod]
             public void WhenCurrencyAndValueAreEqual_ThenComparingShouldBeEqual()
             {
-                Assert.AreEqual(euro10.CompareTo(euro10_1), 0); //using CompareTo()
-                Assert.AreEqual(euro10.CompareTo((object)euro10_1), 0);  //using CompareTo()
-                Assert.AreEqual(Money.Compare(euro10, euro10_1), 0); //using static Compare
+                Assert.AreEqual(_tenEuro1.CompareTo(_tenEuro2), 0); //using CompareTo()
+                Assert.AreEqual(_tenEuro1.CompareTo((object)_tenEuro2), 0);  //using CompareTo()
+                Assert.AreEqual(Money.Compare(_tenEuro1, _tenEuro2), 0); //using static Compare
 
                 //using Compareble operators
-                Assert.IsTrue(euro10 <= euro10_1);
-                Assert.IsTrue(euro10 >= euro10_1);
-                Assert.IsFalse(euro10 > euro10_1);
-                Assert.IsFalse(euro10 < euro10_1);
+                Assert.IsTrue(_tenEuro1 <= _tenEuro2);
+                Assert.IsTrue(_tenEuro1 >= _tenEuro2);
+                Assert.IsFalse(_tenEuro1 > _tenEuro2);
+                Assert.IsFalse(_tenEuro1 < _tenEuro2);
             }
 
             [TestMethod]
             public void WhenValueIsDifferent_ThenComparingShouldNotBeEqual()
             {
                 //using CompareTo()
-                Assert.AreEqual(euro10.CompareTo(euro20), -1);
-                Assert.AreEqual(euro20.CompareTo(euro10), 1);
-                Assert.AreEqual(euro20.CompareTo((object)euro10), 1);
+                Assert.AreEqual(_tenEuro1.CompareTo(_twentyEuro), -1);
+                Assert.AreEqual(_twentyEuro.CompareTo(_tenEuro1), 1);
+                Assert.AreEqual(_twentyEuro.CompareTo((object)_tenEuro1), 1);
 
                 //using static Compare
-                Assert.AreEqual(Money.Compare(euro10, euro20), -1);
-                Assert.AreEqual(Money.Compare(euro20, euro10), 1);
+                Assert.AreEqual(Money.Compare(_tenEuro1, _twentyEuro), -1);
+                Assert.AreEqual(Money.Compare(_twentyEuro, _tenEuro1), 1);
 
                 //using Compareble operators
-                Assert.IsTrue(euro10 < euro20);
-                Assert.IsFalse(euro10 > euro20);
-                Assert.IsTrue(euro10 <= euro20);
-                Assert.IsFalse(euro10 >= euro20);
+                Assert.IsTrue(_tenEuro1 < _twentyEuro);
+                Assert.IsFalse(_tenEuro1 > _twentyEuro);
+                Assert.IsTrue(_tenEuro1 <= _twentyEuro);
+                Assert.IsFalse(_tenEuro1 >= _twentyEuro);
             }
 
             [TestMethod]
             public void WhenCurrencyIsDifferent_ThenComparingShouldFail()
             {
-                Action action = () => euro10.CompareTo(dollar10);
+                Action action = () => _tenEuro1.CompareTo(_tenDollar);
 
                 action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
@@ -171,7 +168,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenComparingToString_ThenComparingShouldFail()
             {
-                Action action = () => euro10.CompareTo("10.00");
+                Action action = () => _tenEuro1.CompareTo("10.00");
 
                 action.ShouldThrow<ArgumentException>().WithMessage("obj is not the same type as this instance*");
             }
@@ -180,17 +177,15 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToAddAndSubtractMoney
         {
-            private Money euro10 = new Money(10.00m, "EUR");
-            private Money euro10_1 = new Money(10.00m, "EUR");
-            private Money euro20 = new Money(20.00m, "EUR");
-            private Money dollar10 = new Money(10.00m, "USD");
+            private readonly Money _tenEuro = new Money(10.00m, "EUR");
+            private readonly Money _tenDollar = new Money(10.00m, "USD");
 
             [TestMethod]
             public void WhenCurrencyIsEqual_ThenAdditionAndSubtractionShouldBePossible()
             {
                 // whole number
-                Money money1 = new Money(101m);
-                Money money2 = new Money(99m);
+                var money1 = new Money(101m);
+                var money2 = new Money(99m);
 
                 Assert.AreEqual(new Money(200), money1 + money2);
                 Assert.AreEqual(new Money(2), money1 - money2);
@@ -200,16 +195,16 @@ namespace NodaMoney.UnitTests
                 Assert.AreEqual(new Money(2), Money.Subtract(money1, money2));
 
                 // fractions
-                Money money3 = new Money(100.00m);
-                Money money4 = new Money(0.01m);
+                var money3 = new Money(100.00m);
+                var money4 = new Money(0.01m);
 
                 Assert.AreEqual(new Money(100.01m), money3 + money4);
                 Assert.AreEqual(new Money(99.99m), money3 - money4);
 
                 // overflow
-                Money money5 = new Money(100.999m);
-                Money money6 = new Money(100.5m);
-                Money money7 = new Money(0.9m);
+                var money5 = new Money(100.999m);
+                var money6 = new Money(100.5m);
+                var money7 = new Money(0.9m);
 
                 Assert.AreEqual(new Money(101.899m), money5 + money7);
                 Assert.AreEqual(new Money(100.099m), money5 - money7);
@@ -217,9 +212,9 @@ namespace NodaMoney.UnitTests
                 Assert.AreEqual(new Money(99.6m), money6 - money7);
 
                 // negative
-                Money money8 = new Money(100.999m);
-                Money money9 = new Money(-0.9m);
-                Money money10 = new Money(-100.999m);
+                var money8 = new Money(100.999m);
+                var money9 = new Money(-0.9m);
+                var money10 = new Money(-100.999m);
 
                 Assert.AreEqual(new Money(100.099m), money8 + money9);
                 Assert.AreEqual(new Money(101.899m), money8 - money9);
@@ -230,7 +225,8 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenCurrencyIsDifferent_ThenAdditionShouldFail()
             {
-                Action action = () => { var result = euro10 + dollar10; };
+// ReSharper disable once UnusedVariable
+                Action action = () => { var result = _tenEuro + _tenDollar; };
 
                 action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
@@ -238,7 +234,8 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenCurrencyIsDifferent_ThenSubtractionShouldFail()
             {
-                Action action = () => { var result = euro10 - dollar10; };
+// ReSharper disable once UnusedVariable
+                Action action = () => { var result = _tenEuro - _tenDollar; };
 
                 action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
             }
@@ -246,7 +243,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
             {
-                var m = +euro10;
+                var m = +_tenEuro;
 
                 m.Amount.Should().Be(10.00m);
                 m.Currency.Code.Should().Be("EUR");
@@ -255,7 +252,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenUsingUnaryMinOperator_ThenThisSucceed()
             {
-                var m = -euro10;
+                var m = -_tenEuro;
 
                 m.Amount.Should().Be(-10.00m);
                 m.Currency.Code.Should().Be("EUR");
@@ -265,115 +262,115 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantMoneyFromANumericTypeAndAnExplicitCurrencyObject
         {
-            private Currency euro = Currency.FromCode("EUR");
+            private readonly Currency _euro = Currency.FromCode("EUR");
 
             [TestMethod]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
-                byte byteValue = 50;
-                var money = new Money(byteValue, euro);
+                const byte byteValue = 50;
+                var money = new Money(byteValue, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(50m);
             }
 
             [TestMethod]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
-                sbyte sByteValue = 75;
-                var money = new Money(sByteValue, euro);
+                const sbyte sbyteValue = 75;
+                var money = new Money(sbyteValue, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(75m);               
             }
 
             [TestMethod]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
-                short int16Value = 100;
-                var money = new Money(int16Value, euro);
+                const short int16Value = 100;
+                var money = new Money(int16Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(100m);
             }
 
             [TestMethod]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
-                int int32Value = 200;
-                var money = new Money(int32Value, euro);
+                const int int32Value = 200;
+                var money = new Money(int32Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(200m);
             }
 
             [TestMethod]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
-                long int64Value = 300;
-                var money = new Money(int64Value, euro);
+                const long int64Value = 300;
+                var money = new Money(int64Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(300m);
             }
 
             [TestMethod]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
-                ushort uInt16Value = 400;
-                var money = new Money(uInt16Value, euro);
+                const ushort uInt16Value = 400;
+                var money = new Money(uInt16Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(400m);
             }
 
             [TestMethod]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
-                uint uInt32Value = 500;
-                var money = new Money(uInt32Value, euro);
+                const uint uInt32Value = 500;
+                var money = new Money(uInt32Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(500m);
             }
 
             [TestMethod]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
-                ulong uInt64Value = 600;
-                var money = new Money(uInt64Value, euro);
+                const ulong uInt64Value = 600;
+                var money = new Money(uInt64Value, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(600m);
             }
 
             [TestMethod]
             public void WhenValueIsSingle_ThenCreatingShouldSucceed()
             {
-                float singleValue = 700;
-                var money = new Money(singleValue, euro);
+                const float singleValue = 700;
+                var money = new Money(singleValue, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(700m);
             }
 
             [TestMethod]
             public void WhenValueIsDouble_ThenCreatingShouldSucceed()
             {
-                double doubleValue = 800;
-                var money = new Money(doubleValue, euro);
+                const double doubleValue = 800;
+                var money = new Money(doubleValue, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(800m);
             }
 
             [TestMethod]
             public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
             {
-                decimal decimalValue = 900;
-                var money = new Money(decimalValue, euro);
+                const decimal decimalValue = 900;
+                var money = new Money(decimalValue, _euro);
 
-                money.Currency.Should().Be(euro);
+                money.Currency.Should().Be(_euro);
                 money.Amount.Should().Be(900m);
             }
         }
@@ -381,104 +378,104 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantMoneyFromANumericTypeAndAnImplicitCurrencyFromTheCurrentCulture
         {
-            private Currency currentCurrency = Currency.FromCulture(Thread.CurrentThread.CurrentCulture);
+            private readonly Currency _currentCurrency = Currency.FromCulture(Thread.CurrentThread.CurrentCulture);
 
             [TestMethod]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
-                byte byteValue = 50;
+                const byte byteValue = 50;
                 Money money = byteValue;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(50);
             }
 
             [TestMethod]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
-                sbyte sByteValue = 75;
-                Money money = sByteValue;
+                const sbyte sbyteValue = 75;
+                Money money = sbyteValue;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(75);
             }
 
             [TestMethod]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
-                short int16Value = 100;
+                const short int16Value = 100;
                 Money money = int16Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(100);
             }
 
             [TestMethod]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
-                int int32Value = 200;
+                const int int32Value = 200;
                 Money money = int32Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(200);
             }
 
             [TestMethod]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
-                long int64Value = 300;
+                const long int64Value = 300;
                 Money money = int64Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(300);
             }
 
             [TestMethod]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
-                ushort uInt16Value = 400;
+                const ushort uInt16Value = 400;
                 Money money = uInt16Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(400);
             }
 
             [TestMethod]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
-                uint uInt32Value = 500;
+                const uint uInt32Value = 500;
                 Money money = uInt32Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(500);
             }
 
             [TestMethod]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
-                ulong uInt64Value = 600;
+                const ulong uInt64Value = 600;
                 Money money = uInt64Value;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(600);
             }
 
             [TestMethod]
             public void WhenValueIsSingleAndExplicitCast_ThenCreatingShouldSucceed()
             {
-                float singleValue = 700;
-                Money money = (Money)singleValue;
+                const float singleValue = 700;
+                var money = (Money)singleValue;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(700);
             }
 
             [TestMethod]
             public void WhenValueIsDoubleAndExplicitCast_ThenCreatingShouldSucceed()
             {
-                Money money = (Money)25.00;
+                var money = (Money)25.00;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(25.00m);
             }
 
@@ -487,7 +484,7 @@ namespace NodaMoney.UnitTests
             {
                 Money money = 25.00m;
 
-                money.Currency.Should().Be(currentCurrency);
+                money.Currency.Should().Be(_currentCurrency);
                 money.Amount.Should().Be(25.00m);
             }
         }
@@ -495,105 +492,116 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantMoneyFromANumericTypeAndAnExplicitIsoCurrencyCode
         {
-            private Currency euro = Currency.FromCode("EUR");
+            private readonly Currency _euro = Currency.FromCode("EUR");
 
             [TestMethod]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
-                byte byteValue = 50;
+                const byte byteValue = 50;
                 var money = new Money(byteValue, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(50, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(50);
             }
 
             [TestMethod]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
-                sbyte sByteValue = 75;
-                var money = new Money(sByteValue, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(75, money.Amount);
+                const sbyte sbyteValue = 75;
+                var money = new Money(sbyteValue, "EUR");
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(75);
             }
 
             [TestMethod]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
-                short int16Value = 100;
+                const short int16Value = 100;
                 var money = new Money(int16Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(100, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(100);
             }
 
             [TestMethod]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
-                int int32Value = 200;
+                const int int32Value = 200;
                 var money = new Money(int32Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(200, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(200);
             }
 
             [TestMethod]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
-                long int64Value = 300;
+                const long int64Value = 300;
                 var money = new Money(int64Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(300, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(300);
             }
 
             [TestMethod]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
-                ushort uInt16Value = 400;
+                const ushort uInt16Value = 400;
                 var money = new Money(uInt16Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(400, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(400);
             }
 
             [TestMethod]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
-                uint uInt32Value = 500;
+                const uint uInt32Value = 500;
                 var money = new Money(uInt32Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(500, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(500);
             }
 
             [TestMethod]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
-                ulong uInt64Value = 600;
+                const ulong uInt64Value = 600;
                 var money = new Money(uInt64Value, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(600, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(600);
             }
 
             [TestMethod]
             public void WhenValueIsSingle_ThenCreatingShouldSucceed()
             {
-                float singleValue = 700;
+                const float singleValue = 700;
                 var money = new Money(singleValue, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(700, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(700);
             }
 
             [TestMethod]
             public void WhenValueIsDouble_ThenCreatingShouldSucceed()
             {
-                double doubleValue = 800;
+                const double doubleValue = 800;
                 var money = new Money(doubleValue, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(800, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(800);
             }
 
             [TestMethod]
             public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
             {
-                decimal decimalValue = 900;
+                const decimal decimalValue = 900;
                 var money = new Money(decimalValue, "EUR");
-                Assert.AreEqual(money.Currency, euro);
-                Assert.AreEqual(900, money.Amount);
+
+                money.Currency.Should().Be(_euro);
+                money.Amount.Should().Be(900);
             }
 
             [TestMethod]
@@ -612,134 +620,146 @@ namespace NodaMoney.UnitTests
             public void WhenEurosIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal
-                Money euros = Money.Euro(10.00m);
-                Assert.AreEqual(euros.Currency, Currency.FromCode("EUR"));
-                Assert.AreEqual(euros.Amount, 10.00m);
+                var euros = Money.Euro(10.00m);
+
+                euros.Currency.Should().Be(Currency.FromCode("EUR"));
+                euros.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenEurosIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
-                Money euros1 = Money.Euro(10.00);
-                Assert.AreEqual(euros1.Currency, Currency.FromCode("EUR"));
-                Assert.AreEqual(euros1.Amount, 10.00m);
+                var euros = Money.Euro(10.00);
+
+                euros.Currency.Should().Be(Currency.FromCode("EUR"));
+                euros.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenEurosIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
-                Money money2 = Money.Euro(10L);
-                Assert.AreEqual(money2.Currency, Currency.FromCode("EUR"));
-                Assert.AreEqual(money2.Amount, 10.00m);
+                var euros = Money.Euro(10L);
+
+                euros.Currency.Should().Be(Currency.FromCode("EUR"));
+                euros.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenDollarsIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
-                Money dollars = Money.USDollar(10.00m);
-                Assert.AreEqual(dollars.Currency, Currency.FromCode("USD"));
-                Assert.AreEqual(dollars.Amount, 10.00m);
+                var dollars = Money.USDollar(10.00m);
+
+                dollars.Currency.Should().Be(Currency.FromCode("USD"));
+                dollars.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenDollarsIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
-                Money dollars1 = Money.USDollar(10.00);
-                Assert.AreEqual(dollars1.Currency, Currency.FromCode("USD"));
-                Assert.AreEqual(dollars1.Amount, 10.00m);
+                var dollars = Money.USDollar(10.00);
+
+                dollars.Currency.Should().Be(Currency.FromCode("USD"));
+                dollars.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenDollarsIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
-                Money money2 = Money.USDollar(10L);
-                Assert.AreEqual(money2.Currency, Currency.FromCode("USD"));
-                Assert.AreEqual(money2.Amount, 10.00m);
+                var dollars = Money.USDollar(10L);
+
+                dollars.Currency.Should().Be(Currency.FromCode("USD"));
+                dollars.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenYensIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
-                Money yens = Money.Yen(10.00m);
-                Assert.IsNotNull(yens);
-                Assert.AreEqual(yens.Currency, Currency.FromCode("JPY"));
-                Assert.AreEqual(yens.Amount, 10.00m);
+                var yens = Money.Yen(10.00m);
+
+                yens.Should().NotBeNull();
+                yens.Currency.Should().Be(Currency.FromCode("JPY"));
+                yens.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenYensIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
-                Money yens1 = Money.Yen(10.00);
-                Assert.IsNotNull(yens1);
-                Assert.AreEqual(yens1.Currency, Currency.FromCode("JPY"));
-                Assert.AreEqual(yens1.Amount, 10.00m);
+                var yens = Money.Yen(10.00);
+
+                yens.Should().NotBeNull();
+                yens.Currency.Should().Be(Currency.FromCode("JPY"));
+                yens.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenYensIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
-                Money money2 = Money.Yen(10L);
-                Assert.IsNotNull(money2);
-                Assert.AreEqual(money2.Currency, Currency.FromCode("JPY"));
-                Assert.AreEqual(money2.Amount, 10.00m);
+                var yens = Money.Yen(10L);
+
+                yens.Should().NotBeNull();
+                yens.Currency.Should().Be(Currency.FromCode("JPY"));
+                yens.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenPondsIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
-                Money pounds = Money.PoundSterling(10.00m);
-                Assert.IsNotNull(pounds);
-                Assert.AreEqual(pounds.Currency, Currency.FromCode("GBP"));
-                Assert.AreEqual(pounds.Amount, 10.00m);
+                var pounds = Money.PoundSterling(10.00m);
+
+                pounds.Should().NotBeNull();
+                pounds.Currency.Should().Be(Currency.FromCode("GBP"));
+                pounds.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenPondsIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
-                Money pounds1 = Money.PoundSterling(10.00);
-                Assert.IsNotNull(pounds1);
-                Assert.AreEqual(pounds1.Currency, Currency.FromCode("GBP"));
-                Assert.AreEqual(pounds1.Amount, 10.00m);
+                var pounds = Money.PoundSterling(10.00);
+
+                pounds.Should().NotBeNull();
+                pounds.Currency.Should().Be(Currency.FromCode("GBP"));
+                pounds.Amount.Should().Be(10.00m);
             }
 
             [TestMethod]
             public void WhenPondsIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
-                Money money2 = Money.PoundSterling(10L);
-                Assert.IsNotNull(money2);
-                Assert.AreEqual(money2.Currency, Currency.FromCode("GBP"));
-                Assert.AreEqual(money2.Amount, 10.00m);
+                var pounds = Money.PoundSterling(10L);
+
+                pounds.Should().NotBeNull();
+                pounds.Currency.Should().Be(Currency.FromCode("GBP"));
+                pounds.Amount.Should().Be(10.00m);
             }
         }
 
         [TestClass]
         public class GivenIWantToConvertMoneyToString
         {
-            private Money yen = new Money(765.4321m, Currency.FromCode("JPY"));
-            private Money euro = new Money(765.4321m, Currency.FromCode("EUR"));
-            private Money dollar = new Money(765.4321m, Currency.FromCode("USD"));
-            private Money dinar = new Money(765.4321m, Currency.FromCode("BHD"));
+            private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));
+            private Money _euro = new Money(765.4321m, Currency.FromCode("EUR"));
+            private Money _dollar = new Money(765.4321m, Currency.FromCode("USD"));
+            private Money _dinar = new Money(765.4321m, Currency.FromCode("BHD"));
 
             [TestMethod]
             public void WhenImplicitConversion_ThenNumberOfDecimalsShouldBeDefaultOfCurrency()
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString().Should().Be("¥765");
-                    euro.ToString().Should().Be("€765.43");
-                    dollar.ToString().Should().Be("$765.43");
-                    dinar.ToString().Should().Be("BD765.432");
+                    _yen.ToString().Should().Be("¥765");
+                    _euro.ToString().Should().Be("€765.43");
+                    _dollar.ToString().Should().Be("$765.43");
+                    _dinar.ToString().Should().Be("BD765.432");
                 }
             }
 
@@ -748,10 +768,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString("C0").Should().Be("¥765");
-                    euro.ToString("C0").Should().Be("€765");
-                    dollar.ToString("C0").Should().Be("$765");
-                    dinar.ToString("C0").Should().Be("BD765");
+                    _yen.ToString("C0").Should().Be("¥765");
+                    _euro.ToString("C0").Should().Be("€765");
+                    _dollar.ToString("C0").Should().Be("$765");
+                    _dinar.ToString("C0").Should().Be("BD765");
                 }
             }
 
@@ -760,10 +780,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString("C1").Should().Be("¥765.0");
-                    euro.ToString("C1").Should().Be("€765.4");
-                    dollar.ToString("C1").Should().Be("$765.4");
-                    dinar.ToString("C1").Should().Be("BD765.4");
+                    _yen.ToString("C1").Should().Be("¥765.0");
+                    _euro.ToString("C1").Should().Be("€765.4");
+                    _dollar.ToString("C1").Should().Be("$765.4");
+                    _dinar.ToString("C1").Should().Be("BD765.4");
                 }
             }
 
@@ -772,10 +792,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString("C2").Should().Be("¥765.00");
-                    euro.ToString("C2").Should().Be("€765.43");
-                    dollar.ToString("C2").Should().Be("$765.43");
-                    dinar.ToString("C2").Should().Be("BD765.43");
+                    _yen.ToString("C2").Should().Be("¥765.00");
+                    _euro.ToString("C2").Should().Be("€765.43");
+                    _dollar.ToString("C2").Should().Be("$765.43");
+                    _dinar.ToString("C2").Should().Be("BD765.43");
                 }
             }
 
@@ -784,10 +804,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString("C3").Should().Be("¥765.000");
-                    euro.ToString("C3").Should().Be("€765.430");
-                    dollar.ToString("C3").Should().Be("$765.430");
-                    dinar.ToString("C3").Should().Be("BD765.432");
+                    _yen.ToString("C3").Should().Be("¥765.000");
+                    _euro.ToString("C3").Should().Be("€765.430");
+                    _dollar.ToString("C3").Should().Be("$765.430");
+                    _dinar.ToString("C3").Should().Be("BD765.432");
                 }
             }
 
@@ -796,10 +816,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    yen.ToString("C4").Should().Be("¥765.0000");
-                    euro.ToString("C4").Should().Be("€765.4300");
-                    dollar.ToString("C4").Should().Be("$765.4300");
-                    dinar.ToString("C4").Should().Be("BD765.4320");
+                    _yen.ToString("C4").Should().Be("¥765.0000");
+                    _euro.ToString("C4").Should().Be("€765.4300");
+                    _dollar.ToString("C4").Should().Be("$765.4300");
+                    _dinar.ToString("C4").Should().Be("BD765.4320");
                 }
             }
 
@@ -810,10 +830,10 @@ namespace NodaMoney.UnitTests
                 {
                     var ci = new CultureInfo("nl-NL");
 
-                    yen.ToString(ci).Should().Be("¥ 765");
-                    euro.ToString(ci).Should().Be("€ 765,43");
-                    dollar.ToString(ci).Should().Be("$ 765,43");
-                    dinar.ToString(ci).Should().Be("BD 765,432");
+                    _yen.ToString(ci).Should().Be("¥ 765");
+                    _euro.ToString(ci).Should().Be("€ 765,43");
+                    _dollar.ToString(ci).Should().Be("$ 765,43");
+                    _dinar.ToString(ci).Should().Be("BD 765,432");
                 }
             }
 
@@ -824,10 +844,10 @@ namespace NodaMoney.UnitTests
                 {
                     var nfi = new CultureInfo("nl-NL").NumberFormat;
 
-                    yen.ToString(nfi).Should().Be("¥ 765");
-                    euro.ToString(nfi).Should().Be("€ 765,43");
-                    dollar.ToString(nfi).Should().Be("$ 765,43");
-                    dinar.ToString(nfi).Should().Be("BD 765,432");
+                    _yen.ToString(nfi).Should().Be("¥ 765");
+                    _euro.ToString(nfi).Should().Be("€ 765,43");
+                    _dollar.ToString(nfi).Should().Be("$ 765,43");
+                    _dinar.ToString(nfi).Should().Be("BD 765,432");
                 }
             }
 
@@ -836,10 +856,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("nl-BE"))
                 {
-                    yen.ToString().Should().Be("¥ 765");
-                    euro.ToString().Should().Be("€ 765,43");
-                    dollar.ToString().Should().Be("$ 765,43");
-                    dinar.ToString().Should().Be("BD 765,432");
+                    _yen.ToString().Should().Be("¥ 765");
+                    _euro.ToString().Should().Be("€ 765,43");
+                    _dollar.ToString().Should().Be("$ 765,43");
+                    _dinar.ToString().Should().Be("BD 765,432");
                 }
             }
 
@@ -848,10 +868,10 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("fr-BE"))
                 {
-                    yen.ToString().Should().Be("765 ¥");
-                    euro.ToString().Should().Be("765,43 €");
-                    dollar.ToString().Should().Be("765,43 $");
-                    dinar.ToString().Should().Be("765,432 BD");
+                    _yen.ToString().Should().Be("765 ¥");
+                    _euro.ToString().Should().Be("765,43 €");
+                    _dollar.ToString().Should().Be("765,43 $");
+                    _dinar.ToString().Should().Be("765,432 BD");
                 }
             }
         }
@@ -859,60 +879,67 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToIncrementMoney
         {
-            private Money yen = new Money(765m, Currency.FromCode("JPY"));
-            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
-            private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
-            private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+            private Money _yens = new Money(765m, Currency.FromCode("JPY"));
+            private Money _euros = new Money(765.43m, Currency.FromCode("EUR"));
+            private Money _dollars = new Money(765.43m, Currency.FromCode("USD"));
+            private Money _dinars = new Money(765.432m, Currency.FromCode("BHD"));
 
             [TestMethod]
             public void WhenIncrementing_ThenAmountShouldIncrementWithMinorUnit()
             {
-                var y = ++yen;
-                var e = ++euro;
-                var d = ++dollar;
-                var di = ++dinar;
+                var yens = ++_yens;
+                var euros = ++_euros;
+                var dollars = ++_dollars;
+                var dinars = ++_dinars;
 
-                y.Amount.Should().Be(766m);
-                y.Currency.Should().Be(yen.Currency);
-                e.Amount.Should().Be(765.44m);
-                e.Currency.Should().Be(euro.Currency);
-                d.Amount.Should().Be(765.44m);
-                d.Currency.Should().Be(dollar.Currency);
-                di.Amount.Should().Be(765.433m);
-                di.Currency.Should().Be(dinar.Currency);
+                yens.Amount.Should().Be(766m);
+                yens.Currency.Should().Be(_yens.Currency);
+
+                euros.Amount.Should().Be(765.44m);
+                euros.Currency.Should().Be(_euros.Currency);
+
+                dollars.Amount.Should().Be(765.44m);
+                dollars.Currency.Should().Be(_dollars.Currency);
+
+                dinars.Amount.Should().Be(765.433m);
+                dinars.Currency.Should().Be(_dinars.Currency);
             }
         }
 
         [TestClass]
         public class GivenIWantToDecrementMoney
         {
-            private Money yen = new Money(765m, Currency.FromCode("JPY"));
-            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
-            private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
-            private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+            private Money _yens = new Money(765m, Currency.FromCode("JPY"));
+            private Money _euros = new Money(765.43m, Currency.FromCode("EUR"));
+            private Money _dollars = new Money(765.43m, Currency.FromCode("USD"));
+            private Money _dinars = new Money(765.432m, Currency.FromCode("BHD"));
 
             [TestMethod]
             public void WhenDecrementing_ThenAmountShouldDecrementWithMinorUnit()
             {
-                var y = --yen;
-                var e = --euro;
-                var d = --dollar;
-                var di = --dinar;
+                var yens = --_yens;
+                var euros = --_euros;
+                var dollars = --_dollars;
+                var dinars = --_dinars;
 
-                y.Amount.Should().Be(764m);
-                y.Currency.Should().Be(yen.Currency);
-                e.Amount.Should().Be(765.42m);
-                e.Currency.Should().Be(euro.Currency);
-                d.Amount.Should().Be(765.42m);
-                d.Currency.Should().Be(dollar.Currency);
-                di.Amount.Should().Be(765.431m);
-                di.Currency.Should().Be(dinar.Currency);
+                yens.Amount.Should().Be(764m);
+                yens.Currency.Should().Be(_yens.Currency);
+
+                euros.Amount.Should().Be(765.42m);
+                euros.Currency.Should().Be(_euros.Currency);
+
+                dollars.Amount.Should().Be(765.42m);
+                dollars.Currency.Should().Be(_dollars.Currency);
+
+                dinars.Amount.Should().Be(765.431m);
+                dinars.Currency.Should().Be(_dinars.Currency);
             }
         }
 
         [TestClass]
         public class GivenIWantToSerializeMoney
         {
+            //TODO: Add GivenIWantToSerializeMoney unit tests?
             //private Money yen = new Money(765m, Currency.FromCode("JPY"));
             //private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
             //private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
@@ -948,12 +975,12 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToConvertMoney
         {
-            readonly Money _euro = new Money(765.43m, "EUR");
+            readonly Money _euros = new Money(765.43m, "EUR");
 
             [TestMethod]
             public void WhenConvertingToDecimal_ThenThisShouldSucceed()
             {
-                decimal result = Money.ToDecimal(_euro);
+                var result = Money.ToDecimal(_euros);
 
                 result.Should().Be(765.43m);                
             }
@@ -961,7 +988,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenConvertingToDouble_ThenThisShouldSucceed()
             {
-                double result = Money.ToDouble(_euro);
+                var result = Money.ToDouble(_euros);
 
                 result.Should().BeApproximately(765.43d, 0.001d);
             }
@@ -969,7 +996,7 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenConvertingToSingle_ThenThisShouldSucceed()
             {
-                float result = Money.ToSingle(_euro);
+                var result = Money.ToSingle(_euros);
 
                 result.Should().BeApproximately(765.43f, 0.001f);
             }
@@ -981,29 +1008,34 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void ShouldMultiplyCorrectly()
             {
-                Money money1 = new Money(100.12);
-                Assert.AreEqual(new Money(50.06m), money1 * 0.5m); // decimal
+                var money1 = new Money(100.12);
+
+                (money1 * 0.5m).Should().Be(new Money(50.06m)); // decimal
                 //Assert.AreEqual(new Money(50.0625m), money1 * 0.5); // double
-                Assert.AreEqual(new Money(500.60m), money1 * 5); // int
+                (money1 * 5).Should().Be(new Money(500.60m)); // int
 
-                Assert.AreEqual(new Money(50.06m), Money.Multiply(money1, 0.5m));
+                Money.Multiply(money1, 0.5m).Should().Be(new Money(50.06m));
                 //Assert.AreEqual(new Money(50.0625m), Money.Multiply(money1, 0.5));
-                Assert.AreEqual(new Money(500.60m), Money.Multiply(money1, 5));
+                Money.Multiply(money1, 5).Should().Be(new Money(500.60m));
 
-                Money money2 = new Money(-100.12);
-                Assert.AreEqual(new Money(-50.06m), money2 * 0.5m);
-                //Assert.AreEqual(new Money(-50.0625m), money2 * 0.5);
-                Assert.AreEqual(new Money(-500.60m), money2 * 5);
+                var money2 = new Money(-100.12);
+
+                (money2 * 0.5m).Should().Be(new Money(-50.06m)); // decimal
+                //Assert.AreEqual(new Money(50.0625m), money2 * 0.5); // double
+                (money2 * 5).Should().Be(new Money(-500.60m)); // int
 
                 // multiplier first
-                Assert.AreEqual(new Money(-50.06m), 0.5m * money2);
-                //Assert.AreEqual(new Money(-50.0625m), 0.5 * money2);
-                Assert.AreEqual(new Money(-500.60m), 5 * money2);
+                (0.5m * money2).Should().Be(new Money(-50.06m));
+                //Assert.AreEqual(new Money(50.0625m), money2 * 0.5);
+                (5 * money2).Should().Be(new Money(-500.60m));
 
-                Money money3 = new Money(15);
-                Money money4 = new Money(100);
-                Assert.AreEqual(new Money(150), money3 * 10);
-                //Assert.AreEqual(new Money(1.5), money3 * 0.1);
+                var money3 = new Money(15);
+
+                (money3 * 10).Should().Be(new Money(150));
+                //(money3 * 0.1).Should().Be(new Money(1.5));
+
+                //var money4 = new Money(100);
+
                 //Assert.AreEqual(new Money(70), money4 * 0.7);
 
                 //assertEquals(Money.dollars(66.67), d100.times(0.66666667));
@@ -1017,23 +1049,26 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void ShouldDivideCorrectly()
             {
-                Money money1 = new Money(100.12);
-                Assert.AreEqual(new Money(50.06m), money1 / 2); // int
-                Assert.AreEqual(new Money(200.24m), money1 / 0.5m); // decimal
+                var money1 = new Money(100.12);
+
+                (money1 / 2).Should().Be(new Money(50.06m)); // int
+                (money1 / 0.5m).Should().Be(new Money(200.24m)); // decimal
                 //Assert.AreEqual(new Money(200.25m), money1 / 0.5); // double
 
-                Assert.AreEqual(new Money(50.06m), Money.Divide(money1, 2));
-                Assert.AreEqual(new Money(200.24m), Money.Divide(money1, 0.5m));
+                Money.Divide(money1, 2).Should().Be(new Money(50.06m));
+                Money.Divide(money1, 0.5m).Should().Be(new Money(200.24m));
                 //Assert.AreEqual(new Money(200.25m), Money.Divide(money1, 0.5));
 
-                Money money3 = new Money(-100.12);
-                Assert.AreEqual(new Money(-50.06m), money3 / 2);
-                Assert.AreEqual(new Money(-200.24m), money3 / 0.5m);
+                var money3 = new Money(-100.12);
+
+                (money3 / 2).Should().Be(new Money(-50.06m));
+                (money3 / 0.5m).Should().Be(new Money(-200.24m));
                 //Assert.AreEqual(new Money(-200.25m), money3 / 0.5);
 
-                Money money4 = new Money(100);
-                Assert.AreEqual(new Money(33.33), money4 / 3);
-                Assert.AreEqual(new Money(16.67), money4 / 6);
+                var money4 = new Money(100);
+
+                (money4 / 3).Should().Be(new Money(33.33));
+                (money4 / 6).Should().Be(new Money(16.67));
 
                 //assertEquals(new BigDecimal(2.50), Money.dollars(5.00).dividedBy(Money.dollars(2.00)).decimalValue(1, Rounding.UNNECESSARY));
                 //assertEquals(new BigDecimal(1.25), Money.dollars(5.00).dividedBy(Money.dollars(4.00)).decimalValue(2, Rounding.UNNECESSARY));
@@ -1107,4 +1142,3 @@ namespace NodaMoney.UnitTests
         //}        
     }
 }
-
