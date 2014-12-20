@@ -11,8 +11,3 @@ using System.Runtime.InteropServices;
 //// this assembly from COM, set the ComVisible attribute to true on that type.
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-
-//// Default version (please don't change this!). The version will be overwritten by the buildserver, using GitVersion (https://github.com/ParticularLabs/GitVersion).
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0.0")]
