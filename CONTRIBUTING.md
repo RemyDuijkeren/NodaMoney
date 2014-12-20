@@ -10,10 +10,10 @@ chance of keeping on top of things.
 ## Getting Started
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * Fork the repository on GitHub (we use the [fork & pull model](https://help.github.com/articles/using-pull-requests))
-
-## Making Changes
 * We use as branching strategy the [Gitflow Workflow](http://nvie.com/posts/a-successful-git-branching-model/). so don't
   work directly on the `master` branch! Only target the `develop` branch.
+
+## Making Changes
 * Make commits of logical units
 * Make sure your commit messages have a good description.
 * Make sure you have added the necessary tests for your changes.
