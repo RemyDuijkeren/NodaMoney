@@ -6,10 +6,11 @@ namespace NodaMoney.UnitTests.Helpers
 {
     /// <summary>Switch the current culture of the thread to an explicit one temporarily.</summary>
     /// <code>
-    /// using (var culture = new SwitchCulture("nl-NL"))
+    /// using (new SwitchCulture("nl-NL"))
     /// {
     ///     //Your code in the specified culture
     /// }
+    /// // returns to orginal culture
     /// </code>
     internal class SwitchCulture : IDisposable
     {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -10,45 +12,108 @@ namespace NodaMoney
     /// various types of Currency. Money will hold the <see cref="Currency" /> and Amount of money,
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
+    [StructLayout(LayoutKind.Sequential)]
     [DataContract] // , ComVisible(true)]
-    public struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable // , IConvertible
+    public partial struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible (not supported in PCL)
     {
-        /// <summary>Initializes a new instance of the Money structure.</summary>        
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        public Money(decimal amount, Currency currency)
-            : this()
-        {                        
-            Currency = currency;
-
-            if (Currency.DecimalDigits == Currency.DOT)
-                Amount = Math.Round(amount);
-            if (Currency.DecimalDigits == Currency.Z07)
-                Amount = Math.Round(amount, 1);             // TODO: Currency.Z07 and Currency.DOT edge case handeling!
-
-            Amount = Math.Round(amount, (int)Currency.DecimalDigits, MidpointRounding.ToEven);
-        }
-
-        /// <summary>Initializes a new instance of the Money structure, based on a ISO 4217 Currency code.</summary>        
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
-        public Money(decimal amount, string code)
-            : this(amount, Currency.FromCode(code))
-        {
-        }
-
         /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
         public Money(decimal amount)
             : this(amount, Currency.CurrentCurrency)
         {
         }
 
+        /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="rounding">The rounding mode.</param>        
+        public Money(decimal amount, MidpointRounding rounding)
+            : this(amount, Currency.CurrentCurrency, rounding)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure, based on a ISO 4217 Currency code.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
+        public Money(decimal amount, string code)
+            : this(amount, Currency.FromCode(code))
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="currency">The Currency of the money.</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
+        public Money(decimal amount, Currency currency)
+            : this(amount, currency, MidpointRounding.ToEven)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure, based on a ISO 4217 Currency code.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        public Money(decimal amount, string code, MidpointRounding rounding)
+            : this(amount, Currency.FromCode(code), rounding)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="currency">The Currency of the money.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        public Money(decimal amount, Currency currency, MidpointRounding rounding)
+            : this()
+        {
+            Currency = currency;
+
+            // TODO: Currency.Z07 and Currency.DOT edge case handeling!
+            if (Currency.DecimalDigits == Currency.DOT)
+                Amount = Math.Round(amount);
+            if (Currency.DecimalDigits == Currency.Z07)
+                Amount = Math.Round(amount, 1);
+
+            Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
+        }
+
         #region Other constructors
+
+        // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
 
         /// <summary>Initializes a new instance of the Money structure.</summary>        
         /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly casted to double).</param>
         /// <param name="currency">The Currency of the money.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        public Money(double amount, Currency currency, MidpointRounding rounding)
+            : this((decimal)amount, currency, rounding)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the Money structure.</summary>        
+        /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly casted to double).</param>
+        /// <param name="currency">The Currency of the money.</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
         public Money(double amount, Currency currency)
             : this((decimal)amount, currency)
         {
@@ -64,6 +129,10 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         public Money(long amount, Currency currency)
             : this((decimal)amount, currency)
@@ -80,6 +149,10 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         [CLSCompliant(false)]
         public Money(ulong amount, Currency currency)
@@ -90,6 +163,12 @@ namespace NodaMoney
         /// <summary>Initializes a new instance of the Money structure, based on a ISO 4217 Currency code.</summary>
         /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly casted to double).</param>
         /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
         public Money(double amount, string code)
             : this((decimal)amount, Currency.FromCode(code))
         {
@@ -105,6 +184,10 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, "EUR");
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         public Money(long amount, string code)
             : this((decimal)amount, Currency.FromCode(code))
@@ -121,6 +204,10 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, "EUR");
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         [CLSCompliant(false)]
         public Money(ulong amount, string code)
@@ -130,6 +217,12 @@ namespace NodaMoney
 
         /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly casted to double).</param>
+        /// <remarks>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
+        /// </remarks>
         public Money(double amount)
             : this((decimal)amount)
         {
@@ -144,6 +237,10 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         public Money(long amount)
             : this((decimal)amount)
@@ -159,155 +256,26 @@ namespace NodaMoney
         /// <code>
         /// Money money = new Money(10, Currency.FromIsoSymbol("EUR"));
         /// </code>
+        /// As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>). 
+        /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
+        /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a 
+        /// midpoint value in a single direction.
         /// </remarks>
         [CLSCompliant(false)]
         public Money(ulong amount)
             : this((decimal)amount)
         {
         }
+        
         #endregion
 
         /// <summary>Gets the amount of money.</summary>
+        [DataMember]
         public decimal Amount { get; private set; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
+        [DataMember]
         public Currency Currency { get; private set; }
-
-        #region Special methods for the four most used currencies in the world.
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        public static Money Euro(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
-        /// <param name="amount">The Amount of money in euro.</param>
-        /// <returns>A <see cref="Money"/> structure with EUR as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money Euro(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("EUR"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        public static Money USDollar(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
-        /// <param name="amount">The Amount of money in US dollar.</param>
-        /// <returns>A <see cref="Money"/> structure with USD as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money USDollar(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("USD"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        public static Money Yen(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
-        /// <param name="amount">The Amount of money in Japanese Yen.</param>
-        /// <returns>A <see cref="Money"/> structure with JPY as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money Yen(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("JPY"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(decimal amount)
-        {
-            return new Money(amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(double amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        public static Money PoundSterling(long amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
-        /// <param name="amount">The Amount of money in Pound Sterling.</param>
-        /// <returns>A <see cref="Money"/> structure with GBP as <see cref="Currency"/>.</returns>
-        [CLSCompliant(false)]
-        public static Money PoundSterling(ulong amount)
-        {
-            return new Money((decimal)amount, Currency.FromCode("GBP"));
-        }
-
-        #endregion
 
         #region Binary operators and there friendly named alternative methods
 
@@ -362,21 +330,21 @@ namespace NodaMoney
         }
 
         ///// <summary>Increments the specified money.</summary>
-        ///// <param name="money1">The money1.</param>
-        ///// <param name="money2">The money2.</param>
+        ///// <param name="left">The left.</param>
+        ///// <param name="right">The right.</param>
         ///// <returns>The incremented money.</returns>
-        ////public static Money Increment(Money money1, Money money2)
+        ////public static Money Increment(Money left, Money right)
         ////{
-        ////    return money1 + money2;
+        ////    return left + right;
         ////}
 
         ///// <summary>Decrements the specified money.</summary>
-        ///// <param name="money1">The money1.</param>
-        ///// <param name="money2">The money2.</param>
+        ///// <param name="left">The left.</param>
+        ///// <param name="right">The right.</param>
         ///// <returns>The decremented money.</returns>
-        ////public static Money Decrement(Money money1, Money money2)
+        ////public static Money Decrement(Money left, Money right)
         ////{
-        ////    return money1 - money2;
+        ////    return left - right;
         ////}
 
         /// <summary>Adds two specified <see cref="Money"/> values.</summary>
@@ -456,6 +424,62 @@ namespace NodaMoney
         ////    return money - new Money(money.Currency, minValue);
         ////}
         
+        #endregion
+
+        #region Unary operators and there friendly named alternative methods
+
+        /// <summary>Pluses the specified money.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result.</returns>
+        public static Money Plus(Money money)
+        {
+            return money;
+        }
+
+        /// <summary>Negates the specified money.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result.</returns>
+        public static Money Negate(Money money)
+        {
+            return new Money(-money.Amount, money.Currency);
+        }
+
+        public static Money Increment(Money money)
+        {
+            return Add(money, new Money(money.Currency.MinorUnit, money.Currency));
+        }
+
+        public static Money Decrement(Money money)
+        {
+            return Subtract(money, new Money(money.Currency.MinorUnit, money.Currency));
+        }
+
+        /// <summary>Implements the operator +.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result of the operator.</returns>
+        public static Money operator +(Money money)
+        {
+            return Plus(money);
+        }
+
+        /// <summary>Implements the operator -.</summary>
+        /// <param name="money">The money.</param>
+        /// <returns>The result of the operator.</returns>
+        public static Money operator -(Money money)
+        {
+            return Negate(money);
+        }
+
+        public static Money operator ++(Money money)
+        {
+            return Increment(money);
+        }
+
+        public static Money operator --(Money money)
+        {
+            return Decrement(money);
+        }
+
         #endregion
 
         #region IEquatable<Money> implementation
@@ -689,7 +713,7 @@ namespace NodaMoney
         /// <returns>A <see cref="T:System.Decimal"/> number equivalent to the value of this instance.</returns>
         public decimal ToDecimal(IFormatProvider provider)
         {
-            return Amount;
+            return Convert.ToDecimal(Amount, provider);
         }
 
         /// <summary>Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.</summary>
@@ -869,7 +893,7 @@ namespace NodaMoney
         /// </remarks>
         public static float ToSingle(Money money)
         {
-            return (float)money;
+            return Convert.ToSingle(money.Amount);
         }
 
         /// <summary>Converts the value of this instance to an <see cref="Double"/>.</summary>
@@ -881,7 +905,7 @@ namespace NodaMoney
         /// </remarks>
         public static double ToDouble(Money money)
         {
-            return (double)money;
+            return Convert.ToDouble(money.Amount);
         }
 
         /// <summary>Converts the value of this instance to an <see cref="Decimal"/>.</summary>
@@ -890,7 +914,7 @@ namespace NodaMoney
         /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
         public static decimal ToDecimal(Money money)
         {
-            return (decimal)money;
+            return money.Amount;
         }
 
         #endregion
@@ -938,34 +962,38 @@ namespace NodaMoney
             return ConvertToString(format, formatProvider);
         }
 
-        private static void AssertIsSameCurrency(Money money1, Money money2)
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])",
+            Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
+        private static void AssertIsSameCurrency(Money left, Money right)
         {
-            if (money1.Currency != money2.Currency)
-                throw new ArgumentException(string.Format("{0} and {1} don't have the same Currency! Use ExchangeRate to convert Money into the correct currency.", money1, money2));
+            if (left.Currency != right.Currency)         
+                throw new InvalidCurrencyException(string.Format("{0} and {1} don't have the same Currency!", left, right));
         }
 
         private string ConvertToString(string format, IFormatProvider formatProvider)
         {
             // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
             // TODO: Move to Currency? Currency.GetNumberFormatInfo()
-            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and  CurrencyDecimalDigits.
-            if (formatProvider == null)
-            {
-                if (RegionInfo.CurrentRegion.ISOCurrencySymbol == Currency.Code)
-                {
-                    formatProvider = NumberFormatInfo.CurrentInfo;
-                }
-                else
-                {
-                    var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
-                    numberFormatInfo.CurrencySymbol = Currency.Sign;
-                    numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
+            // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
+            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
+            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
+            var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
-                    formatProvider = numberFormatInfo;
-                }
+            if (formatProvider != null)
+            {
+                var ci = formatProvider as CultureInfo;
+                if (ci != null)
+                    numberFormatInfo = ci.NumberFormat;
+
+                var nfi = formatProvider as NumberFormatInfo;
+                if (nfi != null)
+                    numberFormatInfo = nfi;
             }
 
-            return Amount.ToString(format ?? "C", formatProvider);
+            numberFormatInfo.CurrencySymbol = Currency.Sign;
+            numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
+
+            return Amount.ToString(format ?? "C", numberFormatInfo);
         }
     }
 }

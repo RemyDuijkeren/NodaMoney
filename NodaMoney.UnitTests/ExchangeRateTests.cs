@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodaMoney.UnitTests.Helpers;
 
@@ -15,14 +16,16 @@ namespace NodaMoney.UnitTests
                 using (new SwitchCulture("en-US"))
                 {
                     var fx1 = ExchangeRate.Parse("EUR/USD 1.2591");
-                    Assert.AreEqual("EUR", fx1.BaseCurrency.Code);
-                    Assert.AreEqual("USD", fx1.QuoteCurrency.Code);
-                    Assert.AreEqual(1.2591M, fx1.Value);
+
+                    fx1.BaseCurrency.Code.Should().Be("EUR");
+                    fx1.QuoteCurrency.Code.Should().Be("USD");
+                    fx1.Value.Should().Be(1.2591M);
 
                     var fx2 = ExchangeRate.Parse("EUR/USD1.2591");
-                    Assert.AreEqual("EUR", fx2.BaseCurrency.Code);
-                    Assert.AreEqual("USD", fx2.QuoteCurrency.Code);
-                    Assert.AreEqual(1.2591M, fx2.Value);
+
+                    fx2.BaseCurrency.Code.Should().Be("EUR");
+                    fx2.QuoteCurrency.Code.Should().Be("USD");
+                    fx2.Value.Should().Be(1.2591M);
                 }
             }
 
@@ -32,31 +35,35 @@ namespace NodaMoney.UnitTests
                 using (new SwitchCulture("nl-NL"))
                 {
                     var fx1 = ExchangeRate.Parse("EUR/USD 1,2591");
-                    Assert.AreEqual("EUR", fx1.BaseCurrency.Code);
-                    Assert.AreEqual("USD", fx1.QuoteCurrency.Code);
-                    Assert.AreEqual(1.2591M, fx1.Value);
+
+                    fx1.BaseCurrency.Code.Should().Be("EUR");
+                    fx1.QuoteCurrency.Code.Should().Be("USD");
+                    fx1.Value.Should().Be(1.2591M);
 
                     var fx2 = ExchangeRate.Parse("EUR/USD1,2591");
-                    Assert.AreEqual("EUR", fx2.BaseCurrency.Code);
-                    Assert.AreEqual("USD", fx2.QuoteCurrency.Code);
-                    Assert.AreEqual(1.2591M, fx2.Value);
+
+                    fx2.BaseCurrency.Code.Should().Be("EUR");
+                    fx2.QuoteCurrency.Code.Should().Be("USD");
+                    fx2.Value.Should().Be(1.2591M);
                 }
             }
 
             [TestMethod]
-            [ExpectedException(typeof(FormatException))]
-            public void WhenCurrencyPairIsNotANumber_ThenParsingShouldFail()
+            public void WhenCurrencyPairIsNotANumber_ThenParsingShouldThrow()
             {
-                var fx = ExchangeRate.Parse("EUR/USD 1,ABC");
+                Action action = () => ExchangeRate.Parse("EUR/USD 1,ABC");
+
+                action.ShouldThrow<FormatException>();
             }
 
             [TestMethod]
-            [ExpectedException(typeof(FormatException))]
-            public void WhenCurrencyPairHasSameCurrencies_ThenParsingShouldFail()
+            public void WhenCurrencyPairHasSameCurrencies_ThenParsingShouldThrow()
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    var fx = ExchangeRate.Parse("EUR/EUR 1.2591");
+                    Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
+
+                    action.ShouldThrow<FormatException>();
                 }
             }
         }
@@ -64,84 +71,103 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GivenIWantToConvertMoney
         {
-            private Currency euro = Currency.FromCode("EUR");
-            private Currency dollar = Currency.FromCode("USD");
-            private ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591); // EUR/USD 1.2591
+            private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly Currency _dollar = Currency.FromCode("USD");
+            private ExchangeRate _exchangeRate = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591); // EUR/USD 1.2591
 
             [TestMethod, Description("When Converting €100,99 With EUR/USD 1.2591, Then Result Should Be $127.16")]
             public void WhenConvertingEurosToDollars_ThenConversionShouldBeCorrect()
             {
                 // Convert €100,99 to $127.156509 (= €100.99 * 1.2591)
-                Money converted = fx.Convert(Money.Euro(100.99M));
-                Assert.AreEqual(dollar, converted.Currency);
-                Assert.AreEqual(127.16M, converted.Amount);
+                var converted = _exchangeRate.Convert(Money.Euro(100.99M));
+
+                converted.Currency.Should().Be(_dollar);
+                converted.Amount.Should().Be(127.16M);
             }
 
             [TestMethod]
             public void WhenConvertingEurosToDollarsAndThenBack_ThenEndResultShouldBeTheSameAsInTheBeginning()
             {
                 // Convert €100,99 to $127.156509 (= €100.99 * 1.2591)
-                Money converted = fx.Convert(Money.Euro(100.99M));
+                var converted = _exchangeRate.Convert(Money.Euro(100.99M));
 
                 // Convert $127.16 to €100,99 (= $127.16 / 1.2591)
-                Money revert = fx.Convert(converted);
-                Assert.AreEqual(euro, revert.Currency);
-                Assert.AreEqual(100.99M, revert.Amount);
+                var revert = _exchangeRate.Convert(converted);
+
+                revert.Currency.Should().Be(_euro);
+                revert.Amount.Should().Be(100.99M);
             }
         }
 
         [TestClass]
         public class GivenIWantToCreateAnExchangeRate
         {
-            private Currency euro = Currency.FromCode("EUR");
-            private Currency dollar = Currency.FromCode("USD");
+            private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly Currency _dollar = Currency.FromCode("USD");
 
             [TestMethod]
             public void WhenRateIsDouble_ThenCreatingShouldSucceed()
             {
-                var fx = new ExchangeRate(euro, dollar, 1.2591);
-                Assert.AreEqual(euro, fx.BaseCurrency);
-                Assert.AreEqual(dollar, fx.QuoteCurrency);
-                Assert.AreEqual(1.2591M, fx.Value);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591);
+
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                // TODO: Can doubles be compared for equality? See https://github.com/dennisdoomen/fluentassertions/wiki
+                fx.Value.Should().Be(1.2591M);
             }
 
             [TestMethod]
             public void WhenRateIsDecimal_ThenCreatingShouldSucceed()
             {
-                var fx = new ExchangeRate(euro, dollar, 1.2591M);
-                Assert.AreEqual(euro, fx.BaseCurrency);
-                Assert.AreEqual(dollar, fx.QuoteCurrency);
-                Assert.AreEqual(1.2591M, fx.Value);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591M);
 
-                // float
-                fx = new ExchangeRate(euro, dollar, 1.2591F);
-                Assert.AreEqual(euro, fx.BaseCurrency);
-                Assert.AreEqual(dollar, fx.QuoteCurrency);
-                Assert.AreEqual(1.2591M, fx.Value);
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                fx.Value.Should().Be(1.2591M);
             }
 
             [TestMethod]
             public void WhenRateIsFloat_ThenCreatingShouldSucceed()
             {
-                var fx = new ExchangeRate(euro, dollar, 1.2591F);
-                Assert.AreEqual(euro, fx.BaseCurrency);
-                Assert.AreEqual(dollar, fx.QuoteCurrency);
-                Assert.AreEqual(1.2591M, fx.Value);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                fx.Value.Should().Be(1.2591M);
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void WhenBaseAndQuoteCurrencyAreTheSame_ThenCreatingShouldFail()
+            public void WhenBaseAndQuoteCurrencyAreTheSame_ThenCreatingShouldThrow()
             {
-                var fx = new ExchangeRate(euro, euro, 1.2591F);
+                // Arrange, Act
+                Action action = () => new ExchangeRate(_euro, _euro, 1.2591F);
+
+                // Assert
+                action.ShouldThrow<ArgumentException>();
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToConvertExchangeRateToString
+        {
+            ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
+
+            [TestMethod]
+            public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    fx.ToString().Should().Be("EUR/USD 1.2524");
+                }
             }
 
             [TestMethod]
-            public void WhenConvertingToString_ThenReturnCurrencyPair()
+            public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
             {
-                ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
-
-                Assert.AreEqual("EUR/USD 1,2524", fx.ToString());
+                using (new SwitchCulture("nl-NL"))
+                {
+                    fx.ToString().Should().Be("EUR/USD 1,2524");
+                }
             }
         }
     }

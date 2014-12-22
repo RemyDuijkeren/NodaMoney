@@ -25,7 +25,7 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException("code");
-            if (string.IsNullOrWhiteSpace(number)) 
+            if (string.IsNullOrWhiteSpace(number))
                 throw new ArgumentNullException("number");
             if (string.IsNullOrWhiteSpace(englishName)) 
                 throw new ArgumentNullException("englishName");
@@ -75,6 +75,7 @@ namespace NodaMoney
         public double DecimalDigits { get; private set; }
 
         /// <summary>Gets the major currency unit.</summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type!")]
         public decimal MajorUnit
         {
             get { return 1; }
@@ -100,7 +101,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(code)) 
                 throw new ArgumentNullException("code");
             if (!Currencies.ContainsKey(code.ToUpperInvariant())) 
-                throw new ArgumentException(string.Format("{0} is an unknown ISO 4217 currency code!", code));
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown ISO 4217 currency code!", code));
 
             return Currencies[code.ToUpperInvariant()];
         }
@@ -314,7 +315,7 @@ namespace NodaMoney
                 { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "L$") },
                 { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "¤") },
                 { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") },
-                { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") },
+                // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
                 { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "LD") },
                 { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "¤") },
                 { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "¤") },
@@ -403,7 +404,8 @@ namespace NodaMoney
                 { "XXX", new Currency("XXX", "999", DOT, "No currency", "¤") },
                 { "YER", new Currency("YER", "886", 2, "Yemeni rial", "¤") },
                 { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
-                { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }
+                { "ZWM", new Currency("ZMK", "967", 2, "Zambian kwacha", "ZK") }
+                // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
             }; 
 
             return currencies;

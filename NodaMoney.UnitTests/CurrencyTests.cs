@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NodaMoney.UnitTests
@@ -12,10 +13,10 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenAskingForIt_ThenAllCurrenciesShouldBeReturned()
             {
-                Currency[] currencies = Currency.GetAllCurrencies();
+                var currencies = Currency.GetAllCurrencies();
 
-                Assert.IsNotNull(currencies);
-                Assert.IsTrue(currencies.Length > 100);
+                currencies.Should().NotBeEmpty();
+                currencies.Length.Should().BeGreaterThan(100);
             }
         }
 
@@ -27,17 +28,18 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.FromCode("EUR");
 
-                Assert.IsNotNull(currency);
-                Assert.AreEqual(currency.Sign, "€");
-                Assert.AreEqual(currency.Code, "EUR");
-                Assert.AreEqual(currency.EnglishName, "Euro");
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("€");
+                currency.Code.Should().Be("EUR");
+                currency.EnglishName.Should().Be("Euro");
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void WhenIsoCodeIsUnknown_ThenCreatingShouldFail()
+            public void WhenIsoCodeIsUnknown_ThenCreatingShouldThrow()
             {
-                var currency = Currency.FromCode("AAA");
+                Action action = () => Currency.FromCode("AAA");
+
+                action.ShouldThrow<ArgumentException>();
             }
         }
 
@@ -49,10 +51,10 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.FromRegion(new RegionInfo("NL"));
 
-                Assert.IsNotNull(currency);
-                Assert.AreEqual(currency.Sign, "€");
-                Assert.AreEqual(currency.Code, "EUR");
-                Assert.AreEqual(currency.EnglishName, "Euro");
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("€");
+                currency.Code.Should().Be("EUR");
+                currency.EnglishName.Should().Be("Euro");
             }
 
             [TestMethod]
@@ -60,17 +62,18 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.FromRegion("NL");
 
-                Assert.IsNotNull(currency);
-                Assert.AreEqual(currency.Sign, "€");
-                Assert.AreEqual(currency.Code, "EUR");
-                Assert.AreEqual(currency.EnglishName, "Euro");
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("€");
+                currency.Code.Should().Be("EUR");
+                currency.EnglishName.Should().Be("Euro");
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentNullException))]
-            public void WhenUsingRegionNameThatIsNull_ThenCreatingShouldFail()
+            public void WhenUsingRegionNameThatIsNull_ThenCreatingShouldThrow()
             {
-                Currency.FromRegion((string)null);
+                Action action = () => Currency.FromRegion((string)null);
+
+                action.ShouldThrow<ArgumentNullException>();
             }
 
             [TestMethod]
@@ -78,17 +81,18 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.FromCulture(CultureInfo.CreateSpecificCulture("nl-NL"));
 
-                Assert.IsNotNull(currency);
-                Assert.AreEqual(currency.Sign, "€");
-                Assert.AreEqual(currency.Code, "EUR");
-                Assert.AreEqual(currency.EnglishName, "Euro");
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("€");
+                currency.Code.Should().Be("EUR");
+                currency.EnglishName.Should().Be("Euro");
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentNullException))]
-            public void WhenCultureInfoIsNull_ThenCreatingShouldFail()
+            public void WhenCultureInfoIsNull_ThenCreatingShouldThrow()
             {
-                Currency.FromCulture(null);
+                Action action = () => Currency.FromCulture(null);
+
+                action.ShouldThrow<ArgumentNullException>();
             }
 
             [TestMethod]
@@ -96,10 +100,10 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.FromRegion("nl-NL");
 
-                Assert.IsNotNull(currency);
-                Assert.AreEqual(currency.Sign, "€");
-                Assert.AreEqual(currency.Code, "EUR");
-                Assert.AreEqual(currency.EnglishName, "Euro");
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("€");
+                currency.Code.Should().Be("EUR");
+                currency.EnglishName.Should().Be("Euro");
             }
 
             [TestMethod]
@@ -107,49 +111,49 @@ namespace NodaMoney.UnitTests
             {
                 var currency = Currency.CurrentCurrency;
 
-                Assert.AreEqual(Currency.FromRegion(RegionInfo.CurrentRegion), currency);
+                currency.Should().Be(Currency.FromRegion(RegionInfo.CurrentRegion));
             }
         }
 
         [TestClass]
         public class GivenIWantToCompareCurrencies
         {
-            private Currency euro1 = Currency.FromCode("EUR");
-            private Currency euro2 = Currency.FromCode("EUR");
-            private Currency dollar = Currency.FromCode("USD");
+            private Currency _euro1 = Currency.FromCode("EUR");
+            private Currency _euro2 = Currency.FromCode("EUR");
+            private Currency _dollar = Currency.FromCode("USD");
 
             [TestMethod]
             public void WhenComparingEquality_ThenCurrencyShouldBeEqual()
             {
-                //using Equal()
-                Assert.AreEqual(euro1, euro2);
-                Assert.AreNotEqual(euro1, dollar);
-                Assert.AreNotEqual(euro1, null);
-                Assert.AreNotEqual(euro1, new object(), "Comparing Currency to a different object should fail!");
+                // Compare using Equal()
+                _euro1.Should().Be(_euro2);
+                _euro1.Should().NotBe(_dollar);
+                _euro1.Should().NotBeNull();
+                _euro1.Should().NotBe(new object(), "comparing Currency to a different object should fail!");
             }
 
             [TestMethod]
             public void WhenComparingStaticEquality_ThenCurrencyShouldBeEqual()
             {
-                //using static Equal()
-                Assert.IsTrue(Currency.Equals(euro1, euro2));
-                Assert.IsFalse(Currency.Equals(euro1, dollar));
+                // Compare using static Equal()
+                Currency.Equals(_euro1, _euro2).Should().BeTrue();
+                Currency.Equals(_euro1, _dollar).Should().BeFalse();
             }
 
             [TestMethod]
             public void WhenComparingWithEqualityOperator_ThenCurrencyShouldBeEqual()
             {
-                //using Euality operators
-                Assert.IsTrue(euro1 == euro2);
-                Assert.IsTrue(euro1 != dollar);
+                // Compare using Euality operators
+                (_euro1 == _euro2).Should().BeTrue();
+                (_euro1 != _dollar).Should().BeTrue();
             }
 
             [TestMethod]
             public void WhenComparingHashCodes_ThenCurrencyShouldBeEqual()
             {
-                //using GetHashCode()
-                Assert.AreEqual(euro1.GetHashCode(), euro2.GetHashCode());
-                Assert.AreNotEqual(euro1.GetHashCode(), dollar.GetHashCode());
+                // Compare using GetHashCode()
+                _euro1.GetHashCode().Should().Be(_euro2.GetHashCode());
+                _euro1.GetHashCode().Should().NotBe(_dollar.GetHashCode());
             }
         }
     }

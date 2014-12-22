@@ -10,11 +10,11 @@
 	<description>$description$</description>
 	<licenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/remyvd/NodaMoney</projectUrl>
-    <iconUrl>https://github.com/remyvd/NodaMoney/Tools/logo_nodamoney.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/</releaseNotes>
+    <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/ </releaseNotes>
     <copyright>Copyright 2014-2015</copyright>
-    <tags>JodaMoney Money Currency ExchangeRate</tags>
+    <tags>Noda Money Currency ExchangeRate</tags>
 	<language>en-US</language>
   </metadata>
 </package>
