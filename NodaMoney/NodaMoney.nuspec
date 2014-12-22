@@ -4,17 +4,21 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-	<owners>$author$</owners>
+    <owners>$author$</owners>
     <authors>Rémy van Duijkeren</authors>
-	<summary>$description$</summary>
-	<description>$description$</description>
-	<licenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</licenseUrl>
+	  <summary>$description$</summary>
+	  <description>$description$</description>
+	  <licenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/remyvd/NodaMoney</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/ </releaseNotes>
+    <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/</releaseNotes>
     <copyright>Copyright 2014-2015</copyright>
     <tags>Noda Money Currency ExchangeRate</tags>
-	<language>en-US</language>
+	  <language>en-US</language>
   </metadata>
+  <files>
+    <file src="..\README.md" target="content" />
+    <file src="..\LICENSE.txt" target="content" />
+  </files>
 </package>
