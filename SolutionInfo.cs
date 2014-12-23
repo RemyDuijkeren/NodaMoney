@@ -6,10 +6,11 @@ using System.Reflection;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")] // neutral
 
-//// Default version (please don't change this!). The version will be overwritten by the buildserver, using GitVersion (https://github.com/ParticularLabs/GitVersion).
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0.0")]
+//// Please don't change the default version!. The version will be overwritten by the buildserver, 
+//// using GitVersion (https://github.com/ParticularLabs/GitVersion).
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: AssemblyInformationalVersion("0.0.0.0")]
 
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
