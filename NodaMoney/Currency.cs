@@ -14,13 +14,16 @@ namespace NodaMoney
     [DebuggerDisplay("{Code}")]
     public struct Currency : IEquatable<Currency>
     {
-        // The Malagasy ariary and the Mauritanian ouguiya are divided into five subunits (the iraimbilanja and khoum respectively)
-        // rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        // The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
+        // khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
+        // a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
+        // used. E.g. 1.2 UM.
+        // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
         internal const double DOT = -1;
         private static readonly Dictionary<string, Currency> Currencies = InitializeCurrencies();
 
-        private Currency(string code, string number, double decimalDigits, string englishName, string sign)
+        internal Currency(string code, string number, double decimalDigits, string englishName, string sign)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -31,8 +34,8 @@ namespace NodaMoney
                 throw new ArgumentNullException("englishName");
             if (string.IsNullOrWhiteSpace(sign)) 
                 throw new ArgumentNullException("sign");
-            if (decimalDigits < -1 || decimalDigits > 7) 
-                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 7!");
+            if (decimalDigits < -1 || decimalDigits > 3) 
+                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 3!");
 
             Code = code;
             Number = number;            
@@ -113,8 +116,6 @@ namespace NodaMoney
         {
             if (region == null) 
                 throw new ArgumentNullException("region");
-            if (string.IsNullOrWhiteSpace(region.ISOCurrencySymbol)) 
-                throw new ArgumentNullException("region", "ISOCurrencySymbol of region is null or empty!");
 
             return FromCode(region.ISOCurrencySymbol);
         }

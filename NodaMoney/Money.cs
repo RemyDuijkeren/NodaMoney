@@ -13,8 +13,8 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    [DataContract] // , ComVisible(true)]
-    public partial struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  //, IConvertible (not supported in PCL)
+    [DataContract]
+    public partial struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  // , IConvertible (not supported in PCL)
     {
         /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
