@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -12,6 +13,7 @@ namespace NodaMoney
     /// <remarks>See <see cref="http://en.wikipedia.org/wiki/Currency"/>.</remarks>
     [DataContract]
     [DebuggerDisplay("{Code}")]
+    [ComVisible(true)]
     public struct Currency : IEquatable<Currency>
     {
         // The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
@@ -34,7 +36,7 @@ namespace NodaMoney
                 throw new ArgumentNullException("englishName");
             if (string.IsNullOrWhiteSpace(sign)) 
                 throw new ArgumentNullException("sign");
-            if (decimalDigits < -1 || decimalDigits > 3) 
+            if (decimalDigits < -1 || decimalDigits > 3)
                 throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 3!");
 
             Code = code;

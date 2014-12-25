@@ -14,6 +14,7 @@ namespace NodaMoney
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
     [DataContract]
+    [ComVisible(true)]
     public partial struct Money : IComparable, IComparable<Money>, IEquatable<Money>, IFormattable  // , IConvertible (not supported in PCL)
     {
         /// <summary>Initializes a new instance of the Money structure, based on the current culture.</summary>

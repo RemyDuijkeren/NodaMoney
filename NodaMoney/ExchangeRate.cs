@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -7,6 +8,7 @@ namespace NodaMoney
     /// <summary>A conversion of money of one currency into money of another currency</summary>
     /// <remarks>See <see cref="http://en.wikipedia.org/wiki/Exchange_rate"/>.</remarks>
     [DataContract]
+    [ComVisible(true)]
     public struct ExchangeRate : IEquatable<ExchangeRate>
     {
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>

@@ -261,7 +261,7 @@ namespace NodaMoney.UnitTests
         }
 
         [TestClass]
-        public class GivenIWantToInitiateInternalyACurrency
+        public class GivenIWantToInitiateInternallyACurrency
         {
             [TestMethod]
             public void WhenParamsAreCorrect_ThenCreatingShouldSucceed()
