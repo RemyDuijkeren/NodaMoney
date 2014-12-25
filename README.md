@@ -3,7 +3,7 @@ NodaMoney
 You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
-If you'd like to work with the bleeding edge, you can use our [custom feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
+If you'd like to work with the bleeding edge, you can use our [custom Nuget feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
 Packages on this feed are pre-release and, while they've passed all our tests, are not yet ready for production.
 
 About
@@ -136,6 +136,4 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 
 Build status: [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
 
-[![Issue Stats](http://www.issuestats.com/github/remyvd/NodaMoney/badge/pr)](http://www.issuestats.com/github/remyvd/NodaMoney)
-[![Issue Stats](http://www.issuestats.com/github/remyvd/NodaMoney/badge/issue)](http://www.issuestats.com/github/remyvd/NodaMoney)
-<a href="http://zenhub.io" target="_blank"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png" height="18px" alt="Powered by ZenHub"/></a>
+[![Powered by ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.svg)](http://zenhub.io)
