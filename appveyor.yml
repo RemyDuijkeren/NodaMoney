@@ -11,14 +11,14 @@ configuration: Release
 nuget:
   disable_publish_on_pr: true
 
-  before_build:
+before_build:
 - GitVersion /output buildserver /updateAssemblyInfo SolutionInfo.cs
 
 build:
   publish_nuget: true  # package projects with .nuspec files and push to artifacts
   verbosity: minimal
 
-  after_build:
+after_build:
 - copy NodaMoney\bin\Release\NodaMoney.dll
 - copy NodaMoney\bin\Release\NodaMoney.pdb
 - 7z a -tzip NodaMoney.zip README.md LICENSE.txt NodaMoney.dll NodaMoney.pdb
