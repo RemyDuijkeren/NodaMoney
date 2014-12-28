@@ -69,12 +69,17 @@ namespace NodaMoney
         /// <summary>Gets the number of digits after the decimal separator.</summary>
         /// <remarks>
         /// <para>
-        /// For example, the default number of fraction digits for the Euro is 2, while for the Japanese Yen it's 0. In the
-        /// case of pseudo-currencies, such as IMF Special Drawing Rights, -1 is returned.
+        /// For example, the default number of fraction digits for the US Dollar and Euro is 2, while for the Japanese Yen it's 0.
+        /// In the case of pseudo-currencies, such as Gold or IMF Special Drawing Rights, -1 is returned.
         /// </para>
         /// <para>
-        /// The Malagasy ariary and the Mauritanian ouguiya are divided into five subunits (the iraimbilanja and khoum respectively)
-        /// rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        /// The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
+        /// khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
+        /// a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
+        /// used. E.g. 1.2 UM.
+        /// </para>
+        /// <para>
+        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         /// </para>
         /// </remarks>
         public double DecimalDigits { get; private set; }
@@ -141,7 +146,7 @@ namespace NodaMoney
         /// <para>-or-</para>
         /// <para>A string that contains the culture name for a specific culture, custom culture, or Windows-only culture. If the 
         /// culture name is not in RFC 4646 format, your application should specify the entire culture name instead of just the
-        /// country/region. See also http://msdn.microsoft.com/en-us/library/atwc2921.aspx. </para> 
+        /// country/region. See also <seealso cref="http://msdn.microsoft.com/en-us/library/atwc2921.aspx"/>.</para> 
         /// </param>
         /// <returns>The <see cref="Currency"/> instance used within the specified region.</returns>
         public static Currency FromRegion(string name)

@@ -7,6 +7,9 @@
     <Recognized>
       <Word>NodaMoney</Word>
       <Word>DynamicHands</Word>
+      <Word>iraimbilanja</Word>
+      <Word>cinquième</Word>
+      <Word>ariary</Word>
     </Recognized>
     <Deprecated>
       <Term PreferredAlternate="EnterpriseServices">ComPlus</Term>
@@ -14,7 +17,6 @@
   </Words>
   <Acronyms>      
     <CasingExceptions>
-      <Acronym>Pi</Acronym>
       <Acronym>USDollar</Acronym>
     </CasingExceptions>
   </Acronyms>

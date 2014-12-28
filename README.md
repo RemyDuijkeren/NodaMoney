@@ -136,4 +136,4 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 
 Build status: [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
 
-[![Powered by ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.svg)](http://zenhub.io)
+<a href="https://zenhub.io"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png" height="18px"></a>
