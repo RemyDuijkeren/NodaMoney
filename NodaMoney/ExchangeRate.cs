@@ -25,7 +25,7 @@ namespace NodaMoney
             if (quoteCurrency == null)
                 throw new ArgumentNullException("quoteCurrency");
             if (baseCurrency == quoteCurrency)
-                throw new ArgumentException("The base and quote currency shouldn't be equal!");
+                throw new ArgumentException("The base and quote currency can't be equal!");
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
@@ -38,6 +38,24 @@ namespace NodaMoney
         /// <param name="rate">The rate of the exchange.</param>
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate)
             : this(baseCurrency, quoteCurrency, (decimal)rate)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
+        /// <param name="baseCode">The code of the base currency.</param>
+        /// <param name="quoteCode">The code of the quote currency.</param>
+        /// <param name="rate">The rate of the exchange.</param>
+        public ExchangeRate(string baseCode, string quoteCode, decimal rate)
+            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
+        /// <param name="baseCode">The code of the base currency.</param>
+        /// <param name="quoteCode">The code of the quote currency.</param>
+        /// <param name="rate">The rate of the exchange.</param>
+        public ExchangeRate(string baseCode, string quoteCode, double rate)
+            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
         {
         }
 
