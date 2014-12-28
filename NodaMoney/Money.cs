@@ -984,11 +984,11 @@ namespace NodaMoney
             {
                 var ci = formatProvider as CultureInfo;
                 if (ci != null)
-                    numberFormatInfo = ci.NumberFormat;
+                    numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
 
                 var nfi = formatProvider as NumberFormatInfo;
                 if (nfi != null)
-                    numberFormatInfo = nfi;
+                    numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
             numberFormatInfo.CurrencySymbol = Currency.Sign;
