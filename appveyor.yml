@@ -60,3 +60,10 @@ notifications:
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: true
+- provider: Slack
+  auth_token:
+    secure: jhC+/1OwjVll6PTQLyyYTxb0oouvf83oOYxp40ZLnMrmNhU9Las0wwIQY64+JJIa
+  channel: general
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
