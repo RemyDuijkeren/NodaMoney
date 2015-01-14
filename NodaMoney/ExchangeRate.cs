@@ -8,13 +8,15 @@ namespace NodaMoney
     /// <summary>A conversion of money of one currency into money of another currency</summary>
     /// <remarks>See <see cref="http://en.wikipedia.org/wiki/Exchange_rate"/>.</remarks>
     [DataContract]
-    [ComVisible(true)]
     public struct ExchangeRate : IEquatable<ExchangeRate>
     {
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
+        /// <exception cref="ArgumentNullException">The value of 'baseCurrency' or 'quoteCurrency' cannot be null. </exception>
+        /// <exception cref="ArgumentOutOfRangeException">Rate must be greater than zero!</exception>
+        /// <exception cref="ArgumentException">The base and quote currency can't be equal!</exception>
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
             : this()
         {

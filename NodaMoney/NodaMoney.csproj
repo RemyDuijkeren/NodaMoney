@@ -49,12 +49,22 @@
     <Compile Include="Extensions\MoneyExtensions.SaveDivide.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="InvalidCurrencyException.cs" />
+    <Compile Include="Money.Comparable.cs" />
+    <Compile Include="Money.Convertible.cs" />
     <Compile Include="Money.cs" />
+    <Compile Include="Money.Formattable.cs" />
     <Compile Include="Money.FourMostUsedCurrencies.cs" />
+    <Compile Include="Money.UnaryOperators.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Money.BinaryOperators.cs" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\CodeAnalysisDictionary.xml">
+      <Link>Properties\CodeAnalysisDictionary.xml</Link>
+    </CodeAnalysisDictionary>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

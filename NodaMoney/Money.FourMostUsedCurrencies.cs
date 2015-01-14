@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace NodaMoney
 {
+    /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     public partial struct Money
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>

@@ -13,7 +13,6 @@ namespace NodaMoney
     /// <remarks>See <see cref="http://en.wikipedia.org/wiki/Currency"/>.</remarks>
     [DataContract]
     [DebuggerDisplay("{Code}")]
-    [ComVisible(true)]
     public struct Currency : IEquatable<Currency>
     {
         // The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
@@ -99,13 +98,15 @@ namespace NodaMoney
                 if (DecimalDigits == DOT)
                     return MajorUnit;
 
-                return new Decimal(1 / Math.Pow(10, DecimalDigits));
+                return new decimal(1 / Math.Pow(10, DecimalDigits));
             }
         }
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
+        /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
+        /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
         public static Currency FromCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code)) 
@@ -119,6 +120,7 @@ namespace NodaMoney
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified <see cref="RegionInfo"/>.</summary>
         /// <param name="region"><see cref="RegionInfo"/> to get a <see cref="Currency"/> for.</param>
         /// <returns>The <see cref="Currency"/> instance used within the specified <see cref="RegionInfo"/>.</returns>
+        /// <exception cref="ArgumentNullException">The value of 'region' cannot be null.</exception>
         public static Currency FromRegion(RegionInfo region)
         {
             if (region == null) 
@@ -130,6 +132,8 @@ namespace NodaMoney
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified <see cref="CultureInfo"/>.</summary>
         /// <param name="culture"><see cref="CultureInfo"/> to get a <see cref="Currency"/> for.</param>
         /// <returns>The <see cref="Currency"/> instance used within the specified <see cref="CultureInfo"/>.</returns>
+        /// <exception cref="ArgumentNullException">The value of 'culture' cannot be null.</exception>
+        /// <exception cref="ArgumentException">Culture is a neutral culture, from which no region information can be extracted!</exception>
         public static Currency FromCulture(CultureInfo culture)
         {
             if (culture == null) 
@@ -138,7 +142,7 @@ namespace NodaMoney
                 throw new ArgumentException("Culture {0} is a neutral culture, from which no region information can be extracted!", culture.Name);
             
             return FromRegion(culture.Name);
-        }     
+        }
 
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified name of the region or culture.</summary>
         /// <param name="name">
@@ -149,6 +153,7 @@ namespace NodaMoney
         /// country/region. See also <seealso cref="http://msdn.microsoft.com/en-us/library/atwc2921.aspx"/>.</para> 
         /// </param>
         /// <returns>The <see cref="Currency"/> instance used within the specified region.</returns>
+        /// <exception cref="ArgumentNullException">The value of 'name' cannot be null.</exception>
         public static Currency FromRegion(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) 
@@ -184,13 +189,13 @@ namespace NodaMoney
         }
 
         /// <summary>Returns a value indicating whether two specified instances of <see cref="Currency"/> represent the same value.</summary>
-        /// <param name="currency1">The first <see cref="Currency"/> object.</param>
-        /// <param name="currency2">The second <see cref="Currency"/> object.</param>
-        /// <returns>true if currency1 and currency2 are equal to this instance; otherwise, false.</returns>
+        /// <param name="left">The first <see cref="Currency"/> object.</param>
+        /// <param name="right">The second <see cref="Currency"/> object.</param>
+        /// <returns>true if left and right are equal to this instance; otherwise, false.</returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-        public static bool Equals(Currency currency1, Currency currency2)
+        public static bool Equals(Currency left, Currency right)
         {
-            return currency1.Equals(currency2);
+            return left.Equals(right);
         }
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Object"/> represent the same type and value.</summary>
@@ -323,6 +328,7 @@ namespace NodaMoney
                 { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "L$") },
                 { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "¤") },
                 { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") },
+
                 // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
                 { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "LD") },
                 { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "¤") },
@@ -413,6 +419,7 @@ namespace NodaMoney
                 { "YER", new Currency("YER", "886", 2, "Yemeni rial", "¤") },
                 { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                 { "ZWM", new Currency("ZMK", "967", 2, "Zambian kwacha", "ZK") }
+
                 // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
             }; 
 

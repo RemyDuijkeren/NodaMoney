@@ -64,7 +64,13 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\MoneyExtensionsSafeDivideTests.cs" />
+    <Compile Include="MoneyBinaryOperatorsTests.cs" />
+    <Compile Include="MoneyComparableTests.cs" />
+    <Compile Include="MoneyConvertibleTests.cs" />
+    <Compile Include="MoneyFormattableTests.cs" />
+    <Compile Include="MoneyFourMostUsedCurrenciesTests.cs" />
     <Compile Include="MoneyTests.cs" />
+    <Compile Include="MoneyUnaryOperatoresTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\RenderSpecs.cs" />
     <Compile Include="Helpers\SwitchCulture.cs" />

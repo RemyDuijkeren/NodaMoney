@@ -1,5 +1,7 @@
 using System.Reflection;
 
+// Use this SolutionInfo.cs file to store information that is the same in all AssemblyInfo.cs files. Drag this file using ALT to 
+// your project to create a link to this file.
 [assembly: AssemblyProduct("NodaMoney")]
 [assembly: AssemblyCompany("DynamicHands B.V.")]
 [assembly: AssemblyCopyright("Copyright 2014-2015")]
