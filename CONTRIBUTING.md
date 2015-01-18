@@ -19,6 +19,7 @@ can be accepted quickly.
 * Make commits of logical units, so that we can pick and choose.
 * Make sure your commit messages have a good description.
 * Complies with StyleCop rules and Code Analysis (runs on Release configuration).
+* Complies with Coding Codelines (see document in solution).
 * Make sure you have added the necessary tests for your changes.
 * Run _all_ the tests to assure nothing else was accidentally broken.
 * Push your changes to  your fork of the repository.
