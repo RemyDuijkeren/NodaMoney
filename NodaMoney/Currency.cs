@@ -327,7 +327,7 @@ namespace NodaMoney
                 { "LKR", new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs") }, // or රු
                 { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "$") }, // or L$, LD$
                 { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "L") }, // L or M (pl.)
-                { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") },
+                // { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") }, // Until 2014-12-31, replaced by EUR
 
                 // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
                 { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "LD") },
