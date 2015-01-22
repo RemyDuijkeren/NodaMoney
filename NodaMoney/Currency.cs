@@ -254,7 +254,7 @@ namespace NodaMoney
                 { "BBD", new Currency("BBD", "052", 2, "Barbados dollar", "$") },
                 { "BDT", new Currency("BDT", "050", 2, "Bangladeshi taka", "৳") }, // or Tk
                 { "BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв") },
-                { "BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "د.ب.‏") }, // or DB
+                { "BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "BD") }, // or د.ب. (switched for unit tests to work)
                 { "BIF", new Currency("BIF", "108", 0, "Burundian franc", "FBu") },
                 { "BMD", new Currency("BMD", "060", 2, "Bermudian dollar", "$") },
                 { "BND", new Currency("BND", "096", 2, "Brunei dollar", "$") }, // or B$
@@ -314,7 +314,7 @@ namespace NodaMoney
                 { "JOD", new Currency("JOD", "400", 3, "Jordanian dinar", "د.ا.‏") },
                 { "JPY", new Currency("JPY", "392", 0, "Japanese yen", "¥") },
                 { "KES", new Currency("KES", "404", 2, "Kenyan shilling", "KSh") },
-                { "KGS", new Currency("KGS", "417", 2, "Kyrgyzstani som", "лв") },
+                { "KGS", new Currency("KGS", "417", 2, "Kyrgyzstani som", "сом") },
                 { "KHR", new Currency("KHR", "116", 2, "Cambodian riel", "៛") },
                 { "KMF", new Currency("KMF", "174", 0, "Comoro franc", "CF") },
                 { "KPW", new Currency("KPW", "408", 0, "North Korean won", "₩") },
@@ -330,12 +330,12 @@ namespace NodaMoney
                 // { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") }, // Until 2014-12-31, replaced by EUR
 
                 // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
-                { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "LD") },
-                { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "¤") },
-                { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "¤") },
+                { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "ل.د") }, // or LD
+                { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "د.م.") },
+                { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "L") },
                 { "MGA", new Currency("MGA", "969", Z07, "Malagasy ariary", "Ar") },  // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
-                { "MKD", new Currency("MKD", "807", 0, "Macedonian denar", "¤") },
-                { "MMK", new Currency("MMK", "104", 0, "Myanma kyat", "K") },
+                { "MKD", new Currency("MKD", "807", 0, "Macedonian denar", "ден") },
+                { "MMK", new Currency("MMK", "104", 0, "Myanma kyat", "K") }, // ------- todo
                 { "MNT", new Currency("MNT", "496", 2, "Mongolian tugrik", "¤") },
                 { "MOP", new Currency("MOP", "446", 2, "Macanese pataca", "MOP$") },
                 { "MRO", new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM") }, // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...

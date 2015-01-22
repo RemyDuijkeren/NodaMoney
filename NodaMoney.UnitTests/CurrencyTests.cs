@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,7 +42,46 @@ namespace NodaMoney.UnitTests
                         writer.WriteLine("ISOCurrencySymbol: {0}", reg.ISOCurrencySymbol);
                         writer.WriteLine("CurrencyEnglishName: {0}", reg.CurrencyEnglishName);
                         writer.WriteLine("CurrencyNativeName: {0}", reg.CurrencyNativeName);
-                        writer.WriteLine("");
+                        writer.WriteLine(string.Empty);
+                    }
+                }
+            }
+
+            [TestMethod][Ignore]
+            public void WriteAllCurrenciesToFile()
+            {
+                using (var stream = File.Open(@"..\..\ISOCurrencies1.txt", FileMode.Create))
+                using (var writer = new StreamWriter(stream))
+                {
+                    foreach (var currency in Currency.GetAllCurrencies())
+                    {
+                        writer.WriteLine("EnglishName: {0}", currency.EnglishName);
+                        writer.WriteLine("Code: {0}, Number: {1}, Sign: {2}", currency.Code, currency.Number, currency.Sign);
+                        writer.WriteLine("MajorUnit: {0}, MinorUnit: {1}, DecimalDigits: {2}", currency.MajorUnit, currency.MinorUnit, currency.DecimalDigits);
+                        writer.WriteLine(string.Empty);
+                    }
+                }
+            }
+
+            [TestMethod][Ignore]
+            public void WriteAllCurrencySymbolsToFile()
+            {
+                var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+                var symbolLookup = new Dictionary<String, String>();
+
+                using (var stream = File.Open(@"..\..\ISOSymbols.txt", FileMode.Create))
+                using (var writer = new StreamWriter(stream))
+                {
+                    foreach (var culture in cultures)
+                    {
+                        var regionInfo = new RegionInfo(culture.LCID);
+                        symbolLookup[regionInfo.ISOCurrencySymbol] = regionInfo.CurrencySymbol;                        
+                    }
+
+                    foreach (var keyvalue in symbolLookup.OrderBy(s => s.Key))
+                    {
+                        writer.WriteLine("Code: {0}, Sign: {1}", keyvalue.Key, keyvalue.Value);
+                        writer.WriteLine(string.Empty);
                     }
                 }
             }
