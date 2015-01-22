@@ -238,95 +238,95 @@ namespace NodaMoney
 
         private static Dictionary<string, Currency> InitializeCurrencies()
         {
-            var currencies = new Dictionary<string, Currency>()
+            var currencies = new Dictionary<string, Currency>
             {
-                { "AED", new Currency("AED", "784", 2, "United Arab Emirates dirham", "¤") },
-                { "AFN", new Currency("AFN", "971", 2, "Afghan afghani", "¤") },
-                { "ALL", new Currency("ALL", "008", 2, "Albanian lek", "¤") },
-                { "AMD", new Currency("AMD", "051", 2, "Armenian dram", "¤") },
+                { "AED", new Currency("AED", "784", 2, "United Arab Emirates dirham", "د.إ") },
+                { "AFN", new Currency("AFN", "971", 2, "Afghan afghani", "؋") },
+                { "ALL", new Currency("ALL", "008", 2, "Albanian lek", "Lek") },
+                { "AMD", new Currency("AMD", "051", 2, "Armenian dram", "֏") },
                 { "ANG", new Currency("ANG", "532", 2, "Netherlands Antillean guilder", "ƒ") },
                 { "AOA", new Currency("AOA", "973", 2, "Angolan kwanza", "Kz") },
                 { "ARS", new Currency("ARS", "032", 2, "Argentine peso", "$") },
                 { "AUD", new Currency("AUD", "036", 2, "Australian dollar", "$") },
                 { "AWG", new Currency("AWG", "533", 2, "Aruban florin", "ƒ") },
-                { "AZN", new Currency("AZN", "944", 2, "Azerbaijani manat", "m") },
+                { "AZN", new Currency("AZN", "944", 2, "Azerbaijani manat", "ман") },
                 { "BAM", new Currency("BAM", "977", 2, "Bosnia and Herzegovina convertible mark", "KM") },
-                { "BBD", new Currency("BBD", "052", 2, "Barbados dollar", "Bds$") },
-                { "BDT", new Currency("BDT", "050", 2, "Bangladeshi taka", "¤") },
-                { "BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "¤") },
-                { "BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "BD") },
-                { "BIF", new Currency("BIF", "108", 0, "Burundian franc", "Fbu") },
-                { "BMD", new Currency("BMD", "060", 2, "Bermudian dollar (customarily known as Bermuda dollar)", "BD$") },
-                { "BND", new Currency("BND", "096", 2, "Brunei dollar", "B$") },
-                { "BOB", new Currency("BOB", "068", 2, "Boliviano", "Bs.") },
-                { "BOV", new Currency("BOV", "984", 2, "Bolivian Mvdol (funds code)", "¤") },
+                { "BBD", new Currency("BBD", "052", 2, "Barbados dollar", "$") },
+                { "BDT", new Currency("BDT", "050", 2, "Bangladeshi taka", "৳") }, // or Tk
+                { "BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв") },
+                { "BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "د.ب.‏") }, // or DB
+                { "BIF", new Currency("BIF", "108", 0, "Burundian franc", "FBu") },
+                { "BMD", new Currency("BMD", "060", 2, "Bermudian dollar", "$") },
+                { "BND", new Currency("BND", "096", 2, "Brunei dollar", "$") }, // or B$
+                { "BOB", new Currency("BOB", "068", 2, "Boliviano", "Bs.") }, // or BS or $b
+                { "BOV", new Currency("BOV", "984", 2, "Bolivian Mvdol (funds code)", "¤") }, // <==== not found
                 { "BRL", new Currency("BRL", "986", 2, "Brazilian real", "R$") },
-                { "BSD", new Currency("BSD", "044", 2, "Bahamian dollar", "B$") },
+                { "BSD", new Currency("BSD", "044", 2, "Bahamian dollar", "$") },
                 { "BTN", new Currency("BTN", "064", 2, "Bhutanese ngultrum", "Nu.") },
                 { "BWP", new Currency("BWP", "072", 2, "Botswana pula", "P") },
-                { "BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br") },
+                { "BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br") }, // or p.? wiki controdicts with xe.com
                 { "BZD", new Currency("BZD", "084", 2, "Belize dollar", "BZ$") },
                 { "CAD", new Currency("CAD", "124", 2, "Canadian dollar", "$") },
-                { "CDF", new Currency("CDF", "976", 2, "Congolese franc", "F") },
-                { "CHE", new Currency("CHE", "947", 2, "WIR Euro (complementary currency)", "¤") },
-                { "CHF", new Currency("CHF", "756", 2, "Swiss franc", "CHF") },
-                { "CHW", new Currency("CHW", "948", 2, "WIR Franc (complementary currency)", "¤") },
-                { "CLF", new Currency("CLF", "990", 0, "Unidad de Fomento (funds code)", "¤") },
+                { "CDF", new Currency("CDF", "976", 2, "Congolese franc", "FC") },
+                { "CHE", new Currency("CHE", "947", 2, "WIR Euro (complementary currency)", "CHE") },
+                { "CHF", new Currency("CHF", "756", 2, "Swiss franc", "fr.") }, // or CHF
+                { "CHW", new Currency("CHW", "948", 2, "WIR Franc (complementary currency)", "CHW") },
+                { "CLF", new Currency("CLF", "990", 0, "Unidad de Fomento (funds code)", "CLF") },
                 { "CLP", new Currency("CLP", "152", 0, "Chilean peso", "$") },
                 { "CNY", new Currency("CNY", "156", 2, "Chinese yuan", "¥") },
                 { "COP", new Currency("COP", "170", 2, "Colombian peso", "$") },
-                { "COU", new Currency("COU", "970", 2, "Unidad de Valor Real", "¤") },
-                { "CRC", new Currency("CRC", "188", 2, "Costa Rican colon", "¢") },
-                { "CUC", new Currency("CUC", "931", 2, "Cuban convertible peso", "¤") },
-                { "CUP", new Currency("CUP", "192", 2, "Cuban peso", "$") },
+                { "COU", new Currency("COU", "970", 2, "Unidad de Valor Real", "¤") }, // ???
+                { "CRC", new Currency("CRC", "188", 2, "Costa Rican colon", "₡") },
+                { "CUC", new Currency("CUC", "931", 2, "Cuban convertible peso", "CUC$") }, // $ or CUC
+                { "CUP", new Currency("CUP", "192", 2, "Cuban peso", "$") }, // or ₱ (obsolete?)
                 { "CVE", new Currency("CVE", "132", 0, "Cape Verde escudo", "$") },
-                { "CZK", new Currency("CZK", "203", 2, "Czech koruna", "Kc") },
+                { "CZK", new Currency("CZK", "203", 2, "Czech koruna", "Kč") },
                 { "DJF", new Currency("DJF", "262", 0, "Djiboutian franc", "Fdj") },
                 { "DKK", new Currency("DKK", "208", 2, "Danish krone", "kr") },
-                { "DOP", new Currency("DOP", "214", 2, "Dominican peso", "RD$") },
-                { "DZD", new Currency("DZD", "012", 2, "Algerian dinar", "DA") },
-                { "EGP", new Currency("EGP", "818", 2, "Egyptian pound", "LE") },
-                { "ERN", new Currency("ERN", "232", 2, "Eritrean nakfa", "Nfk") },
-                { "ETB", new Currency("ETB", "230", 2, "Ethiopian birr", "Br") },
+                { "DOP", new Currency("DOP", "214", 2, "Dominican peso", "RD$") }, // or $
+                { "DZD", new Currency("DZD", "012", 2, "Algerian dinar", "DA") }, // (Latin) or د.ج (Arabic)
+                { "EGP", new Currency("EGP", "818", 2, "Egyptian pound", "LE") }, // or E£ or ج.م (Arabic)
+                { "ERN", new Currency("ERN", "232", 2, "Eritrean nakfa", "ERN") },
+                { "ETB", new Currency("ETB", "230", 2, "Ethiopian birr", "Br") }, // (Latin) or ብር (Ethiopic)
                 { "EUR", new Currency("EUR", "978", 2, "Euro", "€") },
-                { "FJD", new Currency("FJD", "242", 2, "Fiji dollar", "FJ$") },
+                { "FJD", new Currency("FJD", "242", 2, "Fiji dollar", "$") }, // or FJ$
                 { "FKP", new Currency("FKP", "238", 2, "Falkland Islands pound", "£") },
                 { "GBP", new Currency("GBP", "826", 2, "Pound sterling", "£") },
-                { "GEL", new Currency("GEL", "981", 2, "Georgian lari", "¤") },
-                { "GHS", new Currency("GHS", "936", 2, "Ghanaian cedi", "¤") },
+                { "GEL", new Currency("GEL", "981", 2, "Georgian lari", "ლ.") }, // TODO: new sign since July 18, 2014 => see http://en.wikipedia.org/wiki/Georgian_lari
+                { "GHS", new Currency("GHS", "936", 2, "Ghanaian cedi", "GH¢") }, // or GH₵
                 { "GIP", new Currency("GIP", "292", 2, "Gibraltar pound", "£") },
                 { "GMD", new Currency("GMD", "270", 2, "Gambian dalasi", "D") },
-                { "GNF", new Currency("GNF", "324", 0, "Guinean franc", "FG") },
+                { "GNF", new Currency("GNF", "324", 0, "Guinean franc", "FG") }, // (possibly also Fr or GFr)
                 { "GTQ", new Currency("GTQ", "320", 2, "Guatemalan quetzal", "Q") },
-                { "GYD", new Currency("GYD", "328", 2, "Guyanese dollar", "$") },
-                { "HKD", new Currency("HKD", "344", 2, "Hong Kong dollar", "HK$") },
+                { "GYD", new Currency("GYD", "328", 2, "Guyanese dollar", "$") }, // or G$
+                { "HKD", new Currency("HKD", "344", 2, "Hong Kong dollar", "HK$") }, // or $
                 { "HNL", new Currency("HNL", "340", 2, "Honduran lempira", "L") },
                 { "HRK", new Currency("HRK", "191", 2, "Croatian kuna", "kn") },
                 { "HTG", new Currency("HTG", "332", 2, "Haitian gourde", "G") },
                 { "HUF", new Currency("HUF", "348", 2, "Hungarian forint", "Ft") },
                 { "IDR", new Currency("IDR", "360", 2, "Indonesian rupiah", "Rp") },
                 { "ILS", new Currency("ILS", "376", 2, "Israeli new shekel", "₪") },
-                { "INR", new Currency("INR", "356", 2, "Indian rupee", "Rp") },
-                { "IQD", new Currency("IQD", "368", 3, "Iraqi dinar", "¤") },
-                { "IRR", new Currency("IRR", "364", 0, "Iranian rial", "¤") },
+                { "INR", new Currency("INR", "356", 2, "Indian rupee", "₹") },
+                { "IQD", new Currency("IQD", "368", 3, "Iraqi dinar", "د.ع") },
+                { "IRR", new Currency("IRR", "364", 0, "Iranian rial", "ريال") },
                 { "ISK", new Currency("ISK", "352", 0, "Icelandic króna", "kr") },
-                { "JMD", new Currency("JMD", "388", 2, "Jamaican dollar", "$") },
-                { "JOD", new Currency("JOD", "400", 3, "Jordanian dinar", "¤") },
+                { "JMD", new Currency("JMD", "388", 2, "Jamaican dollar", "J$") }, // or $
+                { "JOD", new Currency("JOD", "400", 3, "Jordanian dinar", "د.ا.‏") },
                 { "JPY", new Currency("JPY", "392", 0, "Japanese yen", "¥") },
                 { "KES", new Currency("KES", "404", 2, "Kenyan shilling", "KSh") },
-                { "KGS", new Currency("KGS", "417", 2, "Kyrgyzstani som", "¤") },
-                { "KHR", new Currency("KHR", "116", 2, "Cambodian riel", "¤") },
-                { "KMF", new Currency("KMF", "174", 0, "Comoro franc", "¤") },
+                { "KGS", new Currency("KGS", "417", 2, "Kyrgyzstani som", "лв") },
+                { "KHR", new Currency("KHR", "116", 2, "Cambodian riel", "៛") },
+                { "KMF", new Currency("KMF", "174", 0, "Comoro franc", "CF") },
                 { "KPW", new Currency("KPW", "408", 0, "North Korean won", "₩") },
                 { "KRW", new Currency("KRW", "410", 0, "South Korean won", "₩") },
-                { "KWD", new Currency("KWD", "414", 3, "Kuwaiti dinar", "¤") },
+                { "KWD", new Currency("KWD", "414", 3, "Kuwaiti dinar", "د.ك") }, // or K.D.
                 { "KYD", new Currency("KYD", "136", 2, "Cayman Islands dollar", "$") },
-                { "KZT", new Currency("KZT", "398", 2, "Kazakhstani tenge", "¤") },
-                { "LAK", new Currency("LAK", "418", 0, "Lao kip", "¤") },
-                { "LBP", new Currency("LBP", "422", 0, "Lebanese pound", "¤") },
-                { "LKR", new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs") },
-                { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "L$") },
-                { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "¤") },
+                { "KZT", new Currency("KZT", "398", 2, "Kazakhstani tenge", "₸") },
+                { "LAK", new Currency("LAK", "418", 0, "Lao kip", "₭") }, // or ₭N
+                { "LBP", new Currency("LBP", "422", 0, "Lebanese pound", "ل.ل") },
+                { "LKR", new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs") }, // or රු
+                { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "$") }, // or L$, LD$
+                { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "L") }, // L or M (pl.)
                 { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") },
 
                 // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
