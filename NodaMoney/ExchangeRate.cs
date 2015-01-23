@@ -146,6 +146,7 @@ namespace NodaMoney
         /// <summary>Converts the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The converted money.</returns>
+        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote currency!</exception>
         public Money Convert(Money money)
         {
             if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
