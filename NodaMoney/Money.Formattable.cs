@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NodaMoney
 {
@@ -21,7 +17,8 @@ namespace NodaMoney
             return ConvertToString(null, null);
         }
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation using the specified format.</summary>
+        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation
+        /// using the specified format.</summary>
         /// <param name="format">A numeric format string.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format.</returns>
         /// <exception cref="ArgumentNullException">The value of 'format' cannot be null.</exception>
@@ -34,7 +31,8 @@ namespace NodaMoney
             return ConvertToString(format, null);
         }
 
-        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="String"/> representation using the specified culture-specific format information.</summary>
+        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="String"/> representation using the
+        /// specified culture-specific format information.</summary>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by formatProvider.</returns>
         /// <exception cref="ArgumentNullException">The value of 'formatProvider' cannot be null.</exception>
@@ -46,7 +44,8 @@ namespace NodaMoney
             return ConvertToString(null, formatProvider);
         }
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation using the specified format and culture-specific format information.</summary>
+        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation
+        /// using the specified format and culture-specific format information.</summary>
         /// <param name="format">A numeric format string.</param>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format and formatProvider.</returns>

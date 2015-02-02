@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -81,15 +80,21 @@ namespace NodaMoney
         {
             ExchangeRate fx;
             if (!TryParse(rate, out fx))
-                throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
+            {
+                throw new FormatException(
+                    "rate is not in the correct format! Currencies are the same or the rate is not a number.");
+            }
 
             return fx;
         }
 
-        /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
+        /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent. A return
+        /// value indicates whether the conversion succeeded or failed.</summary>
         /// <param name="rate">The string representation of the exchange rate to convert.</param>
-        /// <param name="result">When this method returns, contains the <see cref="ExchangeRate"/> that is equivalent to the exchange rate contained in rate, if the conversion succeeded,
-        /// or is zero if the conversion failed. The conversion fails if the rate parameter is null, is not a exchange rate in a valid format, or represents a number less than MinValue 
+        /// <param name="result">When this method returns, contains the <see cref="ExchangeRate"/> that is equivalent to the exchange rate contained in
+        /// rate, if the conversion succeeded,
+        /// or is zero if the conversion failed. The conversion fails if the rate parameter is null, is not a exchange rate in a
+        /// valid format, or represents a number less than MinValue
         /// or greater than MaxValue. This parameter is passed uninitialized.</param>
         /// <returns><b>true</b> if rate was converted successfully; otherwise, <b>false</b>.</returns>
         public static bool TryParse(string rate, out ExchangeRate result)
@@ -104,7 +109,7 @@ namespace NodaMoney
                 int index = rate.Substring(3, 1) == "/" ? 4 : 3;
                 var quoteCurrency = Currency.FromCode(rate.Substring(index, 3));
                 var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
-                
+
                 result = new ExchangeRate(baseCurrency, quoteCurrency, value);
                 return true;
             }
@@ -113,11 +118,11 @@ namespace NodaMoney
                 if (ex is FormatException || ex is OverflowException || ex is ArgumentException)
                 {
                     result = new ExchangeRate
-                    {
-                        BaseCurrency = Currency.FromCode("XXX"),
-                        QuoteCurrency = Currency.FromCode("XXX"),
-                        Value = 0
-                    };
+                                 {
+                                     BaseCurrency = Currency.FromCode("XXX"), 
+                                     QuoteCurrency = Currency.FromCode("XXX"), 
+                                     Value = 0
+                                 };
                     return false;
                 }
 
@@ -146,12 +151,17 @@ namespace NodaMoney
         /// <summary>Converts the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The converted money.</returns>
-        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote currency!</exception>
+        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote
+        /// currency!</exception>
         public Money Convert(Money money)
         {
             if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
-                throw new ArgumentException("Money should have the same currency as the base currency or the quote currency!", "money");
-            
+            {
+                throw new ArgumentException(
+                    "Money should have the same currency as the base currency or the quote currency!", 
+                    "money");
+            }
+
             return money.Currency == BaseCurrency
                        ? new Money(money.Amount * Value, QuoteCurrency)
                        : new Money(money.Amount / Value, BaseCurrency);
@@ -169,7 +179,8 @@ namespace NodaMoney
 
         /// <summary>Indicates whether this instance and a specified <see cref="ExchangeRate"/> are equal.</summary>
         /// <param name="other">Another object to compare to.</param>
-        /// <returns>true if <paramref name="other"/> and this instance are the same type and represent the same value; otherwise, false.</returns>
+        /// <returns>true if <paramref name="other"/> and this instance are the same type and represent the same value; otherwise,
+        /// false.</returns>
         public bool Equals(ExchangeRate other)
         {
             return Value == other.Value && BaseCurrency == other.BaseCurrency && QuoteCurrency == other.QuoteCurrency;
@@ -177,9 +188,11 @@ namespace NodaMoney
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
         /// <param name="obj">Another object to compare to.</param>
-        /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.</returns>
+        /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise,
+        /// false.</returns>
         public override bool Equals(object obj)
         {
+            // ReSharper disable once ArrangeThisQualifier
             return (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
         }
 

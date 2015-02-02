@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NodaMoney
+﻿namespace NodaMoney
 {
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     public partial struct Money
@@ -83,7 +77,7 @@ namespace NodaMoney
         /// <returns>The <see cref="Money"/> result of adding left and right.</returns>
         public static Money operator +(Money left, Money right)
         {
-            return Money.Add(left, right);
+            return Add(left, right);
         }
 
         /// <summary>Subtracts two specified <see cref="Money"/> values.</summary>
@@ -92,7 +86,7 @@ namespace NodaMoney
         /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
         public static Money operator -(Money left, Money right)
         {
-            return Money.Subtract(left, right);
+            return Subtract(left, right);
         }
 
         /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
@@ -101,7 +95,7 @@ namespace NodaMoney
         /// <returns>The <see cref="Money"/> result of multiplying right with left.</returns>
         public static Money operator *(Money left, decimal right)
         {
-            return Money.Multiply(left, right);
+            return Multiply(left, right);
         }
 
         /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
@@ -110,7 +104,7 @@ namespace NodaMoney
         /// <returns>The <see cref="Money"/> result of multiplying left with right.</returns>
         public static Money operator *(decimal left, Money right)
         {
-            return Money.Multiply(right, left);
+            return Multiply(right, left);
         }
 
         /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>
@@ -120,7 +114,7 @@ namespace NodaMoney
         /// <remarks>This division can lose money! Use <seealso cref="SafeDivide"/> to do a safe division.</remarks>
         public static Money operator /(Money left, decimal right)
         {
-            return Money.Divide(left, right);
+            return Divide(left, right);
         }
 
         /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>
@@ -130,7 +124,7 @@ namespace NodaMoney
         /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
         public static decimal operator /(Money left, Money right)
         {
-            return Money.Divide(left, right);
+            return Divide(left, right);
         }
 
         ///// <summary>Implements the operator ++.</summary>

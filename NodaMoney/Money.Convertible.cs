@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NodaMoney
 {
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
-    public partial struct Money // , IConvertible (not supported in PCL)
+    public partial struct Money
     {
+        // , IConvertible (not supported in PCL)
+
         /// <summary>Performs an explicit conversion from <see cref="NodaMoney.Money"/> to <see cref="System.Double"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
@@ -92,33 +90,29 @@ namespace NodaMoney
             return new Money(money);
         }
 
-        /// <summary>Converts the value of this instance to an <see cref="Single"/>.</summary>
+        /// <summary>Converts the value of this instance to an <see cref="float"/>.</summary>
         /// <param name="money">A <see cref="Money"/> value.</param>
-        /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="Single"/>.</returns>
-        /// <remarks>
-        /// Because a <see cref="Single"/> has fewer significant digits than a <see cref="Money"/> value, this operation may
-        /// produce round-off errors. Also the <see cref="Currency"/> information is lost.
-        /// </remarks>
+        /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="float"/>.</returns>
+        /// <remarks>Because a <see cref="float"/> has fewer significant digits than a <see cref="Money"/> value, this operation may
+        /// produce round-off errors. Also the <see cref="Currency"/> information is lost.</remarks>
         public static float ToSingle(Money money)
         {
             return Convert.ToSingle(money.Amount);
         }
 
-        /// <summary>Converts the value of this instance to an <see cref="Double"/>.</summary>
+        /// <summary>Converts the value of this instance to an <see cref="double"/>.</summary>
         /// <param name="money">A <see cref="Money"/> value.</param>
-        /// <returns>The value of the current instance, converted to a <see cref="Double"/>.</returns>
-        /// <remarks>
-        /// Because a Double has fewer significant digits than a <see cref="Money"/> value, this operation may produce round-off
-        /// errors.
-        /// </remarks>
+        /// <returns>The value of the current instance, converted to a <see cref="double"/>.</returns>
+        /// <remarks>Because a Double has fewer significant digits than a <see cref="Money"/> value, this operation may produce round-off
+        /// errors.</remarks>
         public static double ToDouble(Money money)
         {
             return Convert.ToDouble(money.Amount);
         }
 
-        /// <summary>Converts the value of this instance to an <see cref="Decimal"/>.</summary>
+        /// <summary>Converts the value of this instance to an <see cref="decimal"/>.</summary>
         /// <param name="money">A <see cref="Money"/> value.</param>
-        /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="Decimal"/>.</returns>
+        /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="decimal"/>.</returns>
         /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
         public static decimal ToDecimal(Money money)
         {
@@ -136,80 +130,100 @@ namespace NodaMoney
         ////    return TypeCode.Object;
         ////}
 
-        /// <summary>Converts the value of this instance to an equivalent Boolean value using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent Boolean value using the specified culture-specific
+        /// formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A Boolean value equivalent to the value of this instance.</returns>
         public bool ToBoolean(IFormatProvider provider)
         {
             return Convert.ToBoolean(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 8-bit unsigned integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 8-bit unsigned integer equivalent to the value of this instance.</returns>
         public byte ToByte(IFormatProvider provider)
         {
             return Convert.ToByte(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent Unicode character using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent Unicode character using the specified culture-specific
+        /// formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A Unicode character equivalent to the value of this instance.</returns>
         public char ToChar(IFormatProvider provider)
         {
             return Convert.ToChar(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent <see cref="T:System.DateTime"/> using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent <see cref="T:System.DateTime"/> using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A <see cref="T:System.DateTime"/> instance equivalent to the value of this instance.</returns>
         public DateTime ToDateTime(IFormatProvider provider)
         {
             return Convert.ToDateTime(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent <see cref="T:System.Decimal"/> number using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent <see cref="T:System.Decimal"/> number using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A <see cref="T:System.Decimal"/> number equivalent to the value of this instance.</returns>
         public decimal ToDecimal(IFormatProvider provider)
         {
             return Convert.ToDecimal(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent double-precision floating-point number using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent double-precision floating-point number using the
+        /// specified culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A double-precision floating-point number equivalent to the value of this instance.</returns>
         public double ToDouble(IFormatProvider provider)
         {
             return Convert.ToDouble(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 16-bit signed integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 16-bit signed integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 16-bit signed integer equivalent to the value of this instance.</returns>
         public short ToInt16(IFormatProvider provider)
         {
             return Convert.ToInt16(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 32-bit signed integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 32-bit signed integer equivalent to the value of this instance.</returns>
         public int ToInt32(IFormatProvider provider)
         {
             return Convert.ToInt32(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 64-bit signed integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 64-bit signed integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 64-bit signed integer equivalent to the value of this instance.</returns>
         public long ToInt64(IFormatProvider provider)
         {
             return Convert.ToInt64(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific
+        /// formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 8-bit signed integer equivalent to the value of this instance.</returns>
         [CLSCompliant(false)]
         public sbyte ToSByte(IFormatProvider provider)
@@ -217,25 +231,31 @@ namespace NodaMoney
             return Convert.ToSByte(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent single-precision floating-point number using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent single-precision floating-point number using the
+        /// specified culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>A single-precision floating-point number equivalent to the value of this instance.</returns>
         public float ToSingle(IFormatProvider provider)
         {
             return Convert.ToSingle(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an <see cref="T:System.Object"/> of the specified <see cref="T:System.Type"/> that has an equivalent value, using the specified culture-specific formatting information.</summary>
+        /// <summary>Converts the value of this instance to an <see cref="T:System.Object"/> of the specified<see cref="T:System.Type"/> that has an equivalent value, using the specified culture-specific formatting information.</summary>
         /// <param name="conversionType">The <see cref="T:System.Type"/> to which the value of this instance is converted.</param>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
-        /// <returns>An <see cref="T:System.Object"/> instance of type <paramref name="conversionType"/> whose value is equivalent to the value of this instance.</returns>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
+        /// <returns>An <see cref="T:System.Object"/> instance of type <paramref name="conversionType"/> whose value is equivalent
+        /// to the value of this instance.</returns>
         public object ToType(Type conversionType, IFormatProvider provider)
         {
             return Convert.ChangeType(Amount, conversionType, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 16-bit unsigned integer equivalent to the value of this instance.</returns>
         [CLSCompliant(false)]
         public ushort ToUInt16(IFormatProvider provider)
@@ -243,8 +263,10 @@ namespace NodaMoney
             return Convert.ToUInt16(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 32-bit unsigned integer equivalent to the value of this instance.</returns>
         [CLSCompliant(false)]
         public uint ToUInt32(IFormatProvider provider)
@@ -252,8 +274,10 @@ namespace NodaMoney
             return Convert.ToUInt32(Amount, provider);
         }
 
-        /// <summary>Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified culture-specific formatting information.</summary>
-        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+        /// <summary>Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified
+        /// culture-specific formatting information.</summary>
+        /// <param name="provider">An <see cref="T:System.IFormatProvider"/> interface implementation that supplies
+        /// culture-specific formatting information.</param>
         /// <returns>An 64-bit unsigned integer equivalent to the value of this instance.</returns>
         [CLSCompliant(false)]
         public ulong ToUInt64(IFormatProvider provider)
