@@ -1,5 +1,7 @@
 NodaMoney
 =========
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/remyvd/NodaMoney?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
@@ -97,25 +99,25 @@ var dollar = new Money(765.43m, "USD");
 var dinar = new Money(765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
-yen.ToString();    // "¥765"
-euro.ToString();   // "€765.43"
+yen.ToString();    // "ï¿½765"
+euro.ToString();   // "ï¿½765.43"
 dollar.ToString(); // "$765.43"
 dinar.ToString();  // "BD765.432"
 
-yen.ToString("C2");    // "¥765.00"
-euro.ToString("C2");   // "€765.43"
+yen.ToString("C2");    // "ï¿½765.00"
+euro.ToString("C2");   // "ï¿½765.43"
 dollar.ToString("C2"); // "$765.43"
 dinar.ToString("C2");  // "BD765.43"
 
 // Implicit when current culture is 'nl-BE'
-yen.ToString();    // "¥ 765"
-euro.ToString();   // "€ 765,43"
+yen.ToString();    // "ï¿½ 765"
+euro.ToString();   // "ï¿½ 765,43"
 dollar.ToString(); // "$ 765,43"
 dinar.ToString();  // "BD 765,432"
 
 // Implicit when current culture is 'fr-BE'
-yen.ToString();    // "765 ¥"
-euro.ToString();   // "765,43 €"
+yen.ToString();    // "765 ï¿½"
+euro.ToString();   // "765,43 ï¿½"
 dollar.ToString(); // "765,43 $"
 dinar.ToString();  // "765,432 BD"
 }
@@ -123,8 +125,8 @@ dinar.ToString();  // "765,432 BD"
 // Explicit format for culture 'nl-NL'
 var ci = new CultureInfo("nl-NL");
 
-yen.ToString(ci);    // "¥ 765"
-euro.ToString(ci);   // "€ 765,43"
+yen.ToString(ci);    // "ï¿½ 765"
+euro.ToString(ci);   // "ï¿½ 765,43"
 dollar.ToString(ci); // "$ 765,43"
 dinar.ToString(ci);  // "BD 765,432"
 ```
