@@ -12,6 +12,7 @@ nuget:
   disable_publish_on_pr: true
 
 before_build:
+- nuget restore
 - GitVersion /output buildserver /updateAssemblyInfo SolutionInfo.cs
 
 build:
