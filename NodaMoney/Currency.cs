@@ -386,26 +386,26 @@ namespace NodaMoney
                 { "SYP", new Currency("SYP", "760", 2, "Syrian pound", "ܠ.ܣ.‏") }, // or LS or £S (or £)
                 { "SZL", new Currency("SZL", "748", 2, "Swazi lilangeni", "L") }, // or E (plural)
                 { "THB", new Currency("THB", "764", 2, "Thai baht", "฿") },
-                { "TJS", new Currency("TJS", "972", 2, "Tajikistani somoni", "¤") }, // TODO
-                { "TMT", new Currency("TMT", "934", 2, "Turkmenistani manat", "m") },
-                { "TND", new Currency("TND", "788", 3, "Tunisian dinar", "¤") },
-                { "TOP", new Currency("TOP", "776", 2, "Tongan paʻanga", "T$") },
-                { "TRY", new Currency("TRY", "949", 2, "Turkish lira", "YTL") },
-                { "TTD", new Currency("TTD", "780", 2, "Trinidad and Tobago dollar", "$") },
-                { "TWD", new Currency("TWD", "901", 2, "New Taiwan dollar", "$") },
-                { "TZS", new Currency("TZS", "834", 2, "Tanzanian shilling", "x/y") },
-                { "UAH", new Currency("UAH", "980", 2, "Ukrainian hryvnia", "¤") },
-                { "UGX", new Currency("UGX", "800", 2, "Ugandan shilling", "Ush") },
-                { "USD", new Currency("USD", "840", 2, "United States dollar", "$") },
+                { "TJS", new Currency("TJS", "972", 2, "Tajikistani somoni", "смн") },
+                { "TMT", new Currency("TMT", "934", 2, "Turkmenistani manat", "m") }, // or T?
+                { "TND", new Currency("TND", "788", 3, "Tunisian dinar", "د.ت") }, // or DT (Latin)
+                { "TOP", new Currency("TOP", "776", 2, "Tongan paʻanga", "T$") }, // (sometimes PT)
+                { "TRY", new Currency("TRY", "949", 2, "Turkish lira", "₺") },
+                { "TTD", new Currency("TTD", "780", 2, "Trinidad and Tobago dollar", "$") }, // or TT$
+                { "TWD", new Currency("TWD", "901", 2, "New Taiwan dollar", "NT$") }, // or $
+                { "TZS", new Currency("TZS", "834", 2, "Tanzanian shilling", "x/y") }, // or TSh
+                { "UAH", new Currency("UAH", "980", 2, "Ukrainian hryvnia", "₴") },
+                { "UGX", new Currency("UGX", "800", 2, "Ugandan shilling", "USh") },
+                { "USD", new Currency("USD", "840", 2, "United States dollar", "$") }, // or US$
                 { "USN", new Currency("USN", "997", 2, "United States dollar (next day) (funds code)", "$") },
                 { "USS", new Currency("USS", "998", 2, "United States dollar (same day) (funds code)", "$") },
                 { "UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (URUIURUI) (funds code)", "¤") },
-                { "UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") },
-                { "UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "¤") },
-                { "VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar fuerte", "Bs.F.") },
-                { "VND", new Currency("VND", "704", 0, "Vietnamese dong", "¤") },
-                { "VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "Vt") },
-                { "WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") },
+                { "UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
+                { "UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
+                { "VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar fuerte", "Bs.F.") }, // or Bs.
+                { "VND", new Currency("VND", "704", 0, "Vietnamese dong", "₫") },
+                { "VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
+                { "WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T
                 { "XAF", new Currency("XAF", "950", 0, "CFA franc BEAC", "FCFA") },
                 { "XAG", new Currency("XAG", "961", DOT, "Silver (one troy ounce)", "¤") },
                 { "XAU", new Currency("XAU", "959", DOT, "Gold (one troy ounce)", "¤") },
@@ -413,19 +413,22 @@ namespace NodaMoney
                 { "XBB", new Currency("XBB", "956", DOT, "European Monetary Unit (E.M.U.-6) (bond market unit)", "¤") },
                 { "XBC", new Currency("XBC", "957", DOT, "European Unit of Account 9 (E.U.A.-9) (bond market unit)", "¤") },
                 { "XBD", new Currency("XBD", "958", DOT, "European Unit of Account 17 (E.U.A.-17) (bond market unit)", "¤") },
-                { "XCD", new Currency("XCD", "951", 2, "East Caribbean dollar", "$") },
+                { "XCD", new Currency("XCD", "951", 2, "East Caribbean dollar", "$") }, // or EC$
                 { "XDR", new Currency("XDR", "960", DOT, "Special drawing rights", "¤") },
                 { "XFU", new Currency("XFU", "Nil", DOT, "UIC franc (special settlement currency)", "¤") },
                 { "XOF", new Currency("XOF", "952", 0, "CFA franc BCEAO", "CFA") },
                 { "XPD", new Currency("XPD", "964", DOT, "Palladium (one troy ounce)", "¤") },
-                { "XPF", new Currency("XPF", "953", 0, "CFP franc", "¤") },
+                { "XPF", new Currency("XPF", "953", 0, "CFP franc", "F") },
                 { "XPT", new Currency("XPT", "962", DOT, "Platinum (one troy ounce)", "¤") },
+                { "XSU", new Currency("XSU", "994", DOT, "SUCRE", "¤") },
                 { "XTS", new Currency("XTS", "963", DOT, "Code reserved for testing purposes", "¤") },
+                { "XUA", new Currency("XUA", "965", DOT, "ADB Unit of Account", "¤") },
                 { "XXX", new Currency("XXX", "999", DOT, "No currency", "¤") },
-                { "YER", new Currency("YER", "886", 2, "Yemeni rial", "¤") },
+                { "YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                 { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
-                { "ZWM", new Currency("ZMK", "967", 2, "Zambian kwacha", "ZK") }
+                { "ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
                 // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
+                { "ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") } // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
             }; 
 
             return currencies;
