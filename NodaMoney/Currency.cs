@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -22,8 +21,16 @@ namespace NodaMoney
         // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
         internal const double DOT = -1;
-        private static readonly Dictionary<string, Currency> Currencies = InitializeCurrencies();
+        private static readonly Dictionary<string, Currency> Currencies = InitializeIsoCurrencies();
 
+        /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
+        /// <param name="code">The code.</param>
+        /// <param name="number">The number.</param>
+        /// <param name="decimalDigits">The decimal digits.</param>
+        /// <param name="englishName">Name of the english.</param>
+        /// <param name="sign">The sign.</param>
+        /// <exception cref="System.ArgumentNullException">code or number or englishName or sign is null</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 3!</exception>
         internal Currency(string code, string number, double decimalDigits, string englishName, string sign)
             : this()
         {
@@ -236,7 +243,7 @@ namespace NodaMoney
         ////    return region.CurrencyNativeName;
         ////}
 
-        private static Dictionary<string, Currency> InitializeCurrencies()
+        private static Dictionary<string, Currency> InitializeIsoCurrencies()
         {
             var currencies = new Dictionary<string, Currency>
             {
@@ -328,59 +335,58 @@ namespace NodaMoney
                 { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "$") }, // or L$, LD$
                 { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "L") }, // L or M (pl.)
                 // { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") }, // Until 2014-12-31, replaced by EUR
-
                 // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
                 { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "ل.د") }, // or LD
                 { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "د.م.") },
                 { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "L") },
                 { "MGA", new Currency("MGA", "969", Z07, "Malagasy ariary", "Ar") },  // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
                 { "MKD", new Currency("MKD", "807", 0, "Macedonian denar", "ден") },
-                { "MMK", new Currency("MMK", "104", 0, "Myanma kyat", "K") }, // ------- todo
-                { "MNT", new Currency("MNT", "496", 2, "Mongolian tugrik", "¤") },
+                { "MMK", new Currency("MMK", "104", 0, "Myanma kyat", "K") },
+                { "MNT", new Currency("MNT", "496", 2, "Mongolian tugrik", "₮") },
                 { "MOP", new Currency("MOP", "446", 2, "Macanese pataca", "MOP$") },
                 { "MRO", new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM") }, // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
                 { "MUR", new Currency("MUR", "480", 2, "Mauritian rupee", "Rs") },
-                { "MVR", new Currency("MVR", "462", 2, "Maldivian rufiyaa", "Rf") },
+                { "MVR", new Currency("MVR", "462", 2, "Maldivian rufiyaa", "Rf") }, // or , MRf, MVR, .ރ or /-
                 { "MWK", new Currency("MWK", "454", 2, "Malawian kwacha", "MK") },
                 { "MXN", new Currency("MXN", "484", 2, "Mexican peso", "$") },
-                { "MXV", new Currency("MXV", "979", 2, "Mexican Unidad de Inversion (UDI) (funds code)", "¤") },
+                { "MXV", new Currency("MXV", "979", 2, "Mexican Unidad de Inversion (UDI) (funds code)", "¤") },  // <==== not found
                 { "MYR", new Currency("MYR", "458", 2, "Malaysian ringgit", "RM") },
-                { "MZN", new Currency("MZN", "943", 2, "Mozambican metical", "MTn") },
-                { "NAD", new Currency("NAD", "516", 2, "Namibian dollar", "N$") },
+                { "MZN", new Currency("MZN", "943", 2, "Mozambican metical", "MTn") }, // or MTN
+                { "NAD", new Currency("NAD", "516", 2, "Namibian dollar", "N$") }, // or $
                 { "NGN", new Currency("NGN", "566", 2, "Nigerian naira", "₦") },
                 { "NIO", new Currency("NIO", "558", 2, "Nicaraguan córdoba", "C$") },
                 { "NOK", new Currency("NOK", "578", 2, "Norwegian krone", "kr") },
-                { "NPR", new Currency("NPR", "524", 2, "Nepalese rupee", "Rs") },
+                { "NPR", new Currency("NPR", "524", 2, "Nepalese rupee", "Rs") }, // or ₨ or रू
                 { "NZD", new Currency("NZD", "554", 2, "New Zealand dollar", "$") },
-                { "OMR", new Currency("OMR", "512", 3, "Omani rial", "¤") },
+                { "OMR", new Currency("OMR", "512", 3, "Omani rial", "ر.ع.") },
                 { "PAB", new Currency("PAB", "590", 2, "Panamanian balboa", "B/.") },
                 { "PEN", new Currency("PEN", "604", 2, "Peruvian nuevo sol", "S/.") },
                 { "PGK", new Currency("PGK", "598", 2, "Papua New Guinean kina", "K") },
-                { "PHP", new Currency("PHP", "608", 2, "Philippine peso", "P") },
-                { "PKR", new Currency("PKR", "586", 2, "Pakistani rupee", "Rs.") },
-                { "PLN", new Currency("PLN", "985", 2, "Polish złoty", "zl") },
-                { "PYG", new Currency("PYG", "600", 0, "Paraguayan guaraní", "¤") },
-                { "QAR", new Currency("QAR", "634", 2, "Qatari riyal", "QR") },
-                { "RON", new Currency("RON", "946", 2, "Romanian new leu", "L") },
-                { "RSD", new Currency("RSD", "941", 2, "Serbian dinar", "RSD") },
-                { "RUB", new Currency("RUB", "643", 2, "Russian rouble", "PP") },
-                { "RWF", new Currency("RWF", "646", 0, "Rwandan franc", "RF") },
-                { "SAR", new Currency("SAR", "682", 2, "Saudi riyal", "SR") },
+                { "PHP", new Currency("PHP", "608", 2, "Philippine peso", "₱") }, // or P or PHP or PhP
+                { "PKR", new Currency("PKR", "586", 2, "Pakistani rupee", "Rs") }, 
+                { "PLN", new Currency("PLN", "985", 2, "Polish złoty", "zł") },
+                { "PYG", new Currency("PYG", "600", 0, "Paraguayan guaraní", "₲") },
+                { "QAR", new Currency("QAR", "634", 2, "Qatari riyal", "ر.ق") }, // or QR
+                { "RON", new Currency("RON", "946", 2, "Romanian new leu", "lei") },
+                { "RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин. or din. ?)
+                { "RUB", new Currency("RUB", "643", 2, "Russian rouble", "₽") }, // or R or руб (both onofficial)
+                { "RWF", new Currency("RWF", "646", 0, "Rwandan franc", "RFw") }, // or RF, R₣
+                { "SAR", new Currency("SAR", "682", 2, "Saudi riyal", "ر.س") }, // or SR (Latin) or ﷼‎ (Unicode)
                 { "SBD", new Currency("SBD", "090", 2, "Solomon Islands dollar", "SI$") },
-                { "SCR", new Currency("SCR", "690", 2, "Seychelles rupee", "SR") },
-                { "SDG", new Currency("SDG", "938", 2, "Sudanese pound", "¤") },
+                { "SCR", new Currency("SCR", "690", 2, "Seychelles rupee", "SR") }, // or SRe
+                { "SDG", new Currency("SDG", "938", 2, "Sudanese pound", "ج.س.") },
                 { "SEK", new Currency("SEK", "752", 2, "Swedish krona/kronor", "kr") },
-                { "SGD", new Currency("SGD", "702", 2, "Singapore dollar", "S$") },
+                { "SGD", new Currency("SGD", "702", 2, "Singapore dollar", "S$") }, // or $
                 { "SHP", new Currency("SHP", "654", 2, "Saint Helena pound", "£") },
                 { "SLL", new Currency("SLL", "694", 0, "Sierra Leonean leone", "Le") },
-                { "SOS", new Currency("SOS", "706", 2, "Somali shilling", "So.") },
+                { "SOS", new Currency("SOS", "706", 2, "Somali shilling", "S") }, // or Sh.So.
                 { "SRD", new Currency("SRD", "968", 2, "Surinamese dollar", "$") },
-                { "SSP", new Currency("SSP", "728", 2, "South Sudanese pound", "¤") },
+                { "SSP", new Currency("SSP", "728", 2, "South Sudanese pound", "£") }, // not sure about sign...
                 { "STD", new Currency("STD", "678", 0, "São Tomé and Príncipe dobra", "Db") },
-                { "SYP", new Currency("SYP", "760", 2, "Syrian pound", "¤") },
-                { "SZL", new Currency("SZL", "748", 2, "Swazi lilangeni", "L") },
-                { "THB", new Currency("THB", "764", 2, "Thai baht", "¤") },
-                { "TJS", new Currency("TJS", "972", 2, "Tajikistani somoni", "¤") },
+                { "SYP", new Currency("SYP", "760", 2, "Syrian pound", "ܠ.ܣ.‏") }, // or LS or £S (or £)
+                { "SZL", new Currency("SZL", "748", 2, "Swazi lilangeni", "L") }, // or E (plural)
+                { "THB", new Currency("THB", "764", 2, "Thai baht", "฿") },
+                { "TJS", new Currency("TJS", "972", 2, "Tajikistani somoni", "¤") }, // TODO
                 { "TMT", new Currency("TMT", "934", 2, "Turkmenistani manat", "m") },
                 { "TND", new Currency("TND", "788", 3, "Tunisian dinar", "¤") },
                 { "TOP", new Currency("TOP", "776", 2, "Tongan paʻanga", "T$") },
@@ -419,7 +425,6 @@ namespace NodaMoney
                 { "YER", new Currency("YER", "886", 2, "Yemeni rial", "¤") },
                 { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                 { "ZWM", new Currency("ZMK", "967", 2, "Zambian kwacha", "ZK") }
-
                 // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
             }; 
 
