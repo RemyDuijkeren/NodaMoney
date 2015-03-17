@@ -53,24 +53,6 @@
             return decimal.Divide(money1.Amount, money2.Amount);
         }
 
-        ///// <summary>Increments the specified money.</summary>
-        ///// <param name="left">The left.</param>
-        ///// <param name="right">The right.</param>
-        ///// <returns>The incremented money.</returns>
-        ////public static Money Increment(Money left, Money right)
-        ////{
-        ////    return left + right;
-        ////}
-
-        ///// <summary>Decrements the specified money.</summary>
-        ///// <param name="left">The left.</param>
-        ///// <param name="right">The right.</param>
-        ///// <returns>The decremented money.</returns>
-        ////public static Money Decrement(Money left, Money right)
-        ////{
-        ////    return left - right;
-        ////}
-
         /// <summary>Adds two specified <see cref="Money"/> values.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
@@ -126,26 +108,5 @@
         {
             return Divide(left, right);
         }
-
-        ///// <summary>Implements the operator ++.</summary>
-        ///// <param name="money">The money.</param>
-        ///// <returns>The result of the operator.</returns>
-        ////public static Money operator ++(Money money)
-        ////{
-        //// TODO: Create in Currency lowest cent value and use this. Not here: it's not responsiblity of money
-        ////    decimal minValue = Math.Pow(10M, -1M * money.Currency.DecimalDigits);
-        ////    return money + new Money(money.Currency, minValue);
-        ////}
-
-        ///// <summary>
-        ///// Implements the operator --.
-        ///// </summary>
-        ///// <param name="money">The money.</param>
-        ///// <returns>The result of the operator.</returns>
-        ////public static Money operator --(Money money)
-        ////{
-        ////    double minValue = Math.Pow(10, -1 * money.Currency.DecimalDigits);
-        ////    return money - new Money(money.Currency, minValue);
-        ////}
     }
 }

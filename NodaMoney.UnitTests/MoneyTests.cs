@@ -1,6 +1,13 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading;
+using System.Xml;
+using System.Xml.Serialization;
+
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodaMoney.UnitTests.Helpers;
@@ -426,88 +433,28 @@ namespace NodaMoney.UnitTests
         }
 
         [TestClass]
-        public class GivenIWantToSerializeMoney
+        public class GivenIWantToConvertDoubleToDecimal
         {
-            //TODO: Add GivenIWantToSerializeMoney unit tests?
-            //private Money yen = new Money(765m, Currency.FromCode("JPY"));
-            //private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
-            //private Money dollar = new Money(765.43m, Currency.FromCode("USD"));
-            //private Money dinar = new Money(765.432m, Currency.FromCode("BHD"));
+            private readonly Currency _euro = Currency.FromCode("EUR");
 
-            //[TestMethod]
-            //public void WhenSerializing_ThenThisShouldSucceed()
-            //{
-            //    yen.Should().Be(Clone<Money>(yen));
-            //}
+            [TestMethod]
+            public void WhenValueIsDoubleOrDecimal_ThenCreatingShouldSucceed()
+            {
+                double value1 = 3.141592653589793238462643383279;
+                decimal value2 = new Decimal(value1);
+                decimal value3 = (decimal)3.141592653589793238462643383279;
+                decimal value4 = 3.141592653589793238462643383279m;
+                
+                string result1 = value1.ToString(CultureInfo.InvariantCulture);
+                string result2 = value2.ToString(CultureInfo.InvariantCulture);
+                string result3 = value3.ToString(CultureInfo.InvariantCulture);
+                string result4 = value4.ToString(CultureInfo.InvariantCulture);
 
-            //public static Stream Serialize(object source)
-            //{
-            //    IFormatter formatter = new BinaryFormatter();
-            //    Stream stream = new MemoryStream();
-            //    formatter.Serialize(stream, source);
-            //    return stream;
-            //}
-
-            //public static T Deserialize<T>(Stream stream)
-            //{
-            //    IFormatter formatter = new BinaryFormatter();
-            //    stream.Position = 0;
-            //    return (T)formatter.Deserialize(stream);
-            //}
-
-            //public static T Clone<T>(object source)
-            //{
-            //    return Deserialize<T>(Serialize(source));
-            //}
-        }
-
-        //public void testCloseNumbersNotEqual()
-        //{
-        //    Money d2_51a = Money.dollars(2.515);
-        //    Money d2_51b = Money.dollars(2.5149);
-        //    assertTrue(!d2_51a.equals(d2_51b));
-        //}
-
-        //public void testRound()
-        //{
-        //    Money dRounded = Money.dollars(1.2350);
-        //    assertEquals(Money.dollars(1.24), dRounded);
-        //}
-
-        //public void testSubtraction()
-        //{
-        //    assertEquals(Money.dollars(12.49), d15.minus(d2_51));
-        //}
-
-        //public void testApplyRatio()
-        //{
-        //    Ratio oneThird = Ratio.of(1, 3);
-        //    Money result = Money.dollars(100).applying(oneThird, 1, Rounding.UP);
-        //    assertEquals(Money.dollars(33.40), result);
-        //}
-
-        //public void testIncremented()
-        //{
-        //    assertEquals(Money.dollars(2.52), d2_51.incremented());
-        //    assertEquals(Money.valueOf(51, JPY), y50.incremented());
-        //}
-
-        //[Fact]
-        //public void MoneyOperationsInvolvingDifferentCurrencyAllFail()
-        //{
-        //    Money money1 = new Money(101.5M, Currency.Aud);
-        //    Money money2 = new Money(98.5M, Currency.Cad);
-        //    Money m;
-        //    Boolean b;
-
-        //    Assert.Throws<InvalidOperationException>(() => { m = money1 + money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { m = money1 - money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 == money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 != money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 > money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 < money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 >= money2; });
-        //    Assert.Throws<InvalidOperationException>(() => { b = money1 <= money2; });
-        //}        
+                Console.WriteLine(result1);
+                Console.WriteLine(result2);
+                Console.WriteLine(result3);
+                Console.WriteLine(result4);
+            }
+        }      
     }
 }
