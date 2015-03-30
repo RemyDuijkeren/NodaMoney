@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
+using NodaMoney.Serialization;
 
 namespace NodaMoney
 {
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
+    [JsonConverter(typeof(MoneyJsonConverter))]
     public partial struct Money : IXmlSerializable
     {
         public XmlSchema GetSchema()
