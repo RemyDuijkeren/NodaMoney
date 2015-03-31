@@ -3,7 +3,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
-using NodaMoney.Serialization;
+using NodaMoney.Serialization.JsonNet;
 
 namespace NodaMoney
 {

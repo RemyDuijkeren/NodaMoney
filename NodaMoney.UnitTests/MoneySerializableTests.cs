@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-
-using NodaMoney.Serialization;
+using NodaMoney.Serialization.AspNet;
+using NodaMoney.Serialization.JsonNet;
 
 using Formatting = Newtonsoft.Json.Formatting;
 
@@ -44,7 +39,7 @@ namespace NodaMoney.UnitTests
                 Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json);
 
-                yen.Should().Be(clone);
+                clone.Should().Be(yen);
             }
 
             [TestMethod]
@@ -54,7 +49,7 @@ namespace NodaMoney.UnitTests
                 Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json, new MoneyJsonConverter());
 
-                euro.Should().Be(clone);
+                clone.Should().Be(euro);
             }
         }
 
@@ -69,21 +64,25 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
+                javaScriptSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
+
                 var json = javaScriptSerializer.Serialize(yen);
                 Console.WriteLine(json);
                 var clone = javaScriptSerializer.Deserialize<Money>(json);
 
-                yen.Should().Be(clone);
+                clone.Should().Be(yen);
             }
 
             [TestMethod]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
+                javaScriptSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
+
                 var json = javaScriptSerializer.Serialize(euro);
                 Console.WriteLine(json);
                 var clone = javaScriptSerializer.Deserialize<Money>(json);
 
-                euro.Should().Be(clone);
+                clone.Should().Be(euro);
             }
         }
 

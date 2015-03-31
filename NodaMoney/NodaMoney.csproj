@@ -57,7 +57,7 @@
     <Compile Include="Money.UnaryOperators.cs" />
     <Compile Include="Money.Serializable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\MoneyJsonConverter.cs" />
+    <Compile Include="Serialization\JsonNet\MoneyJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Money.BinaryOperators.cs" />
