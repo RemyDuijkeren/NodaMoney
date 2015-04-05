@@ -13,7 +13,7 @@ namespace NodaMoney.Extensions
         /// <param name="shares">The number of shares to divide in.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
-        /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>).
+        /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="System.MidpointRounding"/>).
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
         /// midpoint value in a single direction.</remarks>
@@ -52,7 +52,7 @@ namespace NodaMoney.Extensions
         /// <param name="ratios">The number of shares as an array of ratios.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">ratios;Sum of ratios must be greater than 1</exception>
-        /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="http://msdn.microsoft.com/en-us/library/system.midpointrounding.aspx"/>).
+        /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="System.MidpointRounding"/>).
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
         /// midpoint value in a single direction.</remarks>

@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace NodaMoney
 {
     /// <summary>A conversion of money of one currency into money of another currency</summary>
-    /// <remarks>See <see cref="http://en.wikipedia.org/wiki/Exchange_rate"/>.</remarks>
+    /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>
     [DataContract]
     public struct ExchangeRate : IEquatable<ExchangeRate>
     {

@@ -36,7 +36,7 @@
         /// <param name="money">The money.</param>
         /// <param name="divisor">The divider.</param>
         /// <returns>The division as <see cref="Money"/>.</returns>
-        /// <remarks>This division can lose money! Use <seealso cref="SafeDivide"/> to do a safe division.</remarks>
+        /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
         public static Money Divide(Money money, decimal divisor)
         {
             return new Money(decimal.Divide(money.Amount, divisor), money.Currency);
@@ -93,7 +93,7 @@
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="System.Decimal"/> object on the right side.</param>
         /// <returns>The <see cref="Money"/> result of dividing left with right.</returns>
-        /// <remarks>This division can lose money! Use <seealso cref="SafeDivide"/> to do a safe division.</remarks>
+        /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
         public static Money operator /(Money left, decimal right)
         {
             return Divide(left, right);
