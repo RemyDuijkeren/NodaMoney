@@ -45,9 +45,9 @@ deploy:
     branch: '^(\d+\.)?(\d+\.)?(\*|\d+)$'
 
 - provider: NuGet
-  server: https://staging.nuget.org/
+  server: https://www.nuget.org/
   api_key:
-    secure: 3CaDEZjsLpJrX6c6pIMJBKWrOEyRTbvCwrXX4P8dgOgiu4IHEsaaqVxqVCADp5nv
+    secure: cJV4lINlVi8J4NOZBAS5GnaaugKWWO0Zi5jCSKfkDOgs5mEpPDjIf9K0D8hB4bTU
   skip_symbols: true
   on:
     branch: '^(\d+\.)?(\d+\.)?(\*|\d+)$'
