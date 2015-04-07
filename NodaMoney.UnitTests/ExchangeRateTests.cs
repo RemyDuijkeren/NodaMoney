@@ -100,7 +100,7 @@ namespace NodaMoney.UnitTests
         }
 
         [TestClass]
-        public class GivenIWantToCreateAnExchangeRate
+        public class GivenIWantToCreateAnExchangeRateWithCurrencies
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
             private readonly Currency _dollar = Currency.FromCode("USD");
@@ -141,6 +141,56 @@ namespace NodaMoney.UnitTests
             {
                 // Arrange, Act
                 Action action = () => new ExchangeRate(_euro, _euro, 1.2591F);
+
+                // Assert
+                action.ShouldThrow<ArgumentException>();
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToCreateAnExchangeRateWithCurrenciesAsStrings
+        {
+            private readonly string _euroAsString = "EUR";
+            private readonly string _dollarAsString = "USD";
+            private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly Currency _dollar = Currency.FromCode("USD");
+
+            [TestMethod]
+            public void WhenRateIsDouble_ThenCreatingShouldSucceed()
+            {
+                var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591);
+
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                // TODO: Can doubles be compared for equality? See https://github.com/dennisdoomen/fluentassertions/wiki
+                fx.Value.Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenRateIsDecimal_ThenCreatingShouldSucceed()
+            {
+                var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591M);
+
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                fx.Value.Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenRateIsFloat_ThenCreatingShouldSucceed()
+            {
+                var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591F);
+
+                fx.BaseCurrency.Should().Be(_euro);
+                fx.QuoteCurrency.Should().Be(_dollar);
+                fx.Value.Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenBaseAndQuoteCurrencyAreTheSame_ThenCreatingShouldThrow()
+            {
+                // Arrange, Act
+                Action action = () => new ExchangeRate(_euroAsString, _euroAsString, 1.2591F);
 
                 // Assert
                 action.ShouldThrow<ArgumentException>();

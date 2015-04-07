@@ -7,24 +7,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney", "NodaMoney\Noda
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{96BD7E4A-8487-47D7-8459-814BA8288701}"
 	ProjectSection(SolutionItems) = preProject
-		NodaMoney\.nuspec = NodaMoney\.nuspec
+		appveyor.yml = appveyor.yml
 		CodeAnalysisDictionary.xml = CodeAnalysisDictionary.xml
+		Coding Guidelines.docx = Coding Guidelines.docx
 		CONTRIBUTING.md = CONTRIBUTING.md
+		NodaMoney\NodaMoney.nuspec = NodaMoney\NodaMoney.nuspec
 		NodaMoney.sln.DotSettings = NodaMoney.sln.DotSettings
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
 		SolutionInfo.cs = SolutionInfo.cs
-		StyleCopeRulesReadMe.docx = StyleCopeRulesReadMe.docx
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.UnitTests", "NodaMoney.UnitTests\NodaMoney.UnitTests.csproj", "{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4D91A880-3B04-443F-AC5B-FA6BF4D9FD65}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Serialization.AspNet", "NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj", "{4D77971D-49FB-451A-A1D5-E92285291DC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +36,10 @@ Global
 		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

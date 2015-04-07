@@ -1,12 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- See for help: http://msdn.microsoft.com/en-us/library/bb514188.aspx -->
+<!-- To apply a custom dictionary to a project in Solution Explorer, drag this file using ALT to your project (in Properties) to
+     create a link to this file. Right-click then the CustomDictionary.xml file name and click Properties and set 'Build Action' 
+     to CodeAnalysisDictionary and 'Copy to Output Directory' to 'Do not copy'.
+-->
 <Dictionary>
   <Words>
     <Unrecognized>
       <Word>cb</Word>
     </Unrecognized>
     <Recognized>
-      <Word>NodaMoney</Word>
+      <Word>Noda</Word>
       <Word>DynamicHands</Word>
+      <Word>iraimbilanja</Word>
+      <Word>cinquième</Word>
+      <Word>ariary</Word>
     </Recognized>
     <Deprecated>
       <Term PreferredAlternate="EnterpriseServices">ComPlus</Term>
@@ -14,7 +22,6 @@
   </Words>
   <Acronyms>      
     <CasingExceptions>
-      <Acronym>Pi</Acronym>
       <Acronym>USDollar</Acronym>
     </CasingExceptions>
   </Acronyms>
