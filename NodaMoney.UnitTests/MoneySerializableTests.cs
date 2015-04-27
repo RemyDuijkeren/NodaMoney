@@ -144,7 +144,18 @@ namespace NodaMoney.UnitTests
             }
         }
 
-        [TestClass]
+		[DataContract]
+	    public class Article
+	    {
+			[DataMember]
+			public int Id { get; set; }
+			[DataMember]
+			public string Name { get; set; }
+			[DataMember]
+		    public Money Amount { get; set; }
+	    }
+
+	    [TestClass]
         public class GivenIWantToSerializeMoneyWithDataContractSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
@@ -165,6 +176,21 @@ namespace NodaMoney.UnitTests
 
                 euro.Should().Be(Clone<Money>(euro));
             }
+
+	        [TestMethod]
+	        public void WhenSerializingArticle_ThenThisShouldSucceed()
+	        {
+		        var article = new Article
+		        {
+			        Id = 123,
+			        Amount = Money.Euro(27.15),
+			        Name = "Foo"
+		        };
+
+				Console.WriteLine(StreamToString(Serialize(article)));
+
+				article.Amount.Should().Be(Clone<Article>(article).Amount);
+	        }
 
             public static Stream Serialize(object source)
             {

@@ -34,7 +34,7 @@ namespace NodaMoney
             if (reader == null)
                 throw new ArgumentNullException("reader");
 
-            if (reader.MoveToContent() != XmlNodeType.Element || reader.LocalName != "Money")
+            if (reader.MoveToContent() != XmlNodeType.Element)
                 throw new SerializationException("Couldn't find content element with name Money!");
 
             Amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
