@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Coding Guidelines.docx = Coding Guidelines.docx
 		CONTRIBUTING.md = CONTRIBUTING.md
 		NodaMoney\NodaMoney.nuspec = NodaMoney\NodaMoney.nuspec
+		NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.nuspec = NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.nuspec
 		NodaMoney.sln.DotSettings = NodaMoney.sln.DotSettings
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
