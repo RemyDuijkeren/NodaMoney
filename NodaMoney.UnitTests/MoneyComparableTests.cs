@@ -97,7 +97,7 @@ namespace NodaMoney.UnitTests
             {
                 Action action = () => _tenEuro1.CompareTo(_tenDollar);
 
-                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*are not of the same Currency*");
             }
 
             [TestMethod]

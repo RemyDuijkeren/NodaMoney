@@ -60,7 +60,7 @@ namespace NodaMoney.UnitTests
 // ReSharper disable once UnusedVariable
                 Action action = () => { var result = _tenEuro + _tenDollar; };
 
-                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*are not of the same Currency*");
             }
 
             [TestMethod]
@@ -69,7 +69,7 @@ namespace NodaMoney.UnitTests
 // ReSharper disable once UnusedVariable
                 Action action = () => { var result = _tenEuro - _tenDollar; };
 
-                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*don't have the same Currency*");
+                action.ShouldThrow<InvalidCurrencyException>().WithMessage("*are not of the same Currency*");
             }
 
             [TestMethod]
