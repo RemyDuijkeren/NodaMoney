@@ -75,6 +75,7 @@
     <Compile Include="MoneyBinaryOperatorsTests.cs" />
     <Compile Include="MoneyComparableTests.cs" />
     <Compile Include="MoneyConvertibleTests.cs" />
+    <Compile Include="MoneyParsableTests.cs" />
     <Compile Include="MoneyFormattableTests.cs" />
     <Compile Include="MoneyFourMostUsedCurrenciesTests.cs" />
     <Compile Include="MoneySerializableTests.cs" />
