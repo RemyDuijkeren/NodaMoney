@@ -4,6 +4,12 @@
 version: '{build}-{branch}'
 
 #---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+cache:
+  - packages -> **\packages.config
+
+#---------------------------------#
 #       build configuration       #
 #---------------------------------#
 configuration: Release
