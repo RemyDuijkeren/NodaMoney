@@ -45,8 +45,8 @@ namespace NodaMoney
                 throw new ArgumentNullException("englishName");
             if (string.IsNullOrWhiteSpace(sign)) 
                 throw new ArgumentNullException("sign");
-            if (decimalDigits < -1 || decimalDigits > 3)
-                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 3!");
+            if (decimalDigits < -1 || decimalDigits > 4)
+                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 4!");
 
             Code = code;
             Number = number;
