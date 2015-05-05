@@ -41,10 +41,10 @@ var euros = new Money(6.54m, Currency.FromCode("EUR"));
 var euros = new Money(6.54m, "EUR");
 
 // define money explicit using helper method for most used currencies in the world
-var euros = Money.Euro(6.54m);
-var euros = Money.USDollar(6.54m);
-var euros = Money.PoundSterling(6.54m);
-var euros = Money.Yen(6);
+var money = Money.Euro(6.54m);
+var money = Money.USDollar(6.54m);
+var money = Money.PoundSterling(6.54m);
+var money = Money.Yen(6);
 
 // define money implicit using currency of current culture/region
 var money = new Money(6.54m);
