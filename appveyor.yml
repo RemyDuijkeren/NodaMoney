@@ -37,7 +37,7 @@ after_build:
 
 after_test:
 - packages\OpenCover.4.5.3723\OpenCover.Console.exe -register:user -filter:"+[NodaMoney*]*" -target:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\MSTest.exe" -targetargs:"/testcontainer:NodaMoney.UnitTests/bin/Release/NodaMoney.UnitTests.dll" -output:coverage.xml
-- packages\coveralls.io.1.3.4\tools\coveralls.net.exe --opencover coverage.xml
+- packages\coveralls.io.1.3.4\tools\coveralls.net.exe --debug --opencover coverage.xml
 
 
 #---------------------------------#
