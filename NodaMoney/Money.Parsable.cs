@@ -8,19 +8,19 @@ namespace NodaMoney
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     public partial struct Money
     {
-        /// <summary>Parses the specified s.</summary>
-        /// <param name="s">The s.</param>
-        /// <returns></returns>
-        /// <exception cref="System.FormatException">Currency sign matches multiple known currencies! Specify currency or culture expliciet.</exception>
-        public static Money Parse(string s)
+        /// <summary>Parses the specified string.</summary>
+        /// <param name="value">The string to parse to a Money instance.</param>
+        /// <returns>A Money instance from the specified string.</returns>
+        /// <exception cref="System.FormatException">Currency sign matches multiple known currencies! Specify currency or culture explicit.</exception>
+        public static Money Parse(string value)
         {
-            if (string.IsNullOrWhiteSpace(s))
-                throw new ArgumentNullException("s");
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentNullException("value");
 
             // TODO: How to handle alternative symbols, like US$
             var currencyCharacters = new List<char>();
             var amountCharacters = new List<char>();
-            foreach (char character in s)
+            foreach (char character in value)
             {
                 if (char.IsDigit(character) || character == '.' || character == ',')
                 {
@@ -49,14 +49,14 @@ namespace NodaMoney
                 if (match.Count > 1)
                 {
                     throw new FormatException(
-                        "Currency sign matches multiple known currencies! Specify currency or culture expliciet.");
+                        "Currency sign matches multiple known currencies! Specify currency or culture explicit.");
                 }
 
                 currency = match[0];
             }
 
             var nfi = GetNumberFormatInfo(currency, null);
-            decimal d = Decimal.Parse(amountAsString, nfi);
+            decimal d = decimal.Parse(amountAsString, nfi);
             return new Money(d, currency);
         }
     }
