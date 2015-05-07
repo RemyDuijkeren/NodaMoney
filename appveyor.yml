@@ -8,9 +8,7 @@ version: '{build}-{branch}'
 #---------------------------------#
 environment:
   COVERALLS_REPO_TOKEN:
-    secure: Pn67B/ELnBY8YWJUBE4s4oIx98wS5NRLTOrP7AP/EiuU2l9brndSCF2cPL6+JUBe
-cache:
-  - packages -> **\packages.config
+    secure: Pn67B/ELnBY8YWJUBE4s4oIx98wS5NRLTOrP7AP/EiuU2l9brndSCF2cPL6+JUBe
 
 #---------------------------------#
 #       build configuration       #
