@@ -36,7 +36,7 @@ after_build:
 test_script:
 - ps: >-
     iex ((Resolve-Path "packages\OpenCover.*\OpenCover.Console.exe").ToString() + ' --% -register:user -filter:"+[NodaMoney*]*" -target:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\MSTest.exe" -targetargs:"/testcontainer:NodaMoney.UnitTests/bin/Release/NodaMoney.UnitTests.dll" -output:coverage.xml')
-	
+
     iex ((Resolve-Path "packages\coveralls.io.*\tools\coveralls.net.exe").ToString() + ' --opencover coverage.xml')
 
 
