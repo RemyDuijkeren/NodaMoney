@@ -57,7 +57,7 @@ deploy:
   artifact: NodaMoney.zip
   draft: true
   on:
-    branch: '^(\d+\.)?(\d+\.)?(\*|\d+)$'
+    branch: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
 
 - provider: NuGet
   server: https://www.nuget.org/
@@ -65,7 +65,7 @@ deploy:
     secure: cJV4lINlVi8J4NOZBAS5GnaaugKWWO0Zi5jCSKfkDOgs5mEpPDjIf9K0D8hB4bTU
   skip_symbols: true
   on:
-    branch: '^(\d+\.)?(\d+\.)?(\*|\d+)$'
+    branch: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
 
 #---------------------------------#
 #         notifications           #
