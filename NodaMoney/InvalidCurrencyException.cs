@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace NodaMoney
 {
-    /// <summary>The exception that is thrown when the <see cref="Currency"/> is invalid for current context or object state.</summary>
+    /// <summary>The exception that is thrown when the <see cref="Currency"/> is invalid for the current context or object state.</summary>
     [ComVisible(true)]
     public class InvalidCurrencyException : InvalidOperationException
     {

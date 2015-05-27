@@ -45,8 +45,8 @@ namespace NodaMoney
                 throw new ArgumentNullException("englishName");
             if (string.IsNullOrWhiteSpace(sign)) 
                 throw new ArgumentNullException("sign");
-            if (decimalDigits < -1 || decimalDigits > 3)
-                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 3!");
+            if (decimalDigits < -1 || decimalDigits > 4)
+                throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 4!");
 
             Code = code;
             Number = number;
@@ -317,7 +317,7 @@ namespace NodaMoney
                                      { "CHE", new Currency("CHE", "947", 2, "WIR Euro (complementary currency)", "CHE") },
                                      { "CHF", new Currency("CHF", "756", 2, "Swiss franc", "fr.") }, // or CHF
                                      { "CHW", new Currency("CHW", "948", 2, "WIR Franc (complementary currency)", "CHW") },
-                                     { "CLF", new Currency("CLF", "990", 0, "Unidad de Fomento (funds code)", "CLF") },
+                                     { "CLF", new Currency("CLF", "990", 4, "Unidad de Fomento (funds code)", "CLF") },
                                      { "CLP", new Currency("CLP", "152", 0, "Chilean peso", "$") },
                                      { "CNY", new Currency("CNY", "156", 2, "Chinese yuan", "¥") },
                                      { "COP", new Currency("COP", "170", 2, "Colombian peso", "$") },

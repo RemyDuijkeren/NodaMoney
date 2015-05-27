@@ -288,7 +288,7 @@ namespace NodaMoney
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)
-                throw new InvalidCurrencyException(string.Format("{0} and {1} don't have the same Currency!", left, right));
+                throw new InvalidCurrencyException(string.Format("{0} ({1}) and {2} ({3}) are not of the same Currency!", left, left.Currency.Code, right, right.Currency.Code));
         }
     }
 }

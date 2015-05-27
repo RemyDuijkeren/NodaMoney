@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace NodaMoney
 {
@@ -54,13 +56,8 @@ namespace NodaMoney
             return ConvertToString(format, formatProvider);
         }
 
-        private string ConvertToString(string format, IFormatProvider formatProvider)
+        private static NumberFormatInfo GetNumberFormatInfo(Currency currency, IFormatProvider formatProvider)
         {
-            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
-            // TODO: Move to Currency? Currency.GetNumberFormatInfo()
-            // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
-            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
-            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
             var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
             if (formatProvider != null)
@@ -74,8 +71,19 @@ namespace NodaMoney
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
-            numberFormatInfo.CurrencySymbol = Currency.Sign;
-            numberFormatInfo.CurrencyDecimalDigits = (int)Currency.DecimalDigits;
+            numberFormatInfo.CurrencySymbol = currency.Sign;
+            numberFormatInfo.CurrencyDecimalDigits = (int)currency.DecimalDigits;
+            return numberFormatInfo;
+        }
+
+        private string ConvertToString(string format, IFormatProvider formatProvider)
+        {
+            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
+            // TODO: Move to Currency? Currency.GetNumberFormatInfo()
+            // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
+            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
+            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
+            NumberFormatInfo numberFormatInfo = GetNumberFormatInfo(Currency, formatProvider);
 
             return Amount.ToString(format ?? "C", numberFormatInfo);
         }

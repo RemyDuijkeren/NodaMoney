@@ -1,10 +1,18 @@
 NodaMoney
 =========
+<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png">
 You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
 If you'd like to work with the bleeding edge, you can use our [custom Nuget feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
 Packages on this feed are pre-release and, while they've passed all our tests, are not yet ready for production.
+
+For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
+[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
+
+[![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
+[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=develop)](https://coveralls.io/r/remyvd/NodaMoney?branch=develop)
+
 
 About
 ----
@@ -41,10 +49,10 @@ var euros = new Money(6.54m, Currency.FromCode("EUR"));
 var euros = new Money(6.54m, "EUR");
 
 // define money explicit using helper method for most used currencies in the world
-var euros = Money.Euro(6.54m);
-var euros = Money.USDollar(6.54m);
-var euros = Money.PoundSterling(6.54m);
-var euros = Money.Yen(6);
+var money = Money.Euro(6.54m);
+var money = Money.USDollar(6.54m);
+var money = Money.PoundSterling(6.54m);
+var money = Money.Yen(6);
 
 // define money implicit using currency of current culture/region
 var money = new Money(6.54m);
@@ -128,12 +136,3 @@ euro.ToString(ci);   // "€ 765,43"
 dollar.ToString(ci); // "$ 765,43"
 dinar.ToString(ci);  // "BD 765,432"
 ```
-
-Support & Contributing
-----------------------
-For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
-[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
-
-Build status: [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-
-<a href="https://zenhub.io"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png" height="18px"></a>
