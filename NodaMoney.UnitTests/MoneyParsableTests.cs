@@ -17,7 +17,7 @@ namespace NodaMoney.UnitTests
                 using (new SwitchCulture("ja-JP"))
                 {
                     var yen = Money.Parse("¥ 765");
-
+                    
                     yen.Should().Be(new Money(765m, "JPY"));
                 }
             }
@@ -27,9 +27,9 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("zh-CN"))
                 {
-                    var yen = Money.Parse("¥ 765");
+                    var yuan = Money.Parse("¥ 765");
 
-                    yen.Should().Be(new Money(765m, "CNY"));
+                    yuan.Should().Be(new Money(765m, "CNY"));
                 }
             }
 
@@ -50,9 +50,9 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("en-US"))
                 {
-                    var yen = Money.Parse("$765.43");
+                    var dollar = Money.Parse("$765.43");
 
-                    yen.Should().Be(new Money(765.43m, "USD"));
+                    dollar.Should().Be(new Money(765.43m, "USD"));
                 }
             }
 
@@ -61,9 +61,9 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("es-AR"))
                 {
-                    var yen = Money.Parse("$765,43");
+                    var peso = Money.Parse("$765,43");
 
-                    yen.Should().Be(new Money(765.43m, "ARS"));
+                    peso.Should().Be(new Money(765.43m, "ARS"));
                 }
             }
 
@@ -99,28 +99,217 @@ namespace NodaMoney.UnitTests
             {
                 using (new SwitchCulture("fr-BE"))
                 {
-                    string value = "765,43 €";
-                    var euro = Money.Parse(value);
+                    var euro = Money.Parse("765,43 €");
+
+                    euro.Should().Be(new Money(765.43, "EUR"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingNumberWithoutCurrency_ThenThisUseCurrencyOfCurrentCulture()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    var euro = Money.Parse("765,43");
 
                     euro.Should().Be(new Money(765.43, "EUR"));
                 }
             }
         }
 
-        // var yen = Money.Parse("¥ 765");
-        // var euro = Money.Parse("€ 765,43");
-        // var dollar = Money.Parse("$ 765,43");
-        // var dinar = Money.Parse("BD 765,432");
+        [TestClass]
+        public class GivenIWantToParseExplicitCurrency
+        {
+            [TestMethod]
+            public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    var yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
 
-        // var n1 = Money.Parse("¤765.43");
-        // var d1 = Money.Parse("$765.43");
-        // var p1 = Money.Parse("£765.43");
-        // var e1 = Money.Parse("765.43 €");
-        // var e1 = Money.Parse("kr 765.43");
-        
-        // yen.Should().Be(new Money(765m, "JPY"));
-        // euro.Should().Be(new Money(765.43m, "EUR"));
-        // dollar.Should().Be(new Money(765.43m, "USD"));
-        // dinar.Should().Be(new Money(765.432m, "BHD"));
+                    yen.Should().Be(new Money(765, "JPY"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    var peso = Money.Parse("$765.43", Currency.FromCode("ARS"));
+
+                    peso.Should().Be(new Money(765.43m, "ARS"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
+            {
+                using (new SwitchCulture("es-AR"))
+                {
+                    var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+
+                    dollar.Should().Be(new Money(765.43m, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
+            {
+                // $ symbol is used for multiple currencies
+                using (new SwitchCulture("nl-NL"))
+                {
+                    var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+
+                    dollar.Should().Be(new Money(765.43m, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-BE"))
+                {
+                    var euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
+
+                    euro.Should().Be(new Money(765.43m, "EUR"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("fr-BE"))
+                {
+                    var euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
+
+                    euro.Should().Be(new Money(765.43, "EUR"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    var euro = Money.Parse("765,43", Currency.FromCode("USD"));
+
+                    euro.Should().Be(new Money(765.43, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldFail()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    Action action = () => Money.Parse("€ 765,43", Currency.FromCode("USD"));
+
+                    action.ShouldThrow<FormatException>().WithMessage("Input string was not in a correct format.");
+                }
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToParseNegativeMoney
+        {
+            [TestMethod]
+            public void WhenMinusSignBeforeDollarSign_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    string value = "-$765.43";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenMinusSignAfterDollarSign_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    string value = "$-765.43";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenDollarsWithParentheses_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("en-US"))
+                {
+                    string value = "($765.43)";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "USD"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenMinusSignBeforeEuroSign_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    string value = "-€ 765,43";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "EUR"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenMinusSignAfterEuroSign_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    string value = "€ -765,43";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "EUR"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenEurosWithParentheses_ThenThisShouldSucceed()
+            {
+                using (new SwitchCulture("nl-NL"))
+                {
+                    string value = "(€ 765,43)";
+                    var dollar = Money.Parse(value);
+
+                    dollar.Should().Be(new Money(-765.43, "EUR"));
+                }
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToParseMoneyWithMoreDecimalPossibleForCurrency
+        {
+            [TestMethod]
+            public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedDown()
+            {
+                using (new SwitchCulture("ja-JP"))
+                {
+                    var yen = Money.Parse("¥ 765.4");
+
+                    yen.Should().Be(new Money(765m, "JPY"));
+                }
+            }
+
+            [TestMethod]
+            public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedUp()
+            {
+                using (new SwitchCulture("ja-JP"))
+                {
+                    var yen = Money.Parse("¥ 765.5");
+
+                    yen.Should().Be(new Money(766m, "JPY"));
+                }
+            }
+        }
     }
 }
