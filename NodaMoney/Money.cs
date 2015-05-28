@@ -87,11 +87,17 @@ namespace NodaMoney
 
             // TODO: Currency.Z07 and Currency.DOT edge case handeling!
             if (Currency.DecimalDigits == Currency.DOT)
-                Amount = Math.Round(amount);
-            if (Currency.DecimalDigits == Currency.Z07)
+            {
+                Amount = Math.Round(amount);                
+            }
+            else if (Currency.DecimalDigits == Currency.Z07)
+            {
                 Amount = Math.Round(amount, 1);
-
-            Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
+            }
+            else
+            {
+                Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
+            }
         }
 
         // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
