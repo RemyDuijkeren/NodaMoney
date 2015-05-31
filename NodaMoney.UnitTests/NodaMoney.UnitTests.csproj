@@ -86,6 +86,7 @@
     <Compile Include="Helpers\SwitchCulture.cs" />
     <Compile Include="ExchangeRateTests.cs" />
     <Compile Include="CurrencyTests.cs" />
+    <Compile Include="CurrencyBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj">

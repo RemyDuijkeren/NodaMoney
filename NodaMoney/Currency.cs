@@ -24,7 +24,7 @@ namespace NodaMoney
         // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
         internal const double DOT = -1;
-        private static readonly Dictionary<string, Currency> Currencies = InitializeIsoCurrencies();
+        internal static readonly Dictionary<string, Currency> Currencies = InitializeIsoCurrencies();
 
         /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
         /// <param name="code">The code.</param>
