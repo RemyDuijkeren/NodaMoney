@@ -32,9 +32,10 @@ namespace NodaMoney
         /// <param name="decimalDigits">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
         /// <param name="sign">The sign.</param>
+        /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or sign is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 3!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string sign)
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 4!</exception>
+        internal Currency(string code, string number, double decimalDigits, string englishName, string sign, bool isObsolete = false)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -53,6 +54,7 @@ namespace NodaMoney
             DecimalDigits = decimalDigits;
             EnglishName = englishName;
             Sign = sign;
+            IsObsolete = isObsolete;
         }
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -111,6 +113,10 @@ namespace NodaMoney
                 return new decimal(1 / Math.Pow(10, DecimalDigits));
             }
         }
+
+        /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
+        /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
+        public bool IsObsolete { get; private set; }
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
