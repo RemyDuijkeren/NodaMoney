@@ -32,9 +32,10 @@ namespace NodaMoney
         /// <param name="decimalDigits">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
         /// <param name="sign">The sign.</param>
+        /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or sign is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 3!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string sign)
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 4!</exception>
+        internal Currency(string code, string number, double decimalDigits, string englishName, string sign, bool isObsolete = false)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -53,6 +54,7 @@ namespace NodaMoney
             DecimalDigits = decimalDigits;
             EnglishName = englishName;
             Sign = sign;
+            IsObsolete = isObsolete;
         }
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -111,6 +113,10 @@ namespace NodaMoney
                 return new decimal(1 / Math.Pow(10, DecimalDigits));
             }
         }
+
+        /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
+        /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
+        public bool IsObsolete { get; private set; }
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
@@ -373,8 +379,8 @@ namespace NodaMoney
                                      { "LKR", new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs") }, // or රු
                                      { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "$") }, // or L$, LD$
                                      { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "L") }, // L or M (pl.)
-                                     // { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") }, // Until 2014-12-31, replaced by EUR
-                                     // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
+                                     { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", isObsolete: true) }, // Until 2014-12-31, replaced by EUR
+                                     { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", isObsolete: true) }, // Until 2014-01-15, replaced by EUR
                                      { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "ل.د") }, // or LD
                                      { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "د.م.") },
                                      { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "L") },
@@ -466,8 +472,9 @@ namespace NodaMoney
                                      { "YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                                      { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                                      { "ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
-                                     // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
-                                     { "ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") } // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
+                                     { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", isObsolete: true) },  // Until 2013-01-01, replaced by ZWM
+                                     { "ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", isObsolete: true) }, // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
+                                     { "EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", isObsolete: true) }  // From 1992 Until 2010-12-31, replaced by EUR
                                  }; 
 
             return currencies;
