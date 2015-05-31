@@ -99,6 +99,7 @@ namespace NodaMoney.UnitTests
                 currency.Sign.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
+                currency.IsObsolete.Should().BeFalse();
             }
 
             [TestMethod]
@@ -116,6 +117,17 @@ namespace NodaMoney.UnitTests
 
                 action.ShouldThrow<ArgumentNullException>();
             }
+
+            [TestMethod]
+            public void WhenEstionianKrone_ThenItShouldBeObsolete()
+            {
+                var currency = Currency.FromCode("EEK");
+
+                currency.Should().NotBeNull();
+                currency.Sign.Should().Be("kr");
+                currency.IsObsolete.Should().BeTrue();
+            }
+
         }
 
         [TestClass]

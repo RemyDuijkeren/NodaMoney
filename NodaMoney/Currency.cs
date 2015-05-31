@@ -379,8 +379,8 @@ namespace NodaMoney
                                      { "LKR", new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs") }, // or රු
                                      { "LRD", new Currency("LRD", "430", 2, "Liberian dollar", "$") }, // or L$, LD$
                                      { "LSL", new Currency("LSL", "426", 2, "Lesotho loti", "L") }, // L or M (pl.)
-                                     // { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt") }, // Until 2014-12-31, replaced by EUR
-                                     // { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls") }, // Until 2014-01-15, replaced by EUR
+                                     { "LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", isObsolete: true) }, // Until 2014-12-31, replaced by EUR
+                                     { "LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", isObsolete: true) }, // Until 2014-01-15, replaced by EUR
                                      { "LYD", new Currency("LYD", "434", 3, "Libyan dinar", "ل.د") }, // or LD
                                      { "MAD", new Currency("MAD", "504", 2, "Moroccan dirham", "د.م.") },
                                      { "MDL", new Currency("MDL", "498", 2, "Moldovan leu", "L") },
@@ -472,8 +472,9 @@ namespace NodaMoney
                                      { "YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                                      { "ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                                      { "ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
-                                     // { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK") }  // Until 2013-01-01, replaced by ZWM
-                                     { "ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") } // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
+                                     { "ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", isObsolete: true) },  // Until 2013-01-01, replaced by ZWM
+                                     { "ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", isObsolete: true) }, // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
+                                     { "EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", isObsolete: true) }  // From 1992 Until 2010-12-31, replaced by EUR
                                  }; 
 
             return currencies;
