@@ -31,11 +31,11 @@ namespace NodaMoney
         /// <param name="number">The number.</param>
         /// <param name="decimalDigits">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
-        /// <param name="sign">The sign.</param>
+        /// <param name="symbol">The currency symbol.</param>
         /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
-        /// <exception cref="System.ArgumentNullException">code or number or englishName or sign is null</exception>
+        /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 4!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string sign, bool isObsolete = false)
+        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, bool isObsolete = false)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -44,8 +44,8 @@ namespace NodaMoney
                 throw new ArgumentNullException("number");
             if (string.IsNullOrWhiteSpace(englishName)) 
                 throw new ArgumentNullException("englishName");
-            if (string.IsNullOrWhiteSpace(sign)) 
-                throw new ArgumentNullException("sign");
+            if (string.IsNullOrWhiteSpace(symbol)) 
+                throw new ArgumentNullException("symbol");
             if (decimalDigits < -1 || decimalDigits > 4)
                 throw new ArgumentOutOfRangeException("code", "DecimalDigits must be between -1 and 4!");
 
@@ -53,7 +53,7 @@ namespace NodaMoney
             Number = number;
             DecimalDigits = decimalDigits;
             EnglishName = englishName;
-            Sign = sign;
+            Symbol = symbol;
             IsObsolete = isObsolete;
         }
 
@@ -64,8 +64,8 @@ namespace NodaMoney
             get { return Currency.FromRegion(RegionInfo.CurrentRegion); }
         }   
 
-        /// <summary>Gets the currency sign.</summary>
-        public string Sign { get; private set; }
+        /// <summary>Gets the currency symbol.</summary>
+        public string Symbol { get; private set; }
 
         /// <summary>Gets the english name of the currency.</summary>
         public string EnglishName { get; private set; }
@@ -114,7 +114,7 @@ namespace NodaMoney
             }
         }
 
-        /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
+        /// <summary>Gets a value indicating whether currency is obsolete.</summary>
         /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
         public bool IsObsolete { get; private set; }
 
@@ -237,7 +237,7 @@ namespace NodaMoney
         {
             return Code.GetHashCode();
         }
-        
+
         ///// <summary>Gets the name of the currency, formatted in the native language of the country\region where the currency is used.</summary>
         ///// <param name="culture">The culture.</param>
         ///// <returns>The native name of the currency.</returns>
@@ -344,7 +344,7 @@ namespace NodaMoney
                                      { "FJD", new Currency("FJD", "242", 2, "Fiji dollar", "$") }, // or FJ$
                                      { "FKP", new Currency("FKP", "238", 2, "Falkland Islands pound", "£") },
                                      { "GBP", new Currency("GBP", "826", 2, "Pound sterling", "£") },
-                                     { "GEL", new Currency("GEL", "981", 2, "Georgian lari", "ლ.") }, // TODO: new sign since July 18, 2014 => see http://en.wikipedia.org/wiki/Georgian_lari
+                                     { "GEL", new Currency("GEL", "981", 2, "Georgian lari", "ლ.") }, // TODO: new symbol since July 18, 2014 => see http://en.wikipedia.org/wiki/Georgian_lari
                                      { "GHS", new Currency("GHS", "936", 2, "Ghanaian cedi", "GH¢") }, // or GH₵
                                      { "GIP", new Currency("GIP", "292", 2, "Gibraltar pound", "£") },
                                      { "GMD", new Currency("GMD", "270", 2, "Gambian dalasi", "D") },
@@ -426,7 +426,7 @@ namespace NodaMoney
                                      { "SLL", new Currency("SLL", "694", 0, "Sierra Leonean leone", "Le") },
                                      { "SOS", new Currency("SOS", "706", 2, "Somali shilling", "S") }, // or Sh.So.
                                      { "SRD", new Currency("SRD", "968", 2, "Surinamese dollar", "$") },
-                                     { "SSP", new Currency("SSP", "728", 2, "South Sudanese pound", "£") }, // not sure about sign...
+                                     { "SSP", new Currency("SSP", "728", 2, "South Sudanese pound", "£") }, // not sure about symbol...
                                      { "STD", new Currency("STD", "678", 0, "São Tomé and Príncipe dobra", "Db") },
                                      { "SYP", new Currency("SYP", "760", 2, "Syrian pound", "ܠ.ܣ.‏") }, // or LS or £S (or £)
                                      { "SZL", new Currency("SZL", "748", 2, "Swazi lilangeni", "L") }, // or E (plural)

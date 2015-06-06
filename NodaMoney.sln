@@ -8,9 +8,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{96BD7E4A-8487-47D7-8459-814BA8288701}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		CodeAnalysisDictionary.xml = CodeAnalysisDictionary.xml
 		Coding Guidelines.docx = Coding Guidelines.docx
 		CONTRIBUTING.md = CONTRIBUTING.md
+		CustomDictionary.xml = CustomDictionary.xml
 		NodaMoney\NodaMoney.nuspec = NodaMoney\NodaMoney.nuspec
 		NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.nuspec = NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.nuspec
 		NodaMoney.sln.DotSettings = NodaMoney.sln.DotSettings

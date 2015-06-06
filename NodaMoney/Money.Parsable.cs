@@ -136,14 +136,14 @@ namespace NodaMoney
             // TODO: How to handle alternative symbols, like US$
             string currencyAsString = new string(value.Cast<char>().Where(IsNotNumericCharacter()).ToArray());
 
-            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Sign == currencyAsString
+            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Symbol == currencyAsString
                 || Currency.CurrentCurrency.Code == currencyAsString)
             {
                 return Currency.CurrentCurrency;
             }
 
             List<Currency> match =
-                Currency.GetAllCurrencies().Where(c => c.Sign == currencyAsString || c.Code == currencyAsString).ToList();
+                Currency.GetAllCurrencies().Where(c => c.Symbol == currencyAsString || c.Code == currencyAsString).ToList();
 
             if (match.Count == 0)
             {
@@ -153,7 +153,7 @@ namespace NodaMoney
 
             if (match.Count > 1)
             {
-                if (currencyAsString == "¥" && Currency.CurrentCurrency.Sign == "¥")
+                if (currencyAsString == "¥" && Currency.CurrentCurrency.Symbol == "¥")
                     Debug.WriteLine("in error");
 
                 throw new FormatException(

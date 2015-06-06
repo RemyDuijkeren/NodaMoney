@@ -71,7 +71,7 @@ namespace NodaMoney
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
-            numberFormatInfo.CurrencySymbol = currency.Sign;
+            numberFormatInfo.CurrencySymbol = currency.Symbol;
             numberFormatInfo.CurrencyDecimalDigits = (int)currency.DecimalDigits;
             return numberFormatInfo;
         }
