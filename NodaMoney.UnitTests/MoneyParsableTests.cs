@@ -40,6 +40,7 @@ namespace NodaMoney.UnitTests
                 {
                     var euro = Money.Parse("765,43");
 
+
                     euro.Should().Be(new Money(765.43, "EUR"));
                 }
             }

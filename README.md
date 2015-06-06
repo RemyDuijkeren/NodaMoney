@@ -136,3 +136,42 @@ euro.ToString(ci);   // "€ 765,43"
 dollar.ToString(ci); // "$ 765,43"
 dinar.ToString(ci);  // "BD 765,432"
 ```
+
+**Money parsing**
+
+```C#
+// Implicit parsing when current culture is 'nl-BE'
+Money euro = Money.Parse("€ 765,43");
+Money euro = Money.Parse("-€ 765,43");
+Money euro = Money.Parse("€-765,43");
+Money euro = Money.Parse("765,43 €");
+Money yen = Money.Parse("¥ 765"); // throw FormatException, because ¥ symbol is used for Japanese yen and Chinese yuan
+Money dollar = Money.Parse("$ 765,43"); // throw FormatException, because $ symbol is used for multiple currencies
+
+// Implicit parsing when current culture is 'ja-JP'
+Money yen = Money.Parse("¥ 765");
+
+// Implicit parsing when current culture is 'zh-CN'
+Money yuan = Money.Parse("¥ 765");
+
+// Implicit parsing when current culture is 'en-US'
+Money dollar = Money.Parse("$765.43");
+Money dollar = Money.Parse("($765.43)"); // -$765.43
+
+// Implicit parsing when current culture is 'es-AR'
+Money peso = Money.Parse("$765.43");
+
+// Explicit parsing when current culture is 'nl-BE'
+Money euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
+Money euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
+Money yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
+Money yuan = Money.Parse("¥ 765", Currency.FromCode("CNY"));
+
+// Implicit try parsing when current culture is 'nl-BE'
+Money euro;
+Money.TryParse("€ 765,43", out euro);
+
+// Explicit try parsing when current culture is 'nl-BE'
+Money euro;
+Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
+```
