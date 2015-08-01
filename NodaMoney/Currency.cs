@@ -353,7 +353,7 @@ namespace NodaMoney
                                      { "GYD", new Currency("GYD", "328", 2, "Guyanese dollar", "$") }, // or G$
                                      { "HKD", new Currency("HKD", "344", 2, "Hong Kong dollar", "HK$") }, // or $
                                      { "HNL", new Currency("HNL", "340", 2, "Honduran lempira", "L") },
-                                     { "HRK", new Currency("HRK", "191", 2, "Croatian kuna", "kn") },
+                                     { "HRK", new Currency("HRK", "191", 2, "Kuna", "kn") },
                                      { "HTG", new Currency("HTG", "332", 2, "Haitian gourde", "G") },
                                      { "HUF", new Currency("HUF", "348", 2, "Hungarian forint", "Ft") },
                                      { "IDR", new Currency("IDR", "360", 2, "Indonesian rupiah", "Rp") },
@@ -412,7 +412,7 @@ namespace NodaMoney
                                      { "PLN", new Currency("PLN", "985", 2, "Polish złoty", "zł") },
                                      { "PYG", new Currency("PYG", "600", 0, "Paraguayan guaraní", "₲") },
                                      { "QAR", new Currency("QAR", "634", 2, "Qatari riyal", "ر.ق") }, // or QR
-                                     { "RON", new Currency("RON", "946", 2, "Romanian new leu", "lei") },
+                                     { "RON", new Currency("RON", "946", 2, "Romanian Leu", "lei") },
                                      { "RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин. or din. ?)
                                      { "RUB", new Currency("RUB", "643", 2, "Russian rouble", "₽") }, // or R or руб (both onofficial)
                                      { "RWF", new Currency("RWF", "646", 0, "Rwandan franc", "RFw") }, // or RF, R₣
