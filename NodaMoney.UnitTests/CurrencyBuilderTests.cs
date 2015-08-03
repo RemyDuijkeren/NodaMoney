@@ -42,6 +42,7 @@ namespace NodaMoney.UnitTests
                 // numberFormatInfo.CurrencyPositivePattern = 2;
                 // numberFormatInfo.CurrencySymbol = "EUR";
                 // numberFormatInfo.DigitSubstitution = DigitShapes.None;
+
                 builder.Register();
 
                 Currency bitcoin = Currency.FromCode("BTC");
@@ -49,14 +50,32 @@ namespace NodaMoney.UnitTests
             }
 
             [TestMethod]
+            public void WhenRegisterBitCoin_ThenShouldBeAvailableByNamespace()
+            {
+                var builder = new CurrencyBuilder("BTC1", "virtual");
+                builder.Code = "BTC1"; // ISOCode
+                builder.EnglishName = "Bitcoin";
+                builder.Namespace = "virtual";
+                builder.Symbol = "฿";
+                builder.ISONumber = "123"; // iso number
+                builder.DecimalDigits = 4;
+                builder.IsObsolete = false;
+
+                builder.Register();
+
+                Currency bitcoin = Currency.FromCode("BTC1", "virtual");
+                bitcoin.Symbol.Should().Be("฿");
+            }
+
+            [TestMethod]
             public void WhenFromExistingCurrency_ThenThisShouldSucceed()
             {
-                var builder = new CurrencyBuilder("BTC", "virtual");
+                var builder = new CurrencyBuilder("BTC2", "virtual");
 
                 var euro = Currency.FromCode("EUR");
                 builder.LoadDataFromCurrency(euro);
 
-                builder.Code.Should().Be("BTC");
+                builder.Code.Should().Be("BTC2");
                 builder.Namespace.Should().Be("virtual");
                 builder.EnglishName.Should().Be(euro.EnglishName);                
                 builder.Symbol.Should().Be(euro.Symbol);
@@ -88,13 +107,13 @@ namespace NodaMoney.UnitTests
             {
                 var euro = Currency.FromCode("EUR"); // should work
 
-                CurrencyBuilder.Unregister("EUR", "ISO 4217");
+                CurrencyBuilder.Unregister("EUR", "ISO-4217");
                 Action action = () => Currency.FromCode("EUR");
 
-                action.ShouldThrow<ArgumentException>().WithMessage("*unknown ISO 4217 currency*");
+                action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
 
                 // register again for other unit-tests
-                var builder = new CurrencyBuilder("EUR", "ISO 4217");
+                var builder = new CurrencyBuilder("EUR", "ISO-4217");
                 builder.LoadDataFromCurrency(euro);
                 builder.Register();
             }

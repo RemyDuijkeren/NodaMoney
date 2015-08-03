@@ -24,7 +24,10 @@ namespace NodaMoney
         // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
         internal const double DOT = -1;
-        internal static readonly Dictionary<string, Currency> Currencies = InitializeIsoCurrencies();
+        internal static readonly Dictionary<string, Dictionary<string, Currency>> Currencies = new Dictionary<string, Dictionary<string, Currency>>
+                                                                                                   {
+                                                                                                       ["ISO-4217"] = InitializeIsoCurrencies()
+                                                                                                   };
 
         /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
         /// <param name="code">The code.</param>
@@ -126,11 +129,31 @@ namespace NodaMoney
         public static Currency FromCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code)) 
-                throw new ArgumentNullException("code");
-            if (!Currencies.ContainsKey(code.ToUpperInvariant())) 
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown ISO 4217 currency code!", code));
+                throw new ArgumentNullException(nameof(code));
 
-            return Currencies[code.ToUpperInvariant()];
+            // TODO : OrderBy... First ISO-4217 namespace
+            // Don't change to LINQ, because of performance!
+            foreach (var ns in Currencies)
+            {
+                if (ns.Value.ContainsKey(code.ToUpperInvariant()))
+                    return ns.Value[code.ToUpperInvariant()];
+            }
+
+            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown currency code!", code));
+        }
+
+        public static Currency FromCode(string code, string @namespace)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentNullException(nameof(code));
+            if (string.IsNullOrWhiteSpace(@namespace))
+                throw new ArgumentNullException(nameof(@namespace));
+            if (!Currencies.ContainsKey(@namespace))
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown namespace!", @namespace));
+            if (!Currencies[@namespace].ContainsKey(code.ToUpperInvariant()))
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "{0} is an unknown {1} currency code!", code, @namespace));
+
+            return Currencies[@namespace][code.ToUpperInvariant()];
         }
 
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified <see cref="RegionInfo"/>.</summary>
@@ -140,7 +163,7 @@ namespace NodaMoney
         public static Currency FromRegion(RegionInfo region)
         {
             if (region == null) 
-                throw new ArgumentNullException("region");
+                throw new ArgumentNullException(nameof(region));
 
             return FromCode(region.ISOCurrencySymbol);
         }
@@ -153,7 +176,7 @@ namespace NodaMoney
         public static Currency FromCulture(CultureInfo culture)
         {
             if (culture == null) 
-                throw new ArgumentNullException("culture");
+                throw new ArgumentNullException(nameof(culture));
             if (culture.IsNeutralCulture) 
                 throw new ArgumentException("Culture {0} is a neutral culture, from which no region information can be extracted!", culture.Name);
             
@@ -173,7 +196,7 @@ namespace NodaMoney
         public static Currency FromRegion(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) 
-                throw new ArgumentNullException("name");            
+                throw new ArgumentNullException(nameof(name));            
 
             return FromRegion(new RegionInfo(name));
         }
@@ -183,7 +206,7 @@ namespace NodaMoney
         public static Currency[] GetAllCurrencies()
         {
             // TODO: IQueryable?
-            return Currencies.Values.ToArray();
+            return Currencies.SelectMany(ns => ns.Value).Select(kv => kv.Value).ToArray();
         }
 
         /// <summary>Implements the operator ==.</summary>

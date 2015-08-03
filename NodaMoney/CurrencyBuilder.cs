@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NodaMoney
 {
@@ -52,27 +53,30 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">currencyCode specifies a currency that is not found.</exception>
         public static void Unregister(string currencyCode, string @namespace)
         {
-            if (!Currency.Currencies.ContainsKey(currencyCode))
+            if (!(Currency.Currencies.ContainsKey(@namespace) && Currency.Currencies[@namespace].ContainsKey(currencyCode.ToUpperInvariant())))
                 throw new ArgumentException(string.Format("currencyCode {0} specifies a currency that is not found!", currencyCode));
 
-            Currency.Currencies.Remove(currencyCode);
+            Currency.Currencies[@namespace].Remove(currencyCode.ToUpperInvariant());
         }
 
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="System.InvalidOperationException">
+        /// <exception cref="InvalidOperationException">
         ///     <para>The custom currency is already registered</para>
         ///     <para>-or-</para>
         ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
         /// </exception>
         public void Register()
         {
-            if (Currency.Currencies.ContainsKey(Code))
+            if (Currency.Currencies.ContainsKey(Namespace) && Currency.Currencies[Namespace].ContainsKey(Code.ToUpperInvariant()))
                 throw new InvalidOperationException("The custom currency is already registered.\n-or-\n"
                                                     + "The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
 
             var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol);
-            Currency.Currencies.Add(Code, currency);
+
+            if (!Currency.Currencies.ContainsKey(Namespace))
+                Currency.Currencies[Namespace] = new Dictionary<string, Currency>();
+
+            Currency.Currencies[Namespace].Add(currency.Code.ToUpperInvariant(), currency);
         }
 
         /// <summary>Writes an XML representation of the current <see cref="CurrencyBuilder"/> object to the specified file.</summary>
