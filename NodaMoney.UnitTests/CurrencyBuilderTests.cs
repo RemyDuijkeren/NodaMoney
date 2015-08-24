@@ -13,9 +13,7 @@ namespace NodaMoney.UnitTests
             public void WhenRegisterBitCoin_ThenShouldBeAvailable()
             {
                 var builder = new CurrencyBuilder("BTC", "virtual");
-                builder.Code = "BTC"; // ISOCode
                 builder.EnglishName = "Bitcoin";
-                builder.Namespace = "virtual";
                 builder.Symbol = "฿";
                 builder.ISONumber = "123"; // iso number
                 builder.DecimalDigits = 4;
@@ -53,9 +51,7 @@ namespace NodaMoney.UnitTests
             public void WhenRegisterBitCoin_ThenShouldBeAvailableByNamespace()
             {
                 var builder = new CurrencyBuilder("BTC1", "virtual");
-                builder.Code = "BTC1"; // ISOCode
                 builder.EnglishName = "Bitcoin";
-                builder.Namespace = "virtual";
                 builder.Symbol = "฿";
                 builder.ISONumber = "123"; // iso number
                 builder.DecimalDigits = 4;
@@ -122,9 +118,7 @@ namespace NodaMoney.UnitTests
             public void WhenUnregisterCustomCurrency_ThenThisMustSucceed()
             {
                 var builder = new CurrencyBuilder("XYZ", "virtual");
-                builder.Code = "XYZ"; // ISOCode
                 builder.EnglishName = "Xyz";
-                builder.Namespace = "virtual";
                 builder.Symbol = "฿";
                 builder.ISONumber = "123";  // iso number
                 builder.DecimalDigits = 4;

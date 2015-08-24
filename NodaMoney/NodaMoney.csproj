@@ -49,6 +49,7 @@
     </Compile>
     <Compile Include="Currency.cs" />
     <Compile Include="CurrencyBuilder.cs" />
+    <Compile Include="CurrencyNamespace.cs" />
     <Compile Include="ExchangeRate.cs" />
     <Compile Include="Extensions\MoneyExtensions.SaveDivide.cs" />
     <Compile Include="GlobalSuppressions.cs" />
