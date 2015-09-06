@@ -32,7 +32,7 @@ namespace NodaMoney
         public void ReadXml(XmlReader reader)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             if (reader.MoveToContent() != XmlNodeType.Element)
                 throw new SerializationException("Couldn't find content element with name Money!");
@@ -47,7 +47,7 @@ namespace NodaMoney
         public void WriteXml(XmlWriter writer)
         {
             if (writer == null)
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
 
             writer.WriteAttributeString("Amount", Amount.ToString(CultureInfo.InvariantCulture));
             writer.WriteAttributeString("Currency", Currency.Code);

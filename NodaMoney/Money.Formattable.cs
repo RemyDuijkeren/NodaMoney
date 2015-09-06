@@ -28,7 +28,7 @@ namespace NodaMoney
         {
             // http://msdn.microsoft.com/en-us/library/syy068tk.aspx
             if (format == null)
-                throw new ArgumentNullException("format");
+                throw new ArgumentNullException(nameof(format));
 
             return ConvertToString(format, null);
         }
@@ -41,7 +41,7 @@ namespace NodaMoney
         public string ToString(IFormatProvider formatProvider)
         {
             if (formatProvider == null)
-                throw new ArgumentNullException("formatProvider");
+                throw new ArgumentNullException(nameof(formatProvider));
 
             return ConvertToString(null, formatProvider);
         }

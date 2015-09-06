@@ -33,7 +33,7 @@ namespace NodaMoney.Extensions
         public static IEnumerable<Money> SafeDivide(this Money money, int shares, MidpointRounding rounding)
         {
             if (shares <= 1)
-                throw new ArgumentOutOfRangeException("shares", "Number of shares must be greater than 1");
+                throw new ArgumentOutOfRangeException(nameof(shares), "Number of shares must be greater than 1");
 
             decimal shareAmount = Math.Round(money.Amount / shares, (int)money.Currency.DecimalDigits, rounding);
             decimal remainder = money.Amount;

@@ -20,11 +20,11 @@ namespace NodaMoney
             : this()
         {
             if (baseCurrency == null)
-                throw new ArgumentNullException("baseCurrency");
+                throw new ArgumentNullException(nameof(baseCurrency));
             if (rate < 0)
-                throw new ArgumentOutOfRangeException("rate", "Rate must be greater than zero!");
+                throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
             if (quoteCurrency == null)
-                throw new ArgumentNullException("quoteCurrency");
+                throw new ArgumentNullException(nameof(quoteCurrency));
             if (baseCurrency == quoteCurrency)
                 throw new ArgumentException("The base and quote currency can't be equal!");
 
@@ -102,7 +102,7 @@ namespace NodaMoney
             try
             {
                 if (string.IsNullOrWhiteSpace(rate))
-                    throw new ArgumentNullException("rate");
+                    throw new ArgumentNullException(nameof(rate));
 
                 rate = rate.Trim();
                 var baseCurrency = Currency.FromCode(rate.Substring(0, 3));
@@ -159,7 +159,7 @@ namespace NodaMoney
             {
                 throw new ArgumentException(
                     "Money should have the same currency as the base currency or the quote currency!", 
-                    "money");
+                    nameof(money));
             }
 
             return money.Currency == BaseCurrency
@@ -201,7 +201,7 @@ namespace NodaMoney
         /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{0}/{1} {2}", BaseCurrency.Code, QuoteCurrency.Code, Value);
+            return $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value}";
         }
     }
 }
