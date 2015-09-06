@@ -86,11 +86,11 @@ namespace NodaMoney
             Currency = currency;
 
             // TODO: Currency.Z07 and Currency.DOT edge case handeling!
-            if (Currency.DecimalDigits == Currency.DOT)
+            if (Currency.DecimalDigits == CurrencyRegistry.DOT)
             {
                 Amount = Math.Round(amount);                
             }
-            else if (Currency.DecimalDigits == Currency.Z07)
+            else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
             {
                 Amount = Math.Round(amount, 1);
             }

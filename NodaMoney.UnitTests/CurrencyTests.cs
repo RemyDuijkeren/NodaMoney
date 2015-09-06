@@ -20,7 +20,7 @@ namespace NodaMoney.UnitTests
                 var currencies = Currency.GetAllCurrencies();
 
                 currencies.Should().NotBeEmpty();
-                currencies.Length.Should().BeGreaterThan(100);
+                currencies.Count().Should().BeGreaterThan(100);
             }
 
             [TestMethod][Ignore]

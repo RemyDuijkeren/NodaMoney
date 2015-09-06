@@ -10,8 +10,12 @@ namespace NodaMoney
         /// <summary>Initializes a new instance of the <see cref="CurrencyBuilder"/> class.</summary>
         /// <param name="code">The code of the currency, normally the three-character ISO 4217 currency code.</param>
         /// <param name="namespace">The namespace for the currency.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="code"/> is <see langword="null" />.</exception>
         public CurrencyBuilder(string code, string @namespace)
         {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentNullException(nameof(code));
+
             Code = code.ToUpperInvariant();
             Namespace = @namespace;
         }
@@ -50,8 +54,8 @@ namespace NodaMoney
 
         /// <summary>Unregisters the specified currency code from the current AppDomain.</summary>
         /// <param name="code">The name of the currency to unregister.</param>
-        /// <param name="namespace">The namespace of the currency to unregister.</param>
-        /// <exception cref="ArgumentException">code specifies a currency that is not found in hte given namespace.</exception>
+        /// <param name="namespace">The namespace of the currency to unregister from.</param>
+        /// <exception cref="ArgumentException">code specifies a currency that is not found in the given namespace.</exception>
         /// <exception cref="ArgumentNullException">currencyCode or namespace is null or empty.</exception>
         public static void Unregister(string code, string @namespace)
         {
@@ -60,11 +64,9 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            var key = string.Format(CultureInfo.InvariantCulture, "{0}::{1}", @namespace, code.ToUpperInvariant());
-            if (!Currency.Currencies.ContainsKey(key))
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "code {0} specifies a currency that is not found in the namespace {1}!", code, @namespace));
-
-            Currency.Currencies.Remove(code.ToUpperInvariant());
+            Currency currency;
+            if (!Currency.Registry.TryRemove(code, @namespace, out currency))
+                throw new ArgumentException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
         }
 
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
@@ -75,13 +77,12 @@ namespace NodaMoney
         /// </exception>
         public void Register()
         {
-            var key = string.Format(CultureInfo.InvariantCulture, "{0}::{1}", Namespace, Code);
-            if (Currency.Currencies.ContainsKey(key))
+            // TODO: Add validation?
+            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, IsObsolete);
+
+            if (!Currency.Registry.TryAdd(Code, Namespace, currency))
                 throw new InvalidOperationException("The custom currency is already registered.\n-or-\n"
                                                     + "The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
-
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, IsObsolete);            
-            Currency.Currencies.Add(key, currency);
         }
 
         /// <summary>Writes an XML representation of the current <see cref="CurrencyBuilder"/> object to the specified file.</summary>
