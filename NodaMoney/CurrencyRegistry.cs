@@ -14,7 +14,7 @@ namespace NodaMoney
         // used. E.g. 1.2 UM.
         // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
-        internal const double DOT = -1;
+        internal const double NotApplicable = -1;
         private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
@@ -237,23 +237,23 @@ namespace NodaMoney
                                      { "ISO-4217::VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
                                      { "ISO-4217::WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T
                                      { "ISO-4217::XAF", new Currency("XAF", "950", 0, "CFA franc BEAC", "FCFA") },
-                                     { "ISO-4217::XAG", new Currency("XAG", "961", DOT, "Silver (one troy ounce)", "¤") },
-                                     { "ISO-4217::XAU", new Currency("XAU", "959", DOT, "Gold (one troy ounce)", "¤") },
-                                     { "ISO-4217::XBA", new Currency("XBA", "955", DOT, "European Composite Unit (EURCO) (bond market unit)", "¤") },
-                                     { "ISO-4217::XBB", new Currency("XBB", "956", DOT, "European Monetary Unit (E.M.U.-6) (bond market unit)", "¤") },
-                                     { "ISO-4217::XBC", new Currency("XBC", "957", DOT, "European Unit of Account 9 (E.U.A.-9) (bond market unit)", "¤") },
-                                     { "ISO-4217::XBD", new Currency("XBD", "958", DOT, "European Unit of Account 17 (E.U.A.-17) (bond market unit)", "¤") },
+                                     { "ISO-4217::XAG", new Currency("XAG", "961", NotApplicable, "Silver (one troy ounce)", "¤") },
+                                     { "ISO-4217::XAU", new Currency("XAU", "959", NotApplicable, "Gold (one troy ounce)", "¤") },
+                                     { "ISO-4217::XBA", new Currency("XBA", "955", NotApplicable, "European Composite Unit (EURCO) (bond market unit)", "¤") },
+                                     { "ISO-4217::XBB", new Currency("XBB", "956", NotApplicable, "European Monetary Unit (E.M.U.-6) (bond market unit)", "¤") },
+                                     { "ISO-4217::XBC", new Currency("XBC", "957", NotApplicable, "European Unit of Account 9 (E.U.A.-9) (bond market unit)", "¤") },
+                                     { "ISO-4217::XBD", new Currency("XBD", "958", NotApplicable, "European Unit of Account 17 (E.U.A.-17) (bond market unit)", "¤") },
                                      { "ISO-4217::XCD", new Currency("XCD", "951", 2, "East Caribbean dollar", "$") }, // or EC$
-                                     { "ISO-4217::XDR", new Currency("XDR", "960", DOT, "Special drawing rights", "¤") },
-                                     { "ISO-4217::XFU", new Currency("XFU", "Nil", DOT, "UIC franc (special settlement currency)", "¤") },
+                                     { "ISO-4217::XDR", new Currency("XDR", "960", NotApplicable, "Special drawing rights", "¤") },
+                                     { "ISO-4217::XFU", new Currency("XFU", "Nil", NotApplicable, "UIC franc (special settlement currency)", "¤") },
                                      { "ISO-4217::XOF", new Currency("XOF", "952", 0, "CFA franc BCEAO", "CFA") },
-                                     { "ISO-4217::XPD", new Currency("XPD", "964", DOT, "Palladium (one troy ounce)", "¤") },
+                                     { "ISO-4217::XPD", new Currency("XPD", "964", NotApplicable, "Palladium (one troy ounce)", "¤") },
                                      { "ISO-4217::XPF", new Currency("XPF", "953", 0, "CFP franc", "F") },
-                                     { "ISO-4217::XPT", new Currency("XPT", "962", DOT, "Platinum (one troy ounce)", "¤") },
-                                     { "ISO-4217::XSU", new Currency("XSU", "994", DOT, "SUCRE", "¤") },
-                                     { "ISO-4217::XTS", new Currency("XTS", "963", DOT, "Code reserved for testing purposes", "¤") },
-                                     { "ISO-4217::XUA", new Currency("XUA", "965", DOT, "ADB Unit of Account", "¤") },
-                                     { "ISO-4217::XXX", new Currency("XXX", "999", DOT, "No currency", "¤") },
+                                     { "ISO-4217::XPT", new Currency("XPT", "962", NotApplicable, "Platinum (one troy ounce)", "¤") },
+                                     { "ISO-4217::XSU", new Currency("XSU", "994", NotApplicable, "SUCRE", "¤") },
+                                     { "ISO-4217::XTS", new Currency("XTS", "963", NotApplicable, "Code reserved for testing purposes", "¤") },
+                                     { "ISO-4217::XUA", new Currency("XUA", "965", NotApplicable, "ADB Unit of Account", "¤") },
+                                     { "ISO-4217::XXX", new Currency("XXX", "999", NotApplicable, "No currency", "¤") },
                                      { "ISO-4217::YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                                      { "ISO-4217::ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                                      { "ISO-4217::ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW

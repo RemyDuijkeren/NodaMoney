@@ -367,14 +367,6 @@ namespace NodaMoney.UnitTests
 
                 action.ShouldThrow<ArgumentOutOfRangeException>();
             }
-
-            [TestMethod]
-            public void WhenDecimalDigitIsHigherThenFour_ThenCreatingShouldThrow()
-            {
-                Action action = () => { var eur = new Currency("EUR", "978", 5, "Euro", "€"); };
-
-                action.ShouldThrow<ArgumentOutOfRangeException>();
-            }
         }
     }
 }

@@ -41,8 +41,8 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(englishName));
             if (string.IsNullOrWhiteSpace(symbol)) 
                 throw new ArgumentNullException(nameof(symbol));
-            if (decimalDigits < -1 || decimalDigits > 4)
-                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must be between -1 and 4!");
+            if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
+                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to 0!");
 
             Code = code;
             Number = number;
@@ -100,7 +100,7 @@ namespace NodaMoney
         {
             get 
             {
-                if (DecimalDigits == CurrencyRegistry.DOT)
+                if (DecimalDigits == CurrencyRegistry.NotApplicable)
                     return MajorUnit;
 
                 return new decimal(1 / Math.Pow(10, DecimalDigits));

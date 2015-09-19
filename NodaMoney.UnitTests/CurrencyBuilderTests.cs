@@ -19,6 +19,14 @@ namespace NodaMoney.UnitTests
                 builder.DecimalDigits = 4;
                 builder.IsObsolete = false;
 
+                //var builder = new CurrencyBuilder("XTC", "virtual")
+                //    .WithEnglishName("Bitcoin")
+                //    .WithSymbol("฿")
+                //    .WithISONumber("123") // iso number
+                //    .WithDecimalDigits(4)
+                //    .ThatIsObsolete()
+                //    .Register();
+
                 // builder.IsVirtual = true; or IsCustom or both
                 // builder.AlternativeSymbols = arry[];
                 // builder.LegalTender = false;

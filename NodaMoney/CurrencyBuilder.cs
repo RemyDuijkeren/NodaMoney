@@ -10,13 +10,15 @@ namespace NodaMoney
         /// <summary>Initializes a new instance of the <see cref="CurrencyBuilder"/> class.</summary>
         /// <param name="code">The code of the currency, normally the three-character ISO 4217 currency code.</param>
         /// <param name="namespace">The namespace for the currency.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="code"/> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
         public CurrencyBuilder(string code, string @namespace)
-        {
+        {            
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
+            if (string.IsNullOrWhiteSpace(@namespace))
+                throw new ArgumentNullException(nameof(@namespace));
 
-            Code = code.ToUpperInvariant();
+            Code = code;
             Namespace = @namespace;
         }
 
@@ -56,7 +58,7 @@ namespace NodaMoney
         /// <param name="code">The name of the currency to unregister.</param>
         /// <param name="namespace">The namespace of the currency to unregister from.</param>
         /// <exception cref="ArgumentException">code specifies a currency that is not found in the given namespace.</exception>
-        /// <exception cref="ArgumentNullException">currencyCode or namespace is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
         public static void Unregister(string code, string @namespace)
         {
             if (string.IsNullOrWhiteSpace(code))
