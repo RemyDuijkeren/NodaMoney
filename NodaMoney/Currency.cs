@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
@@ -71,7 +69,7 @@ namespace NodaMoney
         public string Number { get; private set; }
 
         /// <summary>Gets the namespace of the currency.</summary>
-        public string Namespace { get; set; }
+        public string Namespace { get; private set; }
 
         /// <summary>Gets the number of digits after the decimal separator.</summary>
         /// <remarks>
@@ -90,6 +88,14 @@ namespace NodaMoney
         /// </para>
         /// </remarks>
         public double DecimalDigits { get; private set; }
+
+        /// <summary>Gets or sets the date when the currency is valid from.</summary>
+        /// <value>The from date when the currency is valid.</value>
+        public DateTime? ValidFrom { get; internal set; }
+
+        /// <summary>Gets or sets the date when the currency is valid to.</summary>
+        /// <value>The to date when the currency is valid.</value>
+        public DateTime? ValidTo { get; internal set; }
 
         /// <summary>Gets the major currency unit.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type!")]
@@ -118,7 +124,13 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
         public static Currency FromCode(string code)
         {
-            return FromCode(code, "ISO-4217");            
+            Currency currency;
+            if (!Registry.TryGet(code, out currency))
+                throw new ArgumentException($"{code} is an unknown currency code!");
+
+            return currency;
+
+            // return FromCode(code, "ISO-4217");            
         }
 
         /// <summary>Create an instance of the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -129,11 +141,6 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown!</exception>
         public static Currency FromCode(string code, string @namespace)
         {
-            if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentNullException(nameof(code));
-            if (string.IsNullOrWhiteSpace(@namespace))
-                throw new ArgumentNullException(nameof(@namespace));
-
             Currency currency;
             if (!Registry.TryGet(code, @namespace, out currency))           
                 throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");

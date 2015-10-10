@@ -368,5 +368,28 @@ namespace NodaMoney.UnitTests
                 action.ShouldThrow<ArgumentOutOfRangeException>();
             }
         }
+
+        [TestClass]
+        public class GiveIWantToUseALotOfCurrencies
+        {
+            [TestMethod]
+            public void WhenCreating3Million_ThenItShouldBeFast()
+            {
+                var sw = Stopwatch.StartNew();
+                var c = Currency.FromCode("EUR");
+                Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
+
+                int max = 1000000;
+                sw.Restart();
+                for (int i = 0; i < max; i++)
+                {
+                    var c1 = Currency.FromCode("EUR");
+                    var c2 = Currency.FromCode("USD");
+                    var c3 = Currency.FromCode("JPY");
+                }
+                sw.Stop();
+                Console.WriteLine("{0} ms for creating {1:N0} currencies (avg {2:F5} ms).", sw.ElapsedMilliseconds, 3 * max, sw.ElapsedMilliseconds / (3.0 * max));
+            }
+        }
     }
 }

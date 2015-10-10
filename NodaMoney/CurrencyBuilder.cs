@@ -44,7 +44,15 @@ namespace NodaMoney
         /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
         /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
         public bool IsObsolete { get; set; }
-               
+
+        /// <summary>Gets or sets the date when the currency is valid from.</summary>
+        /// <value>The from date when the currency is valid.</value>
+        public DateTime? ValidFrom { get; set; }
+
+        /// <summary>Gets or sets the date when the currency is valid to.</summary>
+        /// <value>The to date when the currency is valid.</value>
+        public DateTime? ValidTo { get; set; }
+
         /// <summary>Reconstitutes a <see cref="CurrencyBuilder"/> object from a specified XML file that contains a
         /// representation of the object.</summary>
         /// <param name="xmlFileName">A file name that contains the XML representation of a <see cref="CurrencyBuilder"/> object.</param>
@@ -54,12 +62,13 @@ namespace NodaMoney
             throw new NotImplementedException();
         }
 
-        /// <summary>Unregisters the specified currency code from the current AppDomain.</summary>
+        /// <summary>Unregisters the specified currency code from the current AppDomain and returns it.</summary>
         /// <param name="code">The name of the currency to unregister.</param>
         /// <param name="namespace">The namespace of the currency to unregister from.</param>
+        /// <returns>An instance of the type <see cref="Currency"/>.</returns>
         /// <exception cref="ArgumentException">code specifies a currency that is not found in the given namespace.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
-        public static void Unregister(string code, string @namespace)
+        /// <exception cref="ArgumentNullException"><paramref name="code" /> or <paramref name="namespace" /> is <see langword="null" /> or empty.</exception>
+        public static Currency Unregister(string code, string @namespace)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
@@ -69,6 +78,22 @@ namespace NodaMoney
             Currency currency;
             if (!Currency.Registry.TryRemove(code, @namespace, out currency))
                 throw new ArgumentException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
+
+            return currency;
+        }
+
+        /// <summary>Builds the current <see cref="CurrencyBuilder"/> object as a custom currency.</summary>
+        /// <returns>A <see cref="Currency"/> instance.</returns>
+        //// <exception cref="InvalidOperationException">The current CurrencyBuilder object has a property that must be set before the currency can be registered.</exception>
+        public Currency Build()
+        {
+            // TODO: Add validation?
+            // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
+            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, IsObsolete);
+            currency.ValidFrom = ValidFrom;
+            currency.ValidTo = ValidTo;            
+
+            return currency;
         }
 
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
@@ -77,14 +102,13 @@ namespace NodaMoney
         ///     <para>-or-</para>
         ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
         /// </exception>
-        public void Register()
+        public Currency Register()
         {
-            // TODO: Add validation?
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, IsObsolete);
-
+            Currency currency = Build();
             if (!Currency.Registry.TryAdd(Code, Namespace, currency))
-                throw new InvalidOperationException("The custom currency is already registered.\n-or-\n"
-                                                    + "The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
+                throw new InvalidOperationException("The custom currency is already registered.");
+
+            return currency;
         }
 
         /// <summary>Writes an XML representation of the current <see cref="CurrencyBuilder"/> object to the specified file.</summary>
@@ -116,6 +140,8 @@ namespace NodaMoney
             ISONumber = currency.Number;
             DecimalDigits = currency.DecimalDigits;
             IsObsolete = currency.IsObsolete;
+            ValidFrom = currency.ValidFrom;
+            ValidTo = currency.ValidTo;
         }
     }
 }

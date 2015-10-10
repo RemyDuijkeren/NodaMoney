@@ -1,4 +1,4 @@
-NodaMoney
+ï»¿NodaMoney
 =========
 <img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png">
 You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
@@ -35,11 +35,12 @@ base layer, providing classes that should be in the .NET Framework. It complies 
 
 Usage
 -----
-At the moment there are three classes:
-- Currency: An immutable structure that represents a currency. It can give all ISO 4217 currencies.
+At the moment there are four classes:
+- Currency: An immutable structure that represents a currency. It can give all ISO 4217 and custom currencies.
 - Money: An immutable structure that represents money in a specified currency.
 - ExchangeRate: A stucture that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
+- CurrencyBuilder: Defines a custom currency that is new or based on another currency.
 
 **Initalizing money**
 
@@ -105,25 +106,25 @@ var dollar = new Money(765.43m, "USD");
 var dinar = new Money(765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
-yen.ToString();    // "¥765"
-euro.ToString();   // "€765.43"
+yen.ToString();    // "Â¥765"
+euro.ToString();   // "â‚¬765.43"
 dollar.ToString(); // "$765.43"
 dinar.ToString();  // "BD765.432"
 
-yen.ToString("C2");    // "¥765.00"
-euro.ToString("C2");   // "€765.43"
+yen.ToString("C2");    // "Â¥765.00"
+euro.ToString("C2");   // "â‚¬765.43"
 dollar.ToString("C2"); // "$765.43"
 dinar.ToString("C2");  // "BD765.43"
 
 // Implicit when current culture is 'nl-BE'
-yen.ToString();    // "¥ 765"
-euro.ToString();   // "€ 765,43"
+yen.ToString();    // "Â¥ 765"
+euro.ToString();   // "â‚¬ 765,43"
 dollar.ToString(); // "$ 765,43"
 dinar.ToString();  // "BD 765,432"
 
 // Implicit when current culture is 'fr-BE'
-yen.ToString();    // "765 ¥"
-euro.ToString();   // "765,43 €"
+yen.ToString();    // "765 Â¥"
+euro.ToString();   // "765,43 â‚¬"
 dollar.ToString(); // "765,43 $"
 dinar.ToString();  // "765,432 BD"
 }
@@ -131,8 +132,8 @@ dinar.ToString();  // "765,432 BD"
 // Explicit format for culture 'nl-NL'
 var ci = new CultureInfo("nl-NL");
 
-yen.ToString(ci);    // "¥ 765"
-euro.ToString(ci);   // "€ 765,43"
+yen.ToString(ci);    // "Â¥ 765"
+euro.ToString(ci);   // "â‚¬ 765,43"
 dollar.ToString(ci); // "$ 765,43"
 dinar.ToString(ci);  // "BD 765,432"
 ```
@@ -141,18 +142,18 @@ dinar.ToString(ci);  // "BD 765,432"
 
 ```C#
 // Implicit parsing when current culture is 'nl-BE'
-Money euro = Money.Parse("€ 765,43");
-Money euro = Money.Parse("-€ 765,43");
-Money euro = Money.Parse("€-765,43");
-Money euro = Money.Parse("765,43 €");
-Money yen = Money.Parse("¥ 765"); // throw FormatException, because ¥ symbol is used for Japanese yen and Chinese yuan
+Money euro = Money.Parse("â‚¬ 765,43");
+Money euro = Money.Parse("-â‚¬ 765,43");
+Money euro = Money.Parse("â‚¬-765,43");
+Money euro = Money.Parse("765,43 â‚¬");
+Money yen = Money.Parse("Â¥ 765"); // throw FormatException, because Â¥ symbol is used for Japanese yen and Chinese yuan
 Money dollar = Money.Parse("$ 765,43"); // throw FormatException, because $ symbol is used for multiple currencies
 
 // Implicit parsing when current culture is 'ja-JP'
-Money yen = Money.Parse("¥ 765");
+Money yen = Money.Parse("Â¥ 765");
 
 // Implicit parsing when current culture is 'zh-CN'
-Money yuan = Money.Parse("¥ 765");
+Money yuan = Money.Parse("Â¥ 765");
 
 // Implicit parsing when current culture is 'en-US'
 Money dollar = Money.Parse("$765.43");
@@ -162,16 +163,46 @@ Money dollar = Money.Parse("($765.43)"); // -$765.43
 Money peso = Money.Parse("$765.43");
 
 // Explicit parsing when current culture is 'nl-BE'
-Money euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
-Money euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
-Money yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
-Money yuan = Money.Parse("¥ 765", Currency.FromCode("CNY"));
+Money euro = Money.Parse("â‚¬ 765,43", Currency.FromCode("EUR"));
+Money euro = Money.Parse("765,43 â‚¬", Currency.FromCode("EUR"));
+Money yen = Money.Parse("Â¥ 765", Currency.FromCode("JPY"));
+Money yuan = Money.Parse("Â¥ 765", Currency.FromCode("CNY"));
 
 // Implicit try parsing when current culture is 'nl-BE'
 Money euro;
-Money.TryParse("€ 765,43", out euro);
+Money.TryParse("â‚¬ 765,43", out euro);
 
 // Explicit try parsing when current culture is 'nl-BE'
 Money euro;
-Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
+Money.TryParse("â‚¬ 765,43", Currency.FromCode("EUR"), out euro);
+```
+
+**Adding custom currencies**
+
+```C#
+// Create custom currency and register it (for the life-time of the app domain)
+var builder = new CurrencyBuilder("BTC", "virtual")
+				{
+					EnglishName = "Bitcoin",
+					Symbol = "à¸¿",
+					DecimalDigits = 8
+				};
+
+var bitcoin = builder.Build(); // build BTC, but will not register it
+var bitcoin = builder.Register(); // build and register BTC in namespace 'virtual'
+
+// When the custom is registered, it can be called as any other currency
+Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
+Money bitcoins = new Money(1.2. "BTC");
+
+// Replace ISO 4217 currency (for the life-time of the app domain)
+Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+
+var builder = new CurrencyBuilder("EUR", "ISO-4217");
+builder.LoadDataFromCurrency(oldEuro);
+builder.EnglishName = "New Euro";
+builder.DecimalDigits = 1;
+builder.Register();
+
+Currency newEuro = Currency.FromCode("EUR");
 ```

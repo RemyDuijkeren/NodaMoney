@@ -10,97 +10,74 @@ namespace NodaMoney.UnitTests
         public class GivenIWantToCreateCustomCurrency
         {
             [TestMethod]
-            public void WhenRegisterBitCoin_ThenShouldBeAvailable()
+            public void WhenRegisterBitCoinInIsoNamespace_ThenShouldBeAvailable()
             {
-                var builder = new CurrencyBuilder("BTC", "virtual");
+                var builder = new CurrencyBuilder("BTC", "ISO-4217");
                 builder.EnglishName = "Bitcoin";
                 builder.Symbol = "฿";
                 builder.ISONumber = "123"; // iso number
-                builder.DecimalDigits = 4;
+                builder.DecimalDigits = 8;
                 builder.IsObsolete = false;
 
-                //var builder = new CurrencyBuilder("XTC", "virtual")
-                //    .WithEnglishName("Bitcoin")
-                //    .WithSymbol("฿")
-                //    .WithISONumber("123") // iso number
-                //    .WithDecimalDigits(4)
-                //    .ThatIsObsolete()
-                //    .Register();
-
-                // builder.IsVirtual = true; or IsCustom or both
-                // builder.AlternativeSymbols = arry[];
-                // builder.LegalTender = false;
-                // builder.ValidFrom = DateTime.Now; or Validity(from/to or until)
-                // builder.ValidTo = DateTime.Now;
-                // builder.UsedInCultureRegion.Add(ci);
-                // builder.NativeName = ""; 
-                // builder.DecimalSeparator = ",";
-                // builder.GroupSeparator = ".";
-                // builder.GroupSizes = new int[] { 3, 2 };
-                // builder.Priority = 2;
-                // builder.SubUnit = "Cents";
-                // builder.SubUnitToUnit = 100;
-                // builder.SignFirst = true;
-                // builder.HtmlEntity = "&#x20AC;";
-                // builder.SmallestDenomination = 1;
-                // numberFormatInfo.Currency
-                // numberFormatInfo.CurrencyNegativePattern = 12;
-                // numberFormatInfo.CurrencyPositivePattern = 2;
-                // numberFormatInfo.CurrencySymbol = "EUR";
-                // numberFormatInfo.DigitSubstitution = DigitShapes.None;
-
-                builder.Register();
+                Currency result = builder.Register();
 
                 Currency bitcoin = Currency.FromCode("BTC");
                 bitcoin.Symbol.Should().Be("฿");
+                bitcoin.ShouldBeEquivalentTo(result);
             }
 
             [TestMethod]
-            public void WhenRegisterBitCoin_ThenShouldBeAvailableByNamespace()
+            public void WhenRegisterBitCoin_ThenShouldBeAvailableByExplicitNamespace()
             {
                 var builder = new CurrencyBuilder("BTC1", "virtual");
                 builder.EnglishName = "Bitcoin";
                 builder.Symbol = "฿";
                 builder.ISONumber = "123"; // iso number
-                builder.DecimalDigits = 4;
+                builder.DecimalDigits = 8;
                 builder.IsObsolete = false;
 
-                builder.Register();
+                Currency result = builder.Register();
 
                 Currency bitcoin = Currency.FromCode("BTC1", "virtual");
                 bitcoin.Symbol.Should().Be("฿");
+                bitcoin.ShouldBeEquivalentTo(result);
+            }
+
+            [TestMethod]
+            public void WhenBuildBitCoin_ThenItShouldSuccedButNotBeRegistered()
+            {
+                var builder = new CurrencyBuilder("BTC2", "virtual");
+                builder.EnglishName = "Bitcoin";
+                builder.Symbol = "฿";
+                builder.ISONumber = "123"; // iso number
+                builder.DecimalDigits = 8;
+                builder.IsObsolete = false;
+
+                Currency result = builder.Build();
+                result.Symbol.Should().Be("฿");
+
+                Action action = () => Currency.FromCode("BTC2", "virtual");
+                action.ShouldThrow<ArgumentException>().WithMessage("BTC2 is an unknown virtual currency code!");
             }
 
             [TestMethod]
             public void WhenFromExistingCurrency_ThenThisShouldSucceed()
             {
-                var builder = new CurrencyBuilder("BTC2", "virtual");
+                var builder = new CurrencyBuilder("BTC3", "virtual");
 
                 var euro = Currency.FromCode("EUR");
                 builder.LoadDataFromCurrency(euro);
 
-                builder.Code.Should().Be("BTC2");
+                builder.Code.Should().Be("BTC3");
                 builder.Namespace.Should().Be("virtual");
-                builder.EnglishName.Should().Be(euro.EnglishName);                
+                builder.EnglishName.Should().Be(euro.EnglishName);
                 builder.Symbol.Should().Be(euro.Symbol);
                 builder.ISONumber.Should().Be(euro.Number);
                 builder.DecimalDigits.Should().Be(euro.DecimalDigits);
                 builder.IsObsolete.Should().Be(euro.IsObsolete);
+                builder.ValidFrom.Should().Be(euro.ValidFrom);
+                builder.ValidTo.Should().Be(euro.ValidTo);
             }
-
-            // Currency bitcoin = "BTC";
-
-            // http://www.codeproject.com/Articles/15175/NET-Internationalization-The-Developer-s-Guide-to
-            // https://msdn.microsoft.com/en-us/library/system.globalization.cultureandregioninfobuilder%28v=vs.110%29.aspx
-            // Save to Unicode Technical Standard #35. It is an extensible XML format for the exchange of structured locale data
-            // builder.Save("en-GB.ldml");
-
-            // CultureAndRegionInfoBuilder builder = CultureAndRegionInfoBuilder.CreateFromLdml("en-GB.ldml");
-            // builder.Register();
-
-            // foreach (CultureInfo cultureInfo in CultureInfo.GetCultures(CultureTypes.UserCustomCulture))
-            // CultureTypes.UserCustomCulture
-            // CultureAndRegionInfoBuilderHelper.Export(new CultureInfo("cy-GB"), "cy-GB.ldml","en-GB", "en-GB");
         }
 
         [TestClass]
@@ -128,15 +105,15 @@ namespace NodaMoney.UnitTests
                 var builder = new CurrencyBuilder("XYZ", "virtual");
                 builder.EnglishName = "Xyz";
                 builder.Symbol = "฿";
-                builder.ISONumber = "123";  // iso number
+                builder.ISONumber = "123"; // iso number
                 builder.DecimalDigits = 4;
                 builder.IsObsolete = false;
 
                 builder.Register();
-                Currency xyz = Currency.FromCode("XYZ"); // should work
+                Currency xyz = Currency.FromCode("XYZ", "virtual"); // should work
 
                 CurrencyBuilder.Unregister("XYZ", "virtual");
-                Action action = () => Currency.FromCode("XYZ");
+                Action action = () => Currency.FromCode("XYZ", "virtual");
 
                 action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
             }
@@ -147,6 +124,28 @@ namespace NodaMoney.UnitTests
                 Action action = () => CurrencyBuilder.Unregister("ABC", "virtual");
 
                 action.ShouldThrow<ArgumentException>().WithMessage("*specifies a currency that is not found*");
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToReplaceIsoCurrencyWithOwnVersion
+        {
+            [TestMethod]
+            public void WhenReplacingEuroWithCustom_ThenThisShouldSucceed()
+            {
+                Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+
+                var builder = new CurrencyBuilder("EUR", "ISO-4217");
+                builder.LoadDataFromCurrency(oldEuro);
+                builder.EnglishName = "New Euro";
+                builder.DecimalDigits = 1;
+
+                builder.Register();
+
+                Currency newEuro = Currency.FromCode("EUR");
+                newEuro.Symbol.Should().Be("€");
+                newEuro.EnglishName.Should().Be("New Euro");
+                newEuro.DecimalDigits.Should().Be(1);
             }
         }
     }
