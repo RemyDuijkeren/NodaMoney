@@ -18,7 +18,7 @@ namespace NodaMoney
         public static Money Parse(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             Currency currency = ExtractCurrencyFromString(value);
 
@@ -35,7 +35,7 @@ namespace NodaMoney
         public static Money Parse(string value, Currency currency)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return Parse(value, NumberStyles.Currency, GetNumberFormatInfo(currency, null), currency);
         }
@@ -52,7 +52,7 @@ namespace NodaMoney
         public static Money Parse(string value, NumberStyles style, IFormatProvider provider, Currency currency)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             decimal amount = decimal.Parse(value, style, GetNumberFormatInfo(currency, provider));
             return new Money(amount, currency);
@@ -136,31 +136,26 @@ namespace NodaMoney
             // TODO: How to handle alternative symbols, like US$
             string currencyAsString = new string(value.Cast<char>().Where(IsNotNumericCharacter()).ToArray());
 
-            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Sign == currencyAsString
+            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Symbol == currencyAsString
                 || Currency.CurrentCurrency.Code == currencyAsString)
             {
                 return Currency.CurrentCurrency;
             }
 
             List<Currency> match =
-                Currency.GetAllCurrencies().Where(c => c.Sign == currencyAsString || c.Code == currencyAsString).ToList();
+                Currency.GetAllCurrencies().Where(c => c.Symbol == currencyAsString || c.Code == currencyAsString).ToList();
 
             if (match.Count == 0)
             {
-                throw new FormatException(
-                    string.Format(CultureInfo.InvariantCulture, "{0} is an unknown currency sign or code!", currencyAsString));
+                throw new FormatException($"{currencyAsString} is an unknown currency sign or code!");
             }
 
             if (match.Count > 1)
             {
-                if (currencyAsString == "¥" && Currency.CurrentCurrency.Sign == "¥")
+                if (currencyAsString == "¥" && Currency.CurrentCurrency.Symbol == "¥")
                     Debug.WriteLine("in error");
 
-                throw new FormatException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Currency sign {0} matches with multiple known currencies! Specify currency or culture explicit.",
-                        currencyAsString));
+                throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
             }
 
             return match[0];

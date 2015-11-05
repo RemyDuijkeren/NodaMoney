@@ -86,11 +86,11 @@ namespace NodaMoney
             Currency = currency;
 
             // TODO: Currency.Z07 and Currency.DOT edge case handeling!
-            if (Currency.DecimalDigits == Currency.DOT)
+            if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
             {
                 Amount = Math.Round(amount);                
             }
-            else if (Currency.DecimalDigits == Currency.Z07)
+            else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
             {
                 Amount = Math.Round(amount, 1);
             }
@@ -294,7 +294,7 @@ namespace NodaMoney
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)
-                throw new InvalidCurrencyException(string.Format("{0} ({1}) and {2} ({3}) are not of the same Currency!", left, left.Currency.Code, right, right.Currency.Code));
+                throw new InvalidCurrencyException($"{left} ({left.Currency.Code}) and {right} ({right.Currency.Code}) are not of the same Currency!");
         }
     }
 }

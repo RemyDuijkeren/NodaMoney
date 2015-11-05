@@ -20,7 +20,7 @@ namespace NodaMoney.UnitTests
                 var currencies = Currency.GetAllCurrencies();
 
                 currencies.Should().NotBeEmpty();
-                currencies.Length.Should().BeGreaterThan(100);
+                currencies.Count().Should().BeGreaterThan(100);
             }
 
             [TestMethod][Ignore]
@@ -56,7 +56,7 @@ namespace NodaMoney.UnitTests
                     foreach (var currency in Currency.GetAllCurrencies())
                     {
                         writer.WriteLine("EnglishName: {0}", currency.EnglishName);
-                        writer.WriteLine("Code: {0}, Number: {1}, Sign: {2}", currency.Code, currency.Number, currency.Sign);
+                        writer.WriteLine("Code: {0}, Number: {1}, Sign: {2}", currency.Code, currency.Number, currency.Symbol);
                         writer.WriteLine("MajorUnit: {0}, MinorUnit: {1}, DecimalDigits: {2}", currency.MajorUnit, currency.MinorUnit, currency.DecimalDigits);
                         writer.WriteLine(string.Empty);
                     }
@@ -96,7 +96,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromCode("EUR");
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("€");
+                currency.Symbol.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
                 currency.IsObsolete.Should().BeFalse();
@@ -124,7 +124,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromCode("EEK");
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("kr");
+                currency.Symbol.Should().Be("kr");
                 currency.IsObsolete.Should().BeTrue();
             }
 
@@ -139,7 +139,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromRegion(new RegionInfo("NL"));
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("€");
+                currency.Symbol.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
             }
@@ -158,7 +158,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromRegion("NL");
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("€");
+                currency.Symbol.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
             }
@@ -177,7 +177,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromCulture(CultureInfo.CreateSpecificCulture("nl-NL"));
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("€");
+                currency.Symbol.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
             }
@@ -204,7 +204,7 @@ namespace NodaMoney.UnitTests
                 var currency = Currency.FromRegion("nl-NL");
 
                 currency.Should().NotBeNull();
-                currency.Sign.Should().Be("€");
+                currency.Symbol.Should().Be("€");
                 currency.Code.Should().Be("EUR");
                 currency.EnglishName.Should().Be("Euro");
             }
@@ -325,7 +325,7 @@ namespace NodaMoney.UnitTests
                 eur.Number.Should().Be("978");
                 eur.DecimalDigits.Should().Be(2);
                 eur.EnglishName.Should().Be("Euro");
-                eur.Sign.Should().Be("€");
+                eur.Symbol.Should().Be("€");
             }
 
             [TestMethod]
@@ -367,13 +367,36 @@ namespace NodaMoney.UnitTests
 
                 action.ShouldThrow<ArgumentOutOfRangeException>();
             }
+        }
 
+        [TestClass]
+        public class GiveIWantToUseALotOfCurrencies
+        {
             [TestMethod]
-            public void WhenDecimalDigitIsHigherThenFour_ThenCreatingShouldThrow()
+            public void WhenCreatingOneMillion_ThenItShouldBeWithinTwoSeconds()
             {
-                Action action = () => { var eur = new Currency("EUR", "978", 5, "Euro", "€"); };
+                var sw = Stopwatch.StartNew();
+                var c = Currency.FromCode("EUR");
+                Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
 
-                action.ShouldThrow<ArgumentOutOfRangeException>();
+                double max = 1000000;
+                Action action = () =>
+                    {
+                        sw.Restart();
+                        for (int i = 0; i < max; i++)
+                        {
+                            if (i % 3 == 0)
+                                c = Currency.FromCode("EUR");
+                            else if (i % 2 == 0)
+                                c = Currency.FromCode("USD");
+                            else
+                                c = Currency.FromCode("JPY");
+                        }
+                        sw.Stop();
+                    };
+
+                action.ExecutionTime().ShouldNotExceed(2.Seconds());
+                Console.WriteLine("{0} ms for creating {1:N0} currencies (avg {2:F5} ms).", sw.ElapsedMilliseconds, max, sw.ElapsedMilliseconds / (max));
             }
         }
     }

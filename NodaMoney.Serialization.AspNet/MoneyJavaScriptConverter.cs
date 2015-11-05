@@ -15,10 +15,7 @@ namespace NodaMoney.Serialization.AspNet
     public class MoneyJavaScriptConverter : JavaScriptConverter
     {
         /// <summary>When overridden in a derived class, gets a collection of the supported types.</summary>
-        public override IEnumerable<Type> SupportedTypes
-        {
-            get { return new ReadOnlyCollection<Type>(new List<Type>(new[] { typeof(Money) })); }
-        }
+        public override IEnumerable<Type> SupportedTypes => new ReadOnlyCollection<Type>(new List<Type>(new[] { typeof(Money) }));
 
         /// <summary>When overridden in a derived class, converts the provided dictionary into an object of the specified type.</summary>
         /// <param name="dictionary">An <see cref="T:System.Collections.Generic.IDictionary`2" /> instance of property data stored as name/value pairs.</param>
@@ -30,9 +27,9 @@ namespace NodaMoney.Serialization.AspNet
         public override object Deserialize(IDictionary<string, object> dictionary, Type type, JavaScriptSerializer serializer)
         {
             if (dictionary == null)
-                throw new ArgumentNullException("dictionary");
+                throw new ArgumentNullException(nameof(dictionary));
             if (type != typeof(Money))
-                throw new ArgumentException("object should be of type Money to deserialize!", "type");
+                throw new ArgumentException("object should be of type Money to deserialize!", nameof(type));
 
             decimal amount = decimal.Parse((string)dictionary["amount"], CultureInfo.InvariantCulture);
             string code = (string)dictionary["currency"];

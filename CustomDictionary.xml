@@ -15,6 +15,7 @@
       <Word>iraimbilanja</Word>
       <Word>cinquième</Word>
       <Word>ariary</Word>
+      <Word>Ldml</Word>
     </Recognized>
     <Deprecated>
       <Term PreferredAlternate="EnterpriseServices">ComPlus</Term>
@@ -23,6 +24,7 @@
   <Acronyms>      
     <CasingExceptions>
       <Acronym>USDollar</Acronym>
+      <Acronym>ISO</Acronym>
     </CasingExceptions>
   </Acronyms>
  </Dictionary>
