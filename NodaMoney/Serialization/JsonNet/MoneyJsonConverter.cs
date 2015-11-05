@@ -24,11 +24,11 @@ namespace NodaMoney.Serialization.JsonNet
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (writer == null)
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             if (serializer == null)
-                throw new ArgumentNullException("serializer");
+                throw new ArgumentNullException(nameof(serializer));
 
             Money money = (Money)value;
 
@@ -50,7 +50,7 @@ namespace NodaMoney.Serialization.JsonNet
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             JObject jsonObject = JObject.Load(reader);
             var properties = jsonObject.Properties().ToList();

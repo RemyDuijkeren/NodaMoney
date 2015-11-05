@@ -2,8 +2,9 @@
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NodaMoney.Extensions;
 
-namespace NodaMoney.Extensions.UnitTests
+namespace NodaMoney.UnitTests.Extensions
 {
     public class MoneyExtensionsSafeDivideTests
     {

@@ -104,7 +104,7 @@ namespace NodaMoney
                 return 1;
 
             if (!(obj is Money))
-                throw new ArgumentException("obj is not the same type as this instance", "obj");
+                throw new ArgumentException("obj is not the same type as this instance", nameof(obj));
 
             return CompareTo((Money)obj);
         }
