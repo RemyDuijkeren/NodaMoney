@@ -1,5 +1,7 @@
 #######################
 # Delete Junk
+#
+#
 
 ls -Recurse -include 'bin','obj','packages' |
   foreach { 
