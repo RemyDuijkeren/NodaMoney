@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace NodaMoney
@@ -13,10 +15,11 @@ namespace NodaMoney
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
+        /// <param name="quoteTime">The quote time. (optional)</param>
         /// <exception cref="ArgumentNullException">The value of 'baseCurrency' or 'quoteCurrency' cannot be null. </exception>
         /// <exception cref="ArgumentOutOfRangeException">Rate must be greater than zero!</exception>
         /// <exception cref="ArgumentException">The base and quote currency can't be equal!</exception>
-        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
+        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate, DateTime? quoteTime = default(DateTime?))
             : this()
         {
             if (baseCurrency == null)
@@ -31,14 +34,16 @@ namespace NodaMoney
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
             Value = Math.Round(rate, 4); // value is a ratio 
+            QuoteTime = (quoteTime ?? DateTime.UtcNow).ToUniversalTime();
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"></see> struct.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
-        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate)
-            : this(baseCurrency, quoteCurrency, (decimal)rate)
+        /// <param name="quoteTime">The quote time. (optional)</param>
+        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate, DateTime? quoteTime = default(DateTime?))
+            : this(baseCurrency, quoteCurrency, (decimal)rate, quoteTime)
         {
         }
 
@@ -46,8 +51,9 @@ namespace NodaMoney
         /// <param name="baseCode">The code of the base currency.</param>
         /// <param name="quoteCode">The code of the quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
-        public ExchangeRate(string baseCode, string quoteCode, decimal rate)
-            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
+        /// <param name="quoteTime">The quote time. (optional)</param>
+        public ExchangeRate(string baseCode, string quoteCode, decimal rate, DateTime? quoteTime = default(DateTime?))
+            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate, quoteTime)
         {
         }
 
@@ -55,8 +61,9 @@ namespace NodaMoney
         /// <param name="baseCode">The code of the base currency.</param>
         /// <param name="quoteCode">The code of the quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
-        public ExchangeRate(string baseCode, string quoteCode, double rate)
-            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
+        /// <param name="quoteTime">The quote time. (optional)</param>
+        public ExchangeRate(string baseCode, string quoteCode, double rate, DateTime? quoteTime = default(DateTime?))
+            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate, quoteTime)
         {
         }
 
@@ -71,6 +78,88 @@ namespace NodaMoney
         /// <summary>Gets the value of the exchange rate.</summary>
         /// <value>The value of the exchange rate.</value>
         public decimal Value { get; private set; }
+
+        /// <summary>Gets the (UTC) quote time of the exchange rate.</summary>
+        /// <value>The quote time of the exchange rate in UTC format.</value>
+        public DateTime QuoteTime { get; private set; }
+
+        /// <summary>Indicates if the exchange rate is available on or after specified date</summary>
+        /// <param name="date"></param>
+        /// <returns>true if <paramref name="date"/> equals or greater than quote time, otherwise false.</returns>
+        public bool IsAvailable(DateTime date)
+        {
+            if (DateTimeKind.Unspecified == date.Kind)
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            else if (DateTimeKind.Local == date.Kind)
+                return date.ToUniversalTime() >= QuoteTime;
+
+            return date.Date.Equals(QuoteTime.Date);
+        }
+
+        /// <summary>Gets the exchange rate quotes.</summary>
+        /// <returns>The exchange rate quotes.</returns>
+        /// <remarks>If no exchange rate provider is defined, the dictionary contains the current quote.</remarks>
+        public SortedDictionary<DateTime, decimal> GetQuotes()
+        {
+            return new SortedDictionary<DateTime, decimal>() { { QuoteTime, Value } };
+        }
+
+        /// <summary>Gets the quote on specified date.</summary>
+        /// <param name="quoteDate">Date of quote</param>
+        /// <returns>If a match is found, the quote is returned.</returns>
+        /// <exception cref="NoExchangeRateQuoteFoundException">No available qoute found on specified date!</exception>
+        public decimal GetDayQuote(DateTime quoteDate)
+        {
+            decimal quote;
+            if (!TryGetDayQuote(quoteDate, out quote))
+            {
+                throw new NoExchangeRateQuoteFoundException(quoteDate.ToString());
+            }
+            return quote;
+        }
+
+        /// <summary>Gets the quote on specified date. A return
+        /// value indicates whether the retrieval succeeded or failed.</summary>
+        /// <param name="quoteDate">Date of quote.</param>
+        /// <param name="result">When this method returns, contains the quote.</param>
+        /// <returns><b>true</b> if a quote is found on specified date; otherwise, <b>false</b>.</returns>
+        public bool TryGetDayQuote(DateTime quoteDate, out decimal result)
+        {
+            try
+            {
+                var rate = GetQuotes().First(x => quoteDate.ToUniversalTime().Date.Equals(x.Key.Date));
+                result = rate.Value;
+                return true;
+            }
+            catch (Exception)
+            {
+                result = 0m;
+                return false;
+            }
+        }
+
+        /// <summary>Converts the specified money using available quotes.</summary>
+        /// <param name="money">The money.</param>
+        /// <param name="exchangeDate">The date of the exchange. (optional)</param>
+        /// <returns>The converted money.</returns>
+        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote
+        /// currency!</exception>
+        /// <exception cref="NoExchangeRateQuoteFoundException">No available exchange rate qoute found!</exception>
+        public Money ConvertWithAvailableQuotes(Money money, DateTime? exchangeDate = default(DateTime?))
+        {
+            if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
+            {
+                throw new ArgumentException(
+                    "Money should have the same currency as the base currency or the quote currency!",
+                    nameof(money));
+            }
+
+            decimal quote = GetDayQuote((exchangeDate ?? DateTime.UtcNow).ToUniversalTime());
+
+            return money.Currency == BaseCurrency
+                       ? new Money(money.Amount * quote, QuoteCurrency)
+                       : new Money(money.Amount / quote, BaseCurrency);
+        }
 
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
         /// <param name="rate">The string representation of the exchange rate to convert.</param>
