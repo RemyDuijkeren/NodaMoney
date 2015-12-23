@@ -1,7 +1,7 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodaMoney.UnitTests.Helpers;
+using System;
 
 namespace NodaMoney.UnitTests
 {
@@ -218,6 +218,142 @@ namespace NodaMoney.UnitTests
                 {
                     fx.ToString().Should().Be("EUR/USD 1,2524");
                 }
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToCreateAnExchangeRateWithDateTime
+        {
+            private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly Currency _dollar = Currency.FromCode("USD");
+            private readonly DateTime utcNow = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            [TestMethod]
+            public void WhenDateTimeIsUtcTime_ThenQuoteTimeShouldBeEqual()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                fx.QuoteTime.Should().Equals(utcNow);
+            }
+
+            [TestMethod]
+            public void WhenDateTimeIsLocalTime_ThenQuoteTimeShouldBeEqualToUtcTime()
+            {
+                DateTime time = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Local);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, time);
+
+                fx.QuoteTime.Should().Equals(time.ToUniversalTime());
+            }
+
+            [TestMethod]
+            public void WhenDateTimeIsNull_ThenQuoteTimeShouldBeUtcNow()
+            {
+                DateTime today = DateTime.UtcNow;
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+
+                fx.QuoteTime.Should().BeCloseTo(today);
+            }
+
+            [TestMethod]
+            public void WhenDateTimeIsSpecified_ThenAvailablePropertyShouldBeTrue()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().BeTrue();
+                fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
+
+                fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Local)).Should().BeTrue();
+            }
+        }
+
+        [TestClass]
+        public class GivenIWantToConvertMoneyWithDateTime
+        {
+            private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly Currency _dollar = Currency.FromCode("USD");
+            private readonly DateTime utcNow = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            [TestMethod]
+            public void WhenExchangeRateIsCreated_ThenSingleQuoteShouldExist()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                fx.QuoteTime.Should().Equals(utcNow);
+                var quotes = fx.GetQuotes();
+                quotes.Count.Should().Be(1);
+                quotes.ContainsKey(utcNow).Should().BeTrue();
+                quotes[utcNow].Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenDayQuoteIsAvailable_ThenTryGetDayQuoteShouldSucceed()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+                decimal quote;
+
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.TryGetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeTrue();
+                quote.Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenDayQuoteIsNotAvailable_ThenTryGetDayQuoteShouldFail()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+                decimal quote;
+
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.TryGetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeFalse();
+                quote.Should().Be(0M);
+            }
+
+            [TestMethod]
+            public void WhenDayQuoteIsAvailable_ThenGetDayQuoteShouldSucceed()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.GetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().Be(1.2591M);
+            }
+
+            [TestMethod]
+            public void WhenDayQuoteIsNotAvailable_ThenGetDayQuoteShouldThrow()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                fx.QuoteTime.Should().Equals(utcNow);
+
+                Action action = () => fx.GetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
+
+                action.ShouldThrow<NoExchangeRateQuoteFoundException>();
+            }
+
+            [TestMethod]
+            public void WhenDayQuoteIsAvailable_ThenConversionShouldBeCorrect()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                var converted = fx.ConvertWithAvailableQuotes(
+                                    Money.Euro(100.99M),
+                                    new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+                converted.Currency.Should().Be(_dollar);
+                converted.Amount.Should().Be(127.16M);
+            }
+            [TestMethod]
+            public void WhenDayQuoteIsNotAvailable_ThenConversionShouldThrow()
+            {
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+
+                Action action = () => fx.ConvertWithAvailableQuotes(
+                                        Money.Euro(100.99M),
+                                        new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
+
+                action.ShouldThrow<NoExchangeRateQuoteFoundException>();
             }
         }
     }
