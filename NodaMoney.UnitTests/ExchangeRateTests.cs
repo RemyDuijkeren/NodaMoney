@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodaMoney.UnitTests.Helpers;
 using System;
@@ -227,21 +226,20 @@ namespace NodaMoney.UnitTests
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
             private readonly Currency _dollar = Currency.FromCode("USD");
+            private readonly DateTime utcNow = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
             [TestMethod]
             public void WhenDateTimeIsUtcTime_ThenQuoteTimeShouldBeEqual()
             {
-                DateTime time = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, time);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                fx.QuoteTime.Should().Equals(time);
+                fx.QuoteTime.Should().Equals(utcNow);
             }
 
             [TestMethod]
             public void WhenDateTimeIsLocalTime_ThenQuoteTimeShouldBeEqualToUtcTime()
             {
                 DateTime time = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Local);
-
                 var fx = new ExchangeRate(_euro, _dollar, 1.2591F, time);
 
                 fx.QuoteTime.Should().Equals(time.ToUniversalTime());
@@ -250,38 +248,25 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenDateTimeIsNull_ThenQuoteTimeShouldBeUtcNow()
             {
-                using (ShimsContext.Create())
-                {
-                    DateTime utcNow = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                DateTime today = DateTime.UtcNow;
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
 
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
-
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                }
+                fx.QuoteTime.Should().BeCloseTo(today);
             }
 
             [TestMethod]
             public void WhenDateTimeIsSpecified_ThenAvailablePropertyShouldBeTrue()
             {
-                using (ShimsContext.Create())
-                {
-                    DateTime utcNow = new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().BeTrue();
+                fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                    fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
-                    fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().BeTrue();
-                    fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc)).Should().BeFalse();
-
-                    fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
-                    fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
-                    fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Local)).Should().BeTrue();
-                }
+                fx.IsAvailable(new DateTime(2014, 12, 31, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Local)).Should().BeFalse();
+                fx.IsAvailable(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Local)).Should().BeTrue();
             }
         }
 
@@ -295,115 +280,80 @@ namespace NodaMoney.UnitTests
             [TestMethod]
             public void WhenExchangeRateIsCreated_ThenSingleQuoteShouldExist()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                    var quotes = fx.GetQuotes();
-                    quotes.Count.Should().Be(1);
-                    quotes.ContainsKey(utcNow).Should().BeTrue();
-                    quotes[utcNow].Should().Be(1.2591M);
-                }
+                fx.QuoteTime.Should().Equals(utcNow);
+                var quotes = fx.GetQuotes();
+                quotes.Count.Should().Be(1);
+                quotes.ContainsKey(utcNow).Should().BeTrue();
+                quotes[utcNow].Should().Be(1.2591M);
             }
 
             [TestMethod]
             public void WhenDayQuoteIsAvailable_ThenTryGetDayQuoteShouldSucceed()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+                decimal quote;
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-                    decimal quote;
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                    fx.TryGetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeTrue();
-                    quote.Should().Be(1.2591M);
-                }
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.TryGetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeTrue();
+                quote.Should().Be(1.2591M);
             }
 
             [TestMethod]
             public void WhenDayQuoteIsNotAvailable_ThenTryGetDayQuoteShouldFail()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
+                decimal quote;
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-                    decimal quote;
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                    fx.TryGetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeFalse();
-                    quote.Should().Be(0M);
-                }
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.TryGetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc), out quote).Should().BeFalse();
+                quote.Should().Be(0M);
             }
 
             [TestMethod]
             public void WhenDayQuoteIsAvailable_ThenGetDayQuoteShouldSucceed()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
-
-                    fx.QuoteTime.Should().Equals(utcNow);
-                    fx.GetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().Be(1.2591M);                                        
-                }
+                fx.QuoteTime.Should().Equals(utcNow);
+                fx.GetDayQuote(new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Should().Be(1.2591M);
             }
 
             [TestMethod]
             public void WhenDayQuoteIsNotAvailable_ThenGetDayQuoteShouldThrow()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+                fx.QuoteTime.Should().Equals(utcNow);
 
-                    fx.QuoteTime.Should().Equals(utcNow);
+                Action action = () => fx.GetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
 
-                    Action action = () => fx.GetDayQuote(new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
-
-                    action.ShouldThrow<NoExchangeRateQuoteFoundException>();
-                }
+                action.ShouldThrow<NoExchangeRateQuoteFoundException>();
             }
 
             [TestMethod]
             public void WhenDayQuoteIsAvailable_ThenConversionShouldBeCorrect()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+                var converted = fx.ConvertWithAvailableQuotes(
+                                    Money.Euro(100.99M),
+                                    new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-                    var converted = fx.ConvertWithAvailableQuotes(
-                                        Money.Euro(100.99M),
-                                        new DateTime(2015, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-
-                    converted.Currency.Should().Be(_dollar);
-                    converted.Amount.Should().Be(127.16M);
-                }
+                converted.Currency.Should().Be(_dollar);
+                converted.Amount.Should().Be(127.16M);
             }
             [TestMethod]
             public void WhenDayQuoteIsNotAvailable_ThenConversionShouldThrow()
             {
-                using (ShimsContext.Create())
-                {
-                    System.Fakes.ShimDateTime.UtcNowGet = () => { return utcNow; };
+                var fx = new ExchangeRate(_euro, _dollar, 1.2591F, utcNow);
 
-                    var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+                Action action = () => fx.ConvertWithAvailableQuotes(
+                                        Money.Euro(100.99M),
+                                        new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
 
-                    Action action = () => fx.ConvertWithAvailableQuotes(
-                                            Money.Euro(100.99M),
-                                            new DateTime(2015, 1, 2, 0, 0, 0, DateTimeKind.Utc));
-
-                    action.ShouldThrow<NoExchangeRateQuoteFoundException>();
-                }
+                action.ShouldThrow<NoExchangeRateQuoteFoundException>();
             }
         }
     }
