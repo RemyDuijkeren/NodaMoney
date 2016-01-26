@@ -373,7 +373,7 @@ namespace NodaMoney.UnitTests
         public class GiveIWantToUseALotOfCurrencies
         {
             [TestMethod]
-            public void WhenCreatingOneMillion_ThenItShouldBeWithinTwoSeconds()
+            public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
             {
                 var sw = Stopwatch.StartNew();
                 var c = Currency.FromCode("EUR");
@@ -395,7 +395,7 @@ namespace NodaMoney.UnitTests
                         sw.Stop();
                     };
 
-                action.ExecutionTime().ShouldNotExceed(2.Seconds());
+                action.ExecutionTime().ShouldNotExceed(4.Seconds());
                 Console.WriteLine("{0} ms for creating {1:N0} currencies (avg {2:F5} ms).", sw.ElapsedMilliseconds, max, sw.ElapsedMilliseconds / (max));
             }
         }
