@@ -16,7 +16,7 @@ namespace NodaMoney
         internal const double NotApplicable = -1;
         private static readonly object SyncLock = new object(); // TODO: Replace with ReaderWriterLock?
         private static readonly Dictionary<string, Currency> Currencies = new Dictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte) });
+        private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
@@ -312,12 +312,15 @@ namespace NodaMoney
                                      { "ISO-4217::YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                                      { "ISO-4217::ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                                      { "ISO-4217::ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
-                                     { "ISO-4217::LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", isObsolete: true) }, // Until 2014-12-31, replaced by EUR
-                                     { "ISO-4217::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", isObsolete: true) }, // Until 2014-01-15, replaced by EUR
-                                     { "ISO-4217::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", isObsolete: true) },  // Until 2013-01-01, replaced by ZWM
-                                     { "ISO-4217::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", isObsolete: true) }, // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
-                                     { "ISO-4217::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", isObsolete: true) },  // From 1992 Until 2010-12-31, replaced by EUR
-                                     { "ISO-4217::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", isObsolete: true)} // From 1810 to 1998-12-31
+
+                                     { "ISO-4217-HISTORIC::LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", "ISO-4217-HISTORIC", new DateTime(2014, 12, 31), new DateTime(1993, 1, 1)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", "ISO-4217-HISTORIC", new DateTime(2014, 01, 05), new DateTime(1992, 1, 1)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", "ISO-4217-HISTORIC", new DateTime(2013, 01, 01)) },  // replaced by ZWM
+                                     { "ISO-4217-HISTORIC::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2009, 02, 03)) }, // or Z$ A/10, no successor
+                                     { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2008, 08, 01)) }, // or Z$ A/9, replaced by ZWL
+                                     { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 01, 01)) },  // replaced by EUR
+                                     { "ISO-4217-HISTORIC::EEK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) },  // replaced by EUR
+                                     { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998-12-31), new DateTime(1810, 01, 01))} // From 1810 to 1998-12-31
                                  };
 
             return currencies;

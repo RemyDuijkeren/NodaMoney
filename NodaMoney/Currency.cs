@@ -27,8 +27,8 @@ namespace NodaMoney
         /// <param name="namespace">The namespace of the currency.</param>
         /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 4!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", bool isObsolete = false)
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero!</exception>
+        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime ? validFrom = null)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -40,15 +40,16 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(symbol)) 
                 throw new ArgumentNullException(nameof(symbol));
             if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
-                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to 0!");
+                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
 
             Code = code;
             Number = number;
             DecimalDigits = decimalDigits;
             EnglishName = englishName;
             Symbol = symbol;
-            IsObsolete = isObsolete;
             Namespace = @namespace;
+            ValidTo = validTo;
+            ValidFrom = validFrom;
         }
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -115,7 +116,7 @@ namespace NodaMoney
 
         /// <summary>Gets a value indicating whether currency is obsolete.</summary>
         /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
-        public bool IsObsolete { get; private set; }
+        public bool IsObsolete => ValidTo.HasValue && ValidTo.Value < DateTime.Today;
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>

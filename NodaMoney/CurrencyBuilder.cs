@@ -89,9 +89,7 @@ namespace NodaMoney
         {
             // TODO: Add validation?
             // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, IsObsolete);
-            currency.ValidFrom = ValidFrom;
-            currency.ValidTo = ValidTo;            
+            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);         
 
             return currency;
         }
