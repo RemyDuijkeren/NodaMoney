@@ -232,7 +232,7 @@ namespace NodaMoney
                                      { "ISO-4217::MRO", new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM") }, // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
                                      { "ISO-4217::MUR", new Currency("MUR", "480", 2, "Mauritian rupee", "Rs") },
                                      { "ISO-4217::MVR", new Currency("MVR", "462", 2, "Maldivian rufiyaa", "Rf") }, // or , MRf, MVR, .ރ or /-
-                                     { "ISO-4217::MWK", new Currency("MWK", "454", 2, "Malawian kwacha", "MK") },
+                                     { "ISO-4217::MWK", new Currency("MWK", "454", 2, "Malawi kwacha", "MK") },
                                      { "ISO-4217::MXN", new Currency("MXN", "484", 2, "Mexican peso", "$") },
                                      { "ISO-4217::MXV", new Currency("MXV", "979", 2, "Mexican Unidad de Inversion (UDI) (funds code)", "¤") },  // <==== not found
                                      { "ISO-4217::MYR", new Currency("MYR", "458", 2, "Malaysian ringgit", "RM") },
@@ -245,7 +245,7 @@ namespace NodaMoney
                                      { "ISO-4217::NZD", new Currency("NZD", "554", 2, "New Zealand dollar", "$") },
                                      { "ISO-4217::OMR", new Currency("OMR", "512", 3, "Omani rial", "ر.ع.") },
                                      { "ISO-4217::PAB", new Currency("PAB", "590", 2, "Panamanian balboa", "B/.") },
-                                     { "ISO-4217::PEN", new Currency("PEN", "604", 2, "Peruvian nuevo sol", "S/.") },
+                                     { "ISO-4217::PEN", new Currency("PEN", "604", 2, "Peruvian sol", "S/.") },
                                      { "ISO-4217::PGK", new Currency("PGK", "598", 2, "Papua New Guinean kina", "K") },
                                      { "ISO-4217::PHP", new Currency("PHP", "608", 2, "Philippine peso", "₱") }, // or P or PHP or PhP
                                      { "ISO-4217::PKR", new Currency("PKR", "586", 2, "Pakistani rupee", "Rs") },
@@ -287,7 +287,7 @@ namespace NodaMoney
                                      { "ISO-4217::UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (URUIURUI) (funds code)", "¤") },
                                      { "ISO-4217::UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
                                      { "ISO-4217::UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
-                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar fuerte", "Bs.F.") }, // or Bs.
+                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.F.") }, // or Bs.
                                      { "ISO-4217::VND", new Currency("VND", "704", 0, "Vietnamese dong", "₫") },
                                      { "ISO-4217::VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
                                      { "ISO-4217::WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T
