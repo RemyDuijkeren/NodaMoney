@@ -1,1 +1,2 @@
-assembly-informational-format: NuGetVersion
+mode: ContinuousDeployment
+branches: {}
