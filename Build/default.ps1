@@ -88,7 +88,8 @@ Task Test {
 	
 	cd $artifactsDir | out-null # move current working dir to get TestResults in artifacts
 	exec {
-		.$openCoverExe -register:user -target:"$VsTestConsoleExe" -filter:"+[NodaMoney*]*" -targetargs:"$rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"
+		#.$openCoverExe -register:user -target:$VsTestConsoleExe -filter:"+[NodaMoney*]*" -targetargs:"$rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"
+		.$openCoverExe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" -filter:"+[NodaMoney*]*" -targetargs:"$rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"		
 	}
 }
 
