@@ -22,7 +22,7 @@ nuget:
   disable_publish_on_pr: true
  
 build_script:
-  - ps: .\Build\default.ps1
+  - .\Build\psake.cmd
  
 test: off
 
