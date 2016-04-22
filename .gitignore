@@ -16,6 +16,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+!Build/
 
 # Custom Build results
 [Aa]rtifacts/
