@@ -18,11 +18,7 @@ FormatTaskName (("-"*25) + "[{0}]" + ("-"*25))
 
 Task Default -depends Clean, ApplyVersioning, RestoreNugetPackages, Compile, Test, Package, Zip
 
-Task Init {
-	cls
-}
-
-Task Clean -depends Init {
+Task Clean {
     "Clean Artifacts directory"
 	$artifactsDir = get-artifactsDirectory	
     if (Test-Path $artifactsDir) 
