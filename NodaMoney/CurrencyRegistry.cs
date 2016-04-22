@@ -319,7 +319,7 @@ namespace NodaMoney
                                      { "ISO-4217-HISTORIC::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2009, 02, 03)) }, // or Z$ A/10, no successor
                                      { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2008, 08, 01)) }, // or Z$ A/9, replaced by ZWL
                                      { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 01, 01)) },  // replaced by EUR
-                                     { "ISO-4217-HISTORIC::EEK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) },  // replaced by EUR
+                                     { "ISO-4217-HISTORIC::SKK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) },  // replaced by EUR
                                      { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998-12-31), new DateTime(1810, 01, 01))} // From 1810 to 1998-12-31
                                  };
 

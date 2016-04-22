@@ -372,7 +372,7 @@ namespace NodaMoney.UnitTests
         [TestClass]
         public class GiveIWantToUseALotOfCurrencies
         {
-            [TestMethod]
+            [TestMethod][Ignore]
             public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
             {
                 var sw = Stopwatch.StartNew();
