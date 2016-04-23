@@ -87,7 +87,7 @@ Task Test {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"
 	
 	cd $artifactsDir | out-null # move current working dir to get TestResults in artifacts
-	exec { .vstest.console /Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll }
+	#exec { vstest.console /Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll }
 	
 	if(isAppVeyor) {
 		exec {
