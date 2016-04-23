@@ -90,7 +90,7 @@ Task Test {
 	
 	if(isAppVeyor) {
 		exec {
-			.$openCoverExe -register:user -target:"vstest.console" -filter:"+[NodaMoney*]*" -targetargs:"$rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:Appveyor" -output:"$artifactsDir\coverage.xml"	
+			.$openCoverExe -register:user -target:"vstest.console" -targetargs:"/Logger:Appveyor $rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll" -filter:"+[NodaMoney*]*" -output:"$artifactsDir\coverage.xml"	
 		}
 	} else {
 		.$openCoverExe -register:user -target:$VsTestConsoleExe -filter:"+[NodaMoney*]*" -targetargs:"$rootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"
