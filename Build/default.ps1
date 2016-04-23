@@ -68,9 +68,12 @@ Task ApplyVersioning -depends CalculateVersion {
 
 Task Compile -depends ApplyVersioning, RestoreNugetPackages {
 	$rootDir = get-rootDirectory
-    exec { 
-        msbuild "$rootDir\NodaMoney.sln" /t:Rebuild /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo
-    }
+	
+	if(isAppVeyor) {
+		exec { msbuild "$rootDir\NodaMoney.sln" /t:Rebuild /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
+	} else {
+		exec { msbuild "$rootDir\NodaMoney.sln" /t:Rebuild /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo }
+	}
 }
 
 Task RestoreNugetPackages {
@@ -92,7 +95,7 @@ Task Test {
 	
 	if(isAppVeyor) {
 		exec {
-			.$openCoverExe -register:user -target:"vstest.console.exe" -targetargs:"/Logger:Appveyor '..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll'" -filter:"+[NodaMoney*]*" -output:"$artifactsDir\coverage.xml"
+			.$openCoverExe -register:user -target:"vstest.console.exe" "-targetargs:/Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll" -filter:"+[NodaMoney*]*" -output:"$artifactsDir\coverage.xml"
 		}
 	} else {
 		.$openCoverExe -register:user -target:$VsTestConsoleExe -filter:"+[NodaMoney*]*" -targetargs:"..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"
