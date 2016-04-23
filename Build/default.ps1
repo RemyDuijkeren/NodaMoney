@@ -87,11 +87,12 @@ Task Test {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"
 	
 	cd $artifactsDir | out-null # move current working dir to get TestResults in artifacts
-	#exec { vstest.console /Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll }
+	
+	& vstest.console.exe /Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll
 	
 	if(isAppVeyor) {
 		exec {
-			.$openCoverExe -register:user -target:"vstest.console" -targetargs:"/Logger:Appveyor ..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll" -filter:"+[NodaMoney*]*" -output:"$artifactsDir\coverage.xml"	
+			.$openCoverExe -register:user -target:"vstest.console.exe" -targetargs:"/Logger:Appveyor '..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll'" -filter:"+[NodaMoney*]*" -output:"$artifactsDir\coverage.xml"
 		}
 	} else {
 		.$openCoverExe -register:user -target:$VsTestConsoleExe -filter:"+[NodaMoney*]*" -targetargs:"..\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll /InIsolation /Logger:trx" -output:"$artifactsDir\coverage.xml"
