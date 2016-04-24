@@ -253,7 +253,7 @@ namespace NodaMoney
                                      { "ISO-4217::PYG", new Currency("PYG", "600", 0, "Paraguayan guaraní", "₲") },
                                      { "ISO-4217::QAR", new Currency("QAR", "634", 2, "Qatari riyal", "ر.ق") }, // or QR
                                      { "ISO-4217::RON", new Currency("RON", "946", 2, "Romanian new leu", "lei") },
-                                     { "ISO-4217::RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин. or din. ?)
+                                     { "ISO-4217::RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин or d./д)
                                      { "ISO-4217::RUB", new Currency("RUB", "643", 2, "Russian rouble", "₽") }, // or R or руб (both onofficial)
                                      { "ISO-4217::RWF", new Currency("RWF", "646", 0, "Rwandan franc", "RFw") }, // or RF, R₣
                                      { "ISO-4217::SAR", new Currency("SAR", "682", 2, "Saudi riyal", "ر.س") }, // or SR (Latin) or ﷼‎ (Unicode)
@@ -319,7 +319,8 @@ namespace NodaMoney
                                      { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2008, 08, 01)) }, // or Z$ A/9, replaced by ZWL
                                      { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 01, 01)) }, // replaced by EUR
                                      { "ISO-4217-HISTORIC::SKK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) }, // replaced by EUR
-                                     { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1810, 01, 01)) } // From 1810 to 1998-12-31
+                                     { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1810, 01, 01)) }, // From 1810 to 1998-12-31
+                                     { "ISO-4217-HISTORIC::CSD", new Currency("CSD", "891", 2, "Serbian dinar", "РСД", "ISO-4217-HISTORIC", new DateTime(2006, 01, 01), new DateTime(2003, 07, 03)) } // From 2003-07-03 to 2006, replace by RSD
                                  };
 
             return currencies;

@@ -4,7 +4,7 @@ using System.Reflection;
 // your project to create a link to this file.
 [assembly: AssemblyProduct("NodaMoney")]
 [assembly: AssemblyCompany("DynamicHands B.V.")]
-[assembly: AssemblyCopyright("Copyright 2014-2015")]
+[assembly: AssemblyCopyright("Copyright 2014-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")] // neutral
 
