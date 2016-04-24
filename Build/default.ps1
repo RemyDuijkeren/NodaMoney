@@ -64,8 +64,8 @@ Task RestoreNugetPackages {
 }
 
 Task Compile -depends RestoreNugetPackages {
-	$logger = if(isAppVeyor) { "/logger:""C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"" " }
-
+	$logger = if(isAppVeyor) { "/logger:""C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll""" }
+	
 	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 }
 
