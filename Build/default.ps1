@@ -15,7 +15,6 @@ Properties {
 	$RootDir = Resolve-Path ..
 	$ArtifactsDir = "$RootDir/Artifacts"
 	$ToolsDir = "$RootDir/Tools"
-	$VsTestConsoleExe = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 }
 
 Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip
@@ -79,12 +78,13 @@ Task Compile -depends RestoreNugetPackages {
 Task Test {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
 	$logger = if(isAppVeyor) { "Appveyor" } else { "trx" }
+	$VsTestConsoleExe = if(isAppVeyor) { "vstest.console.exe" } else { "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" }
 	
 	# change current working dir to get TestResults (trx) in artifacts folder
 	Set-Location $ArtifactsDir | out-null
 	
 	exec {
-		& $openCoverExe -register:user "-target:""$VsTestConsoleExe""" "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:$logger" -filter:"+[NodaMoney*]*" -output:"$ArtifactsDir\coverage.xml"
+		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:$logger" -filter:"+[NodaMoney*]*" -output:"$ArtifactsDir\coverage.xml"
 	}
 }
 
