@@ -3,7 +3,10 @@
 #---------------------------------#
 version: '{build}-{branch}'
 os: Visual Studio 2015
-
+branches:
+  except:
+    - gh-pages
+	
 #---------------------------------#
 #    environment configuration    #
 #---------------------------------#
@@ -31,7 +34,11 @@ test: off
 #      artifacts configuration    #
 #---------------------------------#
 artifacts:
-- path: .\Artifacts\*
+- path: .\Artifacts\*.nupkg
+  name: nuget
+- path: .\Artifacts\*.zip
+  name: zip
+
 
 #---------------------------------#
 #     deployment configuration    #
@@ -41,18 +48,20 @@ deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   auth_token:
     secure: y4qyCzCMLVH/DEwqh0WpXYryveAR7kuSSe25yd3PlLJms3dw7rB2gJpYc7HKW37y
-  artifact: NodaMoney.zip
+  artifact: nuget, zip
   draft: true
   on:
-    branch: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
+    branch: master
+    appveyor_repo_tag: true
 
 - provider: NuGet
-  server: https://www.nuget.org/
+  server: https://staging.nuget.org/
   api_key:
     secure: cJV4lINlVi8J4NOZBAS5GnaaugKWWO0Zi5jCSKfkDOgs5mEpPDjIf9K0D8hB4bTU
   skip_symbols: true
   on:
-    branch: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
+    branch: master
+    appveyor_repo_tag: true
 
 #---------------------------------#
 #         notifications           #

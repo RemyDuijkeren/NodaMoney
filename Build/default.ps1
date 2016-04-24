@@ -26,7 +26,7 @@ Task Clean {
 	New-Item $ArtifactsDir -ItemType directory | out-null
     
 	"Clean solution"
-    exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /m /v:m /nologo }
+    exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo }
 }
 
 Task CalculateVersion {
@@ -52,9 +52,9 @@ Task ApplyVersioning -depends CalculateVersion {
 	
 	"Updating $assemblyInfo with versioning"
 	(Get-Content $assemblyInfo ) | ForEach-Object {
-        % { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$script:AssemblyVersion`")]" } |
-        % { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$script:AssemblyFileVersion`")]" } |
-        % { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$script:InformationalVersion`")]" }
+        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$script:AssemblyVersion`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$script:AssemblyFileVersion`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$script:InformationalVersion`")]" }
     } | Set-Content $assemblyInfo
 }
 
@@ -63,16 +63,10 @@ Task RestoreNugetPackages {
 	exec { & $nugetExe restore "$RootDir\NodaMoney.sln" }
 }
 
-Task Compile -depends RestoreNugetPackages {	
-	if(isAppVeyor) {
-		exec {
-			msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /m /v:m /nologo /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-		}
-	} else {
-		exec {
-			msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /v:m /nologo
-		}
-	}
+Task Compile -depends RestoreNugetPackages {
+	$logger = if(isAppVeyor) { "/logger:""C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"" " }
+
+	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 }
 
 Task Test {
@@ -89,18 +83,11 @@ Task Test {
 }
 
 Task PushCoverage -precondition { return $CoverallsToken } {
-	"Pushing coverage to coveralls.io"
-	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"	
+	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"		
+	$commitInfo = if(isAppVeyor) { "--commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor" }
 	
-	if(isAppVeyor) {
-		exec {
-			& $coverallsExe --opencover -i $ArtifactsDir\coverage.xml --repoToken $CoverallsToken --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor
-		}
-	} else {
-		exec {
-			& $coverallsExe --opencover -i $ArtifactsDir\coverage.xml --repoToken $CoverallsToken
-		}
-	}	   
+	"Pushing coverage to coveralls.io"
+	exec { & $coverallsExe --opencover -i $ArtifactsDir\coverage.xml --repoToken $CoverallsToken $commitInfo }	   
 }
 
 Task Package {
