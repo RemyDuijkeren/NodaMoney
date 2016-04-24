@@ -2,7 +2,7 @@
 #      general configuration      #
 #---------------------------------#
 version: '{build}-{branch}'
-os: Visual Studio 2015 RC
+os: Visual Studio 2015
 
 #---------------------------------#
 #    environment configuration    #
@@ -22,7 +22,7 @@ nuget:
   disable_publish_on_pr: true
  
 build_script:
-  - ps: .\Build\psake.ps1 .\Build\default.ps1; if ($psake.build_success -eq $false) { exit 1 } else { exit 0 }
+  - .\Build\psake.cmd
  
 test: off
 

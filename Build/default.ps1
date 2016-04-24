@@ -5,9 +5,9 @@
 #	\Tools		- This is where tools, utilities and executables are stored that the builds need
 #
 Framework "4.6"
+FormatTaskName (("-"*25) + "[{0}]" + ("-"*25))
 
 Properties {
-    $Configuration = "Release"
 	$CoverallsToken = $env:COVERALLS_REPO_TOKEN
 	$NugetApiKey = $env:NUGET_API_KEY
 	$NugetFeed = "https://staging.nuget.org" #/packages?replace=true"
@@ -18,62 +18,45 @@ Properties {
 	$VsTestConsoleExe = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 }
 
-FormatTaskName (("-"*25) + "[{0}]" + ("-"*25))
-
-Task Default -depends Clean, ApplyVersioning, RestoreNugetPackages, Compile, Test, Package, Zip
+Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip
+Task Deploy  -depends Default, PushCoverage, PushPackage
 
 Task Clean {
     "Clean Artifacts directory"	
-    if (Test-Path $ArtifactsDir) {   
-        rd $ArtifactsDir -rec -force -ErrorAction SilentlyContinue | out-null
-    }
-
-    mkdir $ArtifactsDir | out-null
-
-    "Clean solution"
-    exec {
-		msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo
-	}
+	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue #| out-null
+	New-Item $ArtifactsDir -ItemType directory | out-null
+    
+	"Clean solution"
+    exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /m /v:m /nologo }
 }
 
 Task CalculateVersion {
 	$gitVersionExe = Join-Path $ToolsDir -ChildPath "GitVersion.exe"
 	
-    $json = exec { & $gitVersionExe }	
-	$versionInfo = $json -join "`n" | ConvertFrom-Json
-        
-	$script:AssemblyVersion = $versionInfo.AssemblySemVer
-	$script:AssemblyFileVersion = $versionInfo.ClassicVersion
-    $script:InformationalVersion = $versionInfo.NuGetVersion
-    $script:NuGetVersion = $versionInfo.NuGetVersion	
+    $json = exec { & $gitVersionExe }
+	foreach ($line in $json) { "$line" }
 	
-	"Calculated AssemblyVersion: $script:AssemblyVersion"
-	"Calculated AssemblyFileVersion: $script:AssemblyFileVersion"
-	"Calculated InformationalVersion: $script:InformationalVersion"
-	"Calculated NuGetVersion: $script:NuGetVersion"	
+	$versionInfo = $json -join "`n" | ConvertFrom-Json
+    
+	$script:AssemblyVersion = $versionInfo.AssemblySemVer
+	"Use '$script:AssemblyVersion' as AssemblyVersion"
+	$script:AssemblyFileVersion = $versionInfo.ClassicVersion
+	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion"    
+	$script:InformationalVersion = $versionInfo.NuGetVersion
+	"Use '$script:InformationalVersion' as InformationalVersion"
+    $script:NuGetVersion = $versionInfo.NuGetVersion
+	"Use '$script:NuGetVersion' as NuGetVersion"
 }
 
 Task ApplyVersioning -depends CalculateVersion {
 	$assemblyInfo = "$RootDir\GlobalAssemblyInfo.cs"
 	
-	"Updating $assemblyInfo"
+	"Updating $assemblyInfo with versioning"
 	(Get-Content $assemblyInfo ) | ForEach-Object {
-        % {$_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$script:AssemblyVersion`")]" } |
-        % {$_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$script:AssemblyFileVersion`")]" } |
-        % {$_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$script:InformationalVersion`")]" }
+        % { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$script:AssemblyVersion`")]" } |
+        % { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$script:AssemblyFileVersion`")]" } |
+        % { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$script:InformationalVersion`")]" }
     } | Set-Content $assemblyInfo
-}
-
-Task Compile -depends ApplyVersioning, RestoreNugetPackages {	
-	if(isAppVeyor) {
-		exec {
-			msbuild "$RootDir\NodaMoney.sln" /t:Rebuild /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-		}
-	} else {
-		exec {
-			msbuild "$RootDir\NodaMoney.sln" /t:Rebuild /p:Configuration=$Configuration /p:Platform="Any CPU" /v:m /nologo
-		}
-	}
 }
 
 Task RestoreNugetPackages {
@@ -81,22 +64,31 @@ Task RestoreNugetPackages {
 	exec { & $nugetExe restore "$RootDir\NodaMoney.sln" }
 }
 
-Task Test {
-	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"
-	
+Task Compile -depends RestoreNugetPackages {	
 	if(isAppVeyor) {
 		exec {
-			& $openCoverExe -register:user -target:"vstest.console.exe" "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:Appveyor" -filter:"+[NodaMoney*]*" -output:"$ArtifactsDir\coverage.xml"
+			msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /m /v:m /nologo /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 		}
 	} else {
-		cd $ArtifactsDir | out-null # change current working dir to get TestResults (trx) in artifacts folder		
 		exec {
-			& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:trx" -filter:"+[NodaMoney*]*" -output:"$ArtifactsDir\coverage.xml"
+			msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /v:m /nologo
 		}
 	}
 }
 
-Task PushCoverage {
+Task Test {
+	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
+	$logger = if(isAppVeyor) { "Appveyor" } else { "trx" }
+	
+	# change current working dir to get TestResults (trx) in artifacts folder
+	Set-Location $ArtifactsDir | out-null
+	
+	exec {
+		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:$logger" -filter:"+[NodaMoney*]*" -output:"$ArtifactsDir\coverage.xml"
+	}
+}
+
+Task PushCoverage -precondition { return $CoverallsToken } {
 	"Pushing coverage to coveralls.io"
 	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"	
 	
@@ -114,13 +106,12 @@ Task PushCoverage {
 Task Package {
 	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe";
 	
-	exec {
-		& $nugetExe pack "$RootDir\NodaMoney\NodaMoney.csproj" -OutputDirectory $ArtifactsDir
+	$projectsToPackage = Get-ChildItem -File -Path $RootDir -Filter *.nuspec -Recurse | ForEach-Object { $_.FullName -replace "nuspec", "csproj" }
+	
+	foreach ($proj in $projectsToPackage) {
+		exec { & $nugetExe pack $proj -OutputDirectory $ArtifactsDir }
 	}
-	exec {
-		& $nugetExe pack "$RootDir\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" -OutputDirectory $ArtifactsDir
-	}	
-
+	
 	#if(isAppVeyor) {
 	#	$packages = Get-ChildItem $ArtifactsDir *.nupkg
 	#	foreach ($package in $packages) {
@@ -129,7 +120,7 @@ Task Package {
 	#}
 }
 
-Task PushPackage {
+Task PushPackage -precondition { return $NugetApiKey } {
 	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe"			
 	exec { & $nugetExe push "$ArtifactsDir\*.nupkg" $NugetApiKey -source $NugetFeed }
 }
