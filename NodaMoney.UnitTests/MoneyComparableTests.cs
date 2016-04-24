@@ -51,6 +51,7 @@ namespace NodaMoney.UnitTests
             public void WhenComparingWithNull_ThenMoneyShouldNotBeEqual()
             {
                 Assert.AreNotEqual(_tenEuro1, null);
+                _tenEuro1.CompareTo(null).Should().Be(1);
             }
 
             [TestMethod]

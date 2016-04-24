@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,13 +14,14 @@ namespace NodaMoney
         // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
         internal const double NotApplicable = -1;
-        private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte) });
+        private static readonly object SyncLock = new object(); // TODO: Replace with ReaderWriterLock?
+        private static readonly Dictionary<string, Currency> Currencies = new Dictionary<string, Currency>(InitializeIsoCurrencies());
+        private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code, or the default value of the type if the operation failed.</param>
-        /// <returns>An instance of the type <see cref="Currency"/>.</returns>
+        /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
         public bool TryGet(string code, out Currency currency)
         {
@@ -29,12 +29,15 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(code));
 
             var found = new List<Currency>();
-            foreach (var ns in Namespaces.Keys)
+            lock (SyncLock)
             {
-                Currency c;
-                if (Currencies.TryGetValue(ns + "::" + code, out c))
+                foreach (var ns in Namespaces.Keys)
                 {
-                    found.Add(c);
+                    Currency c;
+                    if (Currencies.TryGetValue(ns + "::" + code, out c))
+                    {
+                        found.Add(c);
+                    }
                 }
             }
 
@@ -52,7 +55,7 @@ namespace NodaMoney
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
-        /// <returns>An instance of the type <see cref="Currency"/>.</returns>
+        /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
         public bool TryGet(string code, string @namespace, out Currency currency)
         {
@@ -61,14 +64,17 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
+            lock (SyncLock)
+            {
+                return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
+            }
         }
 
-        /// <summary>Attempts to remove and return the <see cref="Currency"/> of the given code and namespace.</summary>
+        /// <summary>Attempts to add the <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
-        /// <returns>An instance of the type <see cref="Currency"/>.</returns>
+        /// <returns><b>true</b> if the <see cref="Currency"/> with the specified code is added; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
         public bool TryAdd(string code, string @namespace, Currency currency)
         {
@@ -77,16 +83,24 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            Namespaces.TryAdd(@namespace, default(byte));
+            lock (SyncLock)
+            {
+                Namespaces[@namespace] = default(byte);
+                if (!Currencies.ContainsKey(@namespace + "::" + code))
+                {
+                    Currencies.Add(@namespace + "::" + code, currency);
+                    return true;
+                }
+            }
 
-            return Currencies.TryAdd(@namespace + "::" + code, currency);
+            return false;
         }
 
-        /// <summary>Attempts to remove and return the <see cref="Currency"/> of the given code and namespace.</summary>
+        /// <summary>Attempts to remove the <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
-        /// <returns>An instance of the type <see cref="Currency"/>.</returns>
+        /// <returns><b>true</b> if the <see cref="Currency"/> with the specified code is removed; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
         public bool TryRemove(string code, string @namespace, out Currency currency)
         {
@@ -95,9 +109,17 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            byte outValue; // temp variable, we don't care about
-            Namespaces.TryRemove(@namespace, out outValue);
-            return Currencies.TryRemove(@namespace + "::" + code, out currency);
+            lock (SyncLock)
+            {
+                // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
+                if (Currencies.TryGetValue(@namespace + "::" + code, out currency))
+                {
+                    Currencies.Remove(@namespace + "::" + code);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Get all registered currencies.</summary>
@@ -210,7 +232,7 @@ namespace NodaMoney
                                      { "ISO-4217::MRO", new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM") }, // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
                                      { "ISO-4217::MUR", new Currency("MUR", "480", 2, "Mauritian rupee", "Rs") },
                                      { "ISO-4217::MVR", new Currency("MVR", "462", 2, "Maldivian rufiyaa", "Rf") }, // or , MRf, MVR, .ރ or /-
-                                     { "ISO-4217::MWK", new Currency("MWK", "454", 2, "Malawian kwacha", "MK") },
+                                     { "ISO-4217::MWK", new Currency("MWK", "454", 2, "Malawi kwacha", "MK") },
                                      { "ISO-4217::MXN", new Currency("MXN", "484", 2, "Mexican peso", "$") },
                                      { "ISO-4217::MXV", new Currency("MXV", "979", 2, "Mexican Unidad de Inversion (UDI) (funds code)", "¤") },  // <==== not found
                                      { "ISO-4217::MYR", new Currency("MYR", "458", 2, "Malaysian ringgit", "RM") },
@@ -223,7 +245,7 @@ namespace NodaMoney
                                      { "ISO-4217::NZD", new Currency("NZD", "554", 2, "New Zealand dollar", "$") },
                                      { "ISO-4217::OMR", new Currency("OMR", "512", 3, "Omani rial", "ر.ع.") },
                                      { "ISO-4217::PAB", new Currency("PAB", "590", 2, "Panamanian balboa", "B/.") },
-                                     { "ISO-4217::PEN", new Currency("PEN", "604", 2, "Peruvian nuevo sol", "S/.") },
+                                     { "ISO-4217::PEN", new Currency("PEN", "604", 2, "Peruvian sol", "S/.") },
                                      { "ISO-4217::PGK", new Currency("PGK", "598", 2, "Papua New Guinean kina", "K") },
                                      { "ISO-4217::PHP", new Currency("PHP", "608", 2, "Philippine peso", "₱") }, // or P or PHP or PhP
                                      { "ISO-4217::PKR", new Currency("PKR", "586", 2, "Pakistani rupee", "Rs") },
@@ -231,7 +253,7 @@ namespace NodaMoney
                                      { "ISO-4217::PYG", new Currency("PYG", "600", 0, "Paraguayan guaraní", "₲") },
                                      { "ISO-4217::QAR", new Currency("QAR", "634", 2, "Qatari riyal", "ر.ق") }, // or QR
                                      { "ISO-4217::RON", new Currency("RON", "946", 2, "Romanian new leu", "lei") },
-                                     { "ISO-4217::RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин. or din. ?)
+                                     { "ISO-4217::RSD", new Currency("RSD", "941", 2, "Serbian dinar", "РСД") }, // or RSD (or дин or d./д)
                                      { "ISO-4217::RUB", new Currency("RUB", "643", 2, "Russian rouble", "₽") }, // or R or руб (both onofficial)
                                      { "ISO-4217::RWF", new Currency("RWF", "646", 0, "Rwandan franc", "RFw") }, // or RF, R₣
                                      { "ISO-4217::SAR", new Currency("SAR", "682", 2, "Saudi riyal", "ر.س") }, // or SR (Latin) or ﷼‎ (Unicode)
@@ -265,7 +287,7 @@ namespace NodaMoney
                                      { "ISO-4217::UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (URUIURUI) (funds code)", "¤") },
                                      { "ISO-4217::UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
                                      { "ISO-4217::UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
-                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar fuerte", "Bs.F.") }, // or Bs.
+                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.F.") }, // or Bs.
                                      { "ISO-4217::VND", new Currency("VND", "704", 0, "Vietnamese dong", "₫") },
                                      { "ISO-4217::VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
                                      { "ISO-4217::WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T
@@ -290,12 +312,15 @@ namespace NodaMoney
                                      { "ISO-4217::YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                                      { "ISO-4217::ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                                      { "ISO-4217::ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
-                                     { "ISO-4217::LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", isObsolete: true) }, // Until 2014-12-31, replaced by EUR
-                                     { "ISO-4217::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", isObsolete: true) }, // Until 2014-01-15, replaced by EUR
-                                     { "ISO-4217::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", isObsolete: true) },  // Until 2013-01-01, replaced by ZWM
-                                     { "ISO-4217::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", isObsolete: true) }, // or Z$ (official currency of Zimbabwe from 1980 to 12 April 2009, not used anymore)
-                                     { "ISO-4217::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", isObsolete: true) },  // From 1992 Until 2010-12-31, replaced by EUR
-                                     { "ISO-4217::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", isObsolete: true)} // From 1810 to 1998-12-31
+                                     { "ISO-4217-HISTORIC::LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", "ISO-4217-HISTORIC", new DateTime(2014, 12, 31), new DateTime(1993, 1, 1)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", "ISO-4217-HISTORIC", new DateTime(2014, 01, 05), new DateTime(1992, 1, 1)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", "ISO-4217-HISTORIC", new DateTime(2013, 01, 01)) }, // replaced by ZWM
+                                     { "ISO-4217-HISTORIC::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2009, 02, 03)) }, // or Z$ A/10, no successor
+                                     { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2008, 08, 01)) }, // or Z$ A/9, replaced by ZWL
+                                     { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 01, 01)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::SKK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) }, // replaced by EUR
+                                     { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1810, 01, 01)) }, // From 1810 to 1998-12-31
+                                     { "ISO-4217-HISTORIC::CSD", new Currency("CSD", "891", 2, "Serbian dinar", "РСД", "ISO-4217-HISTORIC", new DateTime(2006, 01, 01), new DateTime(2003, 07, 03)) } // From 2003-07-03 to 2006, replace by RSD
                                  };
 
             return currencies;

@@ -18,17 +18,20 @@ namespace NodaMoney
     {
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 
-        /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Currency" /> struct.
+        /// </summary>
         /// <param name="code">The code.</param>
         /// <param name="number">The number.</param>
         /// <param name="decimalDigits">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
         /// <param name="symbol">The currency symbol.</param>
         /// <param name="namespace">The namespace of the currency.</param>
-        /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
+        /// <param name="validTo">The valid until the specified date.</param>
+        /// <param name="validFrom">The valid from the specified date.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be between -1 and 4!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", bool isObsolete = false)
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero!</exception>
+        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -40,15 +43,16 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(symbol)) 
                 throw new ArgumentNullException(nameof(symbol));
             if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
-                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to 0!");
+                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
 
             Code = code;
             Number = number;
             DecimalDigits = decimalDigits;
             EnglishName = englishName;
             Symbol = symbol;
-            IsObsolete = isObsolete;
             Namespace = @namespace;
+            ValidTo = validTo;
+            ValidFrom = validFrom;
         }
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -89,11 +93,11 @@ namespace NodaMoney
         /// </remarks>
         public double DecimalDigits { get; private set; }
 
-        /// <summary>Gets or sets the date when the currency is valid from.</summary>
+        /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
         public DateTime? ValidFrom { get; internal set; }
 
-        /// <summary>Gets or sets the date when the currency is valid to.</summary>
+        /// <summary>Gets the date when the currency is valid to.</summary>
         /// <value>The to date when the currency is valid.</value>
         public DateTime? ValidTo { get; internal set; }
 
@@ -115,7 +119,7 @@ namespace NodaMoney
 
         /// <summary>Gets a value indicating whether currency is obsolete.</summary>
         /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
-        public bool IsObsolete { get; private set; }
+        public bool IsObsolete => ValidTo.HasValue && ValidTo.Value < DateTime.Today;
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
