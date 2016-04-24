@@ -17,7 +17,7 @@ Properties {
 	$ToolsDir = "$RootDir/Tools"
 }
 
-Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip
+Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip, PushCoverage
 Task Deploy  -depends Default, PushCoverage, PushPackage
 
 Task Clean {
@@ -66,8 +66,6 @@ Task RestoreNugetPackages {
 Task Compile -depends RestoreNugetPackages {
 	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
 	
-	"$logger"
-
 	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 }
 
@@ -102,10 +100,7 @@ Task Package {
 	}
 	
 	#if(isAppVeyor) {
-	#	$packages = Get-ChildItem $ArtifactsDir *.nupkg
-	#	foreach ($package in $packages) {
-	#		Push-AppveyorArtifact ($package | Resolve-Path).Path
-	#	}
+	#	Get-ChildItem $ArtifactsDir *.nupkg | ForEach-Object { Push-AppveyorArtifact ($_ | Resolve-Path).Path }
 	#}
 }
 

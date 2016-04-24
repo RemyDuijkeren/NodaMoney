@@ -18,17 +18,20 @@ namespace NodaMoney
     {
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 
-        /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Currency" /> struct.
+        /// </summary>
         /// <param name="code">The code.</param>
         /// <param name="number">The number.</param>
         /// <param name="decimalDigits">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
         /// <param name="symbol">The currency symbol.</param>
         /// <param name="namespace">The namespace of the currency.</param>
-        /// <param name="isObsolete">Value indicating whether currency is obsolete.</param>
+        /// <param name="validTo">The valid until the specified date.</param>
+        /// <param name="validFrom">The valid from the specified date.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero!</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime ? validFrom = null)
+        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -90,11 +93,11 @@ namespace NodaMoney
         /// </remarks>
         public double DecimalDigits { get; private set; }
 
-        /// <summary>Gets or sets the date when the currency is valid from.</summary>
+        /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
         public DateTime? ValidFrom { get; internal set; }
 
-        /// <summary>Gets or sets the date when the currency is valid to.</summary>
+        /// <summary>Gets the date when the currency is valid to.</summary>
         /// <value>The to date when the currency is valid.</value>
         public DateTime? ValidTo { get; internal set; }
 
