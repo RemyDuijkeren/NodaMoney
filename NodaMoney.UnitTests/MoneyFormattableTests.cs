@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -88,6 +89,14 @@ namespace NodaMoney.UnitTests
             }
 
             [TestMethod]
+            public void WhenEmptyFormat_ThenThisShouldThrow()
+            {
+                Action action = () => _yen.ToString((string)null);
+
+                action.ShouldThrow<ArgumentNullException>();
+            }
+
+            [TestMethod]
             public void WhenSpecificCultureIsUsed_ThenCurrencySymbolAndDecimalsOfMoneyShouldStillBeLeading()
             {
                 using (new SwitchCulture("en-US"))
@@ -113,6 +122,14 @@ namespace NodaMoney.UnitTests
                     _dollar.ToString(nfi).Should().Be("$ 765,43");
                     _dinar.ToString(nfi).Should().Be("BD 765,432");
                 }
+            }
+
+            [TestMethod]
+            public void WhenEmptyFormatNumberFormatIsUsed_ThenThisShouldThrow()
+            {
+                Action action = () => _yen.ToString((NumberFormatInfo)null);
+
+                action.ShouldThrow<ArgumentNullException>();
             }
 
             [TestMethod]
