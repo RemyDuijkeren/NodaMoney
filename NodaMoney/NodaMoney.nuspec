@@ -18,7 +18,7 @@
 	  <language>en-US</language>
   </metadata>
   <files>
-    <file src="..\README.md" target="content" />
-    <file src="..\LICENSE.txt" target="content" />
+    <file src="..\README.md" />
+    <file src="..\LICENSE.txt" />
   </files>
 </package>
