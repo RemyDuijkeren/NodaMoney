@@ -13,8 +13,8 @@ Properties {
 	$NugetFeed = "https://staging.nuget.org" #/packages?replace=true"
 	
 	$RootDir = Resolve-Path ..
-	$ArtifactsDir = "$RootDir/Artifacts"
-	$ToolsDir = "$RootDir/Tools"
+	$ArtifactsDir = "$RootDir\Artifacts"
+	$ToolsDir = "$RootDir\Tools"
 }
 
 Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip, PushCoverage
@@ -42,9 +42,7 @@ Task CalculateVersion {
 	$script:AssemblyFileVersion = $versionInfo.ClassicVersion
 	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion"    
 	$script:InformationalVersion = $versionInfo.NuGetVersion
-	"Use '$script:InformationalVersion' as InformationalVersion"
-    $script:NuGetVersion = $versionInfo.NuGetVersion
-	"Use '$script:NuGetVersion' as NuGetVersion"
+	"Use '$script:InformationalVersion' as InformationalVersion & NuGet version"
 }
 
 Task ApplyVersioning -depends CalculateVersion {
