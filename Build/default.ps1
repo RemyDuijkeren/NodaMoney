@@ -6,7 +6,7 @@
 #
 Framework "4.6"
 FormatTaskName (("-"*25) + "[{0}]" + ("-"*25))
-
+ 
 Properties {
 	$CoverallsToken = $env:COVERALLS_REPO_TOKEN
 	$NugetApiKey = $env:NUGET_API_KEY
@@ -31,7 +31,7 @@ Task Clean {
 
 Task CalculateVersion {
 	$gitVersionExe = Join-Path $ToolsDir -ChildPath "GitVersion.exe"
-	
+	exec { & $gitVersionExe }
     $json = exec { & $gitVersionExe }
 	foreach ($line in $json) { "$line" }
 	
