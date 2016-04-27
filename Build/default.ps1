@@ -35,24 +35,32 @@ Task CalculateVersion {
 	#if ($versionInfo.Major -ne 1) { "A"} else { "B" }
 	
 	if(isAppVeyor) {
-		exec { & $gitVersionExe /output buildserver }		
+		exec { & $gitVersionExe /output buildserver }
 		
-		$script:AssemblyVersion = $env:GitVersion_AssemblySemVer	
+		if ($versionInfo.Major -ne 0) {
+			$script:AssemblyVersion =  $env:GitVersion_Major + ".0.0.0"
+		} else {
+			$script:AssemblyVersion = $env:GitVersion_MajorMinorPatch + ".0"
+		}
 		$script:AssemblyFileVersion = $env:GitVersion_MajorMinorPatch + "." + $env:GitVersion_BuildMetaData	   
 		$script:InformationalVersion = $env:GitVersion_NuGetVersion
+		
+		"Setting AppVeyor build version"
+		$appVeyorVersion = $env:GitVersion_FullSemVer + " (" + $env:appveyor_build_version + ")"
+		Update-AppveyorBuild -Version $appVeyorVersion
 	} else {
 	    $json = exec { & $gitVersionExe }	
 		foreach ($line in $json) { "$line" }		
 		$versionInfo = $json -join "`n" | ConvertFrom-Json
 		
-		$script:AssemblyVersion = $versionInfo.AssemblySemVer	
-		$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData	   
+		if ($versionInfo.Major -ne 0) {
+			$script:AssemblyVersion =  $versionInfo.Major + ".0.0.0"
+		} else {
+			$script:AssemblyVersion = $versionInfo.MajorMinorPatch + ".0"
+		}
+		$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData
 		$script:InformationalVersion = $versionInfo.NuGetVersion	
 	}
-			
-	#$version = $env:appveyor_build_version
-	## ... do something with it
-	#Update-AppveyorBuild -Version $version
 	
 	"Use '$script:AssemblyVersion' as AssemblyVersion"
 	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion" 
