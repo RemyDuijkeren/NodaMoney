@@ -51,7 +51,7 @@ deploy:
   artifact: nuget, zip
   draft: true
   on:
-    branch: master
+    branch: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
     appveyor_repo_tag: true
 
 - provider: NuGet
@@ -60,7 +60,6 @@ deploy:
     secure: cJV4lINlVi8J4NOZBAS5GnaaugKWWO0Zi5jCSKfkDOgs5mEpPDjIf9K0D8hB4bTU
   skip_symbols: true
   on:
-    branch: master
     appveyor_repo_tag: true
 
 #---------------------------------#

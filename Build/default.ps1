@@ -34,8 +34,7 @@ Task CalculateVersion {
 	   	
 	if(isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
 
-	$json = exec { & $gitVersionExe }	
-	foreach ($line in $json) { "$line" }		
+	$json = exec { & $gitVersionExe }		
 	$versionInfo = $json -join "`n" | ConvertFrom-Json
 		
 	if ($versionInfo.Major -ne 0) {
