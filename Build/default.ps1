@@ -31,18 +31,24 @@ Task Clean {
 
 Task CalculateVersion {
 	$gitVersionExe = Join-Path $ToolsDir -ChildPath "GitVersion.exe"
-	exec { & $gitVersionExe }
-    $json = exec { & $gitVersionExe }
-	foreach ($line in $json) { "$line" }
-	
+	   	
+	if(isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
+
+	$json = exec { & $gitVersionExe }	
+	foreach ($line in $json) { "$line" }		
 	$versionInfo = $json -join "`n" | ConvertFrom-Json
-    
-	$script:AssemblyVersion = $versionInfo.AssemblySemVer
+		
+	if ($versionInfo.Major -ne 0) {
+		$script:AssemblyVersion =  $versionInfo.Major + ".0.0.0"
+	} else {
+		$script:AssemblyVersion = $versionInfo.MajorMinorPatch + ".0"
+	}
+	$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData
+	$script:InformationalVersion = $versionInfo.NuGetVersion	
+	
 	"Use '$script:AssemblyVersion' as AssemblyVersion"
-	$script:AssemblyFileVersion = $versionInfo.ClassicVersion
-	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion"    
-	$script:InformationalVersion = $versionInfo.NuGetVersion
-	"Use '$script:InformationalVersion' as InformationalVersion & NuGet version"
+	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion" 
+	"Use '$script:InformationalVersion' as InformationalVersion & NuGet version"	
 }
 
 Task ApplyVersioning -depends CalculateVersion {
