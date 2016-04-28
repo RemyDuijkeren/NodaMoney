@@ -9,8 +9,7 @@ can be accepted quickly.
 ## Getting Started
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * Fork the repository on GitHub (we use the [fork & pull model](https://help.github.com/articles/using-pull-requests))
-* We use as branching strategy the [Gitflow Workflow](http://nvie.com/posts/a-successful-git-branching-model/). so don't
-  work directly on the `master` branch! Only target the `develop` branch.
+* We use as branching strategy the [GitHub Flow Workflow](https://guides.github.com/introduction/flow/).
 * Optionally you could install [ZenHub](https://www.zenhub.io/), a chrome extension. This will add a task dashboard, file uploads
   and +1 (likes) to GitHub.
 
@@ -22,7 +21,7 @@ can be accepted quickly.
 * Complies with Coding Codelines (see document in solution).
 * Make sure you have added the necessary tests for your changes.
 * Run _all_ the tests to assure nothing else was accidentally broken.
-* Push your changes to  your fork of the repository.
+* Push your changes to your fork of the repository.
 * Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to the NodaMoney repository.
 * If needed we will give feedback about the pull request or accept it right away.
 
