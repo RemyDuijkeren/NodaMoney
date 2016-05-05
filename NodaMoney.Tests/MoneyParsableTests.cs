@@ -2,9 +2,9 @@ using System;
 using System.Globalization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NodaMoney.UnitTests.Helpers;
+using NodaMoney.Tests.Helpers;
 
-namespace NodaMoney.UnitTests
+namespace NodaMoney.Tests
 {
     static internal class MoneyParsableTests
     {

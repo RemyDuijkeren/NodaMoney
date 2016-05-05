@@ -20,14 +20,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.UnitTests", "NodaMoney.UnitTests\NodaMoney.UnitTests.csproj", "{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Serialization.AspNet", "NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj", "{4D77971D-49FB-451A-A1D5-E92285291DC2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{96715AC6-E05C-4C73-8AD7-2E8FBAFB42BA}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Tests", "NodaMoney.Tests\NodaMoney.Tests.csproj", "{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +39,14 @@ Global
 		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Release|Any CPU.Build.0 = Release|Any CPU
-		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

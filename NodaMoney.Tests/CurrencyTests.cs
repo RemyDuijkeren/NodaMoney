@@ -7,7 +7,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodaMoney.UnitTests
+namespace NodaMoney.Tests
 {    
     public class CurrencyTests
     {

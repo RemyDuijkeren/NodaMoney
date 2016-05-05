@@ -81,7 +81,7 @@ Task Test {
 	Set-Location $ArtifactsDir | out-null
 	
 	exec {
-		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.UnitTests\bin\Release\NodaMoney.UnitTests.dll"" /Logger:$logger" "-filter:+[NodaMoney*]* -[NodaMoney.UnitTests]*" -output:"$ArtifactsDir\coverage.xml"
+		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.Tests\bin\Release\NodaMoney.Tests.dll"" /Logger:$logger" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml"
 	}
 }
 

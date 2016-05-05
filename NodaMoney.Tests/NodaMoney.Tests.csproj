@@ -6,8 +6,8 @@
     <ProjectGuid>{691D9C6B-DA56-4693-B877-6C2E8BFB9E2D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NodaMoney.UnitTests</RootNamespace>
-    <AssemblyName>NodaMoney.UnitTests</AssemblyName>
+    <RootNamespace>NodaMoney.Tests</RootNamespace>
+    <AssemblyName>NodaMoney.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

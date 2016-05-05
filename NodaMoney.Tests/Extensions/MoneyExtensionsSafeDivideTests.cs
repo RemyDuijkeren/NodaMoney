@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodaMoney.Extensions;
 
-namespace NodaMoney.UnitTests.Extensions
+namespace NodaMoney.Tests.Extensions
 {
     public class MoneyExtensionsSafeDivideTests
     {

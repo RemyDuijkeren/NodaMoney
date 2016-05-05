@@ -9,4 +9,4 @@ using System.Runtime.InteropServices;
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-[assembly: InternalsVisibleTo("NodaMoney.UnitTests")]
+[assembly: InternalsVisibleTo("NodaMoney.Tests")]

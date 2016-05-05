@@ -13,7 +13,7 @@ using NodaMoney.Serialization.JsonNet;
 
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace NodaMoney.UnitTests
+namespace NodaMoney.Tests
 {
     internal static class MoneySerializableTests
     {

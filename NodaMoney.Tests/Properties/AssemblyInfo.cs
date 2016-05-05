@@ -3,8 +3,8 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("NodaMoney.UnitTests")]
-[assembly: AssemblyDescription("UnitTests for NodaMoney.")]
+[assembly: AssemblyTitle("NodaMoney.Tests")]
+[assembly: AssemblyDescription("Unit tests for NodaMoney.")]
 [assembly: NeutralResourcesLanguage("en")]
 
 //// Setting ComVisible to false makes the types in this assembly not visible to COM components. If you need to access a type in

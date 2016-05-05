@@ -1,9 +1,9 @@
 ﻿using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NodaMoney.UnitTests.Helpers;
+using NodaMoney.Tests.Helpers;
 
-namespace NodaMoney.UnitTests
+namespace NodaMoney.Tests
 {
     public class ExchangeRateTests
     {

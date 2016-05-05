@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodaMoney.UnitTests
+namespace NodaMoney.Tests
 {
     static internal class MoneyConvertibleTests
     {

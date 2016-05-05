@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Threading;
 
-namespace NodaMoney.UnitTests.Helpers
+namespace NodaMoney.Tests.Helpers
 {
     /// <summary>Switch the current culture of the thread to an explicit one temporarily.</summary>
     /// <code>

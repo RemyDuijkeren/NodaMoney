@@ -9,5 +9,5 @@ using System.Runtime.InteropServices;
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
-[assembly: InternalsVisibleTo("NodaMoney.UnitTests")]
+[assembly: InternalsVisibleTo("NodaMoney.Tests")]
 [assembly: Guid("59f9848f-964a-49a6-8a9c-55b737aa5869")]
