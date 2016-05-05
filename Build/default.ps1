@@ -5,7 +5,7 @@
 #	\Tools		- This is where tools, utilities and executables are stored that the builds need
 #
 Framework "4.6"
-FormatTaskName (("-"*25) + "[{0}]" + ("-"*25))
+FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25))
  
 Properties {
 	$CoverallsToken = $env:COVERALLS_REPO_TOKEN
@@ -17,7 +17,8 @@ Properties {
 	$ToolsDir = "$RootDir\Tools"
 }
 
-Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip, PushCoverage
+Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip
+Task DefaultAndCoveralls -depends Default, PushCoverage
 Task Deploy  -depends Default, PushCoverage, PushPackage
 
 Task Clean {
