@@ -115,7 +115,10 @@ Task Test -depends Compile {
 	Remove-Item $ArtifactsDir\TestResults -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-Task PushCoverage -requiredVariable CoverallsToken {
+Task PushCoverage `
+	-requiredVariable CoverallsToken `
+	-precondition { return $env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null } `
+{
 	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"
 	
 	"Pushing coverage to coveralls.io"
