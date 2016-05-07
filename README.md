@@ -1,6 +1,6 @@
 ﻿NodaMoney
 =========
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png">
+<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
 You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
@@ -11,7 +11,7 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=develop)](https://coveralls.io/r/remyvd/NodaMoney?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=develop)](https://coveralls.io/r/remyvd/NodaMoney)
 
 
 About
