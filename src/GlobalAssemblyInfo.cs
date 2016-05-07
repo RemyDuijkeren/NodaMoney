@@ -10,9 +10,9 @@ using System.Reflection;
 
 //// Please don't change the default version!. The version will be overwritten by the buildserver, 
 //// using GitVersion (https://github.com/ParticularLabs/GitVersion).
-[assembly: AssemblyVersion("0.0.1.0")]
-[assembly: AssemblyFileVersion("0.0.1.0")]
-[assembly: AssemblyInformationalVersion("0.0.1.0")]
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: AssemblyInformationalVersion("0.0.0.0")]
 
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]

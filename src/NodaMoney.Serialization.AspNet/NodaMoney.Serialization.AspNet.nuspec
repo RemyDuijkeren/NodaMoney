@@ -10,7 +10,7 @@
 	  <description>$description$</description>
 	  <licenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>http://www.nodamoney.org/</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/Tools/logo_nodamoney.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>See https://github.com/remyvd/NodaMoney/releases/</releaseNotes>
     <copyright>Copyright 2014-2016</copyright>
@@ -18,7 +18,7 @@
 	  <language>en-US</language>
   </metadata>
   <files>
-    <file src="..\README.md" />
-    <file src="..\LICENSE.txt" />
+    <file src="..\..\README.md" />
+    <file src="..\..\LICENSE.txt" />
   </files>
 </package>

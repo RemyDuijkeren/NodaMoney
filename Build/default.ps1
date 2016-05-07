@@ -1,8 +1,9 @@
 #This build assumes the following directory structure
 #
-#   \Build    	- This is where the project build scripts lives (this file)
-#   \Artifacts	- This folder is created if it is missing and contains output of the build
-#	\Tools		- This is where tools, utilities and executables are stored that the builds need
+#   \build    	- This is where the project build scripts lives (this file)
+#   \artifacts	- This folder is created if it is missing and contains output of the build
+#	\tools		- This is where tools, utilities and executables are stored that the builds need
+#	\packages	- Nuget packages will be installed in here
 #
 Framework "4.6"
 FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25))
@@ -13,21 +14,23 @@ Properties {
 	$NugetFeed = "https://staging.nuget.org" #/packages?replace=true"
 	
 	$RootDir = Resolve-Path ..
-	$ArtifactsDir = "$RootDir\Artifacts"
-	$ToolsDir = "$RootDir\Tools"
+	$ArtifactsDir = "$RootDir\artifacts"
+	$ToolsDir = "$RootDir\tools"
 }
 
-Task Default -depends Clean, ApplyVersioning, Compile, Test, Package, Zip
+Task Default -depends Init, ApplyVersioning, Compile, Test, Package, Zip, ResetVersioning
 Task DefaultAndCoveralls -depends Default, PushCoverage
 Task Deploy  -depends Default, PushCoverage, PushPackage
 
-Task Clean {
-    "Clean Artifacts directory"	
-	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue #| out-null
+Task Init {
+    "(Re)create Artifacts directory"	
+	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue
 	New-Item $ArtifactsDir -ItemType directory | out-null
     
 	"Clean solution"
     exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo }
+	
+	Get-ChildItem $RootDir -Recurse -Include 'bin','obj','packages' | ForEach-Object { Remove-Item $_ -Recurse -Force;  Write-Host Deleted $_ }
 }
 
 Task CalculateVersion {
@@ -52,7 +55,7 @@ Task CalculateVersion {
 }
 
 Task ApplyVersioning -depends CalculateVersion {
-	$assemblyInfo = "$RootDir\GlobalAssemblyInfo.cs"
+	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
 	
 	"Updating $assemblyInfo with versioning"
 	(Get-Content $assemblyInfo ) | ForEach-Object {
@@ -62,8 +65,24 @@ Task ApplyVersioning -depends CalculateVersion {
     } | Set-Content $assemblyInfo
 }
 
+Task ResetVersioning {
+	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
+	
+	"Updating $assemblyInfo to version zero"
+	(Get-Content $assemblyInfo ) | ForEach-Object {
+        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"0.0.0.0`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"0.0.0.0`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"0.0.0.0`")]" }
+    } | Set-Content $assemblyInfo
+}
+
 Task RestoreNugetPackages {
-	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe"	
+	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe"
+	
+	"Restore build packages"
+	exec { & $nugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
+	
+	"Restore solution packages"
 	exec { & $nugetExe restore "$RootDir\NodaMoney.sln" }
 }
 
@@ -73,17 +92,39 @@ Task Compile -depends RestoreNugetPackages {
 	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 }
 
-Task Test {
+Task Test -depends Compile {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
 	$logger = if(isAppVeyor) { "Appveyor" } else { "trx" }
 	$VsTestConsoleExe = if(isAppVeyor) { "vstest.console.exe" } else { "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" }
 	
-	# change current working dir to get TestResults (trx) in artifacts folder
-	Set-Location $ArtifactsDir | out-null
-	
-	exec {
-		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:""$RootDir\NodaMoney.Tests\bin\Release\NodaMoney.Tests.dll"" /Logger:$logger" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml"
+	# Get test assemblies
+	$testAssembliesFiles = Get-ChildItem -Recurse $RootDir\tests\*\bin\Release\*Tests*.dll
+	if ($testAssembliesFiles.Count -eq 0) {
+		Throw "No test assemblies found!"
+	} else {
+		"Found test assemblies:"
+		$testAssembliesFiles | ForEach-Object { Write-Output $_.Name }
+		""
 	}
+	
+	# join files paths into to one string
+	$testAssembliesPaths = $testAssembliesFiles | ForEach-Object { "`"`"" + $_.FullName + "`"`"" } 
+	$testAssemblies = [string]::Join(" ", $testAssembliesPaths)
+	
+	# vstest console doesn't have any option to change the output directory
+	# so we need to change the working directory to the artifacts folder
+	Push-Location $ArtifactsDir
+	
+	# Run OpenCover, which in turn will run VSTest
+	exec {
+		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:$testAssemblies /Logger:$logger" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml"
+	}
+	
+	Pop-Location
+
+	# move the .trx file back to artifacts directory
+	Get-ChildItem  $ArtifactsDir\TestResults\*.trx | Select-Object -Last 1 | Move-Item -Destination $ArtifactsDir\MSTest.trx -Force
+	Remove-Item $ArtifactsDir\TestResults -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Task PushCoverage -precondition { return $CoverallsToken } {
@@ -122,7 +163,7 @@ Task Zip {
 	$7zExe = Join-Path $ToolsDir -ChildPath "7z.exe"
 	
 	exec {
-		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.zip" "$RootDir\NodaMoney.Serialization.AspNet\bin\Release\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
+		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\Release\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
 	}	
 }
 
