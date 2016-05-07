@@ -1,12 +1,16 @@
-#This build assumes the following directory structure
-#
-#   \build    	- This is where the project build scripts lives (this file)
-#   \artifacts	- This folder is created if it is missing and contains output of the build
-#	\tools		- This is where tools, utilities and executables are stored that the builds need
-#	\packages	- Nuget packages will be installed in here
-#
+# This build assumes the following directory structure (https://gist.github.com/davidfowl/ed7564297c61fe9ab8140):
+#   \build    	- Build customizations (custom msbuild files/psake/fake/albacore/etc) scripts
+#   \artifacts	- Build outputs go here. Doing a build.cmd generates artifacts here (nupkgs, zips, etc.)
+#	\docs		- Documentation stuff, markdown files, help files, etc
+#	\lib		- Binaries which are linked to in the source but are not distributed through NuGet
+#	\packages	- Nuget packages
+#	\samples    - Sample projects
+#	\src		- Main projects (the source code)
+#	\tests      - Test projects
+#	\tools		- Binaries which are used as part of the build script (e.g. test runners, external tools)
+
 Framework "4.6"
-FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25))
+FormatTaskName "`r`n`r`n-------- Executing {0} Task --------"
  
 Properties {
 	$CoverallsToken = $env:COVERALLS_REPO_TOKEN
@@ -15,12 +19,13 @@ Properties {
 	
 	$RootDir = Resolve-Path ..
 	$ArtifactsDir = "$RootDir\artifacts"
-	$ToolsDir = "$RootDir\tools"
+	$ToolsDir = "$RootDir\tools"	
+	$NugetExe = Join-Path $ToolsDir -ChildPath "\NuGet*\nuget.exe"
 }
 
-Task Default -depends Init, ApplyVersioning, Compile, Test, Package, Zip, ResetVersioning
+Task Default -depends Init, Compile, Test, Package, Zip
 Task DefaultAndCoveralls -depends Default, PushCoverage
-Task Deploy  -depends Default, PushCoverage, PushPackage
+Task Deploy -depends Default, PushCoverage, PushPackage
 
 Task Init {
     "(Re)create Artifacts directory"	
@@ -29,12 +34,10 @@ Task Init {
     
 	"Clean solution"
     exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo }
-	
-	Get-ChildItem $RootDir -Recurse -Include 'bin','obj','packages' | ForEach-Object { Remove-Item $_ -Recurse -Force;  Write-Host Deleted $_ }
 }
 
 Task CalculateVersion {
-	$gitVersionExe = Join-Path $ToolsDir -ChildPath "GitVersion.exe"
+	$gitVersionExe = Join-Path $ToolsDir -ChildPath "\GitVersion*\GitVersion.exe"
 	   	
 	if(isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
 
@@ -49,47 +52,32 @@ Task CalculateVersion {
 	$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData
 	$script:InformationalVersion = $versionInfo.NuGetVersion	
 	
-	"Use '$script:AssemblyVersion' as AssemblyVersion"
-	"Use '$script:AssemblyFileVersion' as AssemblyFileVersion" 
-	"Use '$script:InformationalVersion' as InformationalVersion & NuGet version"	
+	"AssemblyVersion      = '$script:AssemblyVersion'"
+	"AssemblyFileVersion  = '$script:AssemblyFileVersion'" 
+	"InformationalVersion = '$script:InformationalVersion'"	
+	"NuGetVersion         = '$script:InformationalVersion'"	
 }
 
-Task ApplyVersioning -depends CalculateVersion {
-	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
-	
-	"Updating $assemblyInfo with versioning"
-	(Get-Content $assemblyInfo ) | ForEach-Object {
-        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$script:AssemblyVersion`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$script:AssemblyFileVersion`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$script:InformationalVersion`")]" }
-    } | Set-Content $assemblyInfo
-}
-
-Task ResetVersioning {
-	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
-	
-	"Updating $assemblyInfo to version zero"
-	(Get-Content $assemblyInfo ) | ForEach-Object {
-        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"0.0.0.0`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"0.0.0.0`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"0.0.0.0`")]" }
-    } | Set-Content $assemblyInfo
-}
-
-Task RestoreNugetPackages {
-	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe"
-	
+Task RestoreNugetPackages {	
 	"Restore build packages"
-	exec { & $nugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
+	exec { & $NugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
 	
-	"Restore solution packages"
-	exec { & $nugetExe restore "$RootDir\NodaMoney.sln" }
+	"`nRestore solution packages"
+	exec { & $NugetExe restore "$RootDir\NodaMoney.sln" }
 }
 
-Task Compile -depends RestoreNugetPackages {
+Task Compile -depends RestoreNugetPackages, CalculateVersion {
 	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
+	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
 	
+	"Set version to calculated version"
+	applyVersioning $assemblyInfo $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
+	
+	"Compile solution"
 	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
+	
+	"`nReset version to zero again (to prevent git checkin)"
+	applyVersioning $assemblyInfo "0.0.0.0" "0.0.0.0" "0.0.0.0"
 }
 
 Task Test -depends Compile {
@@ -127,7 +115,7 @@ Task Test -depends Compile {
 	Remove-Item $ArtifactsDir\TestResults -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-Task PushCoverage -precondition { return $CoverallsToken } {
+Task PushCoverage -requiredVariable CoverallsToken {
 	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"
 	
 	"Pushing coverage to coveralls.io"
@@ -140,13 +128,11 @@ Task PushCoverage -precondition { return $CoverallsToken } {
 	}
 }
 
-Task Package {
-	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe";
-	
+Task Package {	
 	$projectsToPackage = Get-ChildItem -File -Path $RootDir -Filter *.nuspec -Recurse | ForEach-Object { $_.FullName -replace "nuspec", "csproj" }
 	
 	foreach ($proj in $projectsToPackage) {
-		exec { & $nugetExe pack $proj -OutputDirectory $ArtifactsDir }
+		exec { & $NugetExe pack $proj -OutputDirectory $ArtifactsDir }
 	}
 	
 	#if(isAppVeyor) {
@@ -154,21 +140,39 @@ Task Package {
 	#}
 }
 
-Task PushPackage -precondition { return $NugetApiKey } {
-	$nugetExe = Join-Path $ToolsDir -ChildPath "NuGet.exe"			
-	exec { & $nugetExe push "$ArtifactsDir\*.nupkg" $NugetApiKey -source $NugetFeed }
+Task PushPackage -requiredVariable NugetApiKey {
+	exec { & $NugetExe push "$ArtifactsDir\*.nupkg" $NugetApiKey -source $NugetFeed }
 }
 
-Task Zip {
-	$7zExe = Join-Path $ToolsDir -ChildPath "7z.exe"
+Task Zip -depends Compile {
+	$7zExe = Join-Path $ToolsDir -ChildPath "\7-Zip*\7z.exe"
 	
 	exec {
-		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\Release\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
+		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.$script:InformationalVersion.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\Release\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
 	}	
+}
+
+Task Clean {
+	Get-ChildItem $RootDir -Recurse -Include 'bin','obj','packages','artifacts' | ForEach-Object { Remove-Item $_ -Recurse -Force;  Write-Host Deleted $_ }
 }
 
 function isAppVeyor() {
 	Test-Path -Path env:\APPVEYOR
+}
+
+function applyVersioning($assemblyInfoFile, $assemblyVersion, $assemblyFileVersion, $informationalVersion) {
+	Write-Output "Apply versioning to $assemblyInfoFile"
+	Write-Output "AssemblyVersion: $assemblyVersion"
+	Write-Output "AssemblyFileVersion: $assemblyFileVersion"
+	Write-Output "InformationalVersion: $informationalVersion"
+	
+	(Get-Content $assemblyInfoFile ) | ForEach-Object {
+        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$assemblyVersion`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$assemblyFileVersion`")]" } |
+        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$informationalVersion`")]" }
+    } | Set-Content $assemblyInfoFile
+	
+	Write-Output "Versioning applied.`n"
 }
 
 function applyXslTransform($xmlFile, $xslFile, $outputFile) {

@@ -25,8 +25,7 @@ nuget:
   disable_publish_on_pr: true
  
 build_script:
-  - cd .\Build
-  - psake.cmd DefaultAndCoveralls
+  - build.cmd DefaultAndCoveralls
  
 test: off
 
