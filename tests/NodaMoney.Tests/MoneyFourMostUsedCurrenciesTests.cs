@@ -1,14 +1,13 @@
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyFourMostUsedCurrenciesTests
+    public class MoneyFourMostUsedCurrenciesTests
     {
-        [TestClass]
         public class GivenIWantMoneyInOneOfTheFourMostUsedCurrenciesInTheWorld
         {
-            [TestMethod]
+            [Fact]
             public void WhenEurosIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal
@@ -18,7 +17,7 @@ namespace NodaMoney.Tests
                 euros.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEurosIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
@@ -28,7 +27,7 @@ namespace NodaMoney.Tests
                 euros.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEurosIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
@@ -38,7 +37,7 @@ namespace NodaMoney.Tests
                 euros.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDollarsIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
@@ -48,7 +47,7 @@ namespace NodaMoney.Tests
                 dollars.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDollarsIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
@@ -58,7 +57,7 @@ namespace NodaMoney.Tests
                 dollars.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDollarsIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
@@ -68,7 +67,7 @@ namespace NodaMoney.Tests
                 dollars.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenYensIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
@@ -79,7 +78,7 @@ namespace NodaMoney.Tests
                 yens.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenYensIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
@@ -90,7 +89,7 @@ namespace NodaMoney.Tests
                 yens.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenYensIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)
@@ -101,7 +100,7 @@ namespace NodaMoney.Tests
                 yens.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenPondsIsDecimal_ThenCreatingShouldSucceed()
             {
                 //from decimal (other integral types are implicitly converted to decimal)
@@ -112,7 +111,7 @@ namespace NodaMoney.Tests
                 pounds.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenPondsIsDouble_ThenCreatingShouldSucceed()
             {
                 //from double (float is implicitly converted to double)
@@ -123,7 +122,7 @@ namespace NodaMoney.Tests
                 pounds.Amount.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenPondsIsLong_ThenCreatingShouldSucceed()
             {
                 //from long (byte, short and int are implicitly converted to long)

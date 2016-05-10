@@ -1,17 +1,16 @@
 using System;
 using System.Globalization;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyParsableTests
+    public class MoneyParsableTests
     {
-        [TestClass]
         public class GivenIWantToParseImplicitCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-BE"))
@@ -22,7 +21,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("fr-BE"))
@@ -33,7 +32,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingNumberWithoutCurrency_ThenThisUseCurrencyOfCurrentCulture()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -45,7 +44,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
             {
                 using (new SwitchCulture("ja-JP"))
@@ -56,7 +55,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
             {
                 using (new SwitchCulture("zh-CN"))
@@ -67,7 +66,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanInNetherlands_ThenThisShouldFail()
             {
                 // ¥ symbol is used for Japanese yen and Chinese yuan
@@ -79,7 +78,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInUSA_ThenThisShouldReturnUSDollar()
             {
                 using (new SwitchCulture("en-US"))
@@ -90,7 +89,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInArgentina_ThenThisShouldReturnArgentinePeso()
             {
                 using (new SwitchCulture("es-AR"))
@@ -101,7 +100,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInNetherlands_ThenThisShouldFail()
             {
                 // $ symbol is used for multiple currencies
@@ -113,11 +112,10 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToParseExplicitCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -128,7 +126,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
             {
                 using (new SwitchCulture("en-US"))
@@ -139,7 +137,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
             {
                 using (new SwitchCulture("es-AR"))
@@ -150,7 +148,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
             {
                 // $ symbol is used for multiple currencies
@@ -162,7 +160,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-BE"))
@@ -173,7 +171,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("fr-BE"))
@@ -184,7 +182,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -195,7 +193,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldFail()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -206,11 +204,10 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToParseNegativeMoney
         {
-            [TestMethod]
+            [Fact]
             public void WhenMinusSignBeforeDollarSign_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -222,7 +219,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenMinusSignAfterDollarSign_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -234,7 +231,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDollarsWithParentheses_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -246,7 +243,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenMinusSignBeforeEuroSign_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -258,7 +255,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenMinusSignAfterEuroSign_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -270,7 +267,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEurosWithParentheses_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -282,11 +279,10 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToParseMoneyWithMoreDecimalPossibleForCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedDown()
             {
                 using (new SwitchCulture("ja-JP"))
@@ -297,7 +293,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedUp()
             {
                 using (new SwitchCulture("ja-JP"))
@@ -308,11 +304,10 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToTryParseImplicitCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-BE"))
@@ -323,7 +318,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("fr-BE"))
@@ -334,7 +329,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingNumberWithoutCurrency_ThenThisUseCurrencyOfCurrentCulture()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -345,7 +340,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
             {
                 using (new SwitchCulture("ja-JP"))
@@ -356,7 +351,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
             {
                 using (new SwitchCulture("zh-CN"))
@@ -367,7 +362,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenYuanInNetherlands_ThenThisShouldReturnFalse()
             {
                 // ¥ symbol is used for Japanese yen and Chinese yuan
@@ -379,7 +374,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInUSA_ThenThisShouldReturnUSDollar()
             {
                 using (new SwitchCulture("en-US"))
@@ -390,7 +385,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInArgentina_ThenThisShouldReturnArgentinePeso()
             {
                 using (new SwitchCulture("es-AR"))
@@ -401,7 +396,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingDollarSymbolInNetherlands_ThenThisShouldReturnFalse()
             {
                 // $ symbol is used for multiple currencies
@@ -413,11 +408,10 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToTryParseExplicitCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -428,7 +422,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
             {
                 using (new SwitchCulture("en-US"))
@@ -439,7 +433,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
             {
                 using (new SwitchCulture("es-AR"))
@@ -450,7 +444,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
             {
                 // $ symbol is used for multiple currencies
@@ -462,7 +456,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-BE"))
@@ -474,7 +468,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("fr-BE"))
@@ -485,7 +479,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -496,7 +490,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldReturnFalse()
             {
                 using (new SwitchCulture("nl-NL"))

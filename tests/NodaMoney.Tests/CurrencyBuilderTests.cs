@@ -1,15 +1,14 @@
 ﻿using System;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {
     public class CurrencyBuilderTests
     {
-        [TestClass]
         public class GivenIWantToCreateCustomCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenRegisterBitCoinInIsoNamespace_ThenShouldBeAvailable()
             {
                 var builder = new CurrencyBuilder("BTC", "ISO-4217");
@@ -26,7 +25,7 @@ namespace NodaMoney.Tests
                 bitcoin.ShouldBeEquivalentTo(result);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRegisterBitCoin_ThenShouldBeAvailableByExplicitNamespace()
             {
                 var builder = new CurrencyBuilder("BTC1", "virtual");
@@ -43,7 +42,7 @@ namespace NodaMoney.Tests
                 bitcoin.ShouldBeEquivalentTo(result);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenBuildBitCoin_ThenItShouldSuccedButNotBeRegistered()
             {
                 var builder = new CurrencyBuilder("BTC2", "virtual");
@@ -60,7 +59,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>().WithMessage("BTC2 is an unknown virtual currency code!");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenFromExistingCurrency_ThenThisShouldSucceed()
             {
                 var builder = new CurrencyBuilder("BTC3", "virtual");
@@ -80,26 +79,20 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToUnregisterCurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenUnregisterIsoCurrency_ThenThisMustSucceed()
             {
-                var euro = Currency.FromCode("EUR"); // should work
+                var euro = Currency.FromCode("PEN"); // should work
 
-                CurrencyBuilder.Unregister("EUR", "ISO-4217");
-                Action action = () => Currency.FromCode("EUR");
+                CurrencyBuilder.Unregister("PEN", "ISO-4217");
+                Action action = () => Currency.FromCode("PEN");
 
-                action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
-
-                // register again for other unit-tests
-                var builder = new CurrencyBuilder("EUR", "ISO-4217");
-                builder.LoadDataFromCurrency(euro);
-                builder.Register();
+                action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");                
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUnregisterCustomCurrency_ThenThisMustSucceed()
             {
                 var builder = new CurrencyBuilder("XYZ", "virtual");
@@ -118,7 +111,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyDoesntExist_ThenThisShouldThrow()
             {
                 Action action = () => CurrencyBuilder.Unregister("ABC", "virtual");
@@ -127,24 +120,24 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToReplaceIsoCurrencyWithOwnVersion
         {
-            [TestMethod]
+            [Fact]
             public void WhenReplacingEuroWithCustom_ThenThisShouldSucceed()
             {
-                Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+                // Panamanian balboa
+                Currency oldEuro = CurrencyBuilder.Unregister("PAB", "ISO-4217");
 
-                var builder = new CurrencyBuilder("EUR", "ISO-4217");
+                var builder = new CurrencyBuilder("PAB", "ISO-4217");
                 builder.LoadDataFromCurrency(oldEuro);
-                builder.EnglishName = "New Euro";
+                builder.EnglishName = "New Panamanian balboa";
                 builder.DecimalDigits = 1;
 
                 builder.Register();
 
-                Currency newEuro = Currency.FromCode("EUR");
-                newEuro.Symbol.Should().Be("€");
-                newEuro.EnglishName.Should().Be("New Euro");
+                Currency newEuro = Currency.FromCode("PAB");
+                newEuro.Symbol.Should().Be("B/.");
+                newEuro.EnglishName.Should().Be("New Panamanian balboa");
                 newEuro.DecimalDigits.Should().Be(1);
             }
         }

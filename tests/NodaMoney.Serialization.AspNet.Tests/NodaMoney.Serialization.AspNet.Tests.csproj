@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D43A21B1-7E4D-426A-BB3B-C7B6A73F4611}</ProjectGuid>
+    <ProjectGuid>{DCEFD498-85BE-4220-B58A-25C6E747D861}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NodaMoney.Tests</RootNamespace>
-    <AssemblyName>NodaMoney.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>NodaMoney.Serialization.AspNet.Tests</RootNamespace>
+    <AssemblyName>NodaMoney.Serialization.AspNet.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FluentAssertions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
@@ -38,13 +41,9 @@
       <HintPath>..\..\packages\FluentAssertions.4.5.0\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,29 +68,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurrencyBuilderTests.cs" />
-    <Compile Include="CurrencyTests.cs" />
-    <Compile Include="ExchangeRateTests.cs" />
-    <Compile Include="Extensions\MoneyExtensionsSafeDivideTests.cs" />
-    <Compile Include="Helpers\RenderSpecs.cs" />
-    <Compile Include="Helpers\SwitchCulture.cs" />
-    <Compile Include="MoneyBinaryOperatorsTests.cs" />
-    <Compile Include="MoneyComparableTests.cs" />
-    <Compile Include="MoneyConvertibleTests.cs" />
-    <Compile Include="MoneyFormattableTests.cs" />
-    <Compile Include="MoneyFourMostUsedCurrenciesTests.cs" />
-    <Compile Include="MoneyParsableTests.cs" />
     <Compile Include="MoneySerializableTests.cs" />
-    <Compile Include="MoneyTests.cs" />
-    <Compile Include="MoneyUnaryOperatoresTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj">
+      <Project>{4d77971d-49fb-451a-a1d5-e92285291dc2}</Project>
+      <Name>NodaMoney.Serialization.AspNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj">
-      <Project>{1814e8de-0e75-4e23-9f70-e039ac816b42}</Project>
+      <Project>{1814E8DE-0E75-4E23-9F70-E039AC816B42}</Project>
       <Name>NodaMoney</Name>
     </ProjectReference>
   </ItemGroup>

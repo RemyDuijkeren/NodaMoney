@@ -38,9 +38,9 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(code));
             if (string.IsNullOrWhiteSpace(number))
                 throw new ArgumentNullException(nameof(number));
-            if (string.IsNullOrWhiteSpace(englishName)) 
+            if (string.IsNullOrWhiteSpace(englishName))
                 throw new ArgumentNullException(nameof(englishName));
-            if (string.IsNullOrWhiteSpace(symbol)) 
+            if (string.IsNullOrWhiteSpace(symbol))
                 throw new ArgumentNullException(nameof(symbol));
             if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
                 throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
@@ -108,7 +108,7 @@ namespace NodaMoney
         /// <summary>Gets the minor currency unit.</summary>
         public decimal MinorUnit
         {
-            get 
+            get
             {
                 if (DecimalDigits == CurrencyRegistry.NotApplicable)
                     return MajorUnit;
@@ -134,7 +134,7 @@ namespace NodaMoney
 
             return currency;
 
-            // return FromCode(code, "ISO-4217");            
+            // return FromCode(code, "ISO-4217");
         }
 
         /// <summary>Create an instance of the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -146,7 +146,7 @@ namespace NodaMoney
         public static Currency FromCode(string code, string @namespace)
         {
             Currency currency;
-            if (!Registry.TryGet(code, @namespace, out currency))           
+            if (!Registry.TryGet(code, @namespace, out currency))
                 throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
 
             return currency;
@@ -159,7 +159,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
         public static Currency FromRegion(RegionInfo region)
         {
-            if (region == null) 
+            if (region == null)
                 throw new ArgumentNullException(nameof(region));
 
             return FromCode(region.ISOCurrencySymbol, "ISO-4217");
@@ -175,11 +175,11 @@ namespace NodaMoney
         /// </exception>
         public static Currency FromCulture(CultureInfo culture)
         {
-            if (culture == null) 
+            if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
-            if (culture.IsNeutralCulture) 
+            if (culture.IsNeutralCulture)
                 throw new ArgumentException("Culture {0} is a neutral culture, from which no region information can be extracted!", culture.Name);
-            
+
             return FromRegion(culture.Name);
         }
 
@@ -187,16 +187,16 @@ namespace NodaMoney
         /// <param name="name">
         /// <para>A string that contains a two-letter code defined in ISO 3166 for country/region.</para>
         /// <para>-or-</para>
-        /// <para>A string that contains the culture name for a specific culture, custom culture, or Windows-only culture. If the 
+        /// <para>A string that contains the culture name for a specific culture, custom culture, or Windows-only culture. If the
         /// culture name is not in RFC 4646 format, your application should specify the entire culture name instead of just the
-        /// country/region. See also <seealso cref="System.Globalization.RegionInfo(System.String)"/>.</para> 
+        /// country/region. See also <seealso cref="System.Globalization.RegionInfo(string)"/>.</para>
         /// </param>
         /// <returns>The <see cref="Currency"/> instance used within the specified region.</returns>
         /// <exception cref="ArgumentNullException">The value of 'name' cannot be null.</exception>
         public static Currency FromRegion(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) 
-                throw new ArgumentNullException(nameof(name));            
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException(nameof(name));
 
             return FromRegion(new RegionInfo(name));
         }
@@ -236,8 +236,8 @@ namespace NodaMoney
             return left.Equals(right);
         }
 
-        /// <summary>Returns a value indicating whether this instance and a specified <see cref="Object"/> represent the same type and value.</summary>
-        /// <param name="obj">An <see cref="Object"/>.</param>
+        /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type and value.</summary>
+        /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
@@ -259,7 +259,7 @@ namespace NodaMoney
         {
             return Code.GetHashCode();
         }
-        
+
         ///// <summary>Gets the name of the currency, formatted in the native language of the country\region where the currency is used.</summary>
         ///// <param name="culture">The culture.</param>
         ///// <returns>The native name of the currency.</returns>
@@ -278,7 +278,7 @@ namespace NodaMoney
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply
         /// the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute" /> to the class.</summary>
         /// <returns>An <see cref="T:System.Xml.Schema.XmlSchema" /> that describes the XML representation of the object that is
-        /// produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)" /> method and 
+        /// produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)" /> method and
         /// consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)" /> method.
         /// </returns>
         public XmlSchema GetSchema()

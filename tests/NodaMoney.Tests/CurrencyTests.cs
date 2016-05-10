@@ -5,16 +5,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {    
     public class CurrencyTests
     {
-        [TestClass]
         public class GivenIWantToKnowAllCurrencies
         {
-            [TestMethod]
+            [Fact]
             public void WhenAskingForIt_ThenAllCurrenciesShouldBeReturned()
             {
                 var currencies = Currency.GetAllCurrencies();
@@ -23,7 +22,7 @@ namespace NodaMoney.Tests
                 currencies.Count().Should().BeGreaterThan(100);
             }
 
-            [TestMethod][Ignore]
+            [Fact(Skip = "For debugging.")]
             public void WriteAllRegionsToFile()
             {
                 using (var stream = File.Open(@"..\..\Regions.txt", FileMode.Create))
@@ -47,7 +46,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod][Ignore]
+            [Fact(Skip = "For debugging.")]
             public void WriteAllCurrenciesToFile()
             {
                 using (var stream = File.Open(@"..\..\ISOCurrencies1.txt", FileMode.Create))
@@ -63,7 +62,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod][Ignore]
+            [Fact(Skip = "For debugging.")]
             public void WriteAllCurrencySymbolsToFile()
             {
                 var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
@@ -87,10 +86,9 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantCurrencyFromIsoCode
         {
-            [TestMethod]
+            [Fact]
             public void WhenIsoCodeIsExisting_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.FromCode("EUR");
@@ -102,7 +100,7 @@ namespace NodaMoney.Tests
                 currency.IsObsolete.Should().BeFalse();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenIsoCodeIsUnknown_ThenCreatingShouldThrow()
             {
                 Action action = () => Currency.FromCode("AAA");
@@ -110,7 +108,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenIsoCodeIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => Currency.FromCode(null);
@@ -118,7 +116,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEstionianKrone_ThenItShouldBeObsolete()
             {
                 var currency = Currency.FromCode("EEK");
@@ -130,10 +128,9 @@ namespace NodaMoney.Tests
 
         }
 
-        [TestClass]
         public class GivenIWantCurrencyFromRegionOrCulture
         {
-            [TestMethod]
+            [Fact]
             public void WhenUsingRegionInfo_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.FromRegion(new RegionInfo("NL"));
@@ -144,7 +141,7 @@ namespace NodaMoney.Tests
                 currency.EnglishName.Should().Be("Euro");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRegionInfoIsNull_ThenCreatingShouldThrow()
             {             
                 Action action = () => Currency.FromRegion((RegionInfo)null);
@@ -152,7 +149,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingRegionName_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.FromRegion("NL");
@@ -163,7 +160,7 @@ namespace NodaMoney.Tests
                 currency.EnglishName.Should().Be("Euro");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingRegionNameThatIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => Currency.FromRegion((string)null);
@@ -171,7 +168,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingCultureInfo_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.FromCulture(CultureInfo.CreateSpecificCulture("nl-NL"));
@@ -182,7 +179,7 @@ namespace NodaMoney.Tests
                 currency.EnglishName.Should().Be("Euro");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCultureInfoIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => Currency.FromCulture(null);
@@ -190,7 +187,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCultureInfoIsNeutralCulture_ThenCreatingShouldThrow()
             {
                 Action action = () => Currency.FromCulture(new CultureInfo("en"));
@@ -198,7 +195,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingCultureName_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.FromRegion("nl-NL");
@@ -209,7 +206,7 @@ namespace NodaMoney.Tests
                 currency.EnglishName.Should().Be("Euro");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingCurrentCurrency_ThenCreatingShouldSucceed()
             {
                 var currency = Currency.CurrentCurrency;
@@ -218,14 +215,13 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToCompareCurrencies
         {
             private Currency _euro1 = Currency.FromCode("EUR");
             private Currency _euro2 = Currency.FromCode("EUR");
             private Currency _dollar = Currency.FromCode("USD");
 
-            [TestMethod]
+            [Fact]
             public void WhenComparingEquality_ThenCurrencyShouldBeEqual()
             {
                 // Compare using Equal()
@@ -235,7 +231,7 @@ namespace NodaMoney.Tests
                 _euro1.Should().NotBe(new object(), "comparing Currency to a different object should fail!");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenComparingStaticEquality_ThenCurrencyShouldBeEqual()
             {
                 // Compare using static Equal()
@@ -243,7 +239,7 @@ namespace NodaMoney.Tests
                 Currency.Equals(_euro1, _dollar).Should().BeFalse();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenComparingWithEqualityOperator_ThenCurrencyShouldBeEqual()
             {
                 // Compare using Euality operators
@@ -251,7 +247,7 @@ namespace NodaMoney.Tests
                 (_euro1 != _dollar).Should().BeTrue();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenComparingHashCodes_ThenCurrencyShouldBeEqual()
             {
                 // Compare using GetHashCode()
@@ -260,7 +256,6 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToKnowMinorUnit
         {
             private Currency _eur = Currency.FromCode("EUR");
@@ -269,7 +264,7 @@ namespace NodaMoney.Tests
             private Currency _mga = Currency.FromCode("MGA"); // Malagasy ariary
             private Currency _xau = Currency.FromCode("XAU"); // Gold            
 
-            [TestMethod]
+            [Fact]
             public void WhenAskingForEuro_ThenMinorUnitShouldBeOneCent()
             {
                 _eur.MajorUnit.Should().Be(1m);
@@ -277,7 +272,7 @@ namespace NodaMoney.Tests
                 _eur.DecimalDigits.Should().Be(2);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenAskingForYen_ThenMinorUnitShouldBeOne()
             {
                 _yen.MajorUnit.Should().Be(1m);
@@ -285,7 +280,7 @@ namespace NodaMoney.Tests
                 _yen.DecimalDigits.Should().Be(0);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenAskingForDinar_ThenMinorUnitShouldBeOneFils()
             {
                 _din.MajorUnit.Should().Be(1m);
@@ -293,7 +288,7 @@ namespace NodaMoney.Tests
                 _din.DecimalDigits.Should().Be(3);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenAskingForGold_ThenMinorUnitShouldBeOne()
             {
                 _xau.MajorUnit.Should().Be(1m);
@@ -301,7 +296,7 @@ namespace NodaMoney.Tests
                 _xau.DecimalDigits.Should().Be(-1); // DOT
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenAskingForMalagasyAriary_ThenMinorUnitShouldBeOneFith()
             {
                 // The Malagasy ariary are technically divided into five subunits, where the coins display "1/5" on their face and
@@ -313,10 +308,9 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToInitiateInternallyACurrency
         {
-            [TestMethod]
+            [Fact]
             public void WhenParamsAreCorrect_ThenCreatingShouldSucceed()
             {
                 var eur = new Currency("EUR", "978", 2, "Euro", "€");
@@ -328,7 +322,7 @@ namespace NodaMoney.Tests
                 eur.Symbol.Should().Be("€");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCodeIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => { var eur = new Currency(null, "978", 2, "Euro", "€"); };
@@ -336,7 +330,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenNumberIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => { var eur = new Currency("EUR", null, 2, "Euro", "€"); };
@@ -344,7 +338,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEnglishNameIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => { var eur = new Currency("EUR", "978", 2, null, "€"); };
@@ -352,7 +346,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSignIsNull_ThenCreatingShouldThrow()
             {
                 Action action = () => { var eur = new Currency("EUR", "978", 2, "Euro", null); };
@@ -360,7 +354,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDecimalDigitIsLowerThenMinusOne_ThenCreatingShouldThrow()
             {
                 Action action = () => { var eur = new Currency("EUR", "978", -2, "Euro", "€"); };
@@ -369,10 +363,9 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GiveIWantToUseALotOfCurrencies
         {
-            [TestMethod][Ignore]
+            [Fact]
             public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
             {
                 var sw = Stopwatch.StartNew();

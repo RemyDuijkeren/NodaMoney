@@ -30,10 +30,10 @@ namespace NodaMoney
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
-            Value = Math.Round(rate, 4); // value is a ratio 
+            Value = Math.Round(rate, 4); // value is a ratio
         }
 
-        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"></see> struct.</summary>
+        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
@@ -119,8 +119,8 @@ namespace NodaMoney
                 {
                     result = new ExchangeRate
                                  {
-                                     BaseCurrency = Currency.FromCode("XXX"), 
-                                     QuoteCurrency = Currency.FromCode("XXX"), 
+                                     BaseCurrency = Currency.FromCode("XXX"),
+                                     QuoteCurrency = Currency.FromCode("XXX"),
                                      Value = 0
                                  };
                     return false;
@@ -158,7 +158,7 @@ namespace NodaMoney
             if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
             {
                 throw new ArgumentException(
-                    "Money should have the same currency as the base currency or the quote currency!", 
+                    "Money should have the same currency as the base currency or the quote currency!",
                     nameof(money));
             }
 
@@ -196,7 +196,7 @@ namespace NodaMoney
             return (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
         }
 
-        /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="String"/> representation.</summary>
+        /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
         /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
         public override string ToString()

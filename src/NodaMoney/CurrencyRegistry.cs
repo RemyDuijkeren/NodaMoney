@@ -47,7 +47,7 @@ namespace NodaMoney
                 return false;
             }
 
-            currency = found[0]; // TODO: If more than one, sort by prio. 
+            currency = found[0]; // TODO: If more than one, sort by prio.
             return true;
         }
 

@@ -1,16 +1,15 @@
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyConvertibleTests
+    public class MoneyConvertibleTests
     {
-        [TestClass]
         public class GivenIWantToConvertMoney
         {
             readonly Money _euros = new Money(765.43m, "EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenConvertingToDecimal_ThenThisShouldSucceed()
             {
                 var result = Money.ToDecimal(_euros);
@@ -18,7 +17,7 @@ namespace NodaMoney.Tests
                 result.Should().Be(765.43m);                
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenConvertingToDouble_ThenThisShouldSucceed()
             {
                 var result = Money.ToDouble(_euros);
@@ -26,7 +25,7 @@ namespace NodaMoney.Tests
                 result.Should().BeApproximately(765.43d, 0.001d);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenConvertingToSingle_ThenThisShouldSucceed()
             {
                 var result = Money.ToSingle(_euros);

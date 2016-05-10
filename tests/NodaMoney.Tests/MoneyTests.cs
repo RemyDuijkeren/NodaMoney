@@ -2,19 +2,18 @@
 using System.Globalization;
 using System.Threading;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests
 {
     public class MoneyTests
     {
-        [TestClass]
         public class GivenIWantToExplicitCastMoneyToANumericType
         {
             readonly Money _euros = new Money(10.00m, "EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToDecimal_ThenCastingShouldSucceed()
             {
                 var m = (decimal)_euros;
@@ -22,7 +21,7 @@ namespace NodaMoney.Tests
                 m.Should().Be(10.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToDouble_ThenCastingShouldSucceed()
             {
                 var d = (double)_euros;
@@ -30,7 +29,7 @@ namespace NodaMoney.Tests
                 d.Should().Be(10.00d);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToFloat_ThenCastingShouldSucceed()
             {
                 var f = (float)_euros;
@@ -38,7 +37,7 @@ namespace NodaMoney.Tests
                 f.Should().Be(10.00f);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToLong_ThenCastingShouldSucceed()
             {
                 var l = (long)_euros;
@@ -46,7 +45,7 @@ namespace NodaMoney.Tests
                 l.Should().Be(10L);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToByte_ThenCastingShouldSucceed()
             {
                 var b = (byte)_euros;
@@ -54,7 +53,7 @@ namespace NodaMoney.Tests
                 b.Should().Be(10);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToShort_ThenCastingShouldSucceed()
             {
                 var s = (short)_euros;
@@ -62,7 +61,7 @@ namespace NodaMoney.Tests
                 s.Should().Be(10);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitCastingToInt_ThenCastingShouldSucceed()
             {
                 var i = (int)_euros;
@@ -70,13 +69,12 @@ namespace NodaMoney.Tests
                 i.Should().Be(10);
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantMoneyFromANumericTypeAndAnExplicitCurrencyObject
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
                 const byte byteValue = 50;
@@ -86,7 +84,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(50m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
                 const sbyte sbyteValue = 75;
@@ -96,7 +94,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(75m);               
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
                 const short int16Value = 100;
@@ -106,7 +104,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(100m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
                 const int int32Value = 200;
@@ -116,7 +114,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(200m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
                 const long int64Value = 300;
@@ -126,7 +124,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(300m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
                 const ushort uInt16Value = 400;
@@ -136,7 +134,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(400m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
                 const uint uInt32Value = 500;
@@ -146,7 +144,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(500m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
                 const ulong uInt64Value = 600;
@@ -156,7 +154,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(600m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSingle_ThenCreatingShouldSucceed()
             {
                 const float singleValue = 700;
@@ -166,7 +164,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(700m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDouble_ThenCreatingShouldSucceed()
             {
                 const double doubleValue = 800;
@@ -176,7 +174,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(800m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
             {
                 const decimal decimalValue = 900;
@@ -186,13 +184,12 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(900m);
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantMoneyFromANumericTypeAndAnImplicitCurrencyFromTheCurrentCulture
         {
             private readonly Currency _currentCurrency = Currency.FromCulture(Thread.CurrentThread.CurrentCulture);
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
                 const byte byteValue = 50;
@@ -202,7 +199,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(50);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
                 const sbyte sbyteValue = 75;
@@ -212,7 +209,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(75);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
                 const short int16Value = 100;
@@ -222,7 +219,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(100);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
                 const int int32Value = 200;
@@ -232,7 +229,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(200);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
                 const long int64Value = 300;
@@ -242,7 +239,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(300);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
                 const ushort uInt16Value = 400;
@@ -252,7 +249,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(400);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
                 const uint uInt32Value = 500;
@@ -262,7 +259,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(500);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
                 const ulong uInt64Value = 600;
@@ -272,7 +269,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(600);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSingleAndExplicitCast_ThenCreatingShouldSucceed()
             {
                 const float singleValue = 700;
@@ -282,7 +279,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(700);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDoubleAndExplicitCast_ThenCreatingShouldSucceed()
             {
                 var money = (Money)25.00;
@@ -291,7 +288,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(25.00m);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
             {
                 Money money = 25.00m;
@@ -301,12 +298,11 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantMoneyFromANumericTypeAndAnExplicitIsoCurrencyCode
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsByte_ThenCreatingShouldSucceed()
             {
                 const byte byteValue = 50;
@@ -316,7 +312,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(50);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
             {
                 const sbyte sbyteValue = 75;
@@ -326,7 +322,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(75);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt16_ThenCreatingShouldSucceed()
             {
                 const short int16Value = 100;
@@ -336,7 +332,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(100);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt32_ThenCreatingShouldSucceed()
             {
                 const int int32Value = 200;
@@ -346,7 +342,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(200);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsInt64_ThenCreatingShouldSucceed()
             {
                 const long int64Value = 300;
@@ -356,7 +352,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(300);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint16_ThenCreatingShouldSucceed()
             {
                 const ushort uInt16Value = 400;
@@ -366,7 +362,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(400);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint32_ThenCreatingShouldSucceed()
             {
                 const uint uInt32Value = 500;
@@ -376,7 +372,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(500);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsUint64_ThenCreatingShouldSucceed()
             {
                 const ulong uInt64Value = 600;
@@ -386,7 +382,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(600);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsSingle_ThenCreatingShouldSucceed()
             {
                 const float singleValue = 700;
@@ -396,7 +392,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(700);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDouble_ThenCreatingShouldSucceed()
             {
                 const double doubleValue = 800;
@@ -406,7 +402,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(800);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
             {
                 const decimal decimalValue = 900;
@@ -416,7 +412,7 @@ namespace NodaMoney.Tests
                 money.Amount.Should().Be(900);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUnknownIsoCurrencySymbol_ThenCreatingShouldFail()
             {
                 Action action = () => new Money(123.25M, "XYZ");
@@ -424,13 +420,12 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>();
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToConvertDoubleToDecimal
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsNormalValue_ThenCreatingShouldSucceed()
             {
                 double value1 = 7922816251426433.7593543950335;
@@ -449,7 +444,7 @@ namespace NodaMoney.Tests
                 Console.WriteLine(result4);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsVeryBigValue_ThenCreatingShouldSucceed()
             {
                 double value1 = 79228162514264337593543.950335;
@@ -468,7 +463,7 @@ namespace NodaMoney.Tests
                 Console.WriteLine(result4);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenValueIsVerySmall_ThenCreatingShouldSucceed()
             {
                 double value1 = 0.0079228162514264337593543950335;

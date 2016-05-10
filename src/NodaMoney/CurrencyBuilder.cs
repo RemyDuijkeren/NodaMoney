@@ -12,7 +12,7 @@ namespace NodaMoney
         /// <param name="namespace">The namespace for the currency.</param>
         /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
         public CurrencyBuilder(string code, string @namespace)
-        {            
+        {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
             if (string.IsNullOrWhiteSpace(@namespace))
@@ -89,7 +89,7 @@ namespace NodaMoney
         {
             // TODO: Add validation?
             // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);         
+            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
 
             return currency;
         }
@@ -100,7 +100,7 @@ namespace NodaMoney
         ///     <para>The custom currency is already registered</para>
         ///     <para>-or-</para>
         ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
-        /// </exception>        
+        /// </exception>
         public Currency Register()
         {
             Currency currency = Build();

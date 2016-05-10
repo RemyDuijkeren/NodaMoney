@@ -1,14 +1,13 @@
 using System;
 using System.Globalization;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyFormattableTests
+    public class MoneyFormattableTests
     {
-        [TestClass]
         public class GivenIWantToConvertMoneyToString
         {
             private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));
@@ -16,7 +15,7 @@ namespace NodaMoney.Tests
             private Money _dollar = new Money(765.4321m, Currency.FromCode("USD"));
             private Money _dinar = new Money(765.4321m, Currency.FromCode("BHD"));
 
-            [TestMethod]
+            [Fact]
             public void WhenImplicitConversion_ThenNumberOfDecimalsShouldBeDefaultOfCurrency()
             {
                 using (new SwitchCulture("en-US"))
@@ -28,7 +27,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitToZeroDecimals_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -40,7 +39,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitToOneDecimals_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -52,7 +51,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitToTwoDecimals_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -64,7 +63,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitToThreeDecimals_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -76,7 +75,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenExplicitToFourDecimals_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -88,7 +87,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEmptyFormat_ThenThisShouldThrow()
             {
                 Action action = () => _yen.ToString((string)null);
@@ -96,7 +95,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSpecificCultureIsUsed_ThenCurrencySymbolAndDecimalsOfMoneyShouldStillBeLeading()
             {
                 using (new SwitchCulture("en-US"))
@@ -110,7 +109,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSpecificNumberFormatIsUsed_ThenCurrencySymbolAndDecimalsOfMoneyShouldStillBeLeading()
             {
                 using (new SwitchCulture("en-US"))
@@ -124,7 +123,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenEmptyFormatNumberFormatIsUsed_ThenThisShouldThrow()
             {
                 Action action = () => _yen.ToString((NumberFormatInfo)null);
@@ -132,7 +131,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentNullException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenShowingMoneyInBelgiumDutchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("nl-BE"))
@@ -144,7 +143,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenShowingMoneyInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
             {
                 using (new SwitchCulture("fr-BE"))

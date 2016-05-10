@@ -82,6 +82,31 @@ Task Compile -depends RestoreNugetPackages, CalculateVersion {
 
 Task Test -depends Compile {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
+	$xunitConsoleExe = Resolve-Path "$rootDir\packages\xunit.runner.console.*\tools\xunit.console.exe"
+	
+	# Get test assemblies
+	$testAssembliesFiles = Get-ChildItem -Recurse $RootDir\tests\*\bin\Release\*Tests*.dll
+	if ($testAssembliesFiles.Count -eq 0) {
+		Throw "No test assemblies found!"
+	} else {
+		"Found test assemblies:"
+		$testAssembliesFiles | ForEach-Object { Write-Output $_.Name }
+		""
+	}
+	
+	# join files paths into to one string
+	$testAssembliesPaths = $testAssembliesFiles | ForEach-Object { "`"`"" + $_.FullName + "`"`"" } 
+	$testAssemblies = [string]::Join(" ", $testAssembliesPaths)
+	
+	# Run OpenCover, which in turn will run Xunit
+	exec {
+		& $openCoverExe -register:user -target:$xunitConsoleExe "-targetargs:$testAssemblies -nologo -noappdomain -parallel none -xml $ArtifactsDir\xunit.xml" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml"
+	}
+}
+
+
+Task TestOld -depends Compile {
+	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
 	$logger = if(isAppVeyor) { "Appveyor" } else { "trx" }
 	$VsTestConsoleExe = if(isAppVeyor) { "vstest.console.exe" } else { "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" }
 	

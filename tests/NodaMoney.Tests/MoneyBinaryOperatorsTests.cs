@@ -1,60 +1,59 @@
 using System;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyBinaryOperatorsTests
+    public class MoneyBinaryOperatorsTests
     {
-        [TestClass]
         public class GivenIWantToAddAndSubtractMoney
         {
             private readonly Money _tenEuro = new Money(10.00m, "EUR");
             private readonly Money _tenDollar = new Money(10.00m, "USD");
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyIsEqual_ThenAdditionAndSubtractionShouldBePossible()
             {
                 // whole number
                 var money1 = new Money(101m);
                 var money2 = new Money(99m);
 
-                Assert.AreEqual(new Money(200), money1 + money2);
-                Assert.AreEqual(new Money(2), money1 - money2);
+                (money1 + money2).Should().Be(new Money(200));
+                (money1 - money2).Should().Be(new Money(2));
 
                 // using CLR methods for languages that don't support operators
-                Assert.AreEqual(new Money(200), Money.Add(money1, money2));
-                Assert.AreEqual(new Money(2), Money.Subtract(money1, money2));
+                Money.Add(money1, money2).Should().Be(new Money(200));
+                Money.Subtract(money1, money2).Should().Be(new Money(2));
 
                 // fractions
                 var money3 = new Money(100.00m);
                 var money4 = new Money(0.01m);
 
-                Assert.AreEqual(new Money(100.01m), money3 + money4);
-                Assert.AreEqual(new Money(99.99m), money3 - money4);
+                (money3 + money4).Should().Be(new Money(100.01m));
+                (money3 - money4).Should().Be(new Money(99.99m));
 
                 // overflow
                 var money5 = new Money(100.999m);
                 var money6 = new Money(100.5m);
                 var money7 = new Money(0.9m);
 
-                Assert.AreEqual(new Money(101.899m), money5 + money7);
-                Assert.AreEqual(new Money(100.099m), money5 - money7);
-                Assert.AreEqual(new Money(101.4m), money6 + money7);
-                Assert.AreEqual(new Money(99.6m), money6 - money7);
+                (money5 + money7).Should().Be(new Money(101.899m));
+                (money5 - money7).Should().Be(new Money(100.099m));
+                (money6 + money7).Should().Be(new Money(101.4m));
+                (money6 - money7).Should().Be(new Money(99.6m));
 
                 // negative
                 var money8 = new Money(100.999m);
                 var money9 = new Money(-0.9m);
                 var money10 = new Money(-100.999m);
 
-                Assert.AreEqual(new Money(100.099m), money8 + money9);
-                Assert.AreEqual(new Money(101.899m), money8 - money9);
-                Assert.AreEqual(new Money(-101.899m), money10 + money9);
-                Assert.AreEqual(new Money(-100.099M), money10 - money9);
+                (money8 + money9).Should().Be(new Money(100.099m));
+                (money8 - money9).Should().Be(new Money(101.899m));
+                (money10 + money9).Should().Be(new Money(-101.899m));
+                (money10 - money9).Should().Be(new Money(-100.099M));
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyIsDifferent_ThenAdditionShouldFail()
             {
 // ReSharper disable once UnusedVariable
@@ -63,7 +62,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<InvalidCurrencyException>().WithMessage("*are not of the same Currency*");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyIsDifferent_ThenSubtractionShouldFail()
             {
 // ReSharper disable once UnusedVariable
@@ -72,7 +71,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<InvalidCurrencyException>().WithMessage("*are not of the same Currency*");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
             {
                 var m = +_tenEuro;
@@ -81,7 +80,7 @@ namespace NodaMoney.Tests
                 m.Currency.Code.Should().Be("EUR");
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenUsingUnaryMinOperator_ThenThisSucceed()
             {
                 var m = -_tenEuro;
@@ -90,11 +89,10 @@ namespace NodaMoney.Tests
                 m.Currency.Code.Should().Be("EUR");
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToMultiplyAndDivideMoney
         {
-            [TestMethod]
+            [Fact]
             public void ShouldMultiplyCorrectly()
             {
                 var money1 = new Money(100.12);
@@ -135,7 +133,7 @@ namespace NodaMoney.Tests
                 //assertEquals(Money.dollars(-66.66), d100.negated().times(new BigDecimal("0.666666"), Rounding.DOWN));
             }
 
-            [TestMethod]
+            [Fact]
             public void ShouldDivideCorrectly()
             {
                 var money1 = new Money(100.12);

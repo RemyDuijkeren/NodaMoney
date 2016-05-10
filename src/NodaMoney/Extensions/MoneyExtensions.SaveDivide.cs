@@ -28,8 +28,7 @@ namespace NodaMoney.Extensions
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
-        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "number-1", 
-            Justification = "Can't be lower than zero.")]
+        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "number-1", Justification = "Can't be lower than zero.")]
         public static IEnumerable<Money> SafeDivide(this Money money, int shares, MidpointRounding rounding)
         {
             if (shares <= 1)
@@ -77,8 +76,8 @@ namespace NodaMoney.Extensions
             for (int i = 0; i < ratios.Length - 1; i++)
             {
                 decimal ratioAmount = Math.Round(
-                    money.Amount * ratios[i] / ratios.Sum(), 
-                    (int)money.Currency.DecimalDigits, 
+                    money.Amount * ratios[i] / ratios.Sum(),
+                    (int)money.Currency.DecimalDigits,
                     rounding);
 
                 remainder -= ratioAmount;

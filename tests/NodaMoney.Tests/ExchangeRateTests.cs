@@ -1,16 +1,15 @@
 ﻿using System;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests
 {
     public class ExchangeRateTests
     {
-        [TestClass]
         public class GivenIWantToParseACurrencyPair
         {
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyPairInUsCulture_ThenParsingShouldSucceed()
             {
                 using (new SwitchCulture("en-US"))
@@ -29,7 +28,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceed()
             {
                 using (new SwitchCulture("nl-NL"))
@@ -48,7 +47,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyPairIsNotANumber_ThenParsingShouldThrow()
             {
                 Action action = () => ExchangeRate.Parse("EUR/USD 1,ABC");
@@ -56,7 +55,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<FormatException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenCurrencyPairHasSameCurrencies_ThenParsingShouldThrow()
             {
                 using (new SwitchCulture("en-US"))
@@ -67,17 +66,18 @@ namespace NodaMoney.Tests
                 }
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToConvertMoney
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
             private readonly Currency _dollar = Currency.FromCode("USD");
             private ExchangeRate _exchangeRate = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591); // EUR/USD 1.2591
 
-            [TestMethod, Description("When Converting €100,99 With EUR/USD 1.2591, Then Result Should Be $127.16")]
+            [Fact]
             public void WhenConvertingEurosToDollars_ThenConversionShouldBeCorrect()
             {
+                // When Converting €100,99 With EUR/USD 1.2591, Then Result Should Be $127.16
+
                 // Convert €100,99 to $127.156509 (= €100.99 * 1.2591)
                 var converted = _exchangeRate.Convert(Money.Euro(100.99M));
 
@@ -85,7 +85,7 @@ namespace NodaMoney.Tests
                 converted.Amount.Should().Be(127.16M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenConvertingEurosToDollarsAndThenBack_ThenEndResultShouldBeTheSameAsInTheBeginning()
             {
                 // Convert €100,99 to $127.156509 (= €100.99 * 1.2591)
@@ -99,13 +99,12 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToCreateAnExchangeRateWithCurrencies
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
             private readonly Currency _dollar = Currency.FromCode("USD");
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsDouble_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euro, _dollar, 1.2591);
@@ -116,7 +115,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsDecimal_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euro, _dollar, 1.2591M);
@@ -126,7 +125,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsFloat_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
@@ -136,7 +135,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenBaseAndQuoteCurrencyAreTheSame_ThenCreatingShouldThrow()
             {
                 // Arrange, Act
@@ -146,8 +145,7 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>();
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToCreateAnExchangeRateWithCurrenciesAsStrings
         {
             private readonly string _euroAsString = "EUR";
@@ -155,7 +153,7 @@ namespace NodaMoney.Tests
             private readonly Currency _euro = Currency.FromCode("EUR");
             private readonly Currency _dollar = Currency.FromCode("USD");
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsDouble_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591);
@@ -166,7 +164,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsDecimal_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591M);
@@ -176,7 +174,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenRateIsFloat_ThenCreatingShouldSucceed()
             {
                 var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591F);
@@ -186,7 +184,7 @@ namespace NodaMoney.Tests
                 fx.Value.Should().Be(1.2591M);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenBaseAndQuoteCurrencyAreTheSame_ThenCreatingShouldThrow()
             {
                 // Arrange, Act
@@ -196,13 +194,12 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<ArgumentException>();
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToConvertExchangeRateToString
         {
             ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
 
-            [TestMethod]
+            [Fact]
             public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()
             {
                 using (new SwitchCulture("en-US"))
@@ -211,7 +208,7 @@ namespace NodaMoney.Tests
                 }
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
             {
                 using (new SwitchCulture("nl-NL"))
