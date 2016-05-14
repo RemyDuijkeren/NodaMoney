@@ -73,8 +73,8 @@
     <Compile Include="CurrencyTests.cs" />
     <Compile Include="ExchangeRateTests.cs" />
     <Compile Include="Extensions\MoneyExtensionsSafeDivideTests.cs" />
+    <Compile Include="Helpers\UseCultureAttribute.cs" />
     <Compile Include="Helpers\RenderSpecs.cs" />
-    <Compile Include="Helpers\SwitchCulture.cs" />
     <Compile Include="MoneyBinaryOperatorsTests.cs" />
     <Compile Include="MoneyComparableTests.cs" />
     <Compile Include="MoneyConvertibleTests.cs" />

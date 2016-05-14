@@ -365,7 +365,7 @@ namespace NodaMoney.Tests
 
         public class GiveIWantToUseALotOfCurrencies
         {
-            [Fact]
+            [Fact(Skip = "Performance Test")]
             public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
             {
                 var sw = Stopwatch.StartNew();

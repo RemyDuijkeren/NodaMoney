@@ -152,9 +152,6 @@ namespace NodaMoney
 
             if (match.Count > 1)
             {
-                if (currencyAsString == "¥" && Currency.CurrentCurrency.Symbol == "¥")
-                    Debug.WriteLine("in error");
-
                 throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
             }
 

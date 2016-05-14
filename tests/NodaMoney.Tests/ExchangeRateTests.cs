@@ -9,42 +9,36 @@ namespace NodaMoney.Tests
     {
         public class GivenIWantToParseACurrencyPair
         {
-            [Fact]
+            [Fact][UseCulture("en-US")]
             public void WhenCurrencyPairInUsCulture_ThenParsingShouldSucceed()
             {
-                using (new SwitchCulture("en-US"))
-                {
-                    var fx1 = ExchangeRate.Parse("EUR/USD 1.2591");
+                var fx1 = ExchangeRate.Parse("EUR/USD 1.2591");
 
-                    fx1.BaseCurrency.Code.Should().Be("EUR");
-                    fx1.QuoteCurrency.Code.Should().Be("USD");
-                    fx1.Value.Should().Be(1.2591M);
+                fx1.BaseCurrency.Code.Should().Be("EUR");
+                fx1.QuoteCurrency.Code.Should().Be("USD");
+                fx1.Value.Should().Be(1.2591M);
 
-                    var fx2 = ExchangeRate.Parse("EUR/USD1.2591");
+                var fx2 = ExchangeRate.Parse("EUR/USD1.2591");
 
-                    fx2.BaseCurrency.Code.Should().Be("EUR");
-                    fx2.QuoteCurrency.Code.Should().Be("USD");
-                    fx2.Value.Should().Be(1.2591M);
-                }
+                fx2.BaseCurrency.Code.Should().Be("EUR");
+                fx2.QuoteCurrency.Code.Should().Be("USD");
+                fx2.Value.Should().Be(1.2591M);
             }
 
-            [Fact]
+            [Fact][UseCulture("nl-NL")]
             public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceed()
             {
-                using (new SwitchCulture("nl-NL"))
-                {
-                    var fx1 = ExchangeRate.Parse("EUR/USD 1,2591");
+                var fx1 = ExchangeRate.Parse("EUR/USD 1,2591");
 
-                    fx1.BaseCurrency.Code.Should().Be("EUR");
-                    fx1.QuoteCurrency.Code.Should().Be("USD");
-                    fx1.Value.Should().Be(1.2591M);
+                fx1.BaseCurrency.Code.Should().Be("EUR");
+                fx1.QuoteCurrency.Code.Should().Be("USD");
+                fx1.Value.Should().Be(1.2591M);
 
-                    var fx2 = ExchangeRate.Parse("EUR/USD1,2591");
+                var fx2 = ExchangeRate.Parse("EUR/USD1,2591");
 
-                    fx2.BaseCurrency.Code.Should().Be("EUR");
-                    fx2.QuoteCurrency.Code.Should().Be("USD");
-                    fx2.Value.Should().Be(1.2591M);
-                }
+                fx2.BaseCurrency.Code.Should().Be("EUR");
+                fx2.QuoteCurrency.Code.Should().Be("USD");
+                fx2.Value.Should().Be(1.2591M);
             }
 
             [Fact]
@@ -55,15 +49,12 @@ namespace NodaMoney.Tests
                 action.ShouldThrow<FormatException>();
             }
 
-            [Fact]
+            [Fact][UseCulture("en-US")]
             public void WhenCurrencyPairHasSameCurrencies_ThenParsingShouldThrow()
             {
-                using (new SwitchCulture("en-US"))
-                {
-                    Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
+                Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
 
-                    action.ShouldThrow<FormatException>();
-                }
+                action.ShouldThrow<FormatException>();
             }
         }
         
@@ -199,22 +190,16 @@ namespace NodaMoney.Tests
         {
             ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
 
-            [Fact]
+            [Fact][UseCulture("en-US")]
             public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()
             {
-                using (new SwitchCulture("en-US"))
-                {
-                    fx.ToString().Should().Be("EUR/USD 1.2524");
-                }
+                fx.ToString().Should().Be("EUR/USD 1.2524");
             }
 
-            [Fact]
+            [Fact][UseCulture("nl-NL")]
             public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
             {
-                using (new SwitchCulture("nl-NL"))
-                {
-                    fx.ToString().Should().Be("EUR/USD 1,2524");
-                }
+                fx.ToString().Should().Be("EUR/USD 1,2524");
             }
         }
     }
