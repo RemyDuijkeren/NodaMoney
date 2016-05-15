@@ -62,5 +62,28 @@ namespace NodaMoney.Tests
                 dinars.Currency.Should().Be(_dinars.Currency);
             }
         }
+
+        public class GivenIWantToAddAndSubtractMoneyUnary
+        {
+            private readonly Money _tenEuro = new Money(10.00m, "EUR");
+
+            [Fact]
+            public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
+            {
+                var m = +_tenEuro;
+
+                m.Amount.Should().Be(10.00m);
+                m.Currency.Code.Should().Be("EUR");
+            }
+
+            [Fact]
+            public void WhenUsingUnaryMinOperator_ThenThisSucceed()
+            {
+                var m = -_tenEuro;
+
+                m.Amount.Should().Be(-10.00m);
+                m.Currency.Code.Should().Be("EUR");
+            }
+        }
     }
 }

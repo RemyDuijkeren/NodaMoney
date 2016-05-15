@@ -103,7 +103,7 @@
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
-        /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
+        /// <remarks>Division of Money by Money, means the unit is lost, so the result will be a ratio <see cref="decimal"/>.</remarks>
         public static decimal operator /(Money left, Money right)
         {
             return Divide(left, right);

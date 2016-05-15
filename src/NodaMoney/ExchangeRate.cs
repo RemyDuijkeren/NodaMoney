@@ -78,11 +78,13 @@ namespace NodaMoney
         /// <exception cref="System.FormatException">rate is not in the correct format!</exception>
         public static ExchangeRate Parse(string rate)
         {
+            if (rate == null)
+                throw new ArgumentNullException(nameof(rate));
+
             ExchangeRate fx;
             if (!TryParse(rate, out fx))
             {
-                throw new FormatException(
-                    "rate is not in the correct format! Currencies are the same or the rate is not a number.");
+                throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
             }
 
             return fx;
@@ -115,18 +117,17 @@ namespace NodaMoney
             }
             catch (Exception ex)
             {
-                if (ex is FormatException || ex is OverflowException || ex is ArgumentException)
-                {
-                    result = new ExchangeRate
-                                 {
-                                     BaseCurrency = Currency.FromCode("XXX"),
-                                     QuoteCurrency = Currency.FromCode("XXX"),
-                                     Value = 0
-                                 };
-                    return false;
-                }
+                if (!(ex is FormatException) && !(ex is OverflowException) && !(ex is ArgumentException))
+                    throw;
 
-                throw;
+                result = new ExchangeRate
+                             {
+                                 BaseCurrency = Currency.FromCode("XXX"),
+                                 QuoteCurrency = Currency.FromCode("XXX"),
+                                 Value = 0
+                             };
+
+                return false;
             }
         }
 

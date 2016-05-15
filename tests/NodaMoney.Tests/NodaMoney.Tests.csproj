@@ -71,11 +71,11 @@
   <ItemGroup>
     <Compile Include="CurrencyBuilderTests.cs" />
     <Compile Include="CurrencyTests.cs" />
-    <Compile Include="ExchangeRateTests.cs" />
+    <Compile Include="ExchangeRateSpec.cs" />
     <Compile Include="Extensions\MoneyExtensionsSafeDivideTests.cs" />
     <Compile Include="Helpers\UseCultureAttribute.cs" />
     <Compile Include="Helpers\RenderSpecs.cs" />
-    <Compile Include="MoneyBinaryOperatorsTests.cs" />
+    <Compile Include="MoneyBinaryOperatorsSpec.cs" />
     <Compile Include="MoneyComparableTests.cs" />
     <Compile Include="MoneyConvertibleTests.cs" />
     <Compile Include="MoneyFormattableTests.cs" />
@@ -94,6 +94,9 @@
       <Project>{1814e8de-0e75-4e23-9f70-e039ac816b42}</Project>
       <Name>NodaMoney</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

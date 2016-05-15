@@ -10,14 +10,11 @@ namespace NodaMoney.Serialization.AspNet.Tests
     {
         public class GivenIWantToSerializeMoneyWithJavaScriptSerializer
         {
-            public static IEnumerable<object[]> TestData
+            public static IEnumerable<object[]> TestData => new[]
             {
-                get
-                {
-                    yield return new object[] { new Money(765m, Currency.FromCode("JPY")) };
-                    yield return new object[] { new Money(765.43m, Currency.FromCode("EUR")) };
-                }
-            }
+                new object[] { new Money(765m, Currency.FromCode("JPY")) },
+                new object[] { new Money(765.43m, Currency.FromCode("EUR")) }
+            };
 
             [Theory]
             [MemberData("TestData")]

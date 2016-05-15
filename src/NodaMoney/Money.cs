@@ -296,7 +296,7 @@ namespace NodaMoney
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)
-                throw new InvalidCurrencyException($"{left} ({left.Currency.Code}) and {right} ({right.Currency.Code}) are not of the same Currency!");
+                throw new InvalidCurrencyException(left.Currency, right.Currency);
         }
     }
 }
