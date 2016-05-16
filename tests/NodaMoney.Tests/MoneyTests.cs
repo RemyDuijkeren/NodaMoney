@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using FluentAssertions;
 using Xunit;
 using NodaMoney.Tests.Helpers;
+
+using Xunit.Abstractions;
 
 namespace NodaMoney.Tests
 {
@@ -424,62 +427,99 @@ namespace NodaMoney.Tests
         public class GivenIWantToConvertDoubleToDecimal
         {
             private readonly Currency _euro = Currency.FromCode("EUR");
+            private readonly ITestOutputHelper _output;
+
+            public GivenIWantToConvertDoubleToDecimal(ITestOutputHelper output)
+            {
+                _output = output;
+            }
 
             [Fact]
             public void WhenValueIsNormalValue_ThenCreatingShouldSucceed()
             {
-                double value1 = 7922816251426433.7593543950335;
-                decimal value2 = new Decimal(value1);
-                decimal value3 = (decimal)7922816251426433.7593543950335;
-                decimal value4 = 7922816251426433.7593543950335m;
-                
+                decimal value = 251426433.75935m;
+                double value1 = 251426433.75935;
+                decimal value2 = new decimal(value1);
+                decimal value3 = (decimal)value1;
+                decimal value4 = decimal.Parse(value1.ToString());
+
+                string result0 = value.ToString(CultureInfo.InvariantCulture);
                 string result1 = value1.ToString(CultureInfo.InvariantCulture);
                 string result2 = value2.ToString(CultureInfo.InvariantCulture);
                 string result3 = value3.ToString(CultureInfo.InvariantCulture);
                 string result4 = value4.ToString(CultureInfo.InvariantCulture);
 
-                Console.WriteLine(result1);
-                Console.WriteLine(result2);
-                Console.WriteLine(result3);
-                Console.WriteLine(result4);
+                _output.WriteLine(result0);
+                _output.WriteLine(result1);
+                _output.WriteLine(result2);
+                _output.WriteLine(result3);
+                _output.WriteLine(result4);
+            }
+
+            [Fact]
+            public void WhenValueIsBigValue_ThenCreatingShouldSucceed()
+            {
+                decimal value = 7922816251426433.7593543950335m;
+                double value1 = 7922816251426433.7593543950335;
+                decimal value2 = new Decimal(value1);
+                decimal value3 = (decimal)value1;
+                //decimal value4 = Decimal.Parse(value1.ToString());
+
+                string result0 = value.ToString(CultureInfo.InvariantCulture);
+                string result1 = value1.ToString(CultureInfo.InvariantCulture);
+                string result2 = value2.ToString(CultureInfo.InvariantCulture);
+                string result3 = value3.ToString(CultureInfo.InvariantCulture);
+                //string result4 = value4.ToString(CultureInfo.InvariantCulture);
+
+                _output.WriteLine(result0);
+                _output.WriteLine(result1);
+                _output.WriteLine(result2);
+                _output.WriteLine(result3);
+                //_output.WriteLine(result4);
             }
 
             [Fact]
             public void WhenValueIsVeryBigValue_ThenCreatingShouldSucceed()
             {
+                decimal value = 79228162514264337593543.950335m;
                 double value1 = 79228162514264337593543.950335;
                 decimal value2 = new Decimal(value1);
-                decimal value3 = (decimal)79228162514264337593543.950335;
-                decimal value4 = 79228162514264337593543.950335m;
+                decimal value3 = (decimal)value1;
+                //decimal value4 = Decimal.Parse(value1.ToString());
 
+                string result0 = value.ToString(CultureInfo.InvariantCulture);
                 string result1 = value1.ToString(CultureInfo.InvariantCulture);
                 string result2 = value2.ToString(CultureInfo.InvariantCulture);
                 string result3 = value3.ToString(CultureInfo.InvariantCulture);
-                string result4 = value4.ToString(CultureInfo.InvariantCulture);
+                //string result4 = value4.ToString(CultureInfo.InvariantCulture);
 
-                Console.WriteLine(result1);
-                Console.WriteLine(result2);
-                Console.WriteLine(result3);
-                Console.WriteLine(result4);
+                _output.WriteLine(result0);
+                _output.WriteLine(result1);
+                _output.WriteLine(result2);
+                _output.WriteLine(result3);
+                //_output.WriteLine(result4);
             }
 
             [Fact]
             public void WhenValueIsVerySmall_ThenCreatingShouldSucceed()
             {
+                decimal value = 0.0079228162514264337593543950335m;
                 double value1 = 0.0079228162514264337593543950335;
                 decimal value2 = new Decimal(value1);
-                decimal value3 = (decimal)0.0079228162514264337593543950335;
-                decimal value4 = 0.0079228162514264337593543950335m;
+                decimal value3 = (decimal)value1;
+                decimal value4 = Decimal.Parse(value1.ToString());
 
+                string result0 = value.ToString(CultureInfo.InvariantCulture);
                 string result1 = value1.ToString(CultureInfo.InvariantCulture);
                 string result2 = value2.ToString(CultureInfo.InvariantCulture);
                 string result3 = value3.ToString(CultureInfo.InvariantCulture);
                 string result4 = value4.ToString(CultureInfo.InvariantCulture);
 
-                Console.WriteLine(result1);
-                Console.WriteLine(result2);
-                Console.WriteLine(result3);
-                Console.WriteLine(result4);
+                _output.WriteLine(result0);
+                _output.WriteLine(result1);
+                _output.WriteLine(result2);
+                _output.WriteLine(result3);
+                _output.WriteLine(result4);
             }
         }      
     }

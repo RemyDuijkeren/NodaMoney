@@ -63,7 +63,7 @@
     <Compile Include="Money.cs" />
     <Compile Include="Money.Parsable.cs" />
     <Compile Include="Money.Formattable.cs" />
-    <Compile Include="Money.FourMostUsedCurrencies.cs" />
+    <Compile Include="Money.FiveMostUsedCurrencies.cs" />
     <Compile Include="Money.UnaryOperators.cs" />
     <Compile Include="Money.Serializable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
