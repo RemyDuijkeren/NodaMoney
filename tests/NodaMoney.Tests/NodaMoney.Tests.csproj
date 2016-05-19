@@ -69,18 +69,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurrencyBuilderTests.cs" />
-    <Compile Include="CurrencyTests.cs" />
+    <Compile Include="CurrencyBuilderSpec.cs" />
+    <Compile Include="CurrencySpec.cs" />
     <Compile Include="ExchangeRateSpec.cs" />
     <Compile Include="Extensions\MoneyExtensionsSafeDivideTests.cs" />
     <Compile Include="Helpers\UseCultureAttribute.cs" />
     <Compile Include="Helpers\RenderSpecs.cs" />
     <Compile Include="MoneyBinaryOperatorsSpec.cs" />
-    <Compile Include="MoneyComparableTests.cs" />
+    <Compile Include="MoneyComparableSpec.cs" />
     <Compile Include="MoneyConvertibleTests.cs" />
-    <Compile Include="MoneyFormattableTests.cs" />
+    <Compile Include="MoneyFormattableSpec.cs" />
     <Compile Include="MoneyFiveMostUsedCurrenciesSpec.cs" />
-    <Compile Include="MoneyParsableTests.cs" />
+    <Compile Include="MoneyParsableSpec.cs" />
     <Compile Include="MoneySerializableTests.cs" />
     <Compile Include="MoneyTests.cs" />
     <Compile Include="MoneyUnaryOperatoresTests.cs" />

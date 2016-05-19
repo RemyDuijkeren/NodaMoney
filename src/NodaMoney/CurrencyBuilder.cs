@@ -41,10 +41,6 @@ namespace NodaMoney
         /// <summary>Gets the code of the currency, normally a three-character ISO 4217 currency code.</summary>
         public string Code { get; }
 
-        /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
-        /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
-        public bool IsObsolete { get; set; }
-
         /// <summary>Gets or sets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
         public DateTime? ValidFrom { get; set; }
@@ -138,7 +134,6 @@ namespace NodaMoney
             Symbol = currency.Symbol;
             ISONumber = currency.Number;
             DecimalDigits = currency.DecimalDigits;
-            IsObsolete = currency.IsObsolete;
             ValidFrom = currency.ValidFrom;
             ValidTo = currency.ValidTo;
         }
