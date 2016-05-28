@@ -147,7 +147,7 @@ namespace NodaMoney
                                      { "ISO-4217::BAM", new Currency("BAM", "977", 2, "Bosnia and Herzegovina convertible mark", "KM") },
                                      { "ISO-4217::BBD", new Currency("BBD", "052", 2, "Barbados dollar", "$") },
                                      { "ISO-4217::BDT", new Currency("BDT", "050", 2, "Bangladeshi taka", "৳") }, // or Tk
-                                     { "ISO-4217::BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв") },
+                                     { "ISO-4217::BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв.") },
                                      { "ISO-4217::BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "BD") }, // or د.ب. (switched for unit tests to work)
                                      { "ISO-4217::BIF", new Currency("BIF", "108", 0, "Burundian franc", "FBu") },
                                      { "ISO-4217::BMD", new Currency("BMD", "060", 2, "Bermudian dollar", "$") },
@@ -288,7 +288,7 @@ namespace NodaMoney
                                      { "ISO-4217::UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (URUIURUI) (funds code)", "¤") },
                                      { "ISO-4217::UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
                                      { "ISO-4217::UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
-                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.F.") }, // or Bs.
+                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.") }, // or Bs.F.
                                      { "ISO-4217::VND", new Currency("VND", "704", 0, "Vietnamese dong", "₫") },
                                      { "ISO-4217::VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
                                      { "ISO-4217::WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T
