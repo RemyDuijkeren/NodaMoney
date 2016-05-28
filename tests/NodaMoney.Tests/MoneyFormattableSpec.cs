@@ -4,7 +4,7 @@ using FluentAssertions;
 using Xunit;
 using NodaMoney.Tests.Helpers;
 
-namespace NodaMoney.Tests.Spec
+namespace NodaMoney.Tests.MoneyFormattableSpec
 {
     public class GivenIWantToConvertMoneyToString
     {

@@ -11,7 +11,7 @@ using NodaMoney.Serialization.JsonNet;
 
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace NodaMoney.Tests
+namespace NodaMoney.Tests.MoneySerializableSpec
 {
     public class MoneySerializableTests
     {
@@ -23,7 +23,7 @@ namespace NodaMoney.Tests
                 return reader.ReadToEnd();
             }
         }
-        
+
         public class GivenIWantToSerializeMoneyWithJsonNetSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));

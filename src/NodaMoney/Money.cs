@@ -85,14 +85,16 @@ namespace NodaMoney
         {
             Currency = currency;
 
-            // TODO: Currency.Z07 and Currency.DOT edge case handeling!
+            // TODO: Currency.Z07 and Currency.NotApplicable edge case handeling!
             if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
             {
                 Amount = Math.Round(amount);
             }
             else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
             {
-                Amount = Math.Round(amount, 1);
+                // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
+                // =ROUND(value/subunit;0)*subunit
+                Amount = Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
             }
             else
             {

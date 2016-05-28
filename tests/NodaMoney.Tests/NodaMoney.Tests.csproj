@@ -77,12 +77,12 @@
     <Compile Include="Helpers\RenderSpecs.cs" />
     <Compile Include="MoneyBinaryOperatorsSpec.cs" />
     <Compile Include="MoneyComparableSpec.cs" />
-    <Compile Include="MoneyConvertibleTests.cs" />
+    <Compile Include="MoneyConvertibleSpec.cs" />
     <Compile Include="MoneyFormattableSpec.cs" />
     <Compile Include="MoneyFiveMostUsedCurrenciesSpec.cs" />
     <Compile Include="MoneyParsableSpec.cs" />
-    <Compile Include="MoneySerializableTests.cs" />
-    <Compile Include="MoneyTests.cs" />
+    <Compile Include="MoneySerializableSpec.cs" />
+    <Compile Include="MoneySpec.cs" />
     <Compile Include="MoneyUnaryOperatoresTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
