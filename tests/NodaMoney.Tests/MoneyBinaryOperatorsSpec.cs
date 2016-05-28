@@ -1,0 +1,263 @@
+using System;
+using System.Collections.Generic;
+
+using FluentAssertions;
+using FluentAssertions.Common;
+
+using Xunit;
+// ReSharper disable All
+
+namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
+{
+    public class GivenIWantToAddAndSubstractMoney
+    {
+        public static IEnumerable<object[]> TestData => new[]
+        {
+            new object[] { 101m, 99m, 200m }, // whole numbers
+            new object[] { 100m, 0.01m, 100.01m }, // fractions
+            new object[] { 100.999m, 0.9m, 101.899m }, // overflow 
+            new object[] { 100.5m, 0.9m, 101.4m }, // overflow
+            new object[] { 100.999m, -0.9m, 100.099m }, // negative
+            new object[] { -100.999m, -0.9m, -101.899m } // negative
+        };
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingAdditionOperator_ThenMoneyShouldBeAdd(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = money1 + money2;
+            
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money1);
+            result.Should().NotBeSameAs(money2);
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingAdditionMethod_ThenMoneyShouldBeAdd(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = Money.Add(money1, money2);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money1);
+            result.Should().NotBeSameAs(money2);
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingSubstractionOperator_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = money1 - money2;
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money1);
+            result.Should().NotBeSameAs(money2);
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingSubstractionMethod_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = Money.Subtract(money1, money2);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money1);
+            result.Should().NotBeSameAs(money2);
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingAdditionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { var result = money1 + money2; };
+
+            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingAdditionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { Money.Add(money1, money2); };
+
+            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingSubstractionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { var result = money1 - money2; };
+
+            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData("TestData")]
+        public void WhenUsingSubstractionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { Money.Subtract(money1, money2); };
+
+            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+    }
+
+    public class GivenIWantToMultiplyAndDivideMoney
+    {
+        public static IEnumerable<object[]> TestDataDecimal => new[]
+        {
+            new object[] { 10m, 15m, 150m },
+            new object[] { 100.12m, 0.5m, 50.06m },
+            new object[] { 100.12m, 5m, 500.60m },
+            new object[] { -100.12m, 0.5m, -50.06m },
+            new object[] { -100.12m, 5m, -500.60m }
+        };
+
+        [Theory, MemberData("TestDataDecimal")]
+        public void WhenUsingMultiplyOperatorWithDecimal_ThenMoneyShouldBeMultipled(decimal value, decimal multiplier, decimal expected)
+        {
+            var money = new Money(value);
+
+            var result1 = money * multiplier;
+            var result2 = multiplier * money;
+                
+            result1.Should().Be(new Money(expected));            
+            result1.Should().NotBeSameAs(money);
+            result2.Should().Be(new Money(expected));
+            result2.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataDecimal")]
+        public void WhenUsingMultiplyMethodWithDecimal_ThenMoneyShouldBeMultipled(decimal value, decimal multiplier, decimal expected)
+        {
+            var money = new Money(value);
+
+            var result = Money.Multiply(money, multiplier);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataDecimal")]
+        public void WhenUsingDivisionOperatorWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
+        {
+            var money = new Money(value);
+
+            var result = money / divider;
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataDecimal")]
+        public void WhenUsingDivisionMethodWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
+        {
+            var money = new Money(value);
+
+            var result = Money.Divide(money, divider);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        public static IEnumerable<object[]> TestDataInteger => new[]
+        {
+            new object[] { 10m, 15, 150 },
+            new object[] { 100.12m, 3, 300.36m },
+            new object[] { 100.12m, 5, 500.60m },
+            new object[] { -100.12m, 3, -300.36m },
+            new object[] { -100.12m, 5, -500.60m }
+        };
+
+        [Theory, MemberData("TestDataInteger")]
+        public void WhenUsingMultiplyOperatorWithInteger_ThenMoneyShouldBeMultipled(decimal value, int multiplier, decimal expected)
+        {
+            var money = new Money(value);
+
+            var result1 = money * multiplier;
+            var result2 = multiplier * money;
+
+            result1.Should().Be(new Money(expected));
+            result1.Should().NotBeSameAs(money);
+            result2.Should().Be(new Money(expected));
+            result2.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataInteger")]
+        public void WhenUsingMultiplyMethodWithInteger_ThenMoneyShouldBeMultipled(decimal value, int multiplier, decimal expected)
+        {
+            var money = new Money(value);
+
+            var result = Money.Multiply(money, multiplier);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataInteger")]
+        public void WhenUsingDivisionOperatorWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
+        {
+            var money = new Money(value);
+
+            var result = money / divider;
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        [Theory, MemberData("TestDataInteger")]
+        public void WhenUsingDivisionMethodWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
+        {
+            var money = new Money(value);
+
+            var result = Money.Divide(money, divider);
+
+            result.Should().Be(new Money(expected));
+            result.Should().NotBeSameAs(money);
+        }
+
+        public static IEnumerable<object[]> TestDataMoney => new[]
+        {
+            new object[] { 150m, 15m, 10m },
+            new object[] { 100.12m, 3m, (100.12m/3m) },
+        };
+
+        [Theory, MemberData("TestDataMoney")]
+        public void WhenUsingDivisionOperatorWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = money1 / money2;
+
+            result.Should().Be(expected); // ratio
+        }
+
+        [Theory, MemberData("TestDataMoney")]
+        public void WhenUsingDivisionMethodWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1);
+            var money2 = new Money(value2);
+
+            var result = Money.Divide(money1, money2);
+
+            result.Should().Be(expected); // ratio
+        }
+    }
+}

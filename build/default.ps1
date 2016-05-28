@@ -82,8 +82,7 @@ Task Compile -depends RestoreNugetPackages, CalculateVersion {
 
 Task Test -depends Compile {
 	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
-	$logger = if(isAppVeyor) { "Appveyor" } else { "trx" }
-	$VsTestConsoleExe = if(isAppVeyor) { "vstest.console.exe" } else { "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" }
+	$xunitConsoleExe = Resolve-Path "$rootDir\packages\xunit.runner.console.*\tools\xunit.console.exe"
 	
 	# Get test assemblies
 	$testAssembliesFiles = Get-ChildItem -Recurse $RootDir\tests\*\bin\Release\*Tests*.dll
@@ -99,20 +98,10 @@ Task Test -depends Compile {
 	$testAssembliesPaths = $testAssembliesFiles | ForEach-Object { "`"`"" + $_.FullName + "`"`"" } 
 	$testAssemblies = [string]::Join(" ", $testAssembliesPaths)
 	
-	# vstest console doesn't have any option to change the output directory
-	# so we need to change the working directory to the artifacts folder
-	Push-Location $ArtifactsDir
-	
-	# Run OpenCover, which in turn will run VSTest
+	# Run OpenCover, which in turn will run Xunit
 	exec {
-		& $openCoverExe -register:user -target:$VsTestConsoleExe "-targetargs:$testAssemblies /Logger:$logger" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml"
+		& $openCoverExe -register:user -target:$xunitConsoleExe "-targetargs:$testAssemblies -nologo -noappdomain -xml $ArtifactsDir\xunit.xml" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml" -returntargetcode
 	}
-	
-	Pop-Location
-
-	# move the .trx file back to artifacts directory
-	Get-ChildItem  $ArtifactsDir\TestResults\*.trx | Select-Object -Last 1 | Move-Item -Destination $ArtifactsDir\MSTest.trx -Force
-	Remove-Item $ArtifactsDir\TestResults -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Task PushCoverage `

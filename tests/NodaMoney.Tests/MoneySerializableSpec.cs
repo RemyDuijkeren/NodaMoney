@@ -2,20 +2,18 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using Newtonsoft.Json;
-using NodaMoney.Serialization.AspNet;
 using NodaMoney.Serialization.JsonNet;
 
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace NodaMoney.Tests
+namespace NodaMoney.Tests.MoneySerializableSpec
 {
-    internal static class MoneySerializableTests
+    public class MoneySerializableTests
     {
         public static string StreamToString(Stream stream)
         {
@@ -26,13 +24,12 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToSerializeMoneyWithJsonNetSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
             private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 string json = JsonConvert.SerializeObject(yen);
@@ -42,7 +39,7 @@ namespace NodaMoney.Tests
                 clone.Should().Be(yen);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 string json = JsonConvert.SerializeObject(euro, Formatting.None, new MoneyJsonConverter());
@@ -52,47 +49,13 @@ namespace NodaMoney.Tests
                 clone.Should().Be(euro);
             }
         }
-
-        [TestClass]
-        public class GivenIWantToSerializeMoneyWithJavaScriptSerializer
-        {
-            private readonly JavaScriptSerializer javaScriptSerializer = new JavaScriptSerializer();
-            private Money yen = new Money(765m, Currency.FromCode("JPY"));
-            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
-
-
-            [TestMethod]
-            public void WhenSerializingYen_ThenThisShouldSucceed()
-            {
-                javaScriptSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
-
-                var json = javaScriptSerializer.Serialize(yen);
-                Console.WriteLine(json);
-                var clone = javaScriptSerializer.Deserialize<Money>(json);
-
-                clone.Should().Be(yen);
-            }
-
-            [TestMethod]
-            public void WhenSerializingEuro_ThenThisShouldSucceed()
-            {
-                javaScriptSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
-
-                var json = javaScriptSerializer.Serialize(euro);
-                Console.WriteLine(json);
-                var clone = javaScriptSerializer.Deserialize<Money>(json);
-
-                clone.Should().Be(euro);
-            }
-        }
-
-        [TestClass]
+        
         public class GivenIWantToSerializeMoneyWithDataContractJsonSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
             private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(yen)));
@@ -100,7 +63,7 @@ namespace NodaMoney.Tests
                 yen.Should().Be(Clone<Money>(yen));
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(euro)));
@@ -137,7 +100,6 @@ namespace NodaMoney.Tests
                 //MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
                 //return (T)serializer.ReadObject(stream);
             }
-
             private static T Clone<T>(object source)
             {
                 return Deserialize<T>(Serialize(source));
@@ -155,13 +117,12 @@ namespace NodaMoney.Tests
 		    public Money Amount { get; set; }
 	    }
 
-	    [TestClass]
         public class GivenIWantToSerializeMoneyWithDataContractSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
             private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(yen)));
@@ -169,7 +130,7 @@ namespace NodaMoney.Tests
                 yen.Should().Be(Clone<Money>(yen));
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(euro)));
@@ -177,7 +138,7 @@ namespace NodaMoney.Tests
                 euro.Should().Be(Clone<Money>(euro));
             }
 
-	        [TestMethod]
+	        [Fact]
 	        public void WhenSerializingArticle_ThenThisShouldSucceed()
 	        {
 		        var article = new Article
@@ -216,13 +177,12 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass]
         public class GivenIWantToSerializeMoneyWitXmlSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
             private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(yen)));
@@ -230,7 +190,7 @@ namespace NodaMoney.Tests
                 yen.Should().Be(Clone<Money>(yen));
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(euro)));
@@ -259,13 +219,12 @@ namespace NodaMoney.Tests
             }
         }
 
-        [TestClass][Ignore]
         public class GivenIWantToSerializeMoneyWithBinaryFormatter
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
             private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
-            [TestMethod]
+            [Fact(Skip = "Not possible with PCL")]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(yen)));
@@ -273,7 +232,7 @@ namespace NodaMoney.Tests
                 yen.Should().Be(Clone<Money>(yen));
             }
 
-            [TestMethod]
+            [Fact(Skip = "Not possible with PCL")]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 Console.WriteLine(StreamToString(Serialize(euro)));

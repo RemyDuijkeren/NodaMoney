@@ -9,6 +9,7 @@ namespace NodaMoney
     {
         /// <summary>Initializes a new instance of the <see cref="InvalidCurrencyException"/> class.</summary>
         public InvalidCurrencyException()
+            : base("The requested operation cannot be performed with the specified currency!")
         {
         }
 
@@ -26,6 +27,14 @@ namespace NodaMoney
         /// handles the inner exception.</param>
         public InvalidCurrencyException(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="InvalidCurrencyException"/> class.</summary>
+        /// <param name="expected">The expected currency.</param>
+        /// <param name="actual">The actual currency.</param>
+        public InvalidCurrencyException(Currency expected, Currency actual)
+            : this($"The requested operation expected the currency {expected.Code}, but the actual value was the currency {actual.Code}!")
         {
         }
     }

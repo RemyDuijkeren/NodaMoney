@@ -45,7 +45,7 @@
         /// <summary>Divides the specified money.</summary>
         /// <param name="money1">The money.</param>
         /// <param name="money2">The divider.</param>
-        /// <returns>The <see cref="System.Decimal"/> result of dividing left with right.</returns>
+        /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
         /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
         public static decimal Divide(Money money1, Money money2)
         {
@@ -73,7 +73,7 @@
 
         /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
-        /// <param name="right">A <see cref="System.Decimal"/> object on the right side.</param>
+        /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
         /// <returns>The <see cref="Money"/> result of multiplying right with left.</returns>
         public static Money operator *(Money left, decimal right)
         {
@@ -81,7 +81,7 @@
         }
 
         /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
-        /// <param name="left">A <see cref="System.Decimal"/> object on the left side.</param>
+        /// <param name="left">A <see cref="decimal"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>The <see cref="Money"/> result of multiplying left with right.</returns>
         public static Money operator *(decimal left, Money right)
@@ -91,7 +91,7 @@
 
         /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
-        /// <param name="right">A <see cref="System.Decimal"/> object on the right side.</param>
+        /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
         /// <returns>The <see cref="Money"/> result of dividing left with right.</returns>
         /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
         public static Money operator /(Money left, decimal right)
@@ -102,8 +102,8 @@
         /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
-        /// <returns>The <see cref="System.Decimal"/> result of dividing left with right.</returns>
-        /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
+        /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
+        /// <remarks>Division of Money by Money, means the unit is lost, so the result will be a ratio <see cref="decimal"/>.</remarks>
         public static decimal operator /(Money left, Money right)
         {
             return Divide(left, right);

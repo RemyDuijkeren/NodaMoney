@@ -47,7 +47,7 @@ namespace NodaMoney
                 return false;
             }
 
-            currency = found[0]; // TODO: If more than one, sort by prio. 
+            currency = found[0]; // TODO: If more than one, sort by prio.
             return true;
         }
 
@@ -147,7 +147,7 @@ namespace NodaMoney
                                      { "ISO-4217::BAM", new Currency("BAM", "977", 2, "Bosnia and Herzegovina convertible mark", "KM") },
                                      { "ISO-4217::BBD", new Currency("BBD", "052", 2, "Barbados dollar", "$") },
                                      { "ISO-4217::BDT", new Currency("BDT", "050", 2, "Bangladeshi taka", "৳") }, // or Tk
-                                     { "ISO-4217::BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв") },
+                                     { "ISO-4217::BGN", new Currency("BGN", "975", 2, "Bulgarian lev", "лв.") },
                                      { "ISO-4217::BHD", new Currency("BHD", "048", 3, "Bahraini dinar", "BD") }, // or د.ب. (switched for unit tests to work)
                                      { "ISO-4217::BIF", new Currency("BIF", "108", 0, "Burundian franc", "FBu") },
                                      { "ISO-4217::BMD", new Currency("BMD", "060", 2, "Bermudian dollar", "$") },
@@ -158,7 +158,8 @@ namespace NodaMoney
                                      { "ISO-4217::BSD", new Currency("BSD", "044", 2, "Bahamian dollar", "$") },
                                      { "ISO-4217::BTN", new Currency("BTN", "064", 2, "Bhutanese ngultrum", "Nu.") },
                                      { "ISO-4217::BWP", new Currency("BWP", "072", 2, "Botswana pula", "P") },
-                                     { "ISO-4217::BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br") }, // or p.? wiki controdicts with xe.com
+                                     { "ISO-4217::BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br", validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)) },
+                                     { "ISO-4217::BYN", new Currency("BYN", "974", 0, "Belarusian ruble", "Br", validFrom: new DateTime(2006, 06, 01)) },
                                      { "ISO-4217::BZD", new Currency("BZD", "084", 2, "Belize dollar", "BZ$") },
                                      { "ISO-4217::CAD", new Currency("CAD", "124", 2, "Canadian dollar", "$") },
                                      { "ISO-4217::CDF", new Currency("CDF", "976", 2, "Congolese franc", "FC") },
@@ -176,7 +177,7 @@ namespace NodaMoney
                                      { "ISO-4217::CVE", new Currency("CVE", "132", 0, "Cape Verde escudo", "$") },
                                      { "ISO-4217::CZK", new Currency("CZK", "203", 2, "Czech koruna", "Kč") },
                                      { "ISO-4217::DJF", new Currency("DJF", "262", 0, "Djiboutian franc", "Fdj") },
-                                     { "ISO-4217::DKK", new Currency("DKK", "208", 2, "Danish krone", "kr") },
+                                     { "ISO-4217::DKK", new Currency("DKK", "208", 2, "Danish krone", "kr.") },
                                      { "ISO-4217::DOP", new Currency("DOP", "214", 2, "Dominican peso", "RD$") }, // or $
                                      { "ISO-4217::DZD", new Currency("DZD", "012", 2, "Algerian dinar", "DA") }, // (Latin) or د.ج (Arabic)
                                      { "ISO-4217::EGP", new Currency("EGP", "818", 2, "Egyptian pound", "LE") }, // or E£ or ج.م (Arabic)
@@ -287,7 +288,7 @@ namespace NodaMoney
                                      { "ISO-4217::UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (URUIURUI) (funds code)", "¤") },
                                      { "ISO-4217::UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
                                      { "ISO-4217::UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
-                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.F.") }, // or Bs.
+                                     { "ISO-4217::VEF", new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.") }, // or Bs.F.
                                      { "ISO-4217::VND", new Currency("VND", "704", 0, "Vietnamese dong", "₫") },
                                      { "ISO-4217::VUV", new Currency("VUV", "548", 0, "Vanuatu vatu", "VT") },
                                      { "ISO-4217::WST", new Currency("WST", "882", 2, "Samoan tala", "WS$") }, // sometimes SAT, ST or T

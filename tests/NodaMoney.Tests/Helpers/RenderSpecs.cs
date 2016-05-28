@@ -3,23 +3,22 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests.Helpers
 {
-    [TestClass]
     public class RenderSpecs
     {
-        [TestMethod]
+        [Fact(Skip = "")]
         public void Render()
         {
             Render("", Console.Out);
         }
 
-        [TestMethod]
+        [Fact]
         public void RenderAllSpecs()
         {
-            using (var stream = File.Open(@"..\..\Specs.txt", FileMode.Create))
+            using (var stream = File.Open(@"..\..\..\..\artifacts\Specs.txt", FileMode.Create))
             using (var writer = new StreamWriter(stream))
             {
                 Render("", writer);
@@ -30,10 +29,12 @@ namespace NodaMoney.Tests.Helpers
         {
             var specs = (from type in this.GetType().Assembly.GetTypes()
                         where type.Namespace != null &&
-                              type.Namespace.StartsWith(withinNamespace) &&
-                              type.GetCustomAttributes(true).OfType<TestClassAttribute>().Any()
+                              type.Namespace.StartsWith(withinNamespace) //&&
+                              //type.GetCustomAttributes(true).OfType<TestClassAttribute>().Any()
                         from method in type.GetMethods()
-                        where method.GetCustomAttributes(true).OfType<TestMethodAttribute>().Any() &&
+                        where (method.GetCustomAttributes(true).OfType<FactAttribute>().Any() ||
+                                method.GetCustomAttributes(true).OfType<TheoryAttribute>().Any()
+                              ) &&
                               method.Name.StartsWith("When") 
                         orderby type.Namespace, type.Name
                         select new

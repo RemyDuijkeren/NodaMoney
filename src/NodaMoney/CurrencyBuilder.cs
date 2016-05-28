@@ -12,7 +12,7 @@ namespace NodaMoney
         /// <param name="namespace">The namespace for the currency.</param>
         /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
         public CurrencyBuilder(string code, string @namespace)
-        {            
+        {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
             if (string.IsNullOrWhiteSpace(@namespace))
@@ -40,10 +40,6 @@ namespace NodaMoney
 
         /// <summary>Gets the code of the currency, normally a three-character ISO 4217 currency code.</summary>
         public string Code { get; }
-
-        /// <summary>Gets or sets a value indicating whether currency is obsolete.</summary>
-        /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
-        public bool IsObsolete { get; set; }
 
         /// <summary>Gets or sets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
@@ -89,7 +85,7 @@ namespace NodaMoney
         {
             // TODO: Add validation?
             // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);         
+            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
 
             return currency;
         }
@@ -100,7 +96,7 @@ namespace NodaMoney
         ///     <para>The custom currency is already registered</para>
         ///     <para>-or-</para>
         ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
-        /// </exception>        
+        /// </exception>
         public Currency Register()
         {
             Currency currency = Build();
@@ -138,7 +134,6 @@ namespace NodaMoney
             Symbol = currency.Symbol;
             ISONumber = currency.Number;
             DecimalDigits = currency.DecimalDigits;
-            IsObsolete = currency.IsObsolete;
             ValidFrom = currency.ValidFrom;
             ValidTo = currency.ValidTo;
         }

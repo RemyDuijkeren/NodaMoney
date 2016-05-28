@@ -12,7 +12,7 @@ namespace NodaMoney
         /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
         /// <param name="value">The string representation of the number to convert.</param>
         /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception> 
+        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
         /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies!</exception>
         /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>.</exception>
         public static Money Parse(string value)
@@ -29,7 +29,7 @@ namespace NodaMoney
         /// <param name="value">The string representation of the number to convert.</param>
         /// <param name="currency">The currency to use for parsing the string representation.</param>
         /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception> 
+        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
         /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies!</exception>
         /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>.</exception>
         public static Money Parse(string value, Currency currency)
@@ -46,7 +46,7 @@ namespace NodaMoney
         /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>.</param>
         /// <param name="currency">The currency to use for parsing the string representation.</param>
         /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception> 
+        /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
         /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies!</exception>
         /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>.</exception>
         public static Money Parse(string value, NumberStyles style, IFormatProvider provider, Currency currency)
@@ -63,7 +63,7 @@ namespace NodaMoney
         /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
         /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
         /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="String.Empty"/>, is not a number
-        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed 
+        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed
         /// uninitialized; any <i>value</i> originally supplied in result will be overwritten</param>
         /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
         /// <remarks>See <see cref="Decimal.TryParse(String, out Decimal)"/> for more info and remarks.</remarks>
@@ -95,7 +95,7 @@ namespace NodaMoney
         /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
         /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
         /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="String.Empty"/>, is not a number
-        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed 
+        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed
         /// uninitialized; any <i>value</i> originally supplied in result will be overwritten</param>
         /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
         /// <remarks>See <see cref="Decimal.TryParse(String, out Decimal)"/> for more info and remarks.</remarks>
@@ -112,7 +112,7 @@ namespace NodaMoney
         /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
         /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
         /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="String.Empty"/>, is not a number
-        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed 
+        /// in a valid format, or represents a number less than <see cref="Decimal.MinValue"/> or greater than <see cref="Decimal.MaxValue"/>. This parameter is passed
         /// uninitialized; any <i>value</i> originally supplied in result will be overwritten</param>
         /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
         /// <remarks>See <see cref="Decimal.TryParse(String, NumberStyles, IFormatProvider, out Decimal)"/> for more info and remarks.</remarks>
@@ -152,9 +152,6 @@ namespace NodaMoney
 
             if (match.Count > 1)
             {
-                if (currencyAsString == "¥" && Currency.CurrentCurrency.Symbol == "¥")
-                    Debug.WriteLine("in error");
-
                 throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
             }
 
@@ -163,7 +160,7 @@ namespace NodaMoney
 
         private static Func<char, bool> IsNotNumericCharacter()
         {
-            return character => !char.IsDigit(character) && !char.IsWhiteSpace(character) && character != '.' && character != ',' 
+            return character => !char.IsDigit(character) && !char.IsWhiteSpace(character) && character != '.' && character != ','
                 && character != '(' && character != ')' && character != '+' && character != '-';
         }
     }

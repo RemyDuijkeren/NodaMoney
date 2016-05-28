@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Linq;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using NodaMoney.Extensions;
 
 namespace NodaMoney.Tests.Extensions
 {
     public class MoneyExtensionsSafeDivideTests
     {
-        [TestClass]
         public class GivenIWantToSafelyDivideMoney
         {
             private Money _eurocent5 = new Money(0.05m, "EUR");
             private Money _euro1 = new Money(1.0m, "EUR");
 
-            [TestMethod]
+            [Fact]
             public void WhenDividing5CentsByTwo_ThenDivisionShouldNotLoseCents()
             {
                 // Foemmel's Conundrum test (see PEAA, page 495)
@@ -34,7 +33,7 @@ namespace NodaMoney.Tests.Extensions
                 enumerable.Sum(m => m.Amount).Should().Be(_eurocent5.Amount);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDividing5CentsByThree_ThenDivisionShouldNotLoseCents()
             {
                 var enumerable = _eurocent5.SafeDivide(3).ToList();
@@ -52,7 +51,7 @@ namespace NodaMoney.Tests.Extensions
                 enumerable.Sum(m => m.Amount).Should().Be(_eurocent5.Amount);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDividing1EuroByGivenRatios_ThenDivisionShouldNotLoseCents()
             {             
                 var enumerable = _euro1.SafeDivide(new[] { 2, 3, 3 }).ToList();
@@ -70,7 +69,7 @@ namespace NodaMoney.Tests.Extensions
                 enumerable.Sum(m => m.Amount).Should().Be(_euro1.Amount);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDividing1EuroByGivenRatiosWhereOneIsVerySmall_ThenDivisionShouldNotLoseCents()
             {
                 var enumerable = _euro1.SafeDivide(new[] { 200, 300, 1 }).ToList();
@@ -88,7 +87,7 @@ namespace NodaMoney.Tests.Extensions
                 enumerable.Sum(m => m.Amount).Should().Be(_euro1.Amount);
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDividingByMinus1_ThenAnExceptionShouldBeThrowed()
             {               
                 Action action = () => _euro1.SafeDivide(-1).ToList();
@@ -96,7 +95,7 @@ namespace NodaMoney.Tests.Extensions
                 action.ShouldThrow<ArgumentOutOfRangeException>();
             }
 
-            [TestMethod]
+            [Fact]
             public void WhenDividingByGivenRatiosWithMinus1_ThenAnExceptionShouldBeThrowed()
             {
                 Action action = () => _euro1.SafeDivide(new[] { 2, -1, 3 }).ToList();

@@ -1,11 +1,10 @@
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NodaMoney.Tests
 {
-    static internal class MoneyUnaryOperatoresTests
+    public class MoneyUnaryOperatoresTests
     {
-        [TestClass]
         public class GivenIWantToIncrementMoney
         {
             private Money _yens = new Money(765m, Currency.FromCode("JPY"));
@@ -13,7 +12,7 @@ namespace NodaMoney.Tests
             private Money _dollars = new Money(765.43m, Currency.FromCode("USD"));
             private Money _dinars = new Money(765.432m, Currency.FromCode("BHD"));
 
-            [TestMethod]
+            [Fact]
             public void WhenIncrementing_ThenAmountShouldIncrementWithMinorUnit()
             {
                 var yens = ++_yens;
@@ -34,8 +33,7 @@ namespace NodaMoney.Tests
                 dinars.Currency.Should().Be(_dinars.Currency);
             }
         }
-
-        [TestClass]
+        
         public class GivenIWantToDecrementMoney
         {
             private Money _yens = new Money(765m, Currency.FromCode("JPY"));
@@ -43,7 +41,7 @@ namespace NodaMoney.Tests
             private Money _dollars = new Money(765.43m, Currency.FromCode("USD"));
             private Money _dinars = new Money(765.432m, Currency.FromCode("BHD"));
 
-            [TestMethod]
+            [Fact]
             public void WhenDecrementing_ThenAmountShouldDecrementWithMinorUnit()
             {
                 var yens = --_yens;
@@ -62,6 +60,29 @@ namespace NodaMoney.Tests
 
                 dinars.Amount.Should().Be(765.431m);
                 dinars.Currency.Should().Be(_dinars.Currency);
+            }
+        }
+
+        public class GivenIWantToAddAndSubtractMoneyUnary
+        {
+            private readonly Money _tenEuro = new Money(10.00m, "EUR");
+
+            [Fact]
+            public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
+            {
+                var m = +_tenEuro;
+
+                m.Amount.Should().Be(10.00m);
+                m.Currency.Code.Should().Be("EUR");
+            }
+
+            [Fact]
+            public void WhenUsingUnaryMinOperator_ThenThisSucceed()
+            {
+                var m = -_tenEuro;
+
+                m.Amount.Should().Be(-10.00m);
+                m.Currency.Code.Should().Be("EUR");
             }
         }
     }

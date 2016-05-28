@@ -30,10 +30,10 @@ namespace NodaMoney
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
-            Value = Math.Round(rate, 4); // value is a ratio 
+            Value = Math.Round(rate, 4); // value is a ratio
         }
 
-        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"></see> struct.</summary>
+        /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
@@ -78,11 +78,13 @@ namespace NodaMoney
         /// <exception cref="System.FormatException">rate is not in the correct format!</exception>
         public static ExchangeRate Parse(string rate)
         {
+            if (rate == null)
+                throw new ArgumentNullException(nameof(rate));
+
             ExchangeRate fx;
             if (!TryParse(rate, out fx))
             {
-                throw new FormatException(
-                    "rate is not in the correct format! Currencies are the same or the rate is not a number.");
+                throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
             }
 
             return fx;
@@ -115,18 +117,17 @@ namespace NodaMoney
             }
             catch (Exception ex)
             {
-                if (ex is FormatException || ex is OverflowException || ex is ArgumentException)
-                {
-                    result = new ExchangeRate
-                                 {
-                                     BaseCurrency = Currency.FromCode("XXX"), 
-                                     QuoteCurrency = Currency.FromCode("XXX"), 
-                                     Value = 0
-                                 };
-                    return false;
-                }
+                if (!(ex is FormatException) && !(ex is OverflowException) && !(ex is ArgumentException))
+                    throw;
 
-                throw;
+                result = new ExchangeRate
+                             {
+                                 BaseCurrency = Currency.FromCode("XXX"),
+                                 QuoteCurrency = Currency.FromCode("XXX"),
+                                 Value = 0
+                             };
+
+                return false;
             }
         }
 
@@ -158,7 +159,7 @@ namespace NodaMoney
             if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
             {
                 throw new ArgumentException(
-                    "Money should have the same currency as the base currency or the quote currency!", 
+                    "Money should have the same currency as the base currency or the quote currency!",
                     nameof(money));
             }
 
@@ -196,7 +197,7 @@ namespace NodaMoney
             return (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
         }
 
-        /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="String"/> representation.</summary>
+        /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
         /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
         public override string ToString()

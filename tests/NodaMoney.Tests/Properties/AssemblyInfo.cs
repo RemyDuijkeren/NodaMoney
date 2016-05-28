@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
+using Xunit;
+
 [assembly: AssemblyTitle("NodaMoney.Tests")]
 [assembly: AssemblyDescription("Unit tests for NodaMoney.")]
 [assembly: NeutralResourcesLanguage("en")]
