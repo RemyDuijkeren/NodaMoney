@@ -158,7 +158,8 @@ namespace NodaMoney
                                      { "ISO-4217::BSD", new Currency("BSD", "044", 2, "Bahamian dollar", "$") },
                                      { "ISO-4217::BTN", new Currency("BTN", "064", 2, "Bhutanese ngultrum", "Nu.") },
                                      { "ISO-4217::BWP", new Currency("BWP", "072", 2, "Botswana pula", "P") },
-                                     { "ISO-4217::BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br") }, // or p.? wiki controdicts with xe.com
+                                     { "ISO-4217::BYR", new Currency("BYR", "974", 0, "Belarusian ruble", "Br", validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)) },
+                                     { "ISO-4217::BYN", new Currency("BYN", "974", 0, "Belarusian ruble", "Br", validFrom: new DateTime(2006, 06, 01)) },
                                      { "ISO-4217::BZD", new Currency("BZD", "084", 2, "Belize dollar", "BZ$") },
                                      { "ISO-4217::CAD", new Currency("CAD", "124", 2, "Canadian dollar", "$") },
                                      { "ISO-4217::CDF", new Currency("CDF", "976", 2, "Congolese franc", "FC") },
