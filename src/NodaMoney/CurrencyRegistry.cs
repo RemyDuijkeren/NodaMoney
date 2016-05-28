@@ -177,7 +177,7 @@ namespace NodaMoney
                                      { "ISO-4217::CVE", new Currency("CVE", "132", 0, "Cape Verde escudo", "$") },
                                      { "ISO-4217::CZK", new Currency("CZK", "203", 2, "Czech koruna", "Kč") },
                                      { "ISO-4217::DJF", new Currency("DJF", "262", 0, "Djiboutian franc", "Fdj") },
-                                     { "ISO-4217::DKK", new Currency("DKK", "208", 2, "Danish krone", "kr") },
+                                     { "ISO-4217::DKK", new Currency("DKK", "208", 2, "Danish krone", "kr.") },
                                      { "ISO-4217::DOP", new Currency("DOP", "214", 2, "Dominican peso", "RD$") }, // or $
                                      { "ISO-4217::DZD", new Currency("DZD", "012", 2, "Algerian dinar", "DA") }, // (Latin) or د.ج (Arabic)
                                      { "ISO-4217::EGP", new Currency("EGP", "818", 2, "Egyptian pound", "LE") }, // or E£ or ج.م (Arabic)
