@@ -50,15 +50,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NodaMoney\NodaMoney.csproj">
-      <Project>{1814E8DE-0E75-4E23-9F70-E039AC816B42}</Project>
-      <Name>NodaMoney</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
       <Link>Properties\CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NodaMoney\NodaMoney.xproj">
+      <Project>{58f0fe5e-e139-4abf-b9a5-969dbbe69f52}</Project>
+      <Name>NodaMoney</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

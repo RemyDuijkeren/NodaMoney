@@ -79,10 +79,6 @@
       <Project>{4d77971d-49fb-451a-a1d5-e92285291dc2}</Project>
       <Name>NodaMoney.Serialization.AspNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj">
-      <Project>{1814E8DE-0E75-4E23-9F70-E039AC816B42}</Project>
-      <Name>NodaMoney</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

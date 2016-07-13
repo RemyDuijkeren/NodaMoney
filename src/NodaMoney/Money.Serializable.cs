@@ -3,7 +3,9 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
+#if !PORTABLE
 using System.Xml.Serialization;
+#endif
 using Newtonsoft.Json;
 using NodaMoney.Serialization.JsonNet;
 
@@ -11,7 +13,10 @@ namespace NodaMoney
 {
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     [JsonConverter(typeof(MoneyJsonConverter))]
-    public partial struct Money : IXmlSerializable
+    public partial struct Money
+#if !PORTABLE
+        : IXmlSerializable
+#endif
     {
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply

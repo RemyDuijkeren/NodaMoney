@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C8B3C22E-2C66-43E1-B1C3-71E7A384B2C2}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,13 +9,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		src\GlobalAssemblyInfo.cs = src\GlobalAssemblyInfo.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney", "src\NodaMoney\NodaMoney.csproj", "{1814E8DE-0E75-4E23-9F70-E039AC816B42}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Serialization.AspNet", "src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj", "{4D77971D-49FB-451A-A1D5-E92285291DC2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Serialization.AspNet.Tests", "tests\NodaMoney.Serialization.AspNet.Tests\NodaMoney.Serialization.AspNet.Tests.csproj", "{DCEFD498-85BE-4220-B58A-25C6E747D861}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Tests", "tests\NodaMoney.Tests\NodaMoney.Tests.csproj", "{D43A21B1-7E4D-426A-BB3B-C7B6A73F4611}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NodaMoney", "src\NodaMoney\NodaMoney.xproj", "{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1814E8DE-0E75-4E23-9F70-E039AC816B42}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D77971D-49FB-451A-A1D5-E92285291DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{D43A21B1-7E4D-426A-BB3B-C7B6A73F4611}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D43A21B1-7E4D-426A-BB3B-C7B6A73F4611}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D43A21B1-7E4D-426A-BB3B-C7B6A73F4611}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

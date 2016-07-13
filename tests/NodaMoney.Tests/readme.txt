@@ -48,7 +48,7 @@ We use this as a guideline. There’s no requirement that we have a context clas
 you’re testing a very small unit. In this case, the *Spec becomes the class, such as below. This is typically more the
 exception than the rule, though.
 
-namespace NOdaMOney.Tests
+namespace NodaMoney.Tests
 {
    public class FinalSpec   {   }
 }

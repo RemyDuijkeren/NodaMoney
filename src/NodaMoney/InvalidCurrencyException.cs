@@ -4,7 +4,9 @@ using System.Runtime.InteropServices;
 namespace NodaMoney
 {
     /// <summary>The exception that is thrown when the <see cref="Currency"/> is invalid for the current context or object state.</summary>
+#if !PORTABLE40
     [ComVisible(true)]
+#endif
     public class InvalidCurrencyException : InvalidOperationException
     {
         /// <summary>Initializes a new instance of the <see cref="InvalidCurrencyException"/> class.</summary>
