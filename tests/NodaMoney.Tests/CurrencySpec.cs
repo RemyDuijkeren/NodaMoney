@@ -381,7 +381,8 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenSerializingYen_ThenThisShouldSucceed()
         {
-            Console.WriteLine(StreamToString(Serialize(yen)));
+            //Console.WriteLine(StreamToString(Serialize(yen)));
+            StreamToString(Serialize(yen));
 
             yen.Should().Be(Clone<Currency>(yen));
         }
@@ -389,7 +390,8 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenSerializingEuro_ThenThisShouldSucceed()
         {
-            Console.WriteLine(StreamToString(Serialize(euro)));
+            //Console.WriteLine(StreamToString(Serialize(euro)));
+            StreamToString(Serialize(euro));
 
             euro.Should().Be(Clone<Currency>(euro));
         }

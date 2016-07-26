@@ -9,13 +9,13 @@ namespace NodaMoney.Tests.Helpers
 {
     public class RenderSpecs
     {
-        [Fact(Skip = "")]
+        [Fact(Skip = "Write Spec")]
         public void Render()
         {
             Render("", Console.Out);
         }
 
-        [Fact]
+        [Fact(Skip = "Write Spec")]
         public void RenderAllSpecs()
         {
             using (var stream = File.Open(@"..\..\..\..\artifacts\Specs.txt", FileMode.Create))
@@ -28,23 +28,23 @@ namespace NodaMoney.Tests.Helpers
         private void Render(string withinNamespace, TextWriter output)
         {
             var specs = (from type in this.GetType().Assembly.GetTypes()
-                        where type.Namespace != null &&
-                              type.Namespace.StartsWith(withinNamespace) //&&
-                              //type.GetCustomAttributes(true).OfType<TestClassAttribute>().Any()
-                        from method in type.GetMethods()
-                        where (method.GetCustomAttributes(true).OfType<FactAttribute>().Any() ||
-                                method.GetCustomAttributes(true).OfType<TheoryAttribute>().Any()
-                              ) &&
-                              method.Name.StartsWith("When") 
-                        orderby type.Namespace, type.Name
-                        select new
-                        {
-                            Type = type,
-                            Method = method,
-                            Phrase = method.Name,
-                            When = ToPhrase(method.Name.Substring(0, method.Name.IndexOf('_'))),
-                            Then = ToPhrase(method.Name.Substring(method.Name.IndexOf('_') + 1)),
-                        })
+                         where type.Namespace != null &&
+                               type.Namespace.StartsWith(withinNamespace) //&&
+                                                                          //type.GetCustomAttributes(true).OfType<TestClassAttribute>().Any()
+                         from method in type.GetMethods()
+                         where (method.GetCustomAttributes(true).OfType<FactAttribute>().Any() ||
+                                 method.GetCustomAttributes(true).OfType<TheoryAttribute>().Any()
+                               ) &&
+                               method.Name.StartsWith("When")
+                         orderby type.Namespace, type.Name
+                         select new
+                         {
+                             Type = type,
+                             Method = method,
+                             Phrase = method.Name,
+                             When = ToPhrase(method.Name.Substring(0, method.Name.IndexOf('_'))),
+                             Then = ToPhrase(method.Name.Substring(method.Name.IndexOf('_') + 1)),
+                         })
                         .GroupBy(x => x.Type)
                         .OrderBy(x => x.Key.FullName)
                         .GroupBy(x => x.Key.IsNested ? x.Key.DeclaringType.Name : x.Key.Namespace);

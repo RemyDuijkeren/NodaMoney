@@ -1,4 +1,4 @@
-# This build assumes the following directory structure (https://gist.github.com/davidfowl/ed7564297c61fe9ab8140):
+# This build assumes the following directory structure (https://gist.github.com/davidfowl/ed7564297c61fe9ab814):
 #   \build    	- Build customizations (custom msbuild files/psake/fake/albacore/etc) scripts
 #   \artifacts	- Build outputs go here. Doing a build.cmd generates artifacts here (nupkgs, zips, etc.)
 #	\docs		- Documentation stuff, markdown files, help files, etc
@@ -74,7 +74,11 @@ Task Compile -depends RestoreNugetPackages, CalculateVersion {
 	applyVersioning $assemblyInfo $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
 	
 	"Compile solution"
-	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
+	#exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
+	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.5" /maxcpucount /verbosity:minimal /nologo $logger }
+	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.0" /p:OutputPath="$ArtifactsDir\x\v40\" /maxcpucount /verbosity:minimal /nologo $logger }
+	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.5" /p:OutputPath="$ArtifactsDir\x\v45\" /maxcpucount /verbosity:minimal /nologo $logger }
+	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:OutputPath="$ArtifactsDir\x\v46\" /maxcpucount /verbosity:minimal /nologo $logger }
 	
 	"`nReset version to zero again (to prevent git checkin)"
 	applyVersioning $assemblyInfo "0.0.0.0" "0.0.0.0" "0.0.0.0"
