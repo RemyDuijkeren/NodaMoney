@@ -1,19 +1,35 @@
-﻿using System.Reflection;
+using System;
+using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NodaMoney.Serialization.AspNet.NetCore")]
-[assembly: AssemblyTrademark("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
+[assembly: AssemblyTitle("NodaMoney.Serialization.AspNet")]
+[assembly: AssemblyDescription("JavaScriptSerializer support for NodaMoney structures.")]
+[assembly: NeutralResourcesLanguage("en")]
+[assembly: CLSCompliant(true)]
+#if !PORTABLE40
 [assembly: ComVisible(false)]
+#endif
+[assembly: InternalsVisibleTo("NodaMoney.Serialization.AspNet.Tests")]
+[assembly: Guid("59f9848f-964a-49a6-8a9c-55b737aa5869")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6bbd36b9-d035-4a5d-8770-cc7e30b636a6")]
+// Use this SolutionInfo.cs file to store information that is the same in all AssemblyInfo.cs files. Drag this file using ALT to
+// your project to create a link to this file.
+[assembly: AssemblyProduct("NodaMoney")]
+[assembly: AssemblyCompany("DynamicHands B.V.")]
+[assembly: AssemblyCopyright("Copyright 2014-2016")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")] // neutral
+
+//// Please don't change the default version!. The version will be overwritten by the buildserver,
+//// using GitVersion (https://github.com/ParticularLabs/GitVersion).
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: AssemblyInformationalVersion("0.0.0.0")]
+
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else
+[assembly: AssemblyConfiguration("Release")]
+#endif

@@ -18,6 +18,7 @@ Properties {
 	$NugetFeed = "https://staging.nuget.org" #/packages?replace=true"
 	
 	$RootDir = Resolve-Path ..
+	$SrcDir = "$RootDir\src"
 	$ArtifactsDir = "$RootDir\artifacts"
 	$ToolsDir = "$RootDir\tools"	
 	$NugetExe = Join-Path $ToolsDir -ChildPath "\NuGet*\nuget.exe"
@@ -68,20 +69,20 @@ Task RestoreNugetPackages {
 
 Task Compile -depends RestoreNugetPackages, CalculateVersion {
 	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
-	$assemblyInfo = "$RootDir\src\GlobalAssemblyInfo.cs"
+	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse
 	
 	"Set version to calculated version"
-	applyVersioning $assemblyInfo $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
+	foreach ($file in $assemblyInfoFiles) {
+		applyVersioning $file.FullName $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
+	}
 	
 	"Compile solution"
-	#exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
-	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.5" /maxcpucount /verbosity:minimal /nologo $logger }
-	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.0" /p:OutputPath="$ArtifactsDir\x\v40\" /maxcpucount /verbosity:minimal /nologo $logger }
-	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.5" /p:OutputPath="$ArtifactsDir\x\v45\" /maxcpucount /verbosity:minimal /nologo $logger }
-	exec { msbuild "$RootDir\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /p:OutputPath="$ArtifactsDir\x\v46\" /maxcpucount /verbosity:minimal /nologo $logger }
-	
+	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
+
 	"`nReset version to zero again (to prevent git checkin)"
-	applyVersioning $assemblyInfo "0.0.0.0" "0.0.0.0" "0.0.0.0"
+	foreach ($file in $assemblyInfoFiles) {
+		applyVersioning $file.FullName "0.0.0.0" "0.0.0.0" "0.0.0.0"
+	}
 }
 
 Task Test -depends Compile {
@@ -108,6 +109,14 @@ Task Test -depends Compile {
 	}
 }
 
+Task TestNew {
+	$projectsToPackage = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+	
+	foreach ($proj in $projectsToPackage) {
+		exec { & dotnet test --no-build --configuration Release --output $ArtifactsDir $proj.FullName }
+	}
+}
+
 Task PushCoverage `
 	-requiredVariable CoverallsToken `
 	-precondition { return $env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null } `
@@ -124,13 +133,26 @@ Task PushCoverage `
 	}
 }
 
-Task Package {	
-	$projectsToPackage = Get-ChildItem -File -Path $RootDir -Filter *.nuspec -Recurse | ForEach-Object { $_.FullName -replace "nuspec", "csproj" }
+Task Package {
+	$projectsToPackage = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
 	
 	foreach ($proj in $projectsToPackage) {
-		exec { & $NugetExe pack $proj -OutputDirectory $ArtifactsDir }
+		$json = Get-Content -Raw -Path $proj.FullName | ConvertFrom-Json
+		#$json.version = $script:InformationalVersion
+		#$json | ConvertTo-Json  | Set-Content $proj.FullName
+
+		#$jsonpath = $scriptDir + "\project.json"
+		#$json = Get-Content -Raw -Path $jsonpath | ConvertFrom-Json
+		#$versionString = $json.version
+		#$patchInt = [convert]::ToInt32($versionString.Split(".")[2], 10)
+		#[int]$incPatch = $patchInt + 1
+		#$patchUpdate = $versionString.Split(".")[0] + "." + $versionString.Split(".")[1] + "." + ($incPatch -as [string])
+		#$json.version = $patchUpdate
+		#$json | ConvertTo-Json -depth 999 | Out-File $jsonpath
+
+		exec { & dotnet pack --no-build --configuration Release --output $ArtifactsDir $proj.FullName }
 	}
-	
+
 	#if(isAppVeyor) {
 	#	Get-ChildItem $ArtifactsDir *.nupkg | ForEach-Object { Push-AppveyorArtifact ($_ | Resolve-Path).Path }
 	#}
