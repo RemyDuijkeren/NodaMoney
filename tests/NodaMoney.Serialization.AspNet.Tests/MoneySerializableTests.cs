@@ -24,7 +24,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
                 jsSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
 
                 var json = jsSerializer.Serialize(money);
-                Console.WriteLine(json);
+                // Console.WriteLine(json);
                 var clone = jsSerializer.Deserialize<Money>(json);
 
                 clone.Should().Be(money);

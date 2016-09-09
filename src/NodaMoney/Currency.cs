@@ -6,7 +6,9 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
+#if !PORTABLE
 using System.Xml.Serialization;
+#endif
 
 namespace NodaMoney
 {
@@ -14,7 +16,11 @@ namespace NodaMoney
     /// <remarks>See http://en.wikipedia.org/wiki/Currency .</remarks>
     [DataContract]
     [DebuggerDisplay("{Code}")]
-    public struct Currency : IEquatable<Currency>, IXmlSerializable
+
+    public struct Currency : IEquatable<Currency>
+#if !PORTABLE
+        , IXmlSerializable
+#endif
     {
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 

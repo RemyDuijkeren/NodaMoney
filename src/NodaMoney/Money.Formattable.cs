@@ -58,7 +58,10 @@ namespace NodaMoney
 
         private static NumberFormatInfo GetNumberFormatInfo(Currency currency, IFormatProvider formatProvider)
         {
-            var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+            var cc = CultureInfo.CurrentCulture;
+
+            var numberFormatInfo = (NumberFormatInfo)cc.NumberFormat.Clone();
+            //var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
             if (formatProvider != null)
             {
@@ -83,9 +86,8 @@ namespace NodaMoney
             // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
             // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
             // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
-            NumberFormatInfo numberFormatInfo = GetNumberFormatInfo(Currency, formatProvider);
 
-            return Amount.ToString(format ?? "C", numberFormatInfo);
+            return Amount.ToString(format ?? "C", GetNumberFormatInfo(Currency, formatProvider));
         }
     }
 }

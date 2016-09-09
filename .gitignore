@@ -7,6 +7,9 @@
 *.sln.docstates
 .vs
 
+#DOTNET Core
+project.lock.json
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

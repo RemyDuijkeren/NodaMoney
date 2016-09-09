@@ -1,0 +1,36 @@
+{
+  "version": "0.6.1-dotnet0001",
+  "title": "NodaMoney.Serialization.AspNet",
+  "description": "JavaScriptSerializer support for NodaMoney structures.",
+  "language": "en-US",
+  "authors": [ "Rémy van Duijkeren" ],
+  "copyright": "Copyright 2014-2016",
+  "packOptions": {
+    "projectUrl": "http://www.nodamoney.org/",
+    "tags": [ "Noda", "Money", "Currency", "ExchangeRate", "Serialization" ],
+    "licenseUrl": "https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt",
+    "iconUrl": "https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png",
+    "releaseNotes": "See https://github.com/remyvd/NodaMoney/releases/",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/remyvd/NodaMoney"
+    }
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "NodaMoney": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "net40": {
+      "frameworkAssemblies": {
+        "System.Web.Extensions": ""
+      }
+    },
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Web.Extensions": ""
+      }
+    }
+  }
+}

@@ -30,7 +30,7 @@ namespace NodaMoney
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
-            Value = Math.Round(rate, 4); // value is a ratio
+            Value = Math.Round(rate, 6); // value is a ratio
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
