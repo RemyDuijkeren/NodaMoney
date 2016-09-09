@@ -27,8 +27,8 @@ Properties {
 	$global:config = "debug"
 }
 
-Task default -depends Local
-Task local -depends init, build, pack, test, zip
+Task default -depends local
+Task local -depends init, build, test, zip
 Task ci -depends release, local, pushcoverage
 Task deploy -depends ci, pushpackage
 
@@ -91,20 +91,12 @@ Task version {
 	}
 }
 
-Task build -depends version {
-	"Restore packages for solution"
-	exec { & $NugetExe restore "$RootDir\NodaMoney.sln" }
-	
-	"Build solution"
-	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
-	exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /t:Build /p:Configuration=$config /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
-}
-
-Task pack {
-	$projectsToPackage = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
-
-	foreach ($proj in $projectsToPackage) {
-		exec { & dotnet pack --no-build --configuration $config --output $ArtifactsDir $proj.FullName }
+Task build -depends version { 
+  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+	foreach ($proj in $projectsToBuild) {
+		exec { & dotnet restore $proj.FullName }
+		exec { & dotnet build $proj.FullName --configuration $config }
+		exec { & dotnet pack $proj.FullName --no-build --configuration $config --output $ArtifactsDir }
 	}
 
 	# if(isAppVeyor) {
@@ -119,6 +111,7 @@ Task test {
 	
 	foreach ($proj in $projectsToTest) {
 		Write-Host $proj.FullName
+		exec { & dotnet restore $proj.FullName }
 
 		# Run OpenCover, which in turns will run dotnet test
 		$targetArgs = "test --configuration $config " + $proj.FullName

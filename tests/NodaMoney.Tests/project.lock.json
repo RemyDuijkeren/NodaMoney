@@ -753,6 +753,10 @@
           "NETStandard.Library": "1.6.0",
           "Newtonsoft.Json": "9.0.1"
         },
+        "frameworkAssemblies": [
+          "System.Runtime.Serialization",
+          "System.Xml"
+        ],
         "compile": {
           "net45/NodaMoney.dll": {}
         },
@@ -3390,5 +3394,7 @@
       "System.Xml",
       "System.Xml.XmlSerializer"
     ]
-  }
+  },
+  "tools": {},
+  "projectFileToolGroups": {}
 }
