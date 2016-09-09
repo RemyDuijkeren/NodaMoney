@@ -746,7 +746,7 @@
           "lib/net35/xunit.runner.utility.desktop.dll": {}
         }
       },
-      "NodaMoney/1.0.0": {
+      "NodaMoney/0.6.1-dotnet0001": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -760,7 +760,7 @@
           "net45/NodaMoney.dll": {}
         }
       },
-      "NodaMoney.Serialization.AspNet/1.0.0": {
+      "NodaMoney.Serialization.AspNet/0.6.1-dotnet0001": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -3385,12 +3385,12 @@
         "xunit.runner.utility.nuspec"
       ]
     },
-    "NodaMoney/1.0.0": {
+    "NodaMoney/0.6.1-dotnet0001": {
       "type": "project",
       "path": "../../src/NodaMoney/project.json",
       "msbuildProject": "../../src/NodaMoney/NodaMoney.xproj"
     },
-    "NodaMoney.Serialization.AspNet/1.0.0": {
+    "NodaMoney.Serialization.AspNet/0.6.1-dotnet0001": {
       "type": "project",
       "path": "../../src/NodaMoney.Serialization.AspNet/project.json",
       "msbuildProject": "../../src/NodaMoney.Serialization.AspNet/NodaMoney.Serialization.AspNet.xproj"
@@ -3399,7 +3399,7 @@
   "projectFileDependencyGroups": {
     "": [
       "FluentAssertions >= 4.12.0",
-      "NodaMoney.Serialization.AspNet >= 1.0.0-*",
+      "NodaMoney.Serialization.AspNet >= 0.7.0-*",
       "System.Runtime.Serialization.Primitives >= 4.0.0",
       "dotnet-test-xunit >= 1.0.0-*",
       "xunit >= 2.1.0"

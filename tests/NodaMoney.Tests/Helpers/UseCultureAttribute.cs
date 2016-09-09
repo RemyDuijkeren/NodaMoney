@@ -13,10 +13,8 @@ namespace NodaMoney.Tests.Helpers
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class UseCultureAttribute : BeforeAfterTestAttribute
     {
-        readonly Lazy<CultureInfo> culture;
-        readonly Lazy<CultureInfo> uiCulture;
-        CultureInfo originalCulture;
-        CultureInfo originalUICulture;
+        private CultureInfo _originalCulture;
+        private CultureInfo _originalUiCulture;
 
         /// <summary>Replaces the culture and UI culture of the current thread with <paramref name="culture" /></summary>
         /// <param name="culture">The name of the culture.</param>
@@ -33,21 +31,15 @@ namespace NodaMoney.Tests.Helpers
         /// <param name="uiCulture">The name of the UI culture.</param>
         public UseCultureAttribute(string culture, string uiCulture)
         {
-            this.culture = new Lazy<CultureInfo>(() => new CultureInfo(culture));
-            this.uiCulture = new Lazy<CultureInfo>(() => new CultureInfo(uiCulture));
+            this.Culture = new CultureInfo(culture);
+            this.UICulture = new CultureInfo(uiCulture);
         }
 
         /// <summary>Gets the culture.</summary>
-        public CultureInfo Culture
-        {
-            get { return culture.Value; }
-        }
+        public CultureInfo Culture { get; }
 
         /// <summary>Gets the UI culture.</summary>
-        public CultureInfo UICulture
-        {
-            get { return uiCulture.Value; }
-        }
+        public CultureInfo UICulture { get; }
 
         /// <summary>Stores the current <see cref="Thread.CurrentPrincipal" />
         /// <see cref="CultureInfo.CurrentCulture" /> and <see cref="CultureInfo.CurrentUICulture" />
@@ -56,8 +48,8 @@ namespace NodaMoney.Tests.Helpers
         /// <param name="methodUnderTest">The method under test</param>
         public override void Before(MethodInfo methodUnderTest)
         {
-            originalCulture = Thread.CurrentThread.CurrentCulture;
-            originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            _originalCulture = Thread.CurrentThread.CurrentCulture;
+            _originalUiCulture = Thread.CurrentThread.CurrentUICulture;
 
             Thread.CurrentThread.CurrentCulture = Culture;
             Thread.CurrentThread.CurrentUICulture = UICulture;
@@ -67,8 +59,8 @@ namespace NodaMoney.Tests.Helpers
 
             // Change the default culture of any new threads created by the application domain.
             // These properties are only available as of .NET 4.5.
-            // CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            // CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            // CultureInfo.DefaultThreadCurrentCulture = Culture;
+            // CultureInfo.DefaultThreadCurrentUICulture = UICulture;
         }
 
         /// <summary>Restores the original <see cref="CultureInfo.CurrentCulture" /> and
@@ -77,8 +69,8 @@ namespace NodaMoney.Tests.Helpers
         /// <param name="methodUnderTest">The method under test</param>
         public override void After(MethodInfo methodUnderTest)
         {
-            Thread.CurrentThread.CurrentCulture = originalCulture;
-            Thread.CurrentThread.CurrentUICulture = originalUICulture;
+            Thread.CurrentThread.CurrentCulture = _originalCulture;
+            Thread.CurrentThread.CurrentUICulture = _originalUiCulture;
 
             CultureInfo.CurrentCulture.ClearCachedData();
             CultureInfo.CurrentUICulture.ClearCachedData();

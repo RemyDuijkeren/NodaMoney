@@ -2,13 +2,13 @@
   "version": "1.0.0-*",
   "testRunner": "xunit",
   "buildOptions": {
-    "debugType": "portable"
+    //"debugType": "portable"
   },
   "dependencies": {
     "System.Runtime.Serialization.Primitives": "4.0.0.0", //"4.1.1\",",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-*",
-    "NodaMoney": "1.0.0-*",
+    "NodaMoney": "0.7.0-*",
     "FluentAssertions": "4.12.0"
   },
   "frameworks": {

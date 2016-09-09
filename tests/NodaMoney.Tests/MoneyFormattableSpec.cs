@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.Threading;
+
 using FluentAssertions;
 using Xunit;
 using NodaMoney.Tests.Helpers;
@@ -117,9 +119,10 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
 
         [Fact]
-        [UseCulture("nl-BE")]
-        public void WhenShowingMoneyInBelgiumDutchSpeaking_ThenThisShouldSucceed()
+        [UseCulture("nl-NL")]
+        public void WhenShowingMoneyInDutch_ThenThisShouldSucceed()
         {
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
             _yen.ToString().Should().Be("¥ 765");
             _euro.ToString().Should().Be("€ 765,43");
             _dollar.ToString().Should().Be("$ 765,43");
@@ -127,9 +130,10 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
 
         [Fact]
-        [UseCulture("fr-BE")]
-        public void WhenShowingMoneyInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
+        [UseCulture("fr-FR")]
+        public void WhenShowingMoneyInFrench_ThenThisShouldSucceed()
         {
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-FR");
             _yen.ToString().Should().Be("765 ¥");
             _euro.ToString().Should().Be("765,43 €");
             _dollar.ToString().Should().Be("765,43 $");

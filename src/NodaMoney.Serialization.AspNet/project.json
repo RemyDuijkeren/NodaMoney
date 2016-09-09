@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0-*",
+  "version": "0.6.1-dotnet0001",
   "title": "NodaMoney.Serialization.AspNet",
   "description": "JavaScriptSerializer support for NodaMoney structures.",
   "language": "en-US",

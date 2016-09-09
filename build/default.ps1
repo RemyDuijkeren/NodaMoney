@@ -19,25 +19,37 @@ Properties {
 	
 	$RootDir = Resolve-Path ..
 	$SrcDir = "$RootDir\src"
+	$TestsDir = "$RootDir\tests"
 	$ArtifactsDir = "$RootDir\artifacts"
 	$ToolsDir = "$RootDir\tools"	
 	$NugetExe = Join-Path $ToolsDir -ChildPath "\NuGet*\nuget.exe"
+
+	$global:config = "debug"
 }
 
-Task Default -depends Init, Compile, Test, Package, Zip
-Task DefaultAndCoveralls -depends Default, PushCoverage
-Task Deploy -depends Default, PushCoverage, PushPackage
+Task default -depends Local
+Task local -depends init, build, pack, test, zip
+Task ci -depends release, local, pushcoverage
+Task deploy -depends ci, pushpackage
 
-Task Init {
-    "(Re)create Artifacts directory"	
+Task release {
+    $global:config = "release"
+}
+
+Task init {
+	"Install dotnet, if not available"
+	Install-Dotnet
+
+	"Restore packages for build"
+	exec { & $NugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
+
+    "(Re)create Artifacts directory"
 	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue
 	New-Item $ArtifactsDir -ItemType directory | out-null
-    
-	"Clean solution"
-    exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo }
 }
 
-Task CalculateVersion {
+Task version {
+	"Calculate version"
 	$gitVersionExe = Join-Path $ToolsDir -ChildPath "\GitVersion*\GitVersion.exe"
 	   	
 	if(isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
@@ -51,73 +63,78 @@ Task CalculateVersion {
 		$script:AssemblyVersion = $versionInfo.MajorMinorPatch + ".0"
 	}
 	$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData
-	$script:InformationalVersion = $versionInfo.NuGetVersion	
+	$script:InformationalVersion = $versionInfo.InformationalVersion
+	$script:NuGetVersion = $versionInfo.NuGetVersion	
 	
 	"AssemblyVersion      = '$script:AssemblyVersion'"
 	"AssemblyFileVersion  = '$script:AssemblyFileVersion'" 
 	"InformationalVersion = '$script:InformationalVersion'"	
-	"NuGetVersion         = '$script:InformationalVersion'"	
-}
+	"NuGetVersion         = '$script:NuGetVersion'"
 
-Task RestoreNugetPackages {	
-	"Restore build packages"
-	exec { & $NugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
-	
-	"`nRestore solution packages"
-	exec { & $NugetExe restore "$RootDir\NodaMoney.sln" }
-}
+	#$version = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
+	#$version = "{0:D5}" -f [convert]::ToInt32($version, 10)
 
-Task Compile -depends RestoreNugetPackages, CalculateVersion {
-	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
+	"Set assemblyInfo files to calculated version"
 	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse
-	
-	"Set version to calculated version"
 	foreach ($file in $assemblyInfoFiles) {
 		applyVersioning $file.FullName $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
 	}
-	
-	"Compile solution"
-	exec { msbuild "$RootDir\NodaMoney.sln" /t:Build /p:Configuration="Release" /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 
-	"`nReset version to zero again (to prevent git checkin)"
-	foreach ($file in $assemblyInfoFiles) {
-		applyVersioning $file.FullName "0.0.0.0" "0.0.0.0" "0.0.0.0"
+	"Set project.json files to calculated version"
+	$projectJsonFiles = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+	foreach ($file in $projectJsonFiles) {
+		Write-Output "Apply version $NuGetVersion to $file"
+
+		(Get-Content $file.FullName ) | ForEach-Object {
+        	Foreach-Object { $_ -replace '"version": .+$', "`"version`": `"$NuGetVersion`"," }
+    	} | Set-Content $file.FullName
 	}
 }
 
-Task Test -depends Compile {
-	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
-	$xunitConsoleExe = Resolve-Path "$rootDir\packages\xunit.runner.console.*\tools\xunit.console.exe"
+Task build -depends version {
+	"Restore packages for solution"
+	exec { & $NugetExe restore "$RootDir\NodaMoney.sln" }
 	
-	# Get test assemblies
-	$testAssembliesFiles = Get-ChildItem -Recurse $RootDir\tests\*\bin\Release\*Tests*.dll
-	if ($testAssembliesFiles.Count -eq 0) {
-		Throw "No test assemblies found!"
-	} else {
-		"Found test assemblies:"
-		$testAssembliesFiles | ForEach-Object { Write-Output $_.Name }
-		""
-	}
-	
-	# join files paths into to one string
-	$testAssembliesPaths = $testAssembliesFiles | ForEach-Object { "`"`"" + $_.FullName + "`"`"" } 
-	$testAssemblies = [string]::Join(" ", $testAssembliesPaths)
-	
-	# Run OpenCover, which in turn will run Xunit
-	exec {
-		& $openCoverExe -register:user -target:$xunitConsoleExe "-targetargs:$testAssemblies -nologo -noappdomain -xml $ArtifactsDir\xunit.xml" "-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" -output:"$ArtifactsDir\coverage.xml" -returntargetcode
-	}
+	"Build solution"
+	$logger = if(isAppVeyor) { "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" }
+	exec { msbuild "$RootDir\NodaMoney.sln" /t:Clean /t:Build /p:Configuration=$config /p:Platform="Any CPU" /maxcpucount /verbosity:minimal /nologo $logger }
 }
 
-Task TestNew {
+Task pack {
 	$projectsToPackage = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
-	
+
 	foreach ($proj in $projectsToPackage) {
-		exec { & dotnet test --no-build --configuration Release --output $ArtifactsDir $proj.FullName }
+		exec { & dotnet pack --no-build --configuration $config --output $ArtifactsDir $proj.FullName }
+	}
+
+	# if(isAppVeyor) {
+	# 	Get-ChildItem $ArtifactsDir *.nupkg | ForEach-Object { Push-AppveyorArtifact ($_ | Resolve-Path).Path }
+	# }
+}
+
+Task test {
+	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
+	$dotnetExe = Resolve-Path "C:\Program Files\dotnet\dotnet.exe"
+	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter project.json -Recurse
+	
+	foreach ($proj in $projectsToTest) {
+		Write-Host $proj.FullName
+
+		# Run OpenCover, which in turns will run dotnet test
+		$targetArgs = "test --configuration $config " + $proj.FullName
+		exec {
+			& $openCoverExe -register:user `
+							-target:$dotnetExe `
+							-targetargs:$targetArgs `
+							"-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" `
+							-output:"$ArtifactsDir\coverage.xml" `
+							-returntargetcode `
+							-oldStyle
+		}
 	}
 }
 
-Task PushCoverage `
+Task pushcoverage `
 	-requiredVariable CoverallsToken `
 	-precondition { return $env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null } `
 {
@@ -133,45 +150,16 @@ Task PushCoverage `
 	}
 }
 
-Task Package {
-	$projectsToPackage = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
-	
-	foreach ($proj in $projectsToPackage) {
-		$json = Get-Content -Raw -Path $proj.FullName | ConvertFrom-Json
-		#$json.version = $script:InformationalVersion
-		#$json | ConvertTo-Json  | Set-Content $proj.FullName
-
-		#$jsonpath = $scriptDir + "\project.json"
-		#$json = Get-Content -Raw -Path $jsonpath | ConvertFrom-Json
-		#$versionString = $json.version
-		#$patchInt = [convert]::ToInt32($versionString.Split(".")[2], 10)
-		#[int]$incPatch = $patchInt + 1
-		#$patchUpdate = $versionString.Split(".")[0] + "." + $versionString.Split(".")[1] + "." + ($incPatch -as [string])
-		#$json.version = $patchUpdate
-		#$json | ConvertTo-Json -depth 999 | Out-File $jsonpath
-
-		exec { & dotnet pack --no-build --configuration Release --output $ArtifactsDir $proj.FullName }
-	}
-
-	#if(isAppVeyor) {
-	#	Get-ChildItem $ArtifactsDir *.nupkg | ForEach-Object { Push-AppveyorArtifact ($_ | Resolve-Path).Path }
-	#}
-}
-
-Task PushPackage -requiredVariable NugetApiKey {
+Task pushpackage -requiredVariable NugetApiKey {
 	exec { & $NugetExe push "$ArtifactsDir\*.nupkg" $NugetApiKey -source $NugetFeed }
 }
 
-Task Zip -depends Compile {
+Task zip -depends build {
 	$7zExe = Join-Path $ToolsDir -ChildPath "\7-Zip*\7z.exe"
 	
 	exec {
-		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.$script:InformationalVersion.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\Release\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
+		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.$NugetVersion.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\$config\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
 	}	
-}
-
-Task Clean {
-	Get-ChildItem $RootDir -Recurse -Include 'bin','obj','packages','artifacts' | ForEach-Object { Remove-Item $_ -Recurse -Force;  Write-Host Deleted $_ }
 }
 
 function isAppVeyor() {
@@ -179,9 +167,7 @@ function isAppVeyor() {
 }
 
 function applyVersioning($assemblyInfoFile, $assemblyVersion, $assemblyFileVersion, $informationalVersion) {
-	Write-Output "Apply versioning to $assemblyInfoFile"
-	Write-Output "AssemblyVersion: $assemblyVersion"
-	Write-Output "AssemblyFileVersion: $assemblyFileVersion"
+	Write-Output "Apply to $assemblyInfoFile AssemblyVersion $assemblyVersion, AssemblyFileVersion: $assemblyFileVersion and "
 	Write-Output "InformationalVersion: $informationalVersion"
 	
 	(Get-Content $assemblyInfoFile ) | ForEach-Object {
@@ -189,23 +175,39 @@ function applyVersioning($assemblyInfoFile, $assemblyVersion, $assemblyFileVersi
         Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$assemblyFileVersion`")]" } |
         Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$informationalVersion`")]" }
     } | Set-Content $assemblyInfoFile
-	
-	Write-Output "Versioning applied.`n"
 }
 
-function applyXslTransform($xmlFile, $xslFile, $outputFile) {
-	Write-Output "XML File: $xmlFile"
-	Write-Output "XSL File: $xslFile"
-	Write-Output "Output File: $outputFile"
+function Install-Dotnet {
+    $dotnetcli = Where-Is('dotnet')
 	
-	$xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
-	$s = New-Object System.Xml.Xsl.XsltSettings $true, $true;
-	$xslt.Load($xslFile, $s, $null);
-	$xslt.Transform($xmlFile, $outputFile);
+    if($dotnetcli -eq $null)
+    {
+		$dotnetPath = "$pwd\.dotnet"
+		$dotnetCliVersion = if ($env:DOTNET_CLI_VERSION -eq $null) { 'Latest' } else { $env:DOTNET_CLI_VERSION }
+		$dotnetInstallScriptUrl = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1'
+		$dotnetInstallScriptPath = '.\scripts\obtain\install.ps1'
 
-	Write-Output "XSL Transform completed."
-
-	if(isAppVeyor) {
-			Push-AppveyorArtifact $outputFile;
+		md -Force ".\scripts\obtain\" | Out-Null
+		curl $dotnetInstallScriptUrl -OutFile $dotnetInstallScriptPath
+		& .\scripts\obtain\install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
+		$env:Path = "$dotnetPath;$env:Path"
 	}
+}
+
+function Where-Is($command) {
+    (ls env:\path).Value.split(';') | `
+        where { $_ } | `
+        %{ [System.Environment]::ExpandEnvironmentVariables($_) } | `
+        where { test-path $_ } |`
+        %{ ls "$_\*" -include *.bat,*.exe,*cmd } | `
+        %{  $file = $_.Name; `
+            if($file -and ($file -eq $command -or `
+			   $file -eq ($command + '.exe') -or  `
+			   $file -eq ($command + '.bat') -or  `
+			   $file -eq ($command + '.cmd'))) `
+            { `
+                $_.FullName `
+            } `
+        } | `
+        select -unique
 }
