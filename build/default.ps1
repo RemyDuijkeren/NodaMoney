@@ -76,12 +76,14 @@ Task version {
 
 	"Set assemblyInfo files to calculated version"
 	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse
+	
 	foreach ($file in $assemblyInfoFiles) {
 		applyVersioning $file.FullName $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
 	}
 
 	"Set project.json files to calculated version"
 	$projectJsonFiles = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+
 	foreach ($file in $projectJsonFiles) {
 		Write-Output "Apply version $NuGetVersion to $file"
 
@@ -93,6 +95,7 @@ Task version {
 
 Task build -depends version { 
   	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+		
 	foreach ($proj in $projectsToBuild) {
 		exec { & dotnet restore $proj.FullName }
 		exec { & dotnet build $proj.FullName --configuration $config }
@@ -127,6 +130,13 @@ Task test {
 	}
 }
 
+Task zip {
+	$7zExe = Join-Path $ToolsDir -ChildPath "\7-Zip*\7z.exe"
+
+	exec { & $7zExe u -tzip "$ArtifactsDir\NodaMoney.$NugetVersion.zip" "$RootDir\src\NodaMoney\bin\$config\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded" }
+	exec { & $7zExe u -tzip "$ArtifactsDir\NodaMoney.$NugetVersion.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\$config\*" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"	}	
+}
+
 Task pushcoverage `
 	-requiredVariable CoverallsToken `
 	-precondition { return $env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null } `
@@ -145,14 +155,6 @@ Task pushcoverage `
 
 Task pushpackage -requiredVariable NugetApiKey {
 	exec { & $NugetExe push "$ArtifactsDir\*.nupkg" $NugetApiKey -source $NugetFeed }
-}
-
-Task zip -depends build {
-	$7zExe = Join-Path $ToolsDir -ChildPath "\7-Zip*\7z.exe"
-	
-	exec {
-		& $7zExe a -tzip "$ArtifactsDir\NodaMoney.$NugetVersion.zip" "$RootDir\src\NodaMoney.Serialization.AspNet\bin\$config\*" "$RootDir\README.md" "$RootDir\LICENSE.txt" -x!"*.CodeAnalysisLog.xml" -x!"*.lastcodeanalysissucceeded"
-	}	
 }
 
 function isAppVeyor() {
