@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+#if !PORTABLE
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace NodaMoney
 {
@@ -288,11 +290,10 @@ namespace NodaMoney
             }
         }
 
-        [SuppressMessage(
-            "Microsoft.Globalization",
-            "CA1305:SpecifyIFormatProvider",
-            MessageId = "System.String.Format(System.String,System.Object[])",
-            Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
+#if !PORTABLE
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])",
+        Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
+#endif
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)

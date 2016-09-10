@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 #if !PORTABLE
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 #endif
 
@@ -16,7 +16,6 @@ namespace NodaMoney
     /// <remarks>See http://en.wikipedia.org/wiki/Currency .</remarks>
     [DataContract]
     [DebuggerDisplay("{Code}")]
-
     public struct Currency : IEquatable<Currency>
 #if !PORTABLE
         , IXmlSerializable
@@ -108,7 +107,9 @@ namespace NodaMoney
         public DateTime? ValidTo { get; internal set; }
 
         /// <summary>Gets the major currency unit.</summary>
+#if !PORTABLE
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type!")]
+#endif
         public decimal MajorUnit => 1;
 
         /// <summary>Gets the minor currency unit.</summary>
@@ -236,7 +237,9 @@ namespace NodaMoney
         /// <param name="left">The first <see cref="Currency"/> object.</param>
         /// <param name="right">The second <see cref="Currency"/> object.</param>
         /// <returns>true if left and right are equal to this instance; otherwise, false.</returns>
+#if !PORTABLE
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
+#endif
         public static bool Equals(Currency left, Currency right)
         {
             return left.Equals(right);
@@ -253,7 +256,9 @@ namespace NodaMoney
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Currency"/> object represent the same value.</summary>
         /// <param name="other">A <see cref="Currency"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
+#if !PORTABLE
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
+#endif
         public bool Equals(Currency other)
         {
             return Equals(this.Code, other.Code);

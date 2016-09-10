@@ -1,18 +1,19 @@
 ﻿NodaMoney
 =========
 <img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
-You can get the latest stable release from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
+You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
 If you'd like to work with the bleeding edge, you can use our [custom Nuget feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
-Packages on this feed are pre-release and, while they've passed all our tests, are not yet ready for production.
+Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
 
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=develop)](https://coveralls.io/r/remyvd/NodaMoney)
+[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/r/remyvd/NodaMoney)
 
+See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
 About
 ----
@@ -180,7 +181,7 @@ Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 **Adding custom currencies**
 
 ```C#
-// Create custom currency and register it (for the life-time of the app domain)
+// Build custom currency
 var builder = new CurrencyBuilder("BTC", "virtual")
 				{
 					EnglishName = "Bitcoin",
@@ -188,14 +189,16 @@ var builder = new CurrencyBuilder("BTC", "virtual")
 					DecimalDigits = 8
 				};
 
-var bitcoin = builder.Build(); // build BTC, but will not register it
-var bitcoin = builder.Register(); // build and register BTC in namespace 'virtual'
+// Build, but will not register it
+var bitcoin = builder.Build();
+Money bitcoins = new Money(1.2, bitcoin);
 
-// When the custom is registered, it can be called as any other currency
+// Build and register it for the life-time of the app domain in the namespace 'virtual'
+var bitcoin = builder.Register();
+Money bitcoins = new Money(1.2, "BTC"); // works if no overlap with other namespaces
 Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
-Money bitcoins = new Money(1.2. "BTC");
 
-// Replace ISO 4217 currency (for the life-time of the app domain)
+// Replace ISO 4217 currency for the life-time of the app domain
 Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
 
 var builder = new CurrencyBuilder("EUR", "ISO-4217");
