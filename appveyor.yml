@@ -60,7 +60,6 @@ deploy:
   skip_symbols: true
   on:
     branch: master
-    appveyor_repo_tag: true
 
 #---------------------------------#
 #         notifications           #

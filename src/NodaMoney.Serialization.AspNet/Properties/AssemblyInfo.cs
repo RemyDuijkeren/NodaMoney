@@ -24,9 +24,9 @@ using System.Runtime.InteropServices;
 
 //// Please don't change the default version!. The version will be overwritten by the buildserver,
 //// using GitVersion (https://github.com/ParticularLabs/GitVersion).
-[assembly: AssemblyVersion("0.6.1.0")]
-[assembly: AssemblyFileVersion("0.6.1.11")]
-[assembly: AssemblyInformationalVersion("0.6.1-dotnet.1+11.Branch.dotnet.Sha.5e1d4e1adae563578333a2fecca7e9d249b26c45")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0-rc.5")]
 
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]

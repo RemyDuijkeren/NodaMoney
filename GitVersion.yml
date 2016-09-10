@@ -1,0 +1,6 @@
+mode: ContinuousDeployment
+continuous-delivery-fallback-tag: rc
+next-version: 1.0.0
+branches: {}
+ignore:
+  sha: []

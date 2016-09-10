@@ -49,44 +49,38 @@ Task init {
 }
 
 Task version {
-	"Calculate version"
-	$gitVersionExe = Join-Path $ToolsDir -ChildPath "\GitVersion*\GitVersion.exe"
-	   	
-	if(isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
+	$gitVersionExe = Resolve-Path "$rootDir\packages\GitVersion.*\tools\GitVersion.exe"	
 
+	"Send updated version to AppVeyor"
+	if (isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
+	
+	"Calculate version"
 	$json = exec { & $gitVersionExe }		
 	$versionInfo = $json -join "`n" | ConvertFrom-Json
-		
-	if ($versionInfo.Major -ne 0) {
-		$script:AssemblyVersion =  $versionInfo.Major + ".0.0.0"
-	} else {
-		$script:AssemblyVersion = $versionInfo.MajorMinorPatch + ".0"
-	}
-	$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $versionInfo.BuildMetaData
-	$script:InformationalVersion = $versionInfo.InformationalVersion
-	$script:NuGetVersion = $versionInfo.NuGetVersion	
 	
-	"AssemblyVersion      = '$script:AssemblyVersion'"
-	"AssemblyFileVersion  = '$script:AssemblyFileVersion'" 
-	"InformationalVersion = '$script:InformationalVersion'"	
-	"NuGetVersion         = '$script:NuGetVersion'"
+	$script:BuildVersion = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
+	$script:AssemblyVersion =  [string]$versionInfo.Major + ".0.0.0" # Minor and Patch versions should work with base Major version
+	$script:AssemblyFileVersion = $versionInfo.MajorMinorPatch + "." + $BuildVersion
+	$script:InformationalVersion = $versionInfo.FullSemVer
+	$script:NuGetVersion = $versionInfo.NuGetVersion
 
-	#$version = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
-	#$version = "{0:D5}" -f [convert]::ToInt32($version, 10)
-
-	"Set assemblyInfo files to calculated version"
-	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse
-	
+	"Update assemblyinfo.cs files in src"
+	Write-Output "Apply AssemblyVersion $assemblyVersion, AssemblyFileVersion $assemblyFileVersion and InformationalVersion $informationalVersion to"
+	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse	
 	foreach ($file in $assemblyInfoFiles) {
-		applyVersioning $file.FullName $script:AssemblyVersion $script:AssemblyFileVersion $script:InformationalVersion
+		Write-Output $file.FullName
+		(Get-Content $file.FullName ) | ForEach-Object {
+        	Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$AssemblyVersion`")]" } |
+        	Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$AssemblyFileVersion`")]" } |
+        	Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$InformationalVersion`")]" }
+    	} | Set-Content $file.FullName
 	}
 
-	"Set project.json files to calculated version"
+	"Update project.json files in src"
+	Write-Output "Apply NuGetVersion $NuGetVersion to"
 	$projectJsonFiles = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
-
 	foreach ($file in $projectJsonFiles) {
-		Write-Output "Apply version $NuGetVersion to $file"
-
+		Write-Output $file.FullName		
 		(Get-Content $file.FullName ) | ForEach-Object {
         	Foreach-Object { $_ -replace '"version": .+$', "`"version`": `"$NuGetVersion`"," }
     	} | Set-Content $file.FullName
@@ -101,15 +95,11 @@ Task build -depends version {
 		exec { & dotnet build $proj.FullName --configuration $config }
 		exec { & dotnet pack $proj.FullName --no-build --configuration $config --output $ArtifactsDir }
 	}
-
-	# if(isAppVeyor) {
-	# 	Get-ChildItem $ArtifactsDir *.nupkg | ForEach-Object { Push-AppveyorArtifact ($_ | Resolve-Path).Path }
-	# }
 }
 
 Task test {
-	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"	
-	$dotnetExe = Resolve-Path "C:\Program Files\dotnet\dotnet.exe"
+	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"
+	$dotnetExe = Where-Is('dotnet')
 	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter project.json -Recurse
 	
 	foreach ($proj in $projectsToTest) {
@@ -159,17 +149,6 @@ Task pushpackage -requiredVariable NugetApiKey {
 
 function isAppVeyor() {
 	Test-Path -Path env:\APPVEYOR
-}
-
-function applyVersioning($assemblyInfoFile, $assemblyVersion, $assemblyFileVersion, $informationalVersion) {
-	Write-Output "Apply to $assemblyInfoFile AssemblyVersion $assemblyVersion, AssemblyFileVersion: $assemblyFileVersion and "
-	Write-Output "InformationalVersion: $informationalVersion"
-	
-	(Get-Content $assemblyInfoFile ) | ForEach-Object {
-        Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$assemblyVersion`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$assemblyFileVersion`")]" } |
-        Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$informationalVersion`")]" }
-    } | Set-Content $assemblyInfoFile
 }
 
 function Install-Dotnet {
