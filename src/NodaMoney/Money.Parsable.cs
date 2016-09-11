@@ -22,7 +22,7 @@ namespace NodaMoney
 
             Currency currency = ExtractCurrencyFromString(value);
 
-            return Parse(value, NumberStyles.Currency, GetNumberFormatInfo(currency, null), currency);
+            return Parse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency);
         }
 
         /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
@@ -37,7 +37,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException(nameof(value));
 
-            return Parse(value, NumberStyles.Currency, GetNumberFormatInfo(currency, null), currency);
+            return Parse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency);
         }
 
         /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
@@ -54,7 +54,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException(nameof(value));
 
-            decimal amount = decimal.Parse(value, style, GetNumberFormatInfo(currency, provider));
+            decimal amount = decimal.Parse(value, style, GetFormatProvider(currency, provider));
             return new Money(amount, currency);
         }
 
@@ -86,7 +86,7 @@ namespace NodaMoney
                 return false;
             }
 
-            return TryParse(value, NumberStyles.Currency, GetNumberFormatInfo(currency, null), currency, out result);
+            return TryParse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency, out result);
         }
 
         /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
@@ -101,7 +101,7 @@ namespace NodaMoney
         /// <remarks>See <see cref="Decimal.TryParse(String, out Decimal)"/> for more info and remarks.</remarks>
         public static bool TryParse(string value, Currency currency, out Money result)
         {
-            return TryParse(value, NumberStyles.Currency, GetNumberFormatInfo(currency, null), currency, out result);
+            return TryParse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency, out result);
         }
 
         /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
@@ -119,7 +119,7 @@ namespace NodaMoney
         public static bool TryParse(string value, NumberStyles style, IFormatProvider provider, Currency currency, out Money result)
         {
             decimal amount;
-            bool isParsingSuccessful = decimal.TryParse(value, style, GetNumberFormatInfo(currency, provider), out amount);
+            bool isParsingSuccessful = decimal.TryParse(value, style, GetFormatProvider(currency, provider), out amount);
 
             if (isParsingSuccessful)
             {
