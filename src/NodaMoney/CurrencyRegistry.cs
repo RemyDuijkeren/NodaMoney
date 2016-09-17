@@ -312,17 +312,113 @@ namespace NodaMoney
                 { "ISO-4217::YER", new Currency("YER", "886", 2, "Yemeni rial", "﷼") }, // or ر.ي.‏‏ ?
                 { "ISO-4217::ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                 { "ISO-4217::ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
-                { "ISO-4217::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") }, //, "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2009, 02, 03)) }, // or Z$ A/10, no successor
+                { "ISO-4217::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") },
+                // Historic ISO-4217 currencies
+                { "ISO-4217-HISTORIC::ESA", new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "", "ISO-4217-HISTORIC") }, // replaced by ESP (EUR)
+                { "ISO-4217-HISTORIC::ESB", new Currency("ESB", "995", NotApplicable, "Spanish peseta (account B)", "", "ISO-4217-HISTORIC") }, // replaced by ESP (EUR)
                 { "ISO-4217-HISTORIC::LTL", new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", "ISO-4217-HISTORIC", new DateTime(2014, 12, 31), new DateTime(1993, 1, 1)) }, // replaced by EUR
-                { "ISO-4217-HISTORIC::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", "ISO-4217-HISTORIC", new DateTime(2014, 01, 05), new DateTime(1992, 1, 1)) }, // replaced by EUR
-                { "ISO-4217-HISTORIC::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", "ISO-4217-HISTORIC", new DateTime(2013, 01, 01)) }, // replaced by ZWM
-                { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar", "$", "ISO-4217-HISTORIC", new DateTime(2009, 02, 02), new DateTime(2008, 08, 01)) }, // or Z$ A/9, replaced by ZWL
-                { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 01, 01)) }, // replaced by EUR
-                { "ISO-4217-HISTORIC::SKK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 02, 08)) }, // replaced by EUR
-                { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1810, 01, 01)) }, // From 1810 to 1998-12-31
-                { "ISO-4217-HISTORIC::CSD", new Currency("CSD", "891", 2, "Serbian dinar", "РСД", "ISO-4217-HISTORIC", new DateTime(2006, 01, 01), new DateTime(2003, 07, 03)) }, // From 2003-07-03 to 2006, replace by RSD
-                { "ISO-4217-HISTORIC::XFU", new Currency("XFU", "Nil", NotApplicable, "UIC franc (special settlement currency)", "¤", "ISO-4217-HISTORIC", new DateTime(2013, 11, 7)) }, // replaced by euro
-                { "ISO-4217-HISTORIC::USS", new Currency("USS", "998", 2, "United States dollar (same day) (funds code)", "$", "ISO-4217-HISTORIC", new DateTime(2014, 3, 28)) } // 2014-03-28 no successor
+                { "ISO-4217-HISTORIC::USS", new Currency("USS", "998", 2, "United States dollar (same day) (funds code)", "$", "ISO-4217-HISTORIC", new DateTime(2014, 3, 28)) }, // replaced by (no successor)
+                { "ISO-4217-HISTORIC::LVL", new Currency("LVL", "428", 2, "Latvian lats", "Ls", "ISO-4217-HISTORIC", new DateTime(2013, 12, 31), new DateTime(1992, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::XFU", new Currency("XFU", "", NotApplicable, "UIC franc (special settlement currency) International Union of Railways", "", "ISO-4217-HISTORIC", new DateTime(2013, 11, 7)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ZMK", new Currency("ZMK", "894", 2, "Zambian kwacha", "ZK", "ISO-4217-HISTORIC", new DateTime(2013, 1, 1), new DateTime(1968, 1, 16)) }, // replaced by ZMW
+                { "ISO-4217-HISTORIC::EEK", new Currency("EEK", "233", 2, "Estonian kroon", "kr", "ISO-4217-HISTORIC", new DateTime(2010, 12, 31), new DateTime(1992, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ZWR", new Currency("ZWR", "935", 2, "Zimbabwean dollar A/09", "$", "ISO-4217-HISTORIC", new DateTime(2009, 2, 2), new DateTime(2008, 8, 1)) }, // replaced by ZWL
+                { "ISO-4217-HISTORIC::SKK", new Currency("SKK", "703", 2, "Slovak koruna", "Sk", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 2, 8)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::TMM", new Currency("TMM", "795", 0, "Turkmenistani manat", "T", "ISO-4217-HISTORIC", new DateTime(2008, 12, 31), new DateTime(1993, 11, 1)) }, // replaced by TMT
+                { "ISO-4217-HISTORIC::ZWN", new Currency("ZWN", "942", 2, "Zimbabwean dollar A/08", "$", "ISO-4217-HISTORIC", new DateTime(2008, 7, 31), new DateTime(2006, 8, 1)) }, // replaced by ZWR
+                { "ISO-4217-HISTORIC::VEB", new Currency("VEB", "862", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2008, 1, 1)) }, // replaced by VEF
+                { "ISO-4217-HISTORIC::CYP", new Currency("CYP", "196", 2, "Cypriot pound", "£", "ISO-4217-HISTORIC", new DateTime(2007, 12, 31), new DateTime(1879, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::MTL", new Currency("MTL", "470", 2, "Maltese lira", "₤", "ISO-4217-HISTORIC", new DateTime(2007, 12, 31), new DateTime(1972, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::GHC", new Currency("GHC", "288", 0, "Ghanaian cedi", "GH₵", "ISO-4217-HISTORIC", new DateTime(2007, 7, 1), new DateTime(1967, 1, 1)) }, // replaced by GHS
+                { "ISO-4217-HISTORIC::SDD", new Currency("SDD", "736", NotApplicable, "Sudanese dinar", "£Sd", "ISO-4217-HISTORIC", new DateTime(2007, 1, 10), new DateTime(1992, 6, 8)) }, // replaced by SDG
+                { "ISO-4217-HISTORIC::SIT", new Currency("SIT", "705", 2, "Slovenian tolar", "", "ISO-4217-HISTORIC", new DateTime(2006, 12, 31), new DateTime(1991, 10, 8)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ZWD", new Currency("ZWD", "716", 2, "Zimbabwean dollar A/06", "$", "ISO-4217-HISTORIC", new DateTime(2006, 7, 31), new DateTime(1980, 4, 18)) }, // replaced by ZWN
+                { "ISO-4217-HISTORIC::MZM", new Currency("MZM", "508", 0, "Mozambican metical", "MT", "ISO-4217-HISTORIC", new DateTime(2006, 6, 30), new DateTime(1980, 1, 1)) }, // replaced by MZN
+                { "ISO-4217-HISTORIC::AZM", new Currency("AZM", "031", 0, "Azerbaijani manat", "₼", "ISO-4217-HISTORIC", new DateTime(2006, 1, 1), new DateTime(1992, 8, 15)) }, // replaced by AZN
+                { "ISO-4217-HISTORIC::CSD", new Currency("CSD", "891", 2, "Serbian dinar", "", "ISO-4217-HISTORIC", new DateTime(2006, 12, 31), new DateTime(2003, 7, 3)) }, // replaced by RSD
+                { "ISO-4217-HISTORIC::MGF", new Currency("MGF", "450", 2, "Malagasy franc", "", "ISO-4217-HISTORIC", new DateTime(2005, 1, 1), new DateTime(1963, 7, 1)) }, // replaced by MGA
+                { "ISO-4217-HISTORIC::ROL", new Currency("ROL", "642", NotApplicable, "Romanian leu A/05", "", "ISO-4217-HISTORIC", new DateTime(2005, 12, 31), new DateTime(1952, 1, 28)) }, // replaced by RON
+                { "ISO-4217-HISTORIC::TRL", new Currency("TRL", "792", 0, "Turkish lira A/05", "₺", "ISO-4217-HISTORIC", new DateTime(2005, 12, 31)) }, // replaced by TRY
+                { "ISO-4217-HISTORIC::SRG", new Currency("SRG", "740", NotApplicable, "Suriname guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(2004, 12, 31)) }, // replaced by SRD
+                { "ISO-4217-HISTORIC::YUM", new Currency("YUM", "891", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(2003, 7, 2), new DateTime(1994, 1, 24)) }, // replaced by CSD
+                { "ISO-4217-HISTORIC::AFA", new Currency("AFA", "004", NotApplicable, "Afghan afghani", "؋", "ISO-4217-HISTORIC", new DateTime(2003, 12, 31), new DateTime(1925, 1, 1)) }, // replaced by AFN
+                { "ISO-4217-HISTORIC::XFO", new Currency("XFO", "", NotApplicable, "Gold franc (special settlement currency)", "", "ISO-4217-HISTORIC", new DateTime(2003, 12, 31), new DateTime(1803, 1, 1)) }, // replaced by XDR
+                { "ISO-4217-HISTORIC::GRD", new Currency("GRD", "300", 2, "Greek drachma", "₯", "ISO-4217-HISTORIC", new DateTime(2000, 12, 31), new DateTime(1954, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::TJR", new Currency("TJR", "762", NotApplicable, "Tajikistani ruble", "", "ISO-4217-HISTORIC", new DateTime(2000, 10, 30), new DateTime(1995, 5, 10)) }, // replaced by TJS
+                { "ISO-4217-HISTORIC::ECV", new Currency("ECV", "983", NotApplicable, "Ecuador Unidad de Valor Constante (funds code)", "", "ISO-4217-HISTORIC", new DateTime(2000, 1, 9), new DateTime(1993, 1, 1)) }, // replaced by (no successor)
+                { "ISO-4217-HISTORIC::ECS", new Currency("ECS", "218", 0, "Ecuadorian sucre", "S/.", "ISO-4217-HISTORIC", new DateTime(2000, 12, 31), new DateTime(1884, 1, 1)) }, // replaced by USD
+                { "ISO-4217-HISTORIC::BYB", new Currency("BYB", "112", 2, "Belarusian ruble", "Br", "ISO-4217-HISTORIC", new DateTime(1999, 12, 31), new DateTime(1992, 1, 1)) }, // replaced by BYR
+                { "ISO-4217-HISTORIC::AOR", new Currency("AOR", "982", 0, "Angolan kwanza readjustado", "Kz", "ISO-4217-HISTORIC", new DateTime(1999, 11, 30), new DateTime(1995, 7, 1)) }, // replaced by AOA
+                { "ISO-4217-HISTORIC::BGL", new Currency("BGL", "100", 2, "Bulgarian lev A/99", "лв.", "ISO-4217-HISTORIC", new DateTime(1999, 7, 5), new DateTime(1962, 1, 1)) }, // replaced by BGN
+                { "ISO-4217-HISTORIC::ADF", new Currency("ADF", "", 2, "Andorran franc (1:1 peg to the French franc)", "Fr", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1960, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ADP", new Currency("ADP", "020", 0, "Andorran peseta (1:1 peg to the Spanish peseta)", "", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1869, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ATS", new Currency("ATS", "040", 2, "Austrian schilling", "öS", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1945, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::BEF", new Currency("BEF", "056", 2, "Belgian franc (currency union with LUF)", "fr.", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1832, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::DEM", new Currency("DEM", "276", 2, "German mark", "DM", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1948, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ESP", new Currency("ESP", "724", 0, "Spanish peseta", "Pta", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1869, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::FIM", new Currency("FIM", "246", 2, "Finnish markka", "mk", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1860, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::FRF", new Currency("FRF", "250", 2, "French franc", "Fr", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1960, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::IEP", new Currency("IEP", "372", 2, "Irish pound (punt in Irish language)", "£", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1938, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::ITL", new Currency("ITL", "380", 0, "Italian lira", "₤", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1861, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::LUF", new Currency("LUF", "442", 2, "Luxembourg franc (currency union with BEF)", "fr.", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1944, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::MCF", new Currency("MCF", "", 2, "Monegasque franc (currency union with FRF)", "fr.", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1960, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::NLG", new Currency("NLG", "528", 2, "Dutch guilder", "ƒ", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1810, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::PTE", new Currency("PTE", "620", 0, "Portuguese escudo", "$", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(4160, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::SML", new Currency("SML", "", 0, "San Marinese lira (currency union with ITL and VAL)", "₤", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1864, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::VAL", new Currency("VAL", "", 0, "Vatican lira (currency union with ITL and SML)", "₤", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1929, 1, 1)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::XEU", new Currency("XEU", "954", NotApplicable, "European Currency Unit (1 XEU = 1 EUR)", "ECU", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1979, 3, 13)) }, // replaced by EUR
+                { "ISO-4217-HISTORIC::BAD", new Currency("BAD", "", 2, "Bosnia and Herzegovina dinar", "", "ISO-4217-HISTORIC", new DateTime(1998, 12, 31), new DateTime(1992, 7, 1)) }, // replaced by BAM
+                { "ISO-4217-HISTORIC::RUR", new Currency("RUR", "810", 2, "Russian ruble A/97", "₽", "ISO-4217-HISTORIC", new DateTime(1997, 12, 31), new DateTime(1992, 1, 1)) }, // replaced by RUB
+                { "ISO-4217-HISTORIC::GWP", new Currency("GWP", "624", NotApplicable, "Guinea-Bissau peso", "", "ISO-4217-HISTORIC", new DateTime(1997, 12, 31), new DateTime(1975, 1, 1)) }, // replaced by XOF
+                { "ISO-4217-HISTORIC::ZRN", new Currency("ZRN", "180", 2, "Zaïrean new zaïre", "Ƶ", "ISO-4217-HISTORIC", new DateTime(1997, 12, 31), new DateTime(1993, 1, 1)) }, // replaced by CDF
+                { "ISO-4217-HISTORIC::UAK", new Currency("UAK", "804", NotApplicable, "Ukrainian karbovanets", "", "ISO-4217-HISTORIC", new DateTime(1996, 9, 1), new DateTime(1992, 10, 1)) }, // replaced by UAH
+                { "ISO-4217-HISTORIC::YDD", new Currency("YDD", "720", NotApplicable, "South Yemeni dinar", "", "ISO-4217-HISTORIC", new DateTime(1996, 6, 11)) }, // replaced by YER
+                { "ISO-4217-HISTORIC::AON", new Currency("AON", "024", 0, "Angolan new kwanza", "Kz", "ISO-4217-HISTORIC", new DateTime(1995, 6, 30), new DateTime(1990, 9, 25)) }, // replaced by AOR
+                { "ISO-4217-HISTORIC::ZAL", new Currency("ZAL", "991", NotApplicable, "South African financial rand (funds code)", "", "ISO-4217-HISTORIC", new DateTime(1995, 3, 13), new DateTime(1985, 9, 1)) }, // replaced by (no successor)
+                { "ISO-4217-HISTORIC::PLZ", new Currency("PLZ", "616", NotApplicable, "Polish zloty A/94", "zł", "ISO-4217-HISTORIC", new DateTime(1994, 12, 31), new DateTime(1950, 10, 30)) }, // replaced by PLN
+                { "ISO-4217-HISTORIC::BRR", new Currency("BRR", "", 2, "Brazilian cruzeiro real", "CR$", "ISO-4217-HISTORIC", new DateTime(1994, 6, 30), new DateTime(1993, 8, 1)) }, // replaced by BRL
+                { "ISO-4217-HISTORIC::HRD", new Currency("HRD", "", NotApplicable, "Croatian dinar", "", "ISO-4217-HISTORIC", new DateTime(1994, 5, 30), new DateTime(1991, 12, 23)) }, // replaced by HRK
+                { "ISO-4217-HISTORIC::YUG", new Currency("YUG", "", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(1994, 1, 23), new DateTime(1994, 1, 1)) }, // replaced by YUM
+                { "ISO-4217-HISTORIC::YUO", new Currency("YUO", "", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(1993, 12, 31), new DateTime(1993, 10, 1)) }, // replaced by YUG
+                { "ISO-4217-HISTORIC::YUR", new Currency("YUR", "", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(1993, 9, 30), new DateTime(1992, 7, 1)) }, // replaced by YUO
+                { "ISO-4217-HISTORIC::BRE", new Currency("BRE", "", 2, "Brazilian cruzeiro", "₢", "ISO-4217-HISTORIC", new DateTime(1993, 8, 1), new DateTime(1990, 3, 15)) }, // replaced by BRR
+                { "ISO-4217-HISTORIC::UYN", new Currency("UYN", "", NotApplicable, "Uruguay new peso", "$U", "ISO-4217-HISTORIC", new DateTime(1993, 3, 1), new DateTime(1975, 7, 1)) }, // replaced by UYU
+                { "ISO-4217-HISTORIC::CSK", new Currency("CSK", "200", NotApplicable, "Czechoslovak koruna", "Kčs", "ISO-4217-HISTORIC", new DateTime(1993, 2, 8), new DateTime(7040, 1, 1)) }, // replaced by CZK and SKK (CZK and EUR)
+                { "ISO-4217-HISTORIC::MKN", new Currency("MKN", "", NotApplicable, "Old Macedonian denar A/93", "ден", "ISO-4217-HISTORIC", new DateTime(1993, 12, 31)) }, // replaced by MKD
+                { "ISO-4217-HISTORIC::MXP", new Currency("MXP", "", NotApplicable, "Mexican peso", "$", "ISO-4217-HISTORIC", new DateTime(1993, 12, 31)) }, // replaced by MXN
+                { "ISO-4217-HISTORIC::ZRZ", new Currency("ZRZ", "", 3, "Zaïrean zaïre", "Ƶ", "ISO-4217-HISTORIC", new DateTime(1993, 12, 31), new DateTime(1967, 1, 1)) }, // replaced by ZRN
+                { "ISO-4217-HISTORIC::YUN", new Currency("YUN", "", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(1992, 6, 30), new DateTime(1990, 1, 1)) }, // replaced by YUR
+                { "ISO-4217-HISTORIC::SDP", new Currency("SDP", "", NotApplicable, "Sudanese old pound", "ج.س.", "ISO-4217-HISTORIC", new DateTime(1992, 6, 8), new DateTime(1956, 1, 1)) }, // replaced by SDD
+                { "ISO-4217-HISTORIC::ARA", new Currency("ARA", "", 2, "Argentine austral", "₳", "ISO-4217-HISTORIC", new DateTime(1991, 12, 31), new DateTime(1985, 6, 15)) }, // replaced by ARS
+                { "ISO-4217-HISTORIC::PEI", new Currency("PEI", "", NotApplicable, "Peruvian inti", "I/.", "ISO-4217-HISTORIC", new DateTime(1991, 10, 1), new DateTime(1985, 2, 1)) }, // replaced by PEN
+                { "ISO-4217-HISTORIC::SUR", new Currency("SUR", "", NotApplicable, "Soviet Union ruble", "руб", "ISO-4217-HISTORIC", new DateTime(1991, 12, 31), new DateTime(1961, 1, 1)) }, // replaced by RUR
+                { "ISO-4217-HISTORIC::AOK", new Currency("AOK", "", 0, "Angolan kwanza", "Kz", "ISO-4217-HISTORIC", new DateTime(1990, 9, 24), new DateTime(1977, 1, 8)) }, // replaced by AON
+                { "ISO-4217-HISTORIC::DDM", new Currency("DDM", "278", NotApplicable, "East German Mark of the GDR (East Germany)", "", "ISO-4217-HISTORIC", new DateTime(1990, 7, 1), new DateTime(1948, 6, 21)) }, // replaced by DEM (EUR)
+                { "ISO-4217-HISTORIC::BRN", new Currency("BRN", "", 2, "Brazilian cruzado novo", "NCz$", "ISO-4217-HISTORIC", new DateTime(1990, 3, 15), new DateTime(1989, 1, 16)) }, // replaced by BRE
+                { "ISO-4217-HISTORIC::YUD", new Currency("YUD", "", 2, "Yugoslav dinar", "дин.", "ISO-4217-HISTORIC", new DateTime(1989, 12, 31), new DateTime(1966, 1, 1)) }, // replaced by YUN
+                { "ISO-4217-HISTORIC::BRC", new Currency("BRC", "", 2, "Brazilian cruzado", "Cz$", "ISO-4217-HISTORIC", new DateTime(1989, 1, 15), new DateTime(1986, 2, 28)) }, // replaced by BRN
+                { "ISO-4217-HISTORIC::BOP", new Currency("BOP", "", 2, "Bolivian peso", "b$.", "ISO-4217-HISTORIC", new DateTime(1987, 1, 1), new DateTime(1963, 1, 1)) }, // replaced by BOB
+                { "ISO-4217-HISTORIC::UGS", new Currency("UGS", "", NotApplicable, "Ugandan shilling A/87", "USh", "ISO-4217-HISTORIC", new DateTime(1987, 12, 31)) }, // replaced by UGX
+                { "ISO-4217-HISTORIC::BRB", new Currency("BRB", "", 2, "Brazilian cruzeiro", "₢", "ISO-4217-HISTORIC", new DateTime(1986, 2, 28), new DateTime(1970, 1, 1)) }, // replaced by BRC
+                { "ISO-4217-HISTORIC::ILR", new Currency("ILR", "", 2, "Israeli shekel", "", "ISO-4217-HISTORIC", new DateTime(1985, 12, 31), new DateTime(1980, 2, 24)) }, // replaced by ILS
+                { "ISO-4217-HISTORIC::ARP", new Currency("ARP", "", 2, "Argentine peso argentino", "$a", "ISO-4217-HISTORIC", new DateTime(1985, 6, 14), new DateTime(1983, 6, 6)) }, // replaced by ARA
+                { "ISO-4217-HISTORIC::PEH", new Currency("PEH", "", NotApplicable, "Peruvian old sol", "", "ISO-4217-HISTORIC", new DateTime(1985, 2, 1), new DateTime(1863, 1, 1)) }, // replaced by PEI
+                { "ISO-4217-HISTORIC::GQE", new Currency("GQE", "", NotApplicable, "Equatorial Guinean ekwele", "", "ISO-4217-HISTORIC", new DateTime(1985, 12, 31), new DateTime(1975, 1, 1)) }, // replaced by XAF
+                { "ISO-4217-HISTORIC::GNE", new Currency("GNE", "", NotApplicable, "Guinean syli", "", "ISO-4217-HISTORIC", new DateTime(1985, 12, 31), new DateTime(1971, 1, 1)) }, // replaced by GNF
+                { "ISO-4217-HISTORIC::MLF", new Currency("MLF", "", NotApplicable, "Mali franc", "MAF", "ISO-4217-HISTORIC", new DateTime(1984, 12, 31)) }, // replaced by XOF
+                { "ISO-4217-HISTORIC::ARL", new Currency("ARL", "", 2, "Argentine peso ley", "$L", "ISO-4217-HISTORIC", new DateTime(1983, 5, 5), new DateTime(1970, 1, 1)) }, // replaced by ARP
+                { "ISO-4217-HISTORIC::ISJ", new Currency("ISJ", "", 2, "Icelandic krona", "kr", "ISO-4217-HISTORIC", new DateTime(1981, 12, 31), new DateTime(1922, 1, 1)) }, // replaced by ISK
+                { "ISO-4217-HISTORIC::MVQ", new Currency("MVQ", "", NotApplicable, "Maldivian rupee", "Rf", "ISO-4217-HISTORIC", new DateTime(1981, 12, 31)) }, // replaced by MVR
+                { "ISO-4217-HISTORIC::ILP", new Currency("ILP", "", 3, "Israeli lira", "I£", "ISO-4217-HISTORIC", new DateTime(1980, 12, 31), new DateTime(1948, 1, 1)) }, // replaced by ILR
+                { "ISO-4217-HISTORIC::ZWC", new Currency("ZWC", "", 2, "Rhodesian dollar", "$", "ISO-4217-HISTORIC", new DateTime(1980, 12, 31), new DateTime(1970, 2, 17)) }, // replaced by ZWD
+                { "ISO-4217-HISTORIC::LAJ", new Currency("LAJ", "", NotApplicable, "Lao kip", "₭", "ISO-4217-HISTORIC", new DateTime(1979, 12, 31)) }, // replaced by LAK
+                { "ISO-4217-HISTORIC::TPE", new Currency("TPE", "", NotApplicable, "Portuguese Timorese escudo", "", "ISO-4217-HISTORIC", new DateTime(1976, 12, 31), new DateTime(1959, 1, 1)) }, // replaced by IDR
+                { "ISO-4217-HISTORIC::UYP", new Currency("UYP", "", NotApplicable, "Uruguay peso", "$", "ISO-4217-HISTORIC", new DateTime(1975, 7, 1), new DateTime(1896, 1, 1)) }, // replaced by UYN
+                { "ISO-4217-HISTORIC::CLE", new Currency("CLE", "", NotApplicable, "Chilean escudo", "Eº", "ISO-4217-HISTORIC", new DateTime(1975, 12, 31), new DateTime(1960, 1, 1)) }, // replaced by CLP
+                { "ISO-4217-HISTORIC::MAF", new Currency("MAF", "", NotApplicable, "Moroccan franc", "", "ISO-4217-HISTORIC", new DateTime(1976, 12, 31), new DateTime(1921, 1, 1)) }, // replaced by MAD
+                { "ISO-4217-HISTORIC::PTP", new Currency("PTP", "", NotApplicable, "Portuguese Timorese pataca", "", "ISO-4217-HISTORIC", new DateTime(1958, 12, 31), new DateTime(1894, 1, 1)) }, // replaced by TPE
+                { "ISO-4217-HISTORIC::TNF", new Currency("TNF", "", 2, "Tunisian franc", "F", "ISO-4217-HISTORIC", new DateTime(1958, 12, 31), new DateTime(1991, 7, 1)) }, // replaced by TND
+                { "ISO-4217-HISTORIC::NFD", new Currency("NFD", "", 2, "Newfoundland dollar", "$", "ISO-4217-HISTORIC", new DateTime(1949, 12, 31), new DateTime(1865, 1, 1)) } // replaced by CAD
             };
 
             return currencies;
