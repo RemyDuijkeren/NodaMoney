@@ -40,13 +40,15 @@ namespace NodaMoney
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentNullException(nameof(code));
-            if (string.IsNullOrWhiteSpace(number))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
+            if (number == null)
                 throw new ArgumentNullException(nameof(number));
             if (string.IsNullOrWhiteSpace(englishName))
-                throw new ArgumentNullException(nameof(englishName));
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(englishName));
             if (string.IsNullOrWhiteSpace(symbol))
-                throw new ArgumentNullException(nameof(symbol));
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(symbol));
+            if (string.IsNullOrWhiteSpace(@namespace))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
             if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
                 throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
 
@@ -108,7 +110,7 @@ namespace NodaMoney
 
         /// <summary>Gets the major currency unit.</summary>
 #if !PORTABLE
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type!")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
 #endif
         public decimal MajorUnit => 1;
 
@@ -140,8 +142,6 @@ namespace NodaMoney
                 throw new ArgumentException($"{code} is an unknown currency code!");
 
             return currency;
-
-            // return FromCode(code, "ISO-4217");
         }
 
         /// <summary>Create an instance of the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -270,20 +270,6 @@ namespace NodaMoney
         {
             return Code.GetHashCode();
         }
-
-        ///// <summary>Gets the name of the currency, formatted in the native language of the country\region where the currency is used.</summary>
-        ///// <param name="culture">The culture.</param>
-        ///// <returns>The native name of the currency.</returns>
-        ////public string GetNativeName(CultureInfo culture)
-        ////{
-        ////    //Require.That(culture, "culture").IsNotNull();
-        ////    RegionInfo region = new RegionInfo(culture.Name);
-        ////    if (!region.ISOCurrencySymbol.Equals(Code))
-        ////    {
-        ////        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.NativeNameDoesNotExistForCulture, Code, culture));
-        ////    }
-        ////    return region.CurrencyNativeName;
-        ////}
 
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply

@@ -336,7 +336,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency(null, "978", 2, "Euro", "€"); };
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.ShouldThrow<ArgumentException>();
         }
 
         [Fact]
@@ -352,7 +352,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", "978", 2, null, "€"); };
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.ShouldThrow<ArgumentException>();
         }
 
         [Fact]
@@ -360,7 +360,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", "978", 2, "Euro", null); };
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.ShouldThrow<ArgumentException>();
         }
 
         [Fact]
