@@ -83,8 +83,10 @@ namespace NodaMoney
         //// <exception cref="InvalidOperationException">The current CurrencyBuilder object has a property that must be set before the currency can be registered.</exception>
         public Currency Build()
         {
-            // TODO: Add validation?
             // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
+            if (string.IsNullOrWhiteSpace(Symbol))
+                Symbol = Currency.CurrencySign;
+
             var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
 
             return currency;

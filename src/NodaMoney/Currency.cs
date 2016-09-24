@@ -23,9 +23,7 @@ namespace NodaMoney
     {
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Currency" /> struct.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
         /// <param name="number">The number.</param>
         /// <param name="decimalDigits">The decimal digits.</param>
@@ -65,6 +63,10 @@ namespace NodaMoney
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
+
+        /// <summary>Gets the currency sign (¤), a character used to denote an unspecified currency.</summary>
+        /// <remarks><seealso cref="https://en.wikipedia.org/wiki/Currency_sign_(typography)"/></remarks>
+        public static string CurrencySign => CultureInfo.InvariantCulture.NumberFormat.CurrencySymbol;
 
         /// <summary>Gets the currency symbol.</summary>
         public string Symbol { get; private set; }
