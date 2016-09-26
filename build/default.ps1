@@ -158,12 +158,12 @@ function Install-Dotnet {
     {
 		$dotnetPath = "$pwd\.dotnet"
 		$dotnetCliVersion = if ($env:DOTNET_CLI_VERSION -eq $null) { 'Latest' } else { $env:DOTNET_CLI_VERSION }
-		$dotnetInstallScriptUrl = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1'
-		$dotnetInstallScriptPath = '.\scripts\obtain\install.ps1'
+		$dotnetInstallScriptUrl = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1'
+		$dotnetInstallScriptPath = '.\scripts\obtain\dotnet-install.ps1'
 
 		md -Force ".\scripts\obtain\" | Out-Null
 		curl $dotnetInstallScriptUrl -OutFile $dotnetInstallScriptPath
-		& .\scripts\obtain\install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
+		& .\scripts\obtain\dotnet-install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
 		$env:Path = "$dotnetPath;$env:Path"
 	}
 }
