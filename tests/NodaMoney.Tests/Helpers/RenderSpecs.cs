@@ -18,7 +18,7 @@ namespace NodaMoney.Tests.Helpers
         [Fact(Skip = "Write Spec")]
         public void RenderAllSpecs()
         {
-            using (var stream = File.Open(@"..\..\..\..\artifacts\Specs.txt", FileMode.Create))
+            using (var stream = File.Open(@"Specs.txt", FileMode.Create))
             using (var writer = new StreamWriter(stream))
             {
                 Render("", writer);

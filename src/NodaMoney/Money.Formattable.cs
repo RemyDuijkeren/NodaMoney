@@ -56,7 +56,7 @@ namespace NodaMoney
             return ConvertToString(format, formatProvider);
         }
 
-        private static NumberFormatInfo GetNumberFormatInfo(Currency currency, IFormatProvider formatProvider)
+        private static IFormatProvider GetFormatProvider(Currency currency, IFormatProvider formatProvider, bool useCode = false)
         {
             var cc = CultureInfo.CurrentCulture;
 
@@ -73,21 +73,70 @@ namespace NodaMoney
                 if (nfi != null)
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
-
-            numberFormatInfo.CurrencySymbol = currency.Symbol;
+            
             numberFormatInfo.CurrencyDecimalDigits = (int)currency.DecimalDigits;
+            numberFormatInfo.CurrencySymbol = currency.Symbol;
+
+            if (useCode)
+            {
+                // Replace symbol with the code
+                numberFormatInfo.CurrencySymbol = currency.Code;
+
+                // Add spacing to PositivePattern and NegativePattern
+                if (numberFormatInfo.CurrencyPositivePattern == 0) // $n
+                    numberFormatInfo.CurrencyPositivePattern = 2; // $ n
+                if (numberFormatInfo.CurrencyPositivePattern == 1) // n$
+                    numberFormatInfo.CurrencyPositivePattern = 3; // n $
+
+                switch (numberFormatInfo.CurrencyNegativePattern)
+                {
+                    case 0: // ($n)
+                        numberFormatInfo.CurrencyNegativePattern = 14; // ($ n)
+                        break;
+                    case 1: // -$n
+                        numberFormatInfo.CurrencyNegativePattern = 9; // -$ n
+                        break;
+                    case 2: // $-n
+                        numberFormatInfo.CurrencyNegativePattern = 12; // $ -n
+                        break;
+                    case 3: // $n-
+                        numberFormatInfo.CurrencyNegativePattern = 11; // $ n-
+                        break;
+                    case 4: // (n$)
+                        numberFormatInfo.CurrencyNegativePattern = 15; // (n $)
+                        break;
+                    case 5: // -n$
+                        numberFormatInfo.CurrencyNegativePattern = 8; // -n $
+                        break;
+                    case 6: // n-$
+                        numberFormatInfo.CurrencyNegativePattern = 13; // n- $
+                        break;
+                    case 7: // n$-
+                        numberFormatInfo.CurrencyNegativePattern = 10; // n $-
+                        break;
+                }
+            }
+            
             return numberFormatInfo;
         }
 
         private string ConvertToString(string format, IFormatProvider formatProvider)
         {
-            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
-            // TODO: Move to Currency? Currency.GetNumberFormatInfo()
-            // TODO: Add custom format to represent USD 12.34, EUR 12.35, etc.
-            // The formatting of Money should respect the NumberFormat of the current Culture, except for the CurrencySymbol and CurrencyDecimalDigits.
-            // http://en.wikipedia.org/wiki/Linguistic_issues_concerning_the_euro
+            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true           
+            // TODO: Hacked solution, solve with better implementation
 
-            return Amount.ToString(format ?? "C", GetNumberFormatInfo(Currency, formatProvider));
+            IFormatProvider provider;
+            if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I") && format.Length >= 1 && format.Length <= 2)
+            {
+                format = format.Replace("I", "C"); 
+                provider = GetFormatProvider(Currency, formatProvider, true);
+            }
+            else
+            {
+                provider = GetFormatProvider(Currency, formatProvider);
+            }            
+
+            return Amount.ToString(format ?? "C", provider);
         }
     }
 }
