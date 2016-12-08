@@ -9,21 +9,10 @@
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-*",
     "NodaMoney": "1.0.0-*",
-    "FluentAssertions": "4.12.0"
+    "FluentAssertions": "4.18.0",
+    "RavenDB.Tests.Helpers": "3.5.1"
   },
   "frameworks": {
-    //"netcoreapp1.0": {
-    //  "dependencies": {
-    //    "Microsoft.NETCore.App": {
-    //      "type": "platform",
-    //      "version": "1.0.0"
-    //    }
-    //  },
-    //  "imports": [
-    //    "dotnet5.4",
-    //    "portable-net451+win8"
-    //  ]
-    //},
     "net451": {
       "frameworkAssemblies": {
         "System.Runtime.Serialization": "",
