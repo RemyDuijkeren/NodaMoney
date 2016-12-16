@@ -65,7 +65,7 @@ namespace NodaMoney
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
 
         /// <summary>Gets the currency sign (¤), a character used to denote an unspecified currency.</summary>
-        /// <remarks><seealso cref="https://en.wikipedia.org/wiki/Currency_sign_(typography)"/></remarks>
+        /// <remarks>https://en.wikipedia.org/wiki/Currency_sign_(typography) </remarks>
         public static string CurrencySign => CultureInfo.InvariantCulture.NumberFormat.CurrencySymbol;
 
         /// <summary>Gets the currency symbol.</summary>
@@ -300,7 +300,7 @@ namespace NodaMoney
         /// Converts an object into its XML representation.
         /// </summary>
         /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
-        /// <exception cref="ArgumentNullException">The value of 'writer' cannot be null. </exception>
+        /// <exception cref="ArgumentNullException">The value of 'writer' cannot be null.</exception>
         public void WriteXml(XmlWriter writer)
         {
             if (writer == null)

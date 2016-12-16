@@ -13,6 +13,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("EUR"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
         /// <param name="rounding">The rounding.</param>
@@ -21,6 +22,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("EUR"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
@@ -37,6 +39,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("EUR"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
         /// <param name="rounding">The rounding.</param>
@@ -49,6 +52,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("EUR"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
@@ -75,6 +79,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("USD"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
         /// <param name="rounding">The rounding.</param>
@@ -83,6 +88,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("USD"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
         /// <param name="amount">The Amount of money in US dollar.</param>
@@ -99,6 +105,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("USD"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
         /// <param name="amount">The Amount of money in US dollar.</param>
         /// <param name="rounding">The rounding.</param>
@@ -111,6 +118,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("USD"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
         /// <param name="amount">The Amount of money in US dollar.</param>
@@ -137,6 +145,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("JPY"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
         /// <param name="amount">The Amount of money in Japanese Yens.</param>
         /// <param name="rounding">The rounding.</param>
@@ -145,6 +154,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("JPY"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
         /// <param name="amount">The Amount of money in Japanese Yen.</param>
@@ -161,6 +171,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("JPY"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
         /// <param name="amount">The Amount of money in Japanese Yen.</param>
         /// <param name="rounding">The rounding.</param>
@@ -173,6 +184,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("JPY"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
         /// <param name="amount">The Amount of money in Japanese Yen.</param>
@@ -199,6 +211,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("GBP"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
         /// <param name="amount">The Amount of money in euro.</param>
         /// <param name="rounding">The rounding.</param>
@@ -207,6 +220,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("GBP"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
         /// <param name="amount">The Amount of money in Pound Sterling.</param>
@@ -223,6 +237,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("GBP"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
         /// <param name="amount">The Amount of money in Pound Sterling.</param>
         /// <param name="rounding">The rounding.</param>
@@ -235,6 +250,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("GBP"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
         /// <param name="amount">The Amount of money in Pound Sterling.</param>
@@ -261,6 +277,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("CNY"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Chinese Yuan.</summary>
         /// <param name="amount">The Amount of money in Chinese Yuan.</param>
         /// <param name="rounding">The rounding.</param>
@@ -269,6 +286,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("CNY"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Chinese Yuan.</summary>
         /// <param name="amount">The Amount of money in Chinese Yuan.</param>
@@ -285,6 +303,7 @@ namespace NodaMoney
             return new Money(amount, Currency.FromCode("CNY"));
         }
 
+#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Chinese Yuan.</summary>
         /// <param name="amount">The Amount of money in Chinese Yuan.</param>
         /// <param name="rounding">The rounding.</param>
@@ -297,6 +316,7 @@ namespace NodaMoney
         {
             return new Money(amount, Currency.FromCode("CNY"), rounding);
         }
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Chinese Yuan.</summary>
         /// <param name="amount">The Amount of money in Chinese Yuan.</param>
