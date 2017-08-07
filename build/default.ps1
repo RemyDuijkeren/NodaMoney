@@ -64,36 +64,27 @@ Task version {
 	$script:InformationalVersion = $versionInfo.FullSemVer
 	$script:NuGetVersion = $versionInfo.NuGetVersion
 
-	"Update assemblyinfo.cs files in src"
-	Write-Output "Apply AssemblyVersion $assemblyVersion, AssemblyFileVersion $assemblyFileVersion and InformationalVersion $informationalVersion to"
-	$assemblyInfoFiles = Get-ChildItem -File -Path $SrcDir -Filter AssemblyInfo.cs -Recurse	
-	foreach ($file in $assemblyInfoFiles) {
-		Write-Output $file.FullName
-		(Get-Content $file.FullName ) | ForEach-Object {
-        	Foreach-Object { $_ -replace 'AssemblyVersion.+$', "AssemblyVersion(`"$AssemblyVersion`")]" } |
-        	Foreach-Object { $_ -replace 'AssemblyFileVersion.+$', "AssemblyFileVersion(`"$AssemblyFileVersion`")]" } |
-        	Foreach-Object { $_ -replace 'AssemblyInformationalVersion.+$', "AssemblyInformationalVersion(`"$InformationalVersion`")]" }
-    	} | Set-Content $file.FullName
-	}
+	"Update Directory.build.props"
+	Write-Output "Apply Version $NuGetVersion, AssemblyVersion $assemblyVersion, AssemblyFileVersion $assemblyFileVersion and InformationalVersion $informationalVersion"
+	$versionFile = "$SrcDir\Directory.build.props"
+	$xml = [xml](Get-Content $versionFile)
+	$xml.Project.PropertyGroup.Version = $NuGetVersion
+	$xml.Project.PropertyGroup.AssemblyVersion = $AssemblyVersion
+	$xml.Project.PropertyGroup.FileVersion = $AssemblyFileVersion
+	$xml.Project.PropertyGroup.InformationalVersion = $InformationalVersion	
 
-	"Update project.json files in src"
-	Write-Output "Apply NuGetVersion $NuGetVersion to"
-	$projectJsonFiles = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
-	foreach ($file in $projectJsonFiles) {
-		Write-Output $file.FullName		
-		(Get-Content $file.FullName ) | ForEach-Object {
-        	Foreach-Object { $_ -replace '"version": .+$', "`"version`": `"$NuGetVersion`"," }
-    	} | Set-Content $file.FullName
-	}
+	$xml.Save($versionFile)
 }
 
 Task build -depends version { 
-  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter project.json -Recurse
+  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse
 		
 	foreach ($proj in $projectsToBuild) {
-		exec { & dotnet restore $proj.FullName }
-		exec { & dotnet build $proj.FullName --configuration $config }
-		exec { & dotnet pack $proj.FullName --no-build --configuration $config --output $ArtifactsDir }
+		Push-Location $proj.PSParentPath
+		exec { & dotnet restore }
+		exec { & dotnet build --configuration $config }
+		exec { & dotnet pack --no-build --configuration $config --output $ArtifactsDir }
+		Pop-Location
 	}
 }
 

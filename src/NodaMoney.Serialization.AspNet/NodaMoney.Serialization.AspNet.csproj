@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>  
+    <AssemblyTitle>NodaMoney.Serialization.AspNet</AssemblyTitle>
+    <AssemblyName>NodaMoney.Serialization.AspNet</AssemblyName>
+    <Description>JavaScriptSerializer support for NodaMoney structures.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>NodaMoney.Serialization.AspNet</PackageId>
+    <PackageTags>Noda;Money;Currency;ExchangeRate;Serialization</PackageTags>   
+    <TargetFrameworks>net40;net45</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NodaMoney\NodaMoney.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
