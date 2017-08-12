@@ -29,7 +29,7 @@ Properties {
 }
 
 Task default -depends local
-Task local -depends init, restore, version, build, test, zip
+Task local -depends init, version, build, test, zip
 Task ci -depends release, local
 Task deploy -depends ci, pushpackage
 
@@ -40,32 +40,14 @@ Task release {
 Task init {
 	"Install dotnet, if not available"
 	Install-Dotnet
+	
+	"Restore packages for build"
+	exec { & dotnet restore "$RootDir\build\packages.csproj" --packages $PackagesDir }
+	Remove-Item "$RootDir\build\obj" -Recurse -Force -ErrorAction SilentlyContinue
 
     "(Re)create Artifacts directory"
 	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue
 	New-Item $ArtifactsDir -ItemType directory | out-null
-}
-
-Task restore { 
-	"Restore packages for build"
-	exec { & dotnet restore "$RootDir\build\packages.csproj" --packages $PackagesDir }
-	Remove-Item "$RootDir\build\obj"  -Recurse -Force -ErrorAction SilentlyContinue
-
-	"Restore packages for source projects"
-  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse		
-	foreach ($proj in $projectsToBuild) {
-		Push-Location $proj.PSParentPath
-		exec { & dotnet restore }
-		Pop-Location
-	}
-
-	"Restore packages for test projects"
-  	$projectsToBuild = Get-ChildItem -File -Path $TestDir -Filter *.csproj -Recurse		
-	foreach ($proj in $projectsToBuild) {
-		Push-Location $proj.PSParentPath
-		exec { & dotnet restore }
-		Pop-Location
-	}
 }
 
 Task version {
@@ -100,6 +82,7 @@ Task build {
   	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse		
 	foreach ($proj in $projectsToBuild) {
 		Push-Location $proj.PSParentPath
+		exec { & dotnet restore }
 		exec { & dotnet build --configuration $config }
 		exec { & dotnet pack --no-build --configuration $config --output $ArtifactsDir }
 		Pop-Location
@@ -110,6 +93,7 @@ Task test {
 	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter *.csproj -Recurse	
 	foreach ($proj in $projectsToTest) {
 		Push-Location $proj.PSParentPath
+		exec { & dotnet restore }
 		exec { & dotnet test --configuration $config }
 		Pop-Location
 	}
