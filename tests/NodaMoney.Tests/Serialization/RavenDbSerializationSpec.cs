@@ -39,39 +39,39 @@ namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
             }
         }
 
-        [Fact]
-        public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
-        {
-            SampleData sample = new SampleData { Name = "Test", Amount = new Money(123.56, "EUR") };
-            NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8079);
-            using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
-            {
-                // store.Conventions.CustomizeJsonSerializer += serializer =>
-                // serializer.Converters.Add(new MoneyJsonConverter());
-                // WaitForUserToContinueTheTest(store, true);
-                // store.UseEmbeddedHttpServer = true;
-                // store.Configuration.Port = 8080;
-                // store.Initialize();
+        //[Fact]
+        //public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
+        //{
+        //    SampleData sample = new SampleData { Name = "Test", Amount = new Money(123.56, "EUR") };
+        //    NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8079);
+        //    using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
+        //    {
+        //        // store.Conventions.CustomizeJsonSerializer += serializer =>
+        //        // serializer.Converters.Add(new MoneyJsonConverter());
+        //        // WaitForUserToContinueTheTest(store, true);
+        //        // store.UseEmbeddedHttpServer = true;
+        //        // store.Configuration.Port = 8080;
+        //        // store.Initialize();
 
-                // Store in RavenDb
-                using (var session = store.OpenSession())
-                {
-                    session.Store(sample);
+        //        // Store in RavenDb
+        //        using (var session = store.OpenSession())
+        //        {
+        //            session.Store(sample);
 
-                    session.SaveChanges();
-                }
+        //            session.SaveChanges();
+        //        }
 
-                // Read from RavenDb
-                using (var session = store.OpenSession())
-                {
-                    var result = session.Query<SampleData>()
-                        .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
-                        .FirstOrDefault();
+        //        // Read from RavenDb
+        //        using (var session = store.OpenSession())
+        //        {
+        //            var result = session.Query<SampleData>()
+        //                .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
+        //                .FirstOrDefault();
 
-                    result.Should().Be(sample);
-                }
-            }
-        }
+        //            result.Should().Be(sample);
+        //        }
+        //    }
+        //}
     }
 
     public class SampleData

@@ -10,6 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 #endif
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("NodaMoney.Tests")]
+
 namespace NodaMoney
 {
     /// <summary>A unit of exchange, a currency of <see cref="Money" />.</summary>

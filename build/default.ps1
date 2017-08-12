@@ -20,16 +20,17 @@ Properties {
 	$RootDir = Resolve-Path ..
 	$SrcDir = "$RootDir\src"
 	$TestsDir = "$RootDir\tests"
+	$PackagesDir = "$RootDir\packages"
 	$ArtifactsDir = "$RootDir\artifacts"
-	$ToolsDir = "$RootDir\tools"	
+	$ToolsDir = "$RootDir\tools"
 	$NugetExe = Join-Path $ToolsDir -ChildPath "\NuGet*\nuget.exe"
 
 	$global:config = "debug"
 }
 
 Task default -depends local
-Task local -depends init, build, test, zip
-Task ci -depends release, local, pushcoverage
+Task local -depends init, restore, version, build, test, zip
+Task ci -depends release, local
 Task deploy -depends ci, pushpackage
 
 Task release {
@@ -40,16 +41,35 @@ Task init {
 	"Install dotnet, if not available"
 	Install-Dotnet
 
-	"Restore packages for build"
-	exec { & $NugetExe restore "$RootDir\build\packages.config" -SolutionDirectory $RootDir  }
-
     "(Re)create Artifacts directory"
 	Remove-Item $ArtifactsDir -Recurse -Force -ErrorAction SilentlyContinue
 	New-Item $ArtifactsDir -ItemType directory | out-null
 }
 
+Task restore { 
+	"Restore packages for build"
+	exec { & dotnet restore "$RootDir\build\packages.csproj" --packages $PackagesDir }
+	Remove-Item "$RootDir\build\obj"  -Recurse -Force -ErrorAction SilentlyContinue
+
+	"Restore packages for source projects"
+  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse		
+	foreach ($proj in $projectsToBuild) {
+		Push-Location $proj.PSParentPath
+		exec { & dotnet restore }
+		Pop-Location
+	}
+
+	"Restore packages for test projects"
+  	$projectsToBuild = Get-ChildItem -File -Path $TestDir -Filter *.csproj -Recurse		
+	foreach ($proj in $projectsToBuild) {
+		Push-Location $proj.PSParentPath
+		exec { & dotnet restore }
+		Pop-Location
+	}
+}
+
 Task version {
-	$gitVersionExe = Resolve-Path "$rootDir\packages\GitVersion.*\tools\GitVersion.exe"	
+	$gitVersionExe = Resolve-Path "$PackagesDir\gitVersion.commandline\*\tools\GitVersion.exe"	
 
 	"Send updated version to AppVeyor"
 	if (isAppVeyor) { exec { & $gitVersionExe /output buildserver } }
@@ -76,12 +96,10 @@ Task version {
 	$xml.Save($versionFile)
 }
 
-Task build -depends version { 
-  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse
-		
+Task build { 
+  	$projectsToBuild = Get-ChildItem -File -Path $SrcDir -Filter *.csproj -Recurse		
 	foreach ($proj in $projectsToBuild) {
 		Push-Location $proj.PSParentPath
-		exec { & dotnet restore }
 		exec { & dotnet build --configuration $config }
 		exec { & dotnet pack --no-build --configuration $config --output $ArtifactsDir }
 		Pop-Location
@@ -89,16 +107,26 @@ Task build -depends version {
 }
 
 Task test {
-	$openCoverExe = Resolve-Path "$rootDir\packages\OpenCover.*\tools\OpenCover.Console.exe"
+	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter *.csproj -Recurse	
+	foreach ($proj in $projectsToTest) {
+		Push-Location $proj.PSParentPath
+		exec { & dotnet test --configuration $config }
+		Pop-Location
+	}
+}
+
+# Doesn't currently work wit .NET Core :-(
+Task testWithCoverage {
+	$openCoverExe = Resolve-Path "$PackagesDir\OpenCover.*\tools\OpenCover.Console.exe"
 	$dotnetExe = Where-Is('dotnet')
-	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter project.json -Recurse
+	$projectsToTest = Get-ChildItem -File -Path $TestsDir -Filter *.csproj -Recurse
 	
 	foreach ($proj in $projectsToTest) {
 		Write-Host $proj.FullName
 		exec { & dotnet restore $proj.FullName }
 
 		# Run OpenCover, which in turns will run dotnet test
-		$targetArgs = "test --configuration $config " + $proj.FullName
+		$targetArgs = "test /p:DebugType=full --configuration $config " + $proj.FullName
 		exec {
 			& $openCoverExe -register:user `
 							-target:$dotnetExe `
@@ -106,6 +134,8 @@ Task test {
 							"-filter:+[NodaMoney*]* -[NodaMoney.Tests]*" `
 							-output:"$ArtifactsDir\coverage.xml" `
 							-returntargetcode `
+							-mergeoutput `
+							-hideskipped:File `
 							-oldStyle
 		}
 	}
@@ -122,7 +152,7 @@ Task pushcoverage `
 	-requiredVariable CoverallsToken `
 	-precondition { return $env:APPVEYOR_PULL_REQUEST_NUMBER -eq $null } `
 {
-	$coverallsExe = Resolve-Path "$RootDir\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe"
+	$coverallsExe = Resolve-Path "$PackagesDir\coveralls.net.*\tools\csmacnz.Coveralls.exe"
 	
 	"Pushing coverage to coveralls.io"
 	if(isAppVeyor) { 
@@ -143,8 +173,7 @@ function isAppVeyor() {
 }
 
 function Install-Dotnet {
-    $dotnetcli = Where-Is('dotnet')
-	
+    $dotnetcli = Where-Is('dotnet')	
     if($dotnetcli -eq $null)
     {
 		$dotnetPath = "$pwd\.dotnet"
@@ -152,20 +181,20 @@ function Install-Dotnet {
 		$dotnetInstallScriptUrl = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1'
 		$dotnetInstallScriptPath = '.\scripts\obtain\dotnet-install.ps1'
 
-		md -Force ".\scripts\obtain\" | Out-Null
-		curl $dotnetInstallScriptUrl -OutFile $dotnetInstallScriptPath
+		mddir -Force ".\scripts\obtain\" | Out-Null
+		Invoke-WebRequest $dotnetInstallScriptUrl -OutFile $dotnetInstallScriptPath
 		& .\scripts\obtain\dotnet-install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
 		$env:Path = "$dotnetPath;$env:Path"
 	}
 }
 
 function Where-Is($command) {
-    (ls env:\path).Value.split(';') | `
-        where { $_ } | `
-        %{ [System.Environment]::ExpandEnvironmentVariables($_) } | `
-        where { test-path $_ } |`
-        %{ ls "$_\*" -include *.bat,*.exe,*cmd } | `
-        %{  $file = $_.Name; `
+    (Get-ChildItem env:\path).Value.split(';') | `
+        Where-Object { $_ } | `
+        ForEach-Object{ [System.Environment]::ExpandEnvironmentVariables($_) } | `
+        Where-Object { test-path $_ } |`
+        ForEach-Object{ ls "$_\*" -include *.bat,*.exe,*cmd } | `
+        ForEach-Object{  $file = $_.Name; `
             if($file -and ($file -eq $command -or `
 			   $file -eq ($command + '.exe') -or  `
 			   $file -eq ($command + '.bat') -or  `
@@ -174,5 +203,5 @@ function Where-Is($command) {
                 $_.FullName `
             } `
         } | `
-        select -unique
+        Select-Object -unique
 }
