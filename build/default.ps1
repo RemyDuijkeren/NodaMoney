@@ -99,7 +99,7 @@ Task test {
 	}
 }
 
-# Doesn't currently work wit .NET Core :-(
+# Doesn't currently work with .NET Core :-(
 Task testWithCoverage {
 	$openCoverExe = Resolve-Path "$PackagesDir\OpenCover.*\tools\OpenCover.Console.exe"
 	$dotnetExe = Where-Is('dotnet')

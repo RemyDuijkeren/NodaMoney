@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
-#if !PORTABLE
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
-#endif
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("NodaMoney.Tests")]
+[assembly: CLSCompliant(true)]
 
 namespace NodaMoney
 {
@@ -18,11 +17,9 @@ namespace NodaMoney
     /// <remarks>See http://en.wikipedia.org/wiki/Currency .</remarks>
     [DataContract]
     [DebuggerDisplay("{Code}")]
-    public struct Currency : IEquatable<Currency>
-#if !PORTABLE
-        , IXmlSerializable
-#endif
+    public struct Currency : IEquatable<Currency>, IXmlSerializable
     {
+        /// <summary>A singleton instance of the currencies registry.</summary>
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
@@ -113,9 +110,7 @@ namespace NodaMoney
         public DateTime? ValidTo { get; internal set; }
 
         /// <summary>Gets the major currency unit.</summary>
-#if !PORTABLE
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
-#endif
         public decimal MajorUnit => 1;
 
         /// <summary>Gets the minor currency unit.</summary>
@@ -133,6 +128,24 @@ namespace NodaMoney
         /// <summary>Gets a value indicating whether currency is obsolete.</summary>
         /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
         public bool IsObsolete => ValidTo.HasValue && ValidTo.Value < DateTime.Today;
+
+        /// <summary>Implements the operator ==.</summary>
+        /// <param name="left">The left Currency.</param>
+        /// <param name="right">The right Currency.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator ==(Currency left, Currency right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>Implements the operator ==.</summary>
+        /// <param name="left">The left Currency.</param>
+        /// <param name="right">The right Currency.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator !=(Currency left, Currency right)
+        {
+            return !(left == right);
+        }
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
@@ -219,31 +232,11 @@ namespace NodaMoney
             return Registry.GetAllCurrencies();
         }
 
-        /// <summary>Implements the operator ==.</summary>
-        /// <param name="left">The left Currency.</param>
-        /// <param name="right">The right Currency.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator ==(Currency left, Currency right)
-        {
-            return left.Equals(right);
-        }
-
-        /// <summary>Implements the operator ==.</summary>
-        /// <param name="left">The left Currency.</param>
-        /// <param name="right">The right Currency.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator !=(Currency left, Currency right)
-        {
-            return !(left == right);
-        }
-
         /// <summary>Returns a value indicating whether two specified instances of <see cref="Currency"/> represent the same value.</summary>
         /// <param name="left">The first <see cref="Currency"/> object.</param>
         /// <param name="right">The second <see cref="Currency"/> object.</param>
         /// <returns>true if left and right are equal to this instance; otherwise, false.</returns>
-#if !PORTABLE
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-#endif
         public static bool Equals(Currency left, Currency right)
         {
             return left.Equals(right);
@@ -260,9 +253,7 @@ namespace NodaMoney
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Currency"/> object represent the same value.</summary>
         /// <param name="other">A <see cref="Currency"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-#if !PORTABLE
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-#endif
         public bool Equals(Currency other)
         {
             return Equals(this.Code, other.Code);

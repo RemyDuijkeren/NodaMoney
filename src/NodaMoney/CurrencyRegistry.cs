@@ -7,13 +7,18 @@ namespace NodaMoney
     /// <summary>Represent the central thread-safe registry for currencies.</summary>
     internal class CurrencyRegistry
     {
-        // The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
-        // khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
-        // a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
-        // used. E.g. 1.2 UM.
-        // To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        /// <summary>
+        /// The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
+        /// khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
+        /// a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
+        /// used. E.g. 1.2 UM.
+        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        /// </summary>
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
+
+        /// <summary>Used for indication that the number of decimal digits doesn't matter, for example for gold or silver.</summary>
         internal const double NotApplicable = -1;
+
         private static readonly object SyncLock = new object(); // TODO: Replace with ReaderWriterLock?
         private static readonly Dictionary<string, Currency> Currencies = new Dictionary<string, Currency>(InitializeIsoCurrencies());
         private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
@@ -284,7 +289,7 @@ namespace NodaMoney
                 { "ISO-4217::UAH", new Currency("UAH", "980", 2, "Ukrainian hryvnia", "₴") },
                 { "ISO-4217::UGX", new Currency("UGX", "800", 2, "Ugandan shilling", "USh") },
                 { "ISO-4217::USD", new Currency("USD", "840", 2, "United States dollar", "$") }, // or US$
-                { "ISO-4217::USN", new Currency("USN", "997", 2, "United States dollar (next day) (funds code)", "$") },               
+                { "ISO-4217::USN", new Currency("USN", "997", 2, "United States dollar (next day) (funds code)", "$") },
                 { "ISO-4217::UYI", new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.CurrencySign) },
                 { "ISO-4217::UYU", new Currency("UYU", "858", 2, "Uruguayan peso", "$") }, // or $U
                 { "ISO-4217::UZS", new Currency("UZS", "860", 2, "Uzbekistan som", "лв") }, // or сўм ?
@@ -313,7 +318,7 @@ namespace NodaMoney
                 { "ISO-4217::ZAR", new Currency("ZAR", "710", 2, "South African rand", "R") },
                 { "ISO-4217::ZMW", new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK") }, // or ZMW
                 { "ISO-4217::ZWL", new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$") },
-                
+
                 // Historic ISO-4217 currencies
                 { "ISO-4217-HISTORIC::ESA", new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)) }, // replaced by ESP (EUR)
                 { "ISO-4217-HISTORIC::ESB", new Currency("ESB", "995", NotApplicable, "Spanish peseta (account B)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)) }, // replaced by ESP (EUR)

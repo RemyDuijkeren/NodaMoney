@@ -7,51 +7,30 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>NodaMoney</PackageId>
     <PackageTags>Noda;Money;Currency;ExchangeRate</PackageTags>
-    <!--<TargetFrameworks>netstandard1.6;netstandard1.0;net40;net45;portable45-net45+win8+wp8+wpa81;portable40-net40+sl5+win8+wp8+wpa81</TargetFrameworks>-->
     <TargetFrameworks>netstandard1.6;netstandard1.0;net40;net45</TargetFrameworks>
   </PropertyGroup>
-
+ 
   <ItemGroup>
     <None Remove="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wp8+wpa81' ">
-    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+    <AssemblyTitle>NodaMoney .NET Standard 1.0</AssemblyTitle>
+    <DefineConstants>NETSTANDARD1_0;$(AdditionalConstants)</DefineConstants>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable40-net40+sl5+win8+wp8+wpa81' ">
-    <DefineConstants>$(DefineConstants);PORTABLE40</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'portable40-net40+sl5+win8+wp8+wpa81' ">
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-
+  
 </Project>

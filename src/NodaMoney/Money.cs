@@ -1,9 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-#if !PORTABLE
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace NodaMoney
 {
@@ -42,36 +40,6 @@ namespace NodaMoney
         {
         }
 
-#if PORTABLE40
-        /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-        /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
-        /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
-        /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
-        /// result from consistently rounding a midpoint value in a single direction.</remarks>
-        public Money(decimal amount, Currency currency)
-        {
-            Currency = currency;
-
-            if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
-            {
-                Amount = Math.Round(amount);
-            }
-            else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
-            {
-                // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
-                Amount = Math.Round(amount / 0.2m, 0) * 0.2m;
-            }
-            else
-            {
-                Amount = Math.Round(amount, (int)Currency.DecimalDigits);
-            }
-        }
-#endif
-
-#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <param name="rounding">The rounding mode.</param>
@@ -131,7 +99,6 @@ namespace NodaMoney
                 Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
             }
         }
-#endif
 
         // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
 
@@ -182,7 +149,6 @@ namespace NodaMoney
         {
         }
 
-#if !PORTABLE40
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
         /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
         /// casted to double).</param>
@@ -196,7 +162,6 @@ namespace NodaMoney
             : this((decimal)amount, currency, rounding)
         {
         }
-#endif
 
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
@@ -303,9 +268,9 @@ namespace NodaMoney
             return Amount == other.Amount && Currency == other.Currency;
         }
 
-        /// <summary>Returns a value indicating whether this instance and a specified <see cref="Object"/> represent the same type
+        /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
         /// and value.</summary>
-        /// <param name="obj">An <see cref="Object"/>.</param>
+        /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
@@ -323,10 +288,11 @@ namespace NodaMoney
             }
         }
 
-#if !PORTABLE
-        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])",
-        Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
-#endif
+        [SuppressMessage(
+            "Microsoft.Globalization",
+            "CA1305:SpecifyIFormatProvider",
+            MessageId = "System.String.Format(System.String,System.Object[])",
+            Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)
