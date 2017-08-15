@@ -21,6 +21,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 !Build/
+tools/
 
 # Custom Build results
 [Aa]rtifacts/
