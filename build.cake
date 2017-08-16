@@ -142,14 +142,13 @@ Task("Upload-AppVeyor-Artifacts")
  Task("Publish-NuGet")
  .WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
  .WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
- //.WithCriteria(() => AppVeyor.Environment.Repository.Tag.IsTag)
  .IsDependentOn("Package")
  .Does(() =>
  {	
     DotNetCoreNuGetPush("*.nupkg", new DotNetCoreNuGetPushSettings
     {
         WorkingDirectory = artifactsDir,
-        //Source = "https://staging.nuget.org/packages?replace=true",
+        Source = "https://www.nuget.org/",
         ApiKey = EnvironmentVariable("NUGET_API_KEY")
     });
 });
