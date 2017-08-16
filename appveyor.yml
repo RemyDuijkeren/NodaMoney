@@ -30,13 +30,6 @@ build_script:
 test: off
 
 #---------------------------------#
-#      artifacts configuration    #
-#---------------------------------#
-artifacts:
-- path: .\Artifacts\*.nupkg
-  name: nuget
-
-#---------------------------------#
 #     deployment configuration    #
 #---------------------------------#
 deploy:
