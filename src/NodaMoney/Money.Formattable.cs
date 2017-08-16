@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace NodaMoney
 {
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     public partial struct Money : IFormattable
     {
-        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="String"/> representation.</summary>
+        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="Money"/> instance.</returns>
         /// <remarks>
         /// Converting will use the <see cref="NumberFormatInfo"/> object for the current culture if this has the same
@@ -19,7 +17,7 @@ namespace NodaMoney
             return ConvertToString(null, null);
         }
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation
+        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
         /// using the specified format.</summary>
         /// <param name="format">A numeric format string.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format.</returns>
@@ -33,7 +31,7 @@ namespace NodaMoney
             return ConvertToString(format, null);
         }
 
-        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="String"/> representation using the
+        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation using the
         /// specified culture-specific format information.</summary>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by formatProvider.</returns>
@@ -46,7 +44,7 @@ namespace NodaMoney
             return ConvertToString(null, formatProvider);
         }
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="String"/> representation
+        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
         /// using the specified format and culture-specific format information.</summary>
         /// <param name="format">A numeric format string.</param>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
@@ -60,8 +58,8 @@ namespace NodaMoney
         {
             var cc = CultureInfo.CurrentCulture;
 
+            // var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
             var numberFormatInfo = (NumberFormatInfo)cc.NumberFormat.Clone();
-            //var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
             if (formatProvider != null)
             {
@@ -73,7 +71,7 @@ namespace NodaMoney
                 if (nfi != null)
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
-            
+
             numberFormatInfo.CurrencyDecimalDigits = (int)currency.DecimalDigits;
             numberFormatInfo.CurrencySymbol = currency.Symbol;
 
@@ -116,25 +114,25 @@ namespace NodaMoney
                         break;
                 }
             }
-            
+
             return numberFormatInfo;
         }
 
         private string ConvertToString(string format, IFormatProvider formatProvider)
         {
-            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true           
-            // TODO: Hacked solution, solve with better implementation
+            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
 
+            // TODO: Hacked solution, solve with better implementation
             IFormatProvider provider;
             if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I") && format.Length >= 1 && format.Length <= 2)
             {
-                format = format.Replace("I", "C"); 
+                format = format.Replace("I", "C");
                 provider = GetFormatProvider(Currency, formatProvider, true);
             }
             else
             {
                 provider = GetFormatProvider(Currency, formatProvider);
-            }            
+            }
 
             return Amount.ToString(format ?? "C", provider);
         }

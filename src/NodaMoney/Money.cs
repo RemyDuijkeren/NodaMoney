@@ -1,9 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-#if !PORTABLE
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace NodaMoney
 {
@@ -14,7 +12,7 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    //// [DataContract]
+    [DataContract]
     public partial struct Money : IEquatable<Money>
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -29,16 +27,6 @@ namespace NodaMoney
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="rounding">The rounding mode.</param>
-        /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-        /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
-        public Money(decimal amount, MidpointRounding rounding)
-            : this(amount, Currency.CurrentCurrency, rounding)
-        {
-        }
-
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
@@ -49,6 +37,16 @@ namespace NodaMoney
         /// result from consistently rounding a midpoint value in a single direction.</remarks>
         public Money(decimal amount, string code)
             : this(amount, Currency.FromCode(code))
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
+        /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
+        public Money(decimal amount, MidpointRounding rounding)
+            : this(amount, Currency.CurrentCurrency, rounding)
         {
         }
 
@@ -270,9 +268,9 @@ namespace NodaMoney
             return Amount == other.Amount && Currency == other.Currency;
         }
 
-        /// <summary>Returns a value indicating whether this instance and a specified <see cref="Object"/> represent the same type
+        /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
         /// and value.</summary>
-        /// <param name="obj">An <see cref="Object"/>.</param>
+        /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
@@ -290,10 +288,11 @@ namespace NodaMoney
             }
         }
 
-#if !PORTABLE
-        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])",
-        Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
-#endif
+        [SuppressMessage(
+            "Microsoft.Globalization",
+            "CA1305:SpecifyIFormatProvider",
+            MessageId = "System.String.Format(System.String,System.Object[])",
+            Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
         private static void AssertIsSameCurrency(Money left, Money right)
         {
             if (left.Currency != right.Currency)

@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 .vs
+.vscode
 
 #DOTNET Core
 project.lock.json
@@ -20,6 +21,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 !Build/
+[Tt]ools/
 
 # Custom Build results
 [Aa]rtifacts/
@@ -159,7 +161,6 @@ AppPackages/
 sql/
 *.Cache
 ClientBin/
-[Ss]tyle[Cc]op.*
 ~$*
 *~
 *.dbmdl

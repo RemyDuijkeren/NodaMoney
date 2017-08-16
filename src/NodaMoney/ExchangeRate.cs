@@ -72,6 +72,24 @@ namespace NodaMoney
         /// <value>The value of the exchange rate.</value>
         public decimal Value { get; private set; }
 
+        /// <summary>Implements the operator ==.</summary>
+        /// <param name="left">The left ExchangeRate.</param>
+        /// <param name="right">The right ExchangeRate.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator ==(ExchangeRate left, ExchangeRate right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>Implements the operator !=.</summary>
+        /// <param name="left">The left ExchangeRate.</param>
+        /// <param name="right">The right ExchangeRate.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator !=(ExchangeRate left, ExchangeRate right)
+        {
+            return !(left == right);
+        }
+
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
         /// <param name="rate">The string representation of the exchange rate to convert.</param>
         /// <returns>The equivalent to the exchange rate contained in rate.</returns>
@@ -129,24 +147,6 @@ namespace NodaMoney
 
                 return false;
             }
-        }
-
-        /// <summary>Implements the operator ==.</summary>
-        /// <param name="left">The left ExchangeRate.</param>
-        /// <param name="right">The right ExchangeRate.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator ==(ExchangeRate left, ExchangeRate right)
-        {
-            return left.Equals(right);
-        }
-
-        /// <summary>Implements the operator !=.</summary>
-        /// <param name="left">The left ExchangeRate.</param>
-        /// <param name="right">The right ExchangeRate.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator !=(ExchangeRate left, ExchangeRate right)
-        {
-            return !(left == right);
         }
 
         /// <summary>Converts the specified money.</summary>

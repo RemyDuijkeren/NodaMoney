@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Project>
+  <PropertyGroup>
+    <Company>DynamicHands B.V.</Company>
+    <Copyright>Copyright Remy van Duijkeren</Copyright>
+    <Authors>Remy van Duijkeren</Authors>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageReleaseNotes>See https://github.com/remyvd/NodaMoney/releases/</PackageReleaseNotes>
+    <PackageIconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png</PackageIconUrl>
+    <PackageProjectUrl>http://www.nodamoney.org/</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/remyvd/NodaMoney</RepositoryUrl>
+    <Version>1.0.1-cake-build0010</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <InformationalVersion>1.0.1-cake-build.10</InformationalVersion>
+  </PropertyGroup>
+</Project>
