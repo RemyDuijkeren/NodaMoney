@@ -35,8 +35,9 @@ var testProjects = GetFiles("./tests/**/*.csproj");
 Task("Clean")
 .Does(() =>
 {
-    CleanDirectory(artifactsDir);
     DotNetCoreClean(rootDir);
+
+    CleanDirectory(artifactsDir);
 
     foreach(var path in srcProjects.Select(csproj => csproj.GetDirectory()))
     {
@@ -126,8 +127,22 @@ Task("Package")
     }
  });
 
- Task("PublishNuGet")
+Task("Upload-AppVeyor-Artifacts")
+.WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
+.WithCriteria(() => !AppVeyor.Environment.PullRequest.IsPullRequest)
+.IsDependentOn("Package")
+.Does(() =>
+{
+    foreach(var package in GetFiles(artifactsDir.ToString() + "/*.nupkg"))
+    {
+        AppVeyor.UploadArtifact(package);
+    }
+});
+
+ Task("Publish-NuGet")
  .WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
+ .WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
+ //.WithCriteria(() => AppVeyor.Environment.Repository.Tag.IsTag)
  .IsDependentOn("Package")
  .Does(() =>
  {	
@@ -144,6 +159,11 @@ Task("Package")
 //////////////////////////////////////////////////////////////////////
 Task("Default")
 .IsDependentOn("Package");
+
+Task("AppVeyor")
+.IsDependentOn("Package")
+.IsDependentOn("Upload-AppVeyor-Artifacts")
+.IsDependentOn("Publish-NuGet");
  
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

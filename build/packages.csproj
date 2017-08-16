@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <PackageReference Include="coveralls.net" Version="0.7.0" />
-    <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="GitVersion.CommandLine" Version="3.6.5" />
-  </ItemGroup>
-
-</Project>
