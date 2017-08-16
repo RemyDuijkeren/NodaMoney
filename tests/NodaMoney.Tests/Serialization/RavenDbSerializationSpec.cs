@@ -12,32 +12,32 @@ namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
     // http://ravendb.net/docs/article-page/2.5/csharp/samples/raven-tests/createraventests
     public class GivenIWantToStoreInRavenDb : RavenTestBase
     {
-        [Fact]
-        public void WhenMoneyAsRoot_ThenThisMustWork()
-        {
-            Money euros = new Money(123.56, "EUR");
+        //[Fact]
+        //public void WhenMoneyAsRoot_ThenThisMustWork()
+        //{
+        //    Money euros = new Money(123.56, "EUR");
 
-            using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
-            {
-                // Store in RavenDb
-                using (var session = store.OpenSession())
-                {
-                    session.Store(euros);
+        //    using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
+        //    {
+        //        // Store in RavenDb
+        //        using (var session = store.OpenSession())
+        //        {
+        //            session.Store(euros);
 
-                    session.SaveChanges();
-                }
+        //            session.SaveChanges();
+        //        }
 
-                // Read from RavenDb
-                using (var session = store.OpenSession())
-                {
-                    var result = session.Query<Money>()
-                        .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
-                        .FirstOrDefault();
+        //        // Read from RavenDb
+        //        using (var session = store.OpenSession())
+        //        {
+        //            var result = session.Query<Money>()
+        //                .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
+        //                .FirstOrDefault();
 
-                    result.Should().Be(euros);
-                }
-            }
-        }
+        //            result.Should().Be(euros);
+        //        }
+        //    }
+        //}
 
         //[Fact]
         //public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
