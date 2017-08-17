@@ -10,7 +10,7 @@ var artifactsDir = Directory("./artifacts/");
 var srcProjects = GetFiles("./src/**/*.csproj");
 var testProjects = GetFiles("./tests/**/*.csproj");
 
-Setup(() =>
+Setup(context =>
 {
    Information(Figlet("NodaMoney"));
 });

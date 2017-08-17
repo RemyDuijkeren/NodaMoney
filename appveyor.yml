@@ -25,7 +25,7 @@ nuget:
   disable_publish_on_pr: true
  
 build_script:
-  - ps: .\build.ps1 -Target "AppVeyor"
+  - ps: .\build.ps1 -Target AppVeyor
  
 test: off
 
