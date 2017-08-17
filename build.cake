@@ -1,42 +1,23 @@
-// This build assumes the following directory structure (https://gist.github.com/davidfowl/ed7564297c61fe9ab814):
-//  \build    	- Build customizations (custom msbuild files/psake/fake/albacore/etc) scripts
-//  \artifacts	- Build outputs go here. Doing a build.cmd generates artifacts here (nupkgs, zips, etc.)
-//	\docs		- Documentation stuff, markdown files, help files, etc
-//	\lib		- Binaries which are linked to in the source but are not distributed through NuGet
-//	\packages	- Nuget packages
-//	\samples    - Sample projects
-//  \src		- Main projects (the source code)
-//	\tests      - Test projects
-//	\tools		- Binaries which are used as part of the build script (e.g. test runners, external tools)
-
-//////////////////////////////////////////////////////////////////////
-// TOOLS
-//////////////////////////////////////////////////////////////////////
 #tool "xunit.runner.console"
 #tool "GitVersion.CommandLine"
+#addin "Cake.Figlet"
 
-//////////////////////////////////////////////////////////////////////
-// ARGUMENTS
-//////////////////////////////////////////////////////////////////////
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
- 
-//////////////////////////////////////////////////////////////////////
-/// GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////
+
 var rootDir = Directory("./");
 var artifactsDir = Directory("./artifacts/");
 var srcProjects = GetFiles("./src/**/*.csproj");
 var testProjects = GetFiles("./tests/**/*.csproj");
 
-//////////////////////////////////////////////////////////////////////
-// TASKS
-//////////////////////////////////////////////////////////////////////
+Setup(() =>
+{
+   Information(Figlet("NodaMoney"));
+});
+
 Task("Clean")
 .Does(() =>
 {
-    DotNetCoreClean(rootDir);
-
     CleanDirectory(artifactsDir);
 
     foreach(var path in srcProjects.Select(csproj => csproj.GetDirectory()))
@@ -76,7 +57,6 @@ Does(() =>
 	
     if (AppVeyor.IsRunningOnAppVeyor)
     {
-        Information("Send updated version to AppVeyor");
         AppVeyor.UpdateBuildVersion(informationalVersion + ".build." + buildVersion);
     }	
 	
@@ -153,9 +133,6 @@ Task("Upload-AppVeyor-Artifacts")
     });
 });
  
-//////////////////////////////////////////////////////////////////////
-// TASK TARGETS
-//////////////////////////////////////////////////////////////////////
 Task("Default")
 .IsDependentOn("Package");
 
@@ -163,8 +140,5 @@ Task("AppVeyor")
 .IsDependentOn("Package")
 .IsDependentOn("Upload-AppVeyor-Artifacts")
 .IsDependentOn("Publish-NuGet");
- 
-//////////////////////////////////////////////////////////////////////
-// EXECUTION
-////////////////////////////////////////////////////////////////////// 
+
 RunTarget(target);
