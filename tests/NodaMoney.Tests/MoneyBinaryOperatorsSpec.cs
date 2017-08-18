@@ -5,6 +5,7 @@ using FluentAssertions;
 using FluentAssertions.Common;
 
 using Xunit;
+using NodaMoney.Tests.Helpers;
 // ReSharper disable All
 
 namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
@@ -22,7 +23,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         };
 
         [Theory, MemberData("TestData")]
-        public void WhenUsingAdditionOperator_ThenMoneyShouldBeAdd(decimal value1, decimal value2, decimal expected)
+        public void WhenUsingAdditionOperator_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);
             var money2 = new Money(value2);
@@ -35,7 +36,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData("TestData")]
-        public void WhenUsingAdditionMethod_ThenMoneyShouldBeAdd(decimal value1, decimal value2, decimal expected)
+        public void WhenUsingAdditionMethod_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);
             var money2 = new Money(value2);
@@ -115,6 +116,60 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             Action action = () => { Money.Subtract(money1, money2); };
 
             action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData("TestData")]
+        [UseCulture("en-us")]
+        public void WhenUsingAddtionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+
+            Money result1 = money1 + value2;
+            Money result2 = value2 + money1;
+
+            result1.Should().Be(new Money(expected, "EUR"));
+            result1.Should().NotBeSameAs(money1);
+            result2.Should().Be(new Money(expected, "EUR"));
+            result2.Should().NotBeSameAs(money1);
+        }
+
+        [Theory, MemberData("TestData")]
+        [UseCulture("en-us")]
+        public void WhenUsingAdditionMethodWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+
+            var result = Money.Add(money1, value2);
+
+            result.Should().Be(new Money(expected, "EUR"));
+            result.Should().NotBeSameAs(money1);
+        }
+
+        [Theory, MemberData("TestData")]
+        [UseCulture("en-us")]
+        public void WhenUsingSubstractionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal expected, decimal value2, decimal value1)
+        {
+            var money1 = new Money(value1, "EUR");
+
+            Money result1 = money1 - value2;
+            Money result2 = value2 - money1;
+
+            result1.Should().Be(new Money(expected, "EUR"));
+            result1.Should().NotBeSameAs(money1);
+            result2.Should().Be(new Money(expected, "EUR"));
+            result2.Should().NotBeSameAs(money1);
+        }
+
+        [Theory, MemberData("TestData")]
+        [UseCulture("en-us")]
+        public void WhenUsingSubstractionMethodWithDecimal_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
+        {
+            var money1 = new Money(value1, "EUR");
+
+            var result = Money.Subtract(money1, value2);
+
+            result.Should().Be(new Money(expected, "EUR"));
+            result.Should().NotBeSameAs(money1);
         }
     }
 

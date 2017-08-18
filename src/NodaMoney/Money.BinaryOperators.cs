@@ -12,6 +12,24 @@
             return Add(left, right);
         }
 
+        /// <summary>Add the <see cref="Money"/> value with the given value.</summary>
+        /// <param name="left">A <see cref="Money"/> object on the left side.</param>
+        /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
+        /// <returns>The <see cref="Money"/> result of adding left and right.</returns>
+        public static Money operator +(Money left, decimal right)
+        {
+            return Add(left, right);
+        }
+
+        /// <summary>Add the <see cref="Money"/> value with the given value.</summary>
+        /// <param name="left">A <see cref="decimal"/> object on the left side.</param>
+        /// <param name="right">A <see cref="Money"/> object on the right side.</param>
+        /// <returns>The <see cref="Money"/> result of adding left and right.</returns>
+        public static Money operator +(decimal left, Money right)
+        {
+            return Add(right, left);
+        }
+
         /// <summary>Subtracts two specified <see cref="Money"/> values.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
@@ -19,6 +37,24 @@
         public static Money operator -(Money left, Money right)
         {
             return Subtract(left, right);
+        }
+
+        /// <summary>Subtracts <see cref="Money"/> value with the given value.</summary>
+        /// <param name="left">A <see cref="Money"/> object on the left side.</param>
+        /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
+        /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
+        public static Money operator -(Money left, decimal right)
+        {
+            return Subtract(left, right);
+        }
+
+        /// <summary>Subtracts <see cref="Money"/> value with the given value.</summary>
+        /// <param name="left">A <see cref="decimal"/> object on the left side.</param>
+        /// <param name="right">A <see cref="Money"/> object on the right side.</param>
+        /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
+        public static Money operator -(decimal left, Money right)
+        {
+            return Subtract(right, left);
         }
 
         /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
@@ -69,6 +105,15 @@
             return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
         }
 
+        /// <summary>Adds two specified <see cref="Money"/> values.</summary>
+        /// <param name="money1">The first <see cref="Money"/> object.</param>
+        /// <param name="money2">The second <see cref="decimal"/> object.</param>
+        /// <returns>A <see cref="Money"/> object with the values of both <see cref="decimal"/> objects added.</returns>
+        public static Money Add(Money money1, decimal money2)
+        {
+            return new Money(decimal.Add(money1.Amount, money2), money1.Currency);
+        }
+
         /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
         /// <param name="money1">The first <see cref="Money"/> object.</param>
         /// <param name="money2">The second <see cref="Money"/> object.</param>
@@ -77,6 +122,15 @@
         {
             AssertIsSameCurrency(money1, money2);
             return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
+        }
+
+        /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
+        /// <param name="money1">The first <see cref="Money"/> object.</param>
+        /// <param name="money2">The second <see cref="decimal"/> object.</param>
+        /// <returns>A <see cref="Money"/> object where the second <see cref="decimal"/> object is subtracted from the first.</returns>
+        public static Money Subtract(Money money1, decimal money2)
+        {
+            return new Money(decimal.Subtract(money1.Amount, money2), money1.Currency);
         }
 
         /// <summary>Multiplies the specified money.</summary>
