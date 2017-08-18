@@ -5,7 +5,7 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
-var rootDir = Directory("./");
+var solutionFile = "./NodaMoney.sln";
 var artifactsDir = Directory("./artifacts/");
 var srcProjects = GetFiles("./src/**/*.csproj");
 var testProjects = GetFiles("./tests/**/*.csproj");
@@ -36,7 +36,7 @@ Task("Clean")
 Task("Restore")
 .Does(() =>
 {
-    DotNetCoreRestore(rootDir);
+    DotNetCoreRestore(solutionFile);
 });
 
 Task("Version").
@@ -61,7 +61,7 @@ Does(() =>
     }	
 	
     Information("Update Directory.build.props");
-    var file = File(rootDir.ToString() + "src/Directory.build.props");
+    var file = File("./src/Directory.build.props");
     XmlPoke(file, "/Project/PropertyGroup/Version", nuGetVersion);
     XmlPoke(file, "/Project/PropertyGroup/AssemblyVersion", assemblyVersion);
     XmlPoke(file, "/Project/PropertyGroup/FileVersion", fileVersion);
@@ -74,7 +74,7 @@ Task("Build")
 .IsDependentOn("Version")
 .Does(() =>
 {
-    DotNetCoreBuild(rootDir, new DotNetCoreBuildSettings { Configuration = configuration });
+    DotNetCoreBuild(solutionFile, new DotNetCoreBuildSettings { Configuration = configuration });
 });
 
 Task("Test")
