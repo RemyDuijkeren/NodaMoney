@@ -119,12 +119,12 @@ Task("Upload-AppVeyor-Artifacts")
     }
 });
 
- Task("Publish-NuGet")
- .WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
- .WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
- .IsDependentOn("Package")
- .Does(() =>
- {	
+Task("Publish-NuGet")
+.WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
+.WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
+.IsDependentOn("Package")
+.Does(() =>
+{	
     DotNetCoreNuGetPush("*.nupkg", new DotNetCoreNuGetPushSettings
     {
         WorkingDirectory = artifactsDir,
