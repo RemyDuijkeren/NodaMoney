@@ -61,7 +61,7 @@ namespace NodaMoney.Serialization.JsonNet
             if (amountProperty == null)
                 throw new ArgumentNullException("Ammount needs to be defined", "amount");
 
-            if (properties.Count == 1)
+            if (currencyProperty == null)
                 return new Money((decimal)amountProperty.Value);
             else
                 return new Money((decimal)amountProperty.Value, Currency.FromCode((string)currencyProperty.Value));
