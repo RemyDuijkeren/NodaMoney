@@ -37,9 +37,7 @@ namespace NodaMoney.Serialization.AspNet
             var amount = decimal.Parse(Convert.ToString(dictionary["amount"], CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
             if (!dictionary.ContainsKey("currency"))
-            {
                 return new Money(amount);
-            }
 
             string code = (string)dictionary["currency"];
             return new Money(amount, Currency.FromCode(code));
