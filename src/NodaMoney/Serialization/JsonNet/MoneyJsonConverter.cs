@@ -54,7 +54,17 @@ namespace NodaMoney.Serialization.JsonNet
 
             JObject jsonObject = JObject.Load(reader);
             var properties = jsonObject.Properties().ToList();
-            return new Money((decimal)properties[0].Value, Currency.FromCode((string)properties[1].Value));
+
+            var amountProperty = properties.FirstOrDefault(pr => string.Compare(pr.Name, "amount", StringComparison.OrdinalIgnoreCase) == 0);
+            var currencyProperty = properties.FirstOrDefault(pr => string.Compare(pr.Name, "currency", StringComparison.OrdinalIgnoreCase) == 0);
+
+            if (amountProperty == null)
+                throw new ArgumentNullException("Ammount needs to be defined", "amount");
+
+            if (properties.Count == 1)
+                return new Money((decimal)amountProperty.Value);
+            else
+                return new Money((decimal)amountProperty.Value, Currency.FromCode((string)currencyProperty.Value));
         }
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
