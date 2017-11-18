@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,9 +20,8 @@ namespace NodaMoney
         /// <summary>Used for indication that the number of decimal digits doesn't matter, for example for gold or silver.</summary>
         internal const double NotApplicable = -1;
 
-        private static readonly object SyncLock = new object(); // TODO: Replace with ReaderWriterLock?
-        private static readonly Dictionary<string, Currency> Currencies = new Dictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
+        private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
+        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
@@ -34,26 +34,17 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(code));
 
             var found = new List<Currency>();
-            lock (SyncLock)
+            foreach (var ns in Namespaces.Keys)
             {
-                foreach (var ns in Namespaces.Keys)
+                // don't use string.Format(), string concat much faster in this case!
+                if (Currencies.TryGetValue(ns + "::" + code, out Currency c))
                 {
-                    Currency c;
-                    if (Currencies.TryGetValue(ns + "::" + code, out c))
-                    {
-                        found.Add(c);
-                    }
+                    found.Add(c);
                 }
             }
 
-            if (found.Count == 0)
-            {
-                currency = default(Currency);
-                return false;
-            }
-
-            currency = found[0]; // TODO: If more than one, sort by prio.
-            return true;
+            currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
+            return !currency.Equals(default(Currency));
         }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
@@ -69,10 +60,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            lock (SyncLock)
-            {
-                return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
-            }
+            return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
         }
 
         /// <summary>Attempts to add the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -88,17 +76,8 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            lock (SyncLock)
-            {
-                Namespaces[@namespace] = default(byte);
-                if (!Currencies.ContainsKey(@namespace + "::" + code))
-                {
-                    Currencies.Add(@namespace + "::" + code, currency);
-                    return true;
-                }
-            }
-
-            return false;
+            Namespaces[@namespace] = default(byte);
+            return Currencies.TryAdd(@namespace + "::" + code, currency);
         }
 
         /// <summary>Attempts to remove the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -114,17 +93,8 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            lock (SyncLock)
-            {
-                // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
-                if (Currencies.TryGetValue(@namespace + "::" + code, out currency))
-                {
-                    Currencies.Remove(@namespace + "::" + code);
-                    return true;
-                }
-            }
-
-            return false;
+            // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
+            return Currencies.TryRemove(@namespace + "::" + code, out currency);
         }
 
         /// <summary>Get all registered currencies.</summary>
@@ -137,7 +107,7 @@ namespace NodaMoney
         private static IDictionary<string, Currency> InitializeIsoCurrencies()
         {
             // TODO: Move to resource file.
-            var currencies = new Dictionary<string, Currency>
+            return new Dictionary<string, Currency>
             {
                 { "ISO-4217::AED", new Currency("AED", "784", 2, "United Arab Emirates dirham", "د.إ") },
                 { "ISO-4217::AFN", new Currency("AFN", "971", 2, "Afghan afghani", "؋") },
@@ -426,8 +396,6 @@ namespace NodaMoney
                 { "ISO-4217-HISTORIC::TNF", new Currency("TNF", string.Empty, 2, "Tunisian franc", "F", "ISO-4217-HISTORIC", new DateTime(1958, 12, 31), new DateTime(1991, 7, 1)) }, // replaced by TND
                 { "ISO-4217-HISTORIC::NFD", new Currency("NFD", string.Empty, 2, "Newfoundland dollar", "$", "ISO-4217-HISTORIC", new DateTime(1949, 12, 31), new DateTime(1865, 1, 1)) } // replaced by CAD
             };
-
-            return currencies;
         }
     }
 }
