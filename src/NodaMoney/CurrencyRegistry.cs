@@ -119,7 +119,7 @@ namespace NodaMoney
                 ["ISO-4217::ARS"] = new Currency("ARS", "032", 2, "Argentine peso", "$"),
                 ["ISO-4217::AUD"] = new Currency("AUD", "036", 2, "Australian dollar", "$"),
                 ["ISO-4217::AWG"] = new Currency("AWG", "533", 2, "Aruban florin", "ƒ"),
-                ["ISO-4217::AZN"] = new Currency("AZN", "944", 2, "Azerbaijan manat", "ман"),
+                ["ISO-4217::AZN"] = new Currency("AZN", "944", 2, "Azerbaijan Manat", "ман"), // AZERBAIJAN
                 ["ISO-4217::BAM"] = new Currency("BAM", "977", 2, "Bosnia and Herzegovina convertible mark", "KM"),
                 ["ISO-4217::BBD"] = new Currency("BBD", "052", 2, "Barbados dollar", "$"),
                 ["ISO-4217::BDT"] = new Currency("BDT", "050", 2, "Bangladeshi taka", "৳"), // or Tk
@@ -167,7 +167,7 @@ namespace NodaMoney
                 ["ISO-4217::GHS"] = new Currency("GHS", "936", 2, "Ghanaian cedi", "GH¢"), // or GH₵
                 ["ISO-4217::GIP"] = new Currency("GIP", "292", 2, "Gibraltar pound", "£"),
                 ["ISO-4217::GMD"] = new Currency("GMD", "270", 2, "Gambian dalasi", "D"),
-                ["ISO-4217::GNF"] = new Currency("GNF", "324", 0, "Guinean franc", "FG"), // (possibly also Fr or GFr)
+                ["ISO-4217::GNF"] = new Currency("GNF", "324", 0, "Guinean Franc", "FG"), // (possibly also Fr or GFr)  GUINEA
                 ["ISO-4217::GTQ"] = new Currency("GTQ", "320", 2, "Guatemalan quetzal", "Q"),
                 ["ISO-4217::GYD"] = new Currency("GYD", "328", 2, "Guyanese dollar", "$"), // or G$
                 ["ISO-4217::HKD"] = new Currency("HKD", "344", 2, "Hong Kong dollar", "HK$"), // or $
@@ -187,13 +187,13 @@ namespace NodaMoney
                 ["ISO-4217::KES"] = new Currency("KES", "404", 2, "Kenyan shilling", "KSh"),
                 ["ISO-4217::KGS"] = new Currency("KGS", "417", 2, "Kyrgyzstani som", "сом"),
                 ["ISO-4217::KHR"] = new Currency("KHR", "116", 2, "Cambodian riel", "៛"),
-                ["ISO-4217::KMF"] = new Currency("KMF", "174", 0, "Comorian franc", "CF"),
+                ["ISO-4217::KMF"] = new Currency("KMF", "174", 0, "Comorian Franc", "CF"), // COMOROS (THE)
                 ["ISO-4217::KPW"] = new Currency("KPW", "408", 0, "North Korean won", "₩"),
                 ["ISO-4217::KRW"] = new Currency("KRW", "410", 0, "South Korean won", "₩"),
                 ["ISO-4217::KWD"] = new Currency("KWD", "414", 3, "Kuwaiti dinar", "د.ك"), // or K.D.
                 ["ISO-4217::KYD"] = new Currency("KYD", "136", 2, "Cayman Islands dollar", "$"),
                 ["ISO-4217::KZT"] = new Currency("KZT", "398", 2, "Kazakhstani tenge", "₸"),
-                ["ISO-4217::LAK"] = new Currency("LAK", "418", 0, "Lao kip", "₭"), // or ₭N
+                ["ISO-4217::LAK"] = new Currency("LAK", "418", 0, "Lao Kip", "₭"), // or ₭N,  LAO PEOPLE’S DEMOCRATIC REPUBLIC(THE), ISO says minor unit=2 but wiki syas Historically, one kip was divided into 100 att (ອັດ).
                 ["ISO-4217::LBP"] = new Currency("LBP", "422", 0, "Lebanese pound", "ل.ل"),
                 ["ISO-4217::LKR"] = new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs"), // or රු
                 ["ISO-4217::LRD"] = new Currency("LRD", "430", 2, "Liberian dollar", "$"), // or L$, LD$
@@ -260,7 +260,7 @@ namespace NodaMoney
                 ["ISO-4217::UGX"] = new Currency("UGX", "800", 2, "Ugandan shilling", "USh"),
                 ["ISO-4217::USD"] = new Currency("USD", "840", 2, "United States dollar", "$"), // or US$
                 ["ISO-4217::USN"] = new Currency("USN", "997", 2, "United States dollar (next day) (funds code)", "$"),
-                ["ISO-4217::UYI"] = new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.CurrencySign),
+                ["ISO-4217::UYI"] = new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.CurrencySign), // List two
                 ["ISO-4217::UYU"] = new Currency("UYU", "858", 2, "Uruguayan peso", "$"), // or $U
                 ["ISO-4217::UZS"] = new Currency("UZS", "860", 2, "Uzbekistan som", "лв"), // or сўм ?
                 ["ISO-4217::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs."), // or Bs.F.
