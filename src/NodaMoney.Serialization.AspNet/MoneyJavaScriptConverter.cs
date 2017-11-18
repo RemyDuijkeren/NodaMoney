@@ -34,14 +34,13 @@ namespace NodaMoney.Serialization.AspNet
             if (!dictionary.ContainsKey("amount"))
                 throw new ArgumentNullException("Ammount needs to be defined", "amount");
 
+            if (!dictionary.ContainsKey("currency"))
+                throw new ArgumentNullException("Currency needs to be defined", "currency");
+
             var amount = decimal.Parse(Convert.ToString(dictionary["amount"], CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
-            if (!dictionary.ContainsKey("currency"))
-            {
-                return new Money(amount);
-            }
+            var code = (string)dictionary["currency"];
 
-            string code = (string)dictionary["currency"];
             return new Money(amount, Currency.FromCode(code));
         }
 

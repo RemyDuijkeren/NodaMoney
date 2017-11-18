@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Web.Script.Serialization;
 using FluentAssertions;
@@ -62,18 +63,24 @@ namespace NodaMoney.Serialization.AspNet.Tests
         {
             private static string CurrentCultureCode = new RegionInfo(CultureInfo.CurrentCulture.LCID).ISOCurrencySymbol;
 
-            public static IEnumerable<object[]> TestData => new[]
+            public static IEnumerable<object[]> ValidJsonData => new[]
             {
                 new object[] { $"{{ amount: '200', currency: '{CurrentCultureCode}' }}", },
                 new object[] { $"{{ amount: 200, currency: '{CurrentCultureCode}' }}" },
                 new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 200 }}" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: '200' }}" }
+            };
+
+            public static IEnumerable<object[]> InvalidJsonData => new[]
+            {
                 new object[] { "{ amount: '200' }" },
-                new object[] { "{ amount: 200 }" }
+                new object[] { "{ amount: 200 }" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
             };
 
             [Theory]
-            [MemberData("TestData")]
-            public void WhenDeserializing_ThenThisShouldSucceed(string json)
+            [MemberData("ValidJsonData")]
+            public void WhenDeserializingWithValidJSON_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
 
@@ -86,35 +93,75 @@ namespace NodaMoney.Serialization.AspNet.Tests
                 clone.Should().Be(money);
             }
 
-            public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
+            [Theory]
+            [MemberData("InvalidJsonData")]
+            public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
             {
-                private static string CurrentCultureCode = new RegionInfo(CultureInfo.CurrentCulture.LCID).ISOCurrencySymbol;
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
 
-                public static IEnumerable<object[]> TestData => new[]
+                var jsSerializer = new JavaScriptSerializer();
+                jsSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
+
+                var exception = Record.Exception(() =>
+                    jsSerializer.Deserialize<Money>(json)
+                );
+
+                exception.Should().BeOfType<ArgumentNullException>();
+            }
+        }
+
+        public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
+        {
+            private static string CurrentCultureCode = new RegionInfo(CultureInfo.CurrentCulture.LCID).ISOCurrencySymbol;
+
+            public static IEnumerable<object[]> ValidJsonData => new[]
+            {
+                new object[] { $"{{ amount: '200', currency: '{CurrentCultureCode}' }}", },
+                new object[] { $"{{ amount: 200, currency: '{CurrentCultureCode}' }}" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 200 }}" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: '200' }}" }
+            };
+
+            public static IEnumerable<object[]> InvalidJsonData => new[]
+            {
+                new object[] { "{ amount: '200' }" },
+                new object[] { "{ amount: 200 }" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
+            };
+
+            [Theory]
+            [MemberData("ValidJsonData")]
+            public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {
-                    new object[] { $"{{ amount: '200', currency: '{CurrentCultureCode}' }}", },
-                    new object[] { $"{{ amount: 200, currency: '{CurrentCultureCode}' }}" },
-                    new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 200 }}" },
-                    new object[] { "{ amount: '200' }" },
-                    new object[] { "{ amount: 200 }" }
+                    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
                 };
 
-                [Theory]
-                [MemberData("TestData")]
-                public void WhenDeserializing_ThenThisShouldSucceed(string json)
+                // Console.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<Money>(json);
+
+                clone.Should().Be(money);
+            }
+
+            [Theory]
+            [MemberData("InvalidJsonData")]
+            public void WhenDeserializing_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {
-                    var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+                    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                };
 
-                    JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                    {
-                        Converters = new List<JsonConverter> { new MoneyJsonConverter() }
-                    };
+                var exception = Record.Exception(() =>
+                    JsonConvert.DeserializeObject<Money>(json)
+                );
 
-                    // Console.WriteLine(json);
-                    var clone = JsonConvert.DeserializeObject<Money>(json);
-
-                    clone.Should().Be(money);
-                }
+                exception.Should().BeOfType<ArgumentNullException>();
             }
         }
     }
