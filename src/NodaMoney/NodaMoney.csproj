@@ -7,7 +7,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>NodaMoney</PackageId>
     <PackageTags>Noda;Money;Currency;ExchangeRate</PackageTags>
-    <TargetFrameworks>netstandard1.6;netstandard1.0;net40;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;net40;net45</TargetFrameworks>
   </PropertyGroup>
  
   <ItemGroup>
@@ -15,10 +15,6 @@
     <AdditionalFiles Include="stylecop.json" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' ">
