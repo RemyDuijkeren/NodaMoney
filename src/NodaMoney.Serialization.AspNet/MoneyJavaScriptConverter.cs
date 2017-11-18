@@ -31,8 +31,15 @@ namespace NodaMoney.Serialization.AspNet
             if (type != typeof(Money))
                 throw new ArgumentException("object should be of type Money to deserialize!", nameof(type));
 
-            decimal amount = decimal.Parse((string)dictionary["amount"], CultureInfo.InvariantCulture);
-            string code = (string)dictionary["currency"];
+            if (!dictionary.ContainsKey("amount"))
+                throw new ArgumentNullException("Ammount needs to be defined", "amount");
+
+            if (!dictionary.ContainsKey("currency"))
+                throw new ArgumentNullException("Currency needs to be defined", "currency");
+
+            var amount = decimal.Parse(Convert.ToString(dictionary["amount"], CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+
+            var code = (string)dictionary["currency"];
 
             return new Money(amount, Currency.FromCode(code));
         }
@@ -42,7 +49,7 @@ namespace NodaMoney.Serialization.AspNet
         /// <param name="serializer">The object that is responsible for the serialization.</param>
         /// <returns>An object that contains key/value pairs that represent the object’s data.</returns>
         public override IDictionary<string, object> Serialize(object obj, JavaScriptSerializer serializer)
-        {            
+        {
             Money money = (Money)obj;
 
             var dictionary = new Dictionary<string, object>
