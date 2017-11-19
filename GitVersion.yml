@@ -1,5 +1,4 @@
-mode: ContinuousDeployment
-continuous-delivery-fallback-tag: rc
+mode: ContinuousDelivery
 next-version: 1.0.0
 branches: {}
 ignore:

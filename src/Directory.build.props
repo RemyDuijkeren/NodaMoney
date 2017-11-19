@@ -10,9 +10,9 @@
     <PackageLicenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/remyvd/NodaMoney</RepositoryUrl>
-    <Version>1.0.1-extend-plus-oper0018</Version>
+    <Version>1.0.2-changedeployment0001</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
-    <InformationalVersion>1.0.1-extend-plus-operator.18</InformationalVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <InformationalVersion>1.0.2-changeDeploymentModel.1+13</InformationalVersion>
   </PropertyGroup>
 </Project>
