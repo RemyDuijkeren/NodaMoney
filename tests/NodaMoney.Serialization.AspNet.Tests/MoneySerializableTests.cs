@@ -78,6 +78,23 @@ namespace NodaMoney.Serialization.AspNet.Tests
                 new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
             };
 
+            public static IEnumerable<object[]> ValidNestedJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" }
+            };
+
+            public static IEnumerable<object[]> ValidNestedNullableJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" },
+                new object[] { $"{{ cash: null }}" },
+            };
+
             [Theory]
             [MemberData("ValidJsonData")]
             public void WhenDeserializingWithValidJSON_ThenThisShouldSucceed(string json)
@@ -108,6 +125,49 @@ namespace NodaMoney.Serialization.AspNet.Tests
 
                 exception.Should().BeOfType<ArgumentNullException>();
             }
+
+            private class TypeWithMoneyProperty
+            {
+                public Money Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedJsonData")]
+            public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                var jsSerializer = new JavaScriptSerializer();
+                jsSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
+
+                // Console.WriteLine(json);
+                var clone = jsSerializer.Deserialize<TypeWithMoneyProperty>(json);
+
+                clone.Cash.Should().Be(money);
+            }
+
+            private class TypeWithNullableMoneyProperty
+            {
+                public Money? Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedNullableJsonData")]
+            public void WhenDeserializingWithNestedNullable_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                var jsSerializer = new JavaScriptSerializer();
+                jsSerializer.RegisterConverters(new JavaScriptConverter[] { new MoneyJavaScriptConverter() });
+
+                // Console.WriteLine(json);
+                var clone = jsSerializer.Deserialize<TypeWithNullableMoneyProperty>(json);
+
+                if (!json.Contains("null"))
+                    clone.Cash.Should().Be(money);
+                else
+                    clone.Cash.Should().BeNull();
+            }
         }
 
         public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
@@ -129,9 +189,26 @@ namespace NodaMoney.Serialization.AspNet.Tests
                 new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
             };
 
+            public static IEnumerable<object[]> ValidNestedJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" }
+            };
+
+            public static IEnumerable<object[]> ValidNestedNullableJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" },
+                new object[] { $"{{ cash: null }}" },
+            };
+
             [Theory]
             [MemberData("ValidJsonData")]
-            public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
+            public void WhenDeserializing_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
 
@@ -148,7 +225,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
 
             [Theory]
             [MemberData("InvalidJsonData")]
-            public void WhenDeserializing_ThenThisShouldSucceed(string json)
+            public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
 
@@ -162,6 +239,53 @@ namespace NodaMoney.Serialization.AspNet.Tests
                 );
 
                 exception.Should().BeOfType<ArgumentNullException>();
+            }
+
+            private class TypeWithMoneyProperty
+            {
+                public Money Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedJsonData")]
+            public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                };
+
+                // Console.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<TypeWithMoneyProperty>(json);
+
+                clone.Cash.Should().Be(money);
+            }
+
+            private class TypeWithNullableMoneyProperty
+            {
+                public Money? Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedNullableJsonData")]
+            public void WhenDeserializingWithNestedNullable_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                };
+
+                // Console.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<TypeWithNullableMoneyProperty>(json);
+
+                if (!json.Contains("null"))
+                    clone.Cash.Should().Be(money);
+                else
+                    clone.Cash.Should().BeNull();
             }
         }
     }
