@@ -206,7 +206,7 @@ namespace NodaMoney
                 ["ISO-4217::MMK"] = new Currency("MMK", "104", 0, "Myanma kyat", "K"),
                 ["ISO-4217::MNT"] = new Currency("MNT", "496", 2, "Mongolian tugrik", "₮"),
                 ["ISO-4217::MOP"] = new Currency("MOP", "446", 2, "Macanese pataca", "MOP$"),
-                ["ISO-4217::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM"), // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
+                ["ISO-4217::MRU"] = new Currency("MRU", "929", Z07, "Mauritanian ouguiya", "UM", validFrom: new DateTime(2018, 01, 01)), // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
                 ["ISO-4217::MUR"] = new Currency("MUR", "480", 2, "Mauritian rupee", "Rs"),
                 ["ISO-4217::MVR"] = new Currency("MVR", "462", 2, "Maldivian rufiyaa", "Rf"), // or , MRf, MVR, .ރ or /-
                 ["ISO-4217::MWK"] = new Currency("MWK", "454", 2, "Malawi kwacha", "MK"),
@@ -292,6 +292,7 @@ namespace NodaMoney
                 ["ISO-4217::STD"] = new Currency("STD", "678", 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
 
                 // Historic ISO-4217 currencies (list three)
+                ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
                 ["ISO-4217-HISTORIC::ESA"] = new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
                 ["ISO-4217-HISTORIC::ESB"] = new Currency("ESB", "995", NotApplicable, "Spanish peseta (account B)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
                 ["ISO-4217-HISTORIC::LTL"] = new Currency("LTL", "440", 2, "Lithuanian litas", "Lt", "ISO-4217-HISTORIC", new DateTime(2014, 12, 31), new DateTime(1993, 1, 1)), // replaced by EUR

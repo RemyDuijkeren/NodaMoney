@@ -17,10 +17,7 @@ namespace NodaMoney.Extensions
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
         /// midpoint value in a single direction.</remarks>
-        public static IEnumerable<Money> SafeDivide(this Money money, int shares)
-        {
-            return SafeDivide(money, shares, MidpointRounding.ToEven);
-        }
+        public static IEnumerable<Money> SafeDivide(this Money money, int shares) => SafeDivide(money, shares, MidpointRounding.ToEven);
 
         /// <summary>Divide the Money in equal shares, without losing Money.</summary>
         /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>
@@ -55,10 +52,7 @@ namespace NodaMoney.Extensions
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
         /// midpoint value in a single direction.</remarks>
-        public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios)
-        {
-            return SafeDivide(money, ratios, MidpointRounding.ToEven);
-        }
+        public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios) => SafeDivide(money, ratios, MidpointRounding.ToEven);
 
         /// <summary>Divide the Money in shares with a specific ratio, without losing Money.</summary>
         /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>

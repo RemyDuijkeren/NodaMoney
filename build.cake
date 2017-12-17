@@ -1,6 +1,9 @@
-#tool "xunit.runner.console"
-#tool "GitVersion.CommandLine"
-#addin "Cake.Figlet"
+#tool nuget:?package=xunit.runner.console
+#tool nuget:?package=GitVersion.CommandLine
+#tool nuget:?package=OpenCover
+#tool nuget:?package=coveralls.net
+#addin nuget:?package=Cake.Figlet
+#addin nuget:?package=Cake.Coveralls
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -74,12 +77,14 @@ Task("Build")
 .IsDependentOn("Version")
 .Does(() =>
 {
-    DotNetCoreBuild(solutionFile, new DotNetCoreBuildSettings { Configuration = configuration });
+    DotNetCoreBuild(solutionFile, new DotNetCoreBuildSettings
+    {
+        Configuration = configuration,
+        ArgumentCustomization = arg => arg.AppendSwitch("/p:DebugType","=","Full") // needed for OpenCover
+    });
 });
 
 Task("Test")
-.IsDependentOn("Clean")
-.IsDependentOn("Restore")
 .IsDependentOn("Build")
 .Does(() =>
 {
@@ -89,9 +94,30 @@ Task("Test")
     }
 });
 
-Task("Package")
-.IsDependentOn("Build")
+Task("Coverage")
 .IsDependentOn("Test")
+.Does(() =>
+{
+    var openCoverSettings = new OpenCoverSettings
+    {
+        OldStyle = true,
+        MergeOutput = true
+    }
+    .WithFilter("+[NodaMoney*]* -[*.Tests*]*");
+
+    var xunit2Settings = new XUnit2Settings { ShadowCopy = false };
+
+    foreach(var testLib in GetFiles("./tests/**/bin/Release/*/NodaMoney*.Tests.dll"))
+    {
+        OpenCover(
+            context => { context.XUnit2(testLib.FullPath, xunit2Settings); },
+            artifactsDir.Path + "/coverage.xml",
+            openCoverSettings);
+    }
+});
+
+Task("Package")
+.IsDependentOn("Coverage")
 .Does(() =>
 {
     var packSettings = new DotNetCorePackSettings
@@ -106,6 +132,36 @@ Task("Package")
         DotNetCorePack(csproj.ToString(), packSettings);
     }
  });
+
+Task("Upload-Coverage-CoverallsIo")
+.WithCriteria(() => HasEnvironmentVariable("COVERALLS_REPO_TOKEN"))
+.WithCriteria(() => !AppVeyor.Environment.PullRequest.IsPullRequest)
+.IsDependentOn("Coverage")
+.Does(() =>
+{
+    if (AppVeyor.IsRunningOnAppVeyor)
+    {
+        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
+        {
+            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
+            CommitId = AppVeyor.Environment.Repository.Commit.Id,
+            CommitBranch = AppVeyor.Environment.Repository.Branch,
+            CommitAuthor = AppVeyor.Environment.Repository.Commit.Author,
+            CommitEmail = AppVeyor.Environment.Repository.Commit.Email,
+            CommitMessage = AppVeyor.Environment.Repository.Commit.Message,
+            JobId = Convert.ToInt32(EnvironmentVariable("APPVEYOR_BUILD_NUMBER")),
+            ServiceName = "appveyor"
+        });
+    }
+    else
+    {
+        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
+        {
+            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
+            ServiceName = "local"
+        });        
+    }
+});
 
 Task("Upload-AppVeyor-Artifacts")
 .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
@@ -122,6 +178,7 @@ Task("Upload-AppVeyor-Artifacts")
 Task("Publish-NuGet")
 .WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
 .WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
+.WithCriteria(() => AppVeyor.Environment.Repository.Tag.IsTag)
 .IsDependentOn("Package")
 .Does(() =>
 {	
@@ -139,6 +196,7 @@ Task("Default")
 Task("AppVeyor")
 .IsDependentOn("Package")
 .IsDependentOn("Upload-AppVeyor-Artifacts")
+.IsDependentOn("Upload-Coverage-CoverallsIo")
 .IsDependentOn("Publish-NuGet");
 
 RunTarget(target);

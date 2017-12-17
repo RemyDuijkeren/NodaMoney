@@ -65,24 +65,31 @@ namespace NodaMoney.Tests
 
         public class GivenIWantToAddAndSubtractMoneyUnary
         {
-            private readonly Money _tenEuro = new Money(10.00m, "EUR");
+            private readonly Money _tenEuroPlus = new Money(10.00m, "EUR");
+            private readonly Money _tenEuroMin = new Money(-10.00m, "EUR");
 
             [Fact]
             public void WhenUsingUnaryPlusOperator_ThenThisSucceed()
             {
-                var m = +_tenEuro;
+                var r1 = +_tenEuroPlus;
+                var r2 = +_tenEuroMin;
 
-                m.Amount.Should().Be(10.00m);
-                m.Currency.Code.Should().Be("EUR");
+                r1.Amount.Should().Be(10.00m);
+                r1.Currency.Code.Should().Be("EUR");
+                r2.Amount.Should().Be(-10.00m);
+                r2.Currency.Code.Should().Be("EUR");
             }
 
             [Fact]
             public void WhenUsingUnaryMinOperator_ThenThisSucceed()
             {
-                var m = -_tenEuro;
+                var r1 = -_tenEuroPlus;
+                var r2 = -_tenEuroMin;
 
-                m.Amount.Should().Be(-10.00m);
-                m.Currency.Code.Should().Be("EUR");
+                r1.Amount.Should().Be(-10.00m);
+                r1.Currency.Code.Should().Be("EUR");
+                r2.Amount.Should().Be(10.00m);
+                r2.Currency.Code.Should().Be("EUR");
             }
         }
     }

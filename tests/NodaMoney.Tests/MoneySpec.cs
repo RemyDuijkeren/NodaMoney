@@ -426,4 +426,18 @@ namespace NodaMoney.Tests.MoneySpec
             _output.WriteLine(result4);
         }
     }
+
+    public class GivenIWantToDeconstructMoney
+    {
+        [Fact]
+        public void WhenDeconstructing_ThenShouldSucceed()
+        {
+            var money = new Money(10m, "EUR");
+
+            var (amount, currency) = money;
+
+            amount.Should().Be(10m);
+            currency.Should().Be(Currency.FromCode("EUR"));
+        }
+    }
 }

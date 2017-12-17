@@ -357,4 +357,19 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             (fx1 != fx2).Should().Be(!areEqual); //using Euality operators
         }
     }
+
+    public class GivenIWantToDeconstructExchangeRate
+    {
+        [Fact]
+        public void WhenDeconstructing_ThenShouldSucceed()
+        {
+            var fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591m);
+
+            var (baseCurrency, quoteCurrency, rate) = fx;
+
+            rate.Should().Be(1.2591m);
+            baseCurrency.Should().Be(Currency.FromCode("EUR"));
+            quoteCurrency.Should().Be(Currency.FromCode("USD"));
+        }
+    }
 }
