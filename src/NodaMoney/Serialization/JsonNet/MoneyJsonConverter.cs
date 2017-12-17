@@ -52,6 +52,9 @@ namespace NodaMoney.Serialization.JsonNet
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+
             JObject jsonObject = JObject.Load(reader);
             var properties = jsonObject.Properties().ToList();
 
