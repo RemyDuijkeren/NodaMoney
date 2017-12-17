@@ -177,7 +177,6 @@ Task("Upload-AppVeyor-Artifacts")
 
 Task("Publish-NuGet")
 .WithCriteria(() => HasEnvironmentVariable("NUGET_API_KEY"))
-.WithCriteria(() => AppVeyor.Environment.Repository.Branch == "master")
 .WithCriteria(() => AppVeyor.Environment.Repository.Tag.IsTag)
 .IsDependentOn("Package")
 .Does(() =>
