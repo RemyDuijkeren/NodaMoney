@@ -12,7 +12,6 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    [DataContract]
     public partial struct Money : IEquatable<Money>
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
