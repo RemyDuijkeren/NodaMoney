@@ -459,4 +459,19 @@ namespace NodaMoney.Tests.CurrencySpec
                 sw.ElapsedMilliseconds / (max));
         }
     }
+
+    public class GivenIWantToDeconstructCurrency
+    {
+        [Fact]
+        public void WhenDeconstructing_ThenShouldSucceed()
+        {
+            var currency = Currency.FromCode("EUR");
+
+            var (code, number, symbol) = currency;
+
+            code.Should().Be("EUR");
+            number.Should().Be("978");
+            symbol.Should().Be("€");
+        }
+    }
 }

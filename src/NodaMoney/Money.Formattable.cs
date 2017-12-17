@@ -12,10 +12,7 @@ namespace NodaMoney
         /// Converting will use the <see cref="NumberFormatInfo"/> object for the current culture if this has the same
         /// ISOCurrencySymbol, otherwise the <see cref="NumberFormatInfo"/> from the <see cref="Currency"/> will be used.
         /// </remarks>
-        public override string ToString()
-        {
-            return ConvertToString(null, null);
-        }
+        public override string ToString() => ConvertToString(null, null);
 
         /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
         /// using the specified format.</summary>

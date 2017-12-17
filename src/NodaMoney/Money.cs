@@ -233,6 +233,15 @@ namespace NodaMoney
         {
         }
 
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="currency">The Currency of the money.</param>
+        public void Deconstruct(out decimal amount, out Currency currency)
+        {
+            amount = Amount;
+            currency = Currency;
+        }
+
         /// <summary>Gets the amount of money.</summary>
         [DataMember]
         public decimal Amount { get; private set; }
@@ -245,38 +254,25 @@ namespace NodaMoney
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left and right are equal; otherwise, false.</returns>
-        public static bool operator ==(Money left, Money right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Money left, Money right) => left.Equals(right);
 
         /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are not equal.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left and right are not equal; otherwise, false.</returns>
-        public static bool operator !=(Money left, Money right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Money left, Money right) => !(left == right);
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Money"/> object represent the same
         /// value.</summary>
         /// <param name="other">A <see cref="Money"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public bool Equals(Money other)
-        {
-            return Amount == other.Amount && Currency == other.Currency;
-        }
+        public bool Equals(Money other) => Amount == other.Amount && Currency == other.Currency;
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
         /// and value.</summary>
         /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once ArrangeThisQualifier
-            return (obj is Money) && this.Equals((Money)obj);
-        }
+        public override bool Equals(object obj) => (obj is Money) && this.Equals((Money)obj);
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer hash code.</returns>

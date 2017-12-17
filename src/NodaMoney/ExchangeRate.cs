@@ -60,6 +60,17 @@ namespace NodaMoney
         {
         }
 
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="baseCurrency">The base currency.</param>
+        /// <param name="quoteCurrency">The quote currency.</param>
+        /// <param name="rate">The rate of the exchange.</param>
+        public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
+        {
+            baseCurrency = BaseCurrency;
+            quoteCurrency = QuoteCurrency;
+            rate = Value;
+        }
+
         /// <summary>Gets the base currency.</summary>
         /// <value>The base currency.</value>
         public Currency BaseCurrency { get; private set; }
@@ -76,19 +87,13 @@ namespace NodaMoney
         /// <param name="left">The left ExchangeRate.</param>
         /// <param name="right">The right ExchangeRate.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator ==(ExchangeRate left, ExchangeRate right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(ExchangeRate left, ExchangeRate right) => left.Equals(right);
 
         /// <summary>Implements the operator !=.</summary>
         /// <param name="left">The left ExchangeRate.</param>
         /// <param name="right">The right ExchangeRate.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator !=(ExchangeRate left, ExchangeRate right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(ExchangeRate left, ExchangeRate right) => !(left == right);
 
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
         /// <param name="rate">The string representation of the exchange rate to convert.</param>
@@ -99,8 +104,7 @@ namespace NodaMoney
             if (rate == null)
                 throw new ArgumentNullException(nameof(rate));
 
-            ExchangeRate fx;
-            if (!TryParse(rate, out fx))
+            if (!TryParse(rate, out ExchangeRate fx))
             {
                 throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
             }
@@ -183,26 +187,17 @@ namespace NodaMoney
         /// <returns>true if <paramref name="other"/> and this instance are the same type and represent the same value; otherwise,
         /// false.</returns>
         public bool Equals(ExchangeRate other)
-        {
-            return Value == other.Value && BaseCurrency == other.BaseCurrency && QuoteCurrency == other.QuoteCurrency;
-        }
+            => Value == other.Value && BaseCurrency == other.BaseCurrency && QuoteCurrency == other.QuoteCurrency;
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
         /// <param name="obj">Another object to compare to.</param>
         /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise,
         /// false.</returns>
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once ArrangeThisQualifier
-            return (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
-        }
+        public override bool Equals(object obj) => (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
 
         /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
         /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
-        public override string ToString()
-        {
-            return $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value}";
-        }
+        public override string ToString() => $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value}";
     }
 }

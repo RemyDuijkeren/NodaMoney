@@ -59,6 +59,17 @@ namespace NodaMoney
             ValidFrom = validFrom;
         }
 
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="code">The code.</param>
+        /// <param name="number">The number.</param>
+        /// <param name="symbol">The currency symbol.</param>
+        public void Deconstruct(out string code, out string number, out string symbol)
+        {
+            code = Code;
+            number = Number;
+            symbol = Symbol;
+        }
+
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
@@ -133,19 +144,13 @@ namespace NodaMoney
         /// <param name="left">The left Currency.</param>
         /// <param name="right">The right Currency.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator ==(Currency left, Currency right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Currency left, Currency right) => left.Equals(right);
 
         /// <summary>Implements the operator ==.</summary>
         /// <param name="left">The left Currency.</param>
         /// <param name="right">The right Currency.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator !=(Currency left, Currency right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Currency left, Currency right) => !(left == right);
 
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
@@ -227,44 +232,29 @@ namespace NodaMoney
 
         /// <summary>Get all currencies.</summary>
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
-        public static IEnumerable<Currency> GetAllCurrencies()
-        {
-            return Registry.GetAllCurrencies();
-        }
+        public static IEnumerable<Currency> GetAllCurrencies() => Registry.GetAllCurrencies();
 
         /// <summary>Returns a value indicating whether two specified instances of <see cref="Currency"/> represent the same value.</summary>
         /// <param name="left">The first <see cref="Currency"/> object.</param>
         /// <param name="right">The second <see cref="Currency"/> object.</param>
         /// <returns>true if left and right are equal to this instance; otherwise, false.</returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-        public static bool Equals(Currency left, Currency right)
-        {
-            return left.Equals(right);
-        }
+        public static bool Equals(Currency left, Currency right) => left.Equals(right);
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type and value.</summary>
         /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            return (obj is Currency) && Equals((Currency)obj);
-        }
+        public override bool Equals(object obj) => (obj is Currency) && Equals((Currency)obj);
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Currency"/> object represent the same value.</summary>
         /// <param name="other">A <see cref="Currency"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-        public bool Equals(Currency other)
-        {
-            return Equals(this.Code, other.Code);
-        }
+        public bool Equals(Currency other) => Equals(this.Code, other.Code);
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode()
-        {
-            return Code.GetHashCode();
-        }
+        public override int GetHashCode() => Code.GetHashCode();
 
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply
@@ -273,10 +263,7 @@ namespace NodaMoney
         /// produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)" /> method and
         /// consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)" /> method.
         /// </returns>
-        public XmlSchema GetSchema()
-        {
-            return null;
-        }
+        public XmlSchema GetSchema() => null;
 
         /// <summary>Generates an object from its XML representation.</summary>
         /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>

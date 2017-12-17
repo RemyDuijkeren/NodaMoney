@@ -13,37 +13,25 @@ namespace NodaMoney
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left is less than right; otherwise, false.</returns>
-        public static bool operator <(Money left, Money right)
-        {
-            return Compare(left, right) < 0;
-        }
+        public static bool operator <(Money left, Money right) => Compare(left, right) < 0;
 
         /// <summary>Returns a value indicating whether a specified <see cref="Money"/> is greater than another specified <see cref="Money"/>.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left is greater than right; otherwise, false.</returns>
-        public static bool operator >(Money left, Money right)
-        {
-            return Compare(left, right) > 0;
-        }
+        public static bool operator >(Money left, Money right) => Compare(left, right) > 0;
 
         /// <summary>Returns a value indicating whether a specified <see cref="Money"/> is less than or equal to another specified <see cref="Money"/>.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left is less than or equal to right; otherwise, false.</returns>
-        public static bool operator <=(Money left, Money right)
-        {
-            return Compare(left, right) <= 0;
-        }
+        public static bool operator <=(Money left, Money right) => Compare(left, right) <= 0;
 
         /// <summary>Returns a value indicating whether a specified <see cref="Money"/> is greater than or equal to another specified <see cref="Money"/>.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
         /// <param name="right">A <see cref="Money"/> object on the right side.</param>
         /// <returns>true if left is greater than or equal to right; otherwise, false.</returns>
-        public static bool operator >=(Money left, Money right)
-        {
-            return Compare(left, right) >= 0;
-        }
+        public static bool operator >=(Money left, Money right) => Compare(left, right) >= 0;
 
         /// <summary>Compares two specified <see cref="Money"/> values.</summary>
         /// <param name="left">The first <see cref="Money"/> object.</param>
@@ -69,10 +57,7 @@ namespace NodaMoney
         /// </item>
         /// </list>
         /// </returns>
-        public static int Compare(Money left, Money right)
-        {
-            return left.CompareTo(right);
-        }
+        public static int Compare(Money left, Money right) => left.CompareTo(right);
 
         /// <summary>Compares this instance to a specified <see cref="Money"/> object.</summary>
         /// <param name="obj">A <see cref="Money"/> object.</param>
@@ -135,7 +120,6 @@ namespace NodaMoney
         public int CompareTo(Money other)
         {
             AssertIsSameCurrency(this, other);
-
             return Amount.CompareTo(other.Amount);
         }
     }
