@@ -1,6 +1,6 @@
 ﻿NodaMoney
 =========
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
+<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png"></img>
 You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [github releases page](https://github.com/remyvd/NodaMoney/releases).
 
