@@ -5,7 +5,7 @@ namespace NodaMoney
     /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
     public partial struct Money
 #if !NETSTANDARD1_3
-        : IConvertible
+        //: IConvertible
 #endif
     {
         /// <summary>Performs an explicit conversion from <see cref="NodaMoney.Money"/> to <see cref="double"/>.</summary>
@@ -175,7 +175,7 @@ namespace NodaMoney
         /// culture-specific formatting information.</param>
         /// <returns>An <see cref="T:System.Object"/> instance of type <paramref name="conversionType"/> whose value is equivalent
         /// to the value of this instance.</returns>
-        public object ToType(Type conversionType, IFormatProvider provider) => Convert.ChangeType(Amount, conversionType, provider);
+        public object ToType(Type conversionType, IFormatProvider provider) => Convert.ChangeType(this, conversionType, provider);
 
         /// <summary>Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified
         /// culture-specific formatting information.</summary>

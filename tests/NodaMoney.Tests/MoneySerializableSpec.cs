@@ -8,8 +8,11 @@ using FluentAssertions;
 using Xunit;
 using Newtonsoft.Json;
 using NodaMoney.Serialization.JsonNet;
-
 using Formatting = Newtonsoft.Json.Formatting;
+using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace NodaMoney.Tests.MoneySerializableSpec
 {
@@ -24,51 +27,223 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
         }
 
-        public class GivenIWantToSerializeMoneyWithJsonNetSerializer
+        public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
         {
-            private Money yen = new Money(765m, Currency.FromCode("JPY"));
-            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+            private static string CurrentCultureCode = new RegionInfo(CultureInfo.CurrentCulture.LCID).ISOCurrencySymbol;
 
-            [Fact]
-            public void WhenSerializingYen_ThenThisShouldSucceed()
+            public static IEnumerable<object[]> ValidJsonData => new[]
             {
-                string json = JsonConvert.SerializeObject(yen);
-                Console.WriteLine(json);
+                new object[] { $"{{ amount: '200', currency: '{CurrentCultureCode}' }}", },
+                new object[] { $"{{ amount: 200, currency: '{CurrentCultureCode}' }}" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 200 }}" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: '200' }}" }
+            };
+
+            public static IEnumerable<object[]> InvalidJsonData => new[]
+            {
+                new object[] { "{ amount: '200' }" },
+                new object[] { "{ amount: 200 }" },
+                new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
+                //new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 'ABC' }}" }, /=> formatexception without telling wich meber
+            };
+
+            public static IEnumerable<object[]> ValidNestedJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" }
+            };
+
+            public static IEnumerable<object[]> ValidNestedNullableJsonData => new[]
+            {
+                new object[] { $"{{ cash: {{ amount: '200', currency: '{CurrentCultureCode}' }} }}", },
+                new object[] { $"{{ cash: {{ amount: 200, currency: '{CurrentCultureCode}' }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: 200 }} }}" },
+                new object[] { $"{{ cash: {{ currency: '{CurrentCultureCode}', amount: '200' }} }}" },
+                new object[] { $"{{ cash: null }}" },
+            };
+
+            [Theory]
+            [MemberData("ValidJsonData")]
+            public void WhenDeserializing_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                //{
+                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                //};
+
+                // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json);
 
-                clone.Should().Be(yen);
+                clone.Should().Be(money);
             }
 
-            [Fact]
-            public void WhenSerializingEuro_ThenThisShouldSucceed()
+            [Theory]
+            [MemberData("InvalidJsonData")]
+            public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
             {
-                string json = JsonConvert.SerializeObject(euro, Formatting.None, new MoneyJsonConverter());
-                Console.WriteLine(json);
-                var clone = JsonConvert.DeserializeObject<Money>(json, new MoneyJsonConverter());
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
 
-                clone.Should().Be(euro);
+                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                //{
+                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                //};
+
+                var exception = Record.Exception(() =>
+                    JsonConvert.DeserializeObject<Money>(json)
+                );
+
+                exception.Should().BeOfType<SerializationException>();
             }
 
-            [Fact]
-            public void WhenSerializingArticle_ThenThisShouldSucceed()
+            private class TypeWithMoneyProperty
+            {
+                public Money Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedJsonData")]
+            public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                //{
+                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                //};
+
+                // Console.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<TypeWithMoneyProperty>(json);
+
+                clone.Cash.Should().Be(money);
+            }
+
+            private class TypeWithNullableMoneyProperty
+            {
+                public Money? Cash { get; set; }
+            }
+
+            [Theory]
+            [MemberData("ValidNestedNullableJsonData")]
+            public void WhenDeserializingWithNestedNullable_ThenThisShouldSucceed(string json)
+            {
+                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
+
+                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                //{
+                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+                //};
+
+                // Console.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<TypeWithNullableMoneyProperty>(json);
+
+                if (!json.Contains("null"))
+                    clone.Cash.Should().Be(money);
+                else
+                    clone.Cash.Should().BeNull();
+            }
+        }
+
+        public class GivenIWantToSerializeMoneyWithJsonNetSerializer
+        {
+            public static IEnumerable<object[]> TestData => new[]
+            {
+                new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
+                new object[] { new Money(765.4321m, Currency.FromCode("EUR")) },
+                new object[] { new Money(765.4321m, Currency.FromCode("USD")) },
+                new object[] { new Money(765.4321m, Currency.FromCode("BHD")) }
+            };
+
+            [Theory]
+            [MemberData("TestData")]
+            public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money)
+            {
+                string json = JsonConvert.SerializeObject(money.Currency);
+                Trace.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<Currency>(json);
+
+                clone.Should().Be(money.Currency);
+            }
+
+            [Theory]
+            [MemberData("TestData")]
+            public void WhenSerializingMoney_ThenThisShouldSucceed(Money money)
+            {
+                string json = JsonConvert.SerializeObject(money);
+                Trace.WriteLine(json);
+                var clone = JsonConvert.DeserializeObject<Money>(json);
+
+                clone.Should().Be(money);
+            }
+
+            [Theory]
+            [MemberData("TestData")]
+            public void WhenSerializingArticle_ThenThisShouldSucceed(Money money)
             {
                 var article = new Article
                 {
                     Id = 123,
-                    Amount = Money.Euro(27.15),
+                    Price = money,
                     Name = "Foo"
                 };
 
-                string json = JsonConvert.SerializeObject(article, Formatting.None, new MoneyJsonConverter());
+                string json = JsonConvert.SerializeObject(article);
                 Console.WriteLine(json);
-                var clone = JsonConvert.DeserializeObject<Article>(json, new MoneyJsonConverter());
+                var clone = JsonConvert.DeserializeObject<Article>(json);
 
-                clone.Id.Should().Be(article.Id);
-                clone.Name.Should().Be(article.Name);
-                clone.Amount.Should().Be(article.Amount);
-                //clone.Should().Be(article);
+                clone.Price.Should().Be(money);
             }
+
+            //[Theory]
+            //[MemberData("TestData")]
+            //public void WhenSerializing_ThenThisShouldSucceed(Money money)
+            //{
+            //    JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            //    {
+            //        Converters = new List<JsonConverter> { new MoneyJsonConverter() }
+            //    };
+
+            //    var json = JsonConvert.SerializeObject(money);
+            //    // Console.WriteLine(json);
+            //    var clone = JsonConvert.DeserializeObject<Money>(json);
+
+            //    clone.Should().Be(money);
+            //}
+
+            //[Fact]
+            //public void WhenSerializingEuroWithExplicitConverter_ThenThisShouldSucceed()
+            //{
+            //    string json = JsonConvert.SerializeObject(euro, Formatting.None, new MoneyJsonConverter());
+            //    Console.WriteLine(json);
+            //    var clone = JsonConvert.DeserializeObject<Money>(json, new MoneyJsonConverter());
+
+            //    clone.Should().Be(euro);
+            //}
+
+            //[Fact]
+            //public void WhenSerializingArticleWithExplicitConverter_ThenThisShouldSucceed()
+            //{
+            //    var article = new Article
+            //    {
+            //        Id = 123,
+            //        Amount = Money.Euro(27.15),
+            //        Name = "Foo"
+            //    };
+
+            //    string json = JsonConvert.SerializeObject(article, Formatting.None, new MoneyJsonConverter());
+            //    Console.WriteLine(json);
+            //    var clone = JsonConvert.DeserializeObject<Article>(json, new MoneyJsonConverter());
+
+            //    clone.Id.Should().Be(article.Id);
+            //    clone.Name.Should().Be(article.Name);
+            //    clone.Amount.Should().Be(article.Amount);
+            //    //clone.Should().Be(article);
+            //}
         }
+
         public class GivenIWantToSerializeMoneyWithDataContractSerializer
         {
             private Money yen = new Money(765m, Currency.FromCode("JPY"));
@@ -96,13 +271,13 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                 var article = new Article
                 {
                     Id = 123,
-                    Amount = Money.Euro(27.15),
+                    Price = Money.Euro(27.15),
                     Name = "Foo"
                 };
 
                 Console.WriteLine(StreamToString(Serialize(article)));
 
-                article.Amount.Should().Be(Clone<Article>(article).Amount);
+                article.Price.Should().Be(Clone<Article>(article).Price);
             }
 
             public static Stream Serialize(object source)
@@ -156,13 +331,13 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                 var article = new Article
                 {
                     Id = 123,
-                    Amount = Money.Euro(27.15),
+                    Price = Money.Euro(27.15),
                     Name = "Foo"
                 };
 
                 Console.WriteLine(StreamToString(Serialize(article)));
 
-                article.Amount.Should().Be(Clone<Article>(article).Amount);
+                article.Price.Should().Be(Clone<Article>(article).Price);
             }
 
             public static Stream Serialize(object source)
@@ -186,7 +361,64 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
         }
 
-        [DataContract]
+        public class GivenIWantToSerializeMoneyWithBinaryFormatter
+        {
+            private Money yen = new Money(765m, Currency.FromCode("JPY"));
+            private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+
+            [Fact]
+            public void WhenSerializingYen_ThenThisShouldSucceed()
+            {
+                Console.WriteLine(StreamToString(Serialize(yen)));
+
+                yen.Should().Be(Clone<Money>(yen));
+            }
+
+            [Fact]
+            public void WhenSerializingEuro_ThenThisShouldSucceed()
+            {
+                Console.WriteLine(StreamToString(Serialize(euro)));
+
+                euro.Should().Be(Clone<Money>(euro));
+            }
+
+            [Fact]
+            public void WhenSerializingArticle_ThenThisShouldSucceed()
+            {
+                var article = new Article
+                {
+                    Id = 123,
+                    Price = Money.Euro(27.15),
+                    Name = "Foo"
+                };
+
+                Console.WriteLine(StreamToString(Serialize(article)));
+
+                article.Price.Should().Be(Clone<Article>(article).Price);
+            }
+
+            public static Stream Serialize(object source)
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new MemoryStream();
+                formatter.Serialize(stream, source);
+                return stream;
+            }
+
+            public static T Deserialize<T>(Stream stream)
+            {
+                IFormatter formatter = new BinaryFormatter();
+                stream.Position = 0L;
+                return (T)formatter.Deserialize(stream);
+            }
+
+            public static T Clone<T>(object source)
+            {
+                return Deserialize<T>(Serialize(source));
+            }
+        }
+
+        [DataContract][Serializable]
         public class Article
         {
             [DataMember]
@@ -194,49 +426,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [DataMember]
             public string Name { get; set; }
             [DataMember]
-            public Money Amount { get; set; }
+            public Money Price { get; set; }
         }
-
-        //public class GivenIWantToSerializeMoneyWithBinaryFormatter
-        //{
-        //    private Money yen = new Money(765m, Currency.FromCode("JPY"));
-        //    private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
-
-        //    [Fact(Skip = "Not possible with PCL")]
-        //    public void WhenSerializingYen_ThenThisShouldSucceed()
-        //    {
-        //        Console.WriteLine(StreamToString(Serialize(yen)));
-
-        //        yen.Should().Be(Clone<Money>(yen));
-        //    }
-
-        //    [Fact(Skip = "Not possible with PCL")]
-        //    public void WhenSerializingEuro_ThenThisShouldSucceed()
-        //    {
-        //        Console.WriteLine(StreamToString(Serialize(euro)));
-
-        //        euro.Should().Be(Clone<Money>(euro));
-        //    }
-
-        //    public static Stream Serialize(object source)
-        //    {
-        //        IFormatter formatter = new BinaryFormatter();
-        //        Stream stream = new MemoryStream();
-        //        formatter.Serialize(stream, source);
-        //        return stream;
-        //    }
-
-        //    public static T Deserialize<T>(Stream stream)
-        //    {
-        //        IFormatter formatter = new BinaryFormatter();
-        //        stream.Position = 0L;
-        //        return (T)formatter.Deserialize(stream);
-        //    }
-
-        //    public static T Clone<T>(object source)
-        //    {
-        //        return Deserialize<T>(Serialize(source));
-        //    }
-        //}
     }
 }

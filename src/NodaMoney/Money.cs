@@ -1,7 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 namespace NodaMoney
 {
@@ -12,6 +12,7 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
+    //[TypeConverter(typeof(MoneyTypeConverter))]
     public partial struct Money : IEquatable<Money>
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -232,21 +233,10 @@ namespace NodaMoney
         {
         }
 
-        /// <summary>Deconstructs the current instance into its components.</summary>
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        public void Deconstruct(out decimal amount, out Currency currency)
-        {
-            amount = Amount;
-            currency = Currency;
-        }
-
         /// <summary>Gets the amount of money.</summary>
-        [DataMember]
         public decimal Amount { get; private set; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-        [DataMember]
         public Currency Currency { get; private set; }
 
         /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
@@ -283,8 +273,17 @@ namespace NodaMoney
             }
         }
 
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="currency">The Currency of the money.</param>
+        public void Deconstruct(out decimal amount, out Currency currency)
+        {
+            amount = Amount;
+            currency = Currency;
+        }
+
         [SuppressMessage(
-            "Microsoft.Globalization",
+                    "Microsoft.Globalization",
             "CA1305:SpecifyIFormatProvider",
             MessageId = "System.String.Format(System.String,System.Object[])",
             Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]

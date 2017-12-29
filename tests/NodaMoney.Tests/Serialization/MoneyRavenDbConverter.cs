@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Raven.Imports.Newtonsoft.Json;
+using Raven.Imports.Newtonsoft.Json.Linq;
 
 namespace NodaMoney.Serialization.JsonNet
 {
     /// <summary>Converts a instance of Money to and from JSON.</summary>
-    public class MoneyJsonConverter : JsonConverter
+    public class MoneyRavenDbConverter : JsonConverter
     {
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON.</summary>
         /// <value><c>true</c> if this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON; otherwise, <c>false</c>. </value>

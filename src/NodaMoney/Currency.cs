@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -15,12 +16,27 @@ namespace NodaMoney
 {
     /// <summary>A unit of exchange, a currency of <see cref="Money" />.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency .</remarks>
-    [DataContract]
+    [Serializable]
     [DebuggerDisplay("{Code}")]
-    public struct Currency : IEquatable<Currency>, IXmlSerializable
+    [TypeConverter(typeof(CurrencyTypeConverter))]
+    public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>A singleton instance of the currencies registry.</summary>
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
+
+        internal Currency(string code, string @namespace = "ISO-4217")
+        {
+            var c = FromCode(code, @namespace);
+
+            Code = c.Code;
+            Number = c.Number;
+            DecimalDigits = c.DecimalDigits;
+            EnglishName = c.EnglishName;
+            Symbol = c.Symbol;
+            Namespace = c.Namespace;
+            ValidTo = c.ValidTo;
+            ValidFrom = c.ValidFrom;
+        }
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
@@ -58,18 +74,6 @@ namespace NodaMoney
             ValidTo = validTo;
             ValidFrom = validFrom;
         }
-
-        /// <summary>Deconstructs the current instance into its components.</summary>
-        /// <param name="code">The code.</param>
-        /// <param name="number">The number.</param>
-        /// <param name="symbol">The currency symbol.</param>
-        public void Deconstruct(out string code, out string number, out string symbol)
-        {
-            code = Code;
-            number = Number;
-            symbol = Symbol;
-        }
-
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
@@ -85,7 +89,6 @@ namespace NodaMoney
         public string EnglishName { get; private set; }
 
         /// <summary>Gets the three-character ISO-4217 currency code.</summary>
-        [DataMember]
         public string Code { get; private set; }
 
         /// <summary>Gets the numeric ISO-4217 currency code.</summary>
@@ -159,8 +162,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
         public static Currency FromCode(string code)
         {
-            Currency currency;
-            if (!Registry.TryGet(code, out currency))
+            if (!Registry.TryGet(code, out Currency currency))
                 throw new ArgumentException($"{code} is an unknown currency code!");
 
             return currency;
@@ -174,8 +176,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown!</exception>
         public static Currency FromCode(string code, string @namespace)
         {
-            Currency currency;
-            if (!Registry.TryGet(code, @namespace, out currency))
+            if (!Registry.TryGet(code, @namespace, out Currency currency))
                 throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
 
             return currency;
@@ -250,11 +251,40 @@ namespace NodaMoney
         /// <param name="other">A <see cref="Currency"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
-        public bool Equals(Currency other) => Equals(this.Code, other.Code);
+        public bool Equals(Currency other)
+        {
+            return this.Code == other.Code
+                && this.Namespace == other.Namespace
+                && this.DecimalDigits == other.DecimalDigits
+                && this.EnglishName == other.EnglishName
+                && this.MajorUnit == other.MajorUnit
+                && this.MinorUnit == other.MinorUnit
+
+                && this.Symbol == other.Symbol
+                && this.ValidFrom == other.ValidFrom
+                && this.ValidTo == other.ValidTo;
+        }
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode() => Code.GetHashCode();
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Code.GetHashCode() ^ (397 * Namespace.GetHashCode());
+            }
+        }
+
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="code">The code.</param>
+        /// <param name="number">The number.</param>
+        /// <param name="symbol">The currency symbol.</param>
+        public void Deconstruct(out string code, out string number, out string symbol)
+        {
+            code = Code;
+            number = Number;
+            symbol = Symbol;
+        }
 
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply
@@ -287,6 +317,21 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(writer));
 
             writer.WriteAttributeString("Currency", Code);
+        }
+
+        /// <summary>Populates a <see cref="SerializationInfo" /> with the data needed to serialize the target object.</summary>
+        /// <param name="info">The <see cref="SerializationInfo" /> to populate with data. </param>
+        /// <param name="context">The destination (see <see cref="StreamingContext" />) for this serialization. </param>
+        /// <exception cref="System.Security.SecurityException">The caller does not have the required permission. </exception>
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("code", Code);
+            info.AddValue("namespace", Namespace);
+        }
+
+        private Currency(SerializationInfo info, StreamingContext context)
+            : this(info.GetString("code"), info.GetString("namespace"))
+        {
         }
     }
 }

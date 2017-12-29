@@ -7,6 +7,22 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
     public class GivenIWantToCreateCustomCurrency
     {
         [Fact]
+        public void WhenRegisterAsSimpleAsPossible_ThenShouldBeAvailable()
+        {
+            var result = new CurrencyBuilder("BTC4", "ISO-4217")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8,
+            }.Register();
+
+            Currency bitcoin = Currency.FromCode("BTC4");
+            bitcoin.Symbol.Should().Be("฿");
+            bitcoin.ShouldBeEquivalentTo(result);
+        }
+
+        [Fact]
         public void WhenRegisterBitCoinInIsoNamespace_ThenShouldBeAvailable()
         {
             var builder = new CurrencyBuilder("BTC", "ISO-4217");

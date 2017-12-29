@@ -6,78 +6,87 @@ using Raven.Database.Server;
 using Xunit;
 using Raven.Tests.Helpers;
 using NodaMoney.Serialization.JsonNet;
+using Raven.Client.Document;
 
 namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
 {
     // http://ravendb.net/docs/article-page/2.5/csharp/samples/raven-tests/createraventests
     public class GivenIWantToStoreInRavenDb : RavenTestBase
     {
-        //[Fact]
-        //public void WhenMoneyAsRoot_ThenThisMustWork()
-        //{
-        //    Money euros = new Money(123.56, "EUR");
+        [Fact]
+        public void WhenMoneyAsRoot_ThenThisMustWork()
+        {
+            Money euros = new Money(123.56, "EUR");
 
-        //    using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
-        //    {
-        //        // Store in RavenDb
-        //        using (var session = store.OpenSession())
-        //        {
-        //            session.Store(euros);
+            using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
+            {
+                //using (var store = new DocumentStore { Url = "http://obelix:8081/", DefaultDatabase = "Example" })
+                //{
+                //store.Conventions.CustomizeJsonSerializer += serializer =>
+                //    serializer.Converters.Add(new MoneyRavenDbConverter());
+                store.Initialize();
 
-        //            session.SaveChanges();
-        //        }
+                // Store in RavenDb
+                using (var session = store.OpenSession())
+                {
+                    session.Store(euros);
 
-        //        // Read from RavenDb
-        //        using (var session = store.OpenSession())
-        //        {
-        //            var result = session.Query<Money>()
-        //                .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
-        //                .FirstOrDefault();
+                    session.SaveChanges();
+                }
 
-        //            result.Should().Be(euros);
-        //        }
-        //    }
-        //}
+                // Read from RavenDb
+                using (var session = store.OpenSession())
+                {
+                    var result = session.Query<Money>()
+                        .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
+                        .FirstOrDefault();
 
-        //[Fact]
-        //public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
-        //{
-        //    SampleData sample = new SampleData { Name = "Test", Amount = new Money(123.56, "EUR") };
-        //    NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8079);
-        //    using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
-        //    {
-        //        // store.Conventions.CustomizeJsonSerializer += serializer =>
-        //        // serializer.Converters.Add(new MoneyJsonConverter());
-        //        // WaitForUserToContinueTheTest(store, true);
-        //        // store.UseEmbeddedHttpServer = true;
-        //        // store.Configuration.Port = 8080;
-        //        // store.Initialize();
+                    result.Should().Be(euros);
+                }
+            }
+        }
 
-        //        // Store in RavenDb
-        //        using (var session = store.OpenSession())
-        //        {
-        //            session.Store(sample);
+        [Fact]
+        public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
+        {
+            SampleData sample = new SampleData { Name = "Test", Price = new Money(123.56, "EUR"), BaseCurrency = Currency.FromCode("USD") };
+            using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
+            {
+            //using (var store = new DocumentStore { Url = "http://obelix:8081/", DefaultDatabase = "Example" })
+            //{
+                //store.Conventions.CustomizeJsonSerializer += serializer =>
+                //    serializer.Converters.Add(new MoneyRavenDbConverter());
+                store.Initialize();
 
-        //            session.SaveChanges();
-        //        }
+                // Store in RavenDb
+                using (var session = store.OpenSession())
+                {
+                    session.Store(sample);
 
-        //        // Read from RavenDb
-        //        using (var session = store.OpenSession())
-        //        {
-        //            var result = session.Query<SampleData>()
-        //                .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
-        //                .FirstOrDefault();
+                    session.SaveChanges();
+                }
 
-        //            result.Should().Be(sample);
-        //        }
-        //    }
-        //}
+                //WaitForUserToContinueTheTest(store, true);
+                // Read from RavenDb
+                using (var session = store.OpenSession())
+                {
+                    var result = session.Query<SampleData>()
+                        .Customize(customization => customization.WaitForNonStaleResultsAsOfNow())
+                        .FirstOrDefault();
+
+                    result.Name.Should().Be(sample.Name);
+                    result.Price.Should().Be(sample.Price);
+                }
+            }
+        }
     }
 
     public class SampleData
     {
         public string Name { get; set; }
 
-        public Money Amount { get; set; }
+        public Money Price { get; set; }
+
+        public Currency BaseCurrency { get; set; }
     }
 }
