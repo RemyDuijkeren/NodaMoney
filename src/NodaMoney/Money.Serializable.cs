@@ -54,9 +54,8 @@ namespace NodaMoney
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission. </exception>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("amount", Amount);
-            //info.AddValue("currency", Currency, typeof(Currency));
-            info.AddValue("currency", Currency.Code);
+            info.AddValue("Amount", Amount);
+            info.AddValue("Currency", Currency.Code);
         }
 
         /// <summary>
@@ -64,28 +63,30 @@ namespace NodaMoney
         /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the <see cref="Money"/>.</param>
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
         private Money(SerializationInfo info, StreamingContext context)
-        //: this(info.GetDecimal("amount"), (Currency)info.GetValue("currency", typeof(Currency)))
-        : this(info.GetDecimal("amount"), info.GetString("currency"))
+            : this()
         {
-            //var amount = info.GetDecimal("amount");
-            //var currencyCode = info.GetString("currency");
-            //Currency = currency;
+            decimal amount;
+            try
+            {
+                amount = info.GetDecimal("Amount");
+            }
+            catch (SerializationException)
+            {
+                amount = info.GetDecimal("amount");
+            }
 
-            //if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
-            //{
-            //    Amount = Math.Round(amount);
-            //}
-            //else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
-            //{
-            //    // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
-            //    Amount = Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
-            //}
-            //else
-            //{
-            //    Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
-            //}
+            string currency;
+            try
+            {
+                currency = info.GetString("Currency");
+            }
+            catch (SerializationException)
+            {
+                currency = info.GetString("currency");
+            }
 
-            //Money(info.GetDecimal("amount"), info.GetString("currency"))
+            Currency = Currency.FromCode(currency);
+            Amount = Round(amount, Currency, MidpointRounding.ToEven);
 
             //        if (reader == null)
             //            throw new ArgumentNullException(nameof(reader));

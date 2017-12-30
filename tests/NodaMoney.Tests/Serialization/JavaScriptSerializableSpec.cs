@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Web.Script.Serialization;
 using FluentAssertions;
-//using Newtonsoft.Json;
-//using NodaMoney.Serialization.JsonNet;
 using Xunit;
 
 namespace NodaMoney.Serialization.AspNet.Tests
 {
-    public static class MoneySerializableTests
+    public static class JavaScriptSerializableSpec
     {
         public class GivenIWantToSerializeMoneyWithJavaScriptSerializer
         {
@@ -20,7 +18,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
             };
 
             [Theory]
-            [MemberData("TestData")]
+            [MemberData(nameof(TestData))]
             public void WhenSerializing_ThenThisShouldSucceed(Money money)
             {
                 var jsSerializer = new JavaScriptSerializer();
@@ -71,7 +69,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
             };
 
             [Theory]
-            [MemberData("ValidJsonData")]
+            [MemberData(nameof(ValidJsonData))]
             public void WhenDeserializingWithValidJSON_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
@@ -86,7 +84,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
             }
 
             [Theory]
-            [MemberData("InvalidJsonData")]
+            [MemberData(nameof(InvalidJsonData))]
             public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
@@ -107,7 +105,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
             }
 
             [Theory]
-            [MemberData("ValidNestedJsonData")]
+            [MemberData(nameof(ValidNestedJsonData))]
             public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
@@ -127,7 +125,7 @@ namespace NodaMoney.Serialization.AspNet.Tests
             }
 
             [Theory]
-            [MemberData("ValidNestedNullableJsonData")]
+            [MemberData(nameof(ValidNestedNullableJsonData))]
             public void WhenDeserializingWithNestedNullable_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));

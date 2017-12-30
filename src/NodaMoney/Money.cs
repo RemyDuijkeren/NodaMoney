@@ -12,7 +12,6 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    //[TypeConverter(typeof(MoneyTypeConverter))]
     public partial struct Money : IEquatable<Money>
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -84,20 +83,7 @@ namespace NodaMoney
             : this()
         {
             Currency = currency;
-
-            if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
-            {
-                Amount = Math.Round(amount);
-            }
-            else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
-            {
-                // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
-                Amount = Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
-            }
-            else
-            {
-                Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
-            }
+            Amount = Round(amount, currency, rounding);
         }
 
         // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
@@ -269,7 +255,9 @@ namespace NodaMoney
         {
             unchecked
             {
-                return Amount.GetHashCode() ^ (397 * Currency.GetHashCode());
+                int hash = 17;
+                hash = (hash * 23) + Amount.GetHashCode();
+                return (hash * 23) + Currency.GetHashCode();
             }
         }
 
@@ -280,6 +268,22 @@ namespace NodaMoney
         {
             amount = Amount;
             currency = Currency;
+        }
+
+        private static decimal Round(decimal amount, Currency currency, MidpointRounding rounding)
+        {
+            switch (currency.DecimalDigits)
+            {
+                case CurrencyRegistry.NotApplicable:
+                    return Math.Round(amount);
+
+                case CurrencyRegistry.Z07:
+                    // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
+                    return Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
+
+                default:
+                    return Math.Round(amount, (int)currency.DecimalDigits, rounding);
+            }
         }
 
         [SuppressMessage(

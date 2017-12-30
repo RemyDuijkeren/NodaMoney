@@ -271,7 +271,9 @@ namespace NodaMoney
         {
             unchecked
             {
-                return Code.GetHashCode() ^ (397 * Namespace.GetHashCode());
+                int hash = 17;
+                hash = (hash * 23) + (Code?.GetHashCode() ?? 0);
+                return (hash * 23) + (Namespace?.GetHashCode() ?? 0);
             }
         }
 

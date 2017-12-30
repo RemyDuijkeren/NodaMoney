@@ -7,14 +7,13 @@ using System.Xml.Serialization;
 using FluentAssertions;
 using Xunit;
 using Newtonsoft.Json;
-using NodaMoney.Serialization.JsonNet;
-using Formatting = Newtonsoft.Json.Formatting;
 using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using System.Globalization;
+using NodaMoney.Tests.Serialization;
 
-namespace NodaMoney.Tests.MoneySerializableSpec
+namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
 {
     public class MoneySerializableTests
     {
@@ -30,22 +29,6 @@ namespace NodaMoney.Tests.MoneySerializableSpec
         public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
         {
             private static string CurrentCultureCode = new RegionInfo(CultureInfo.CurrentCulture.LCID).ISOCurrencySymbol;
-
-            public static IEnumerable<object[]> ValidJsonData => new[]
-            {
-                new object[] { $"{{ amount: '200', currency: '{CurrentCultureCode}' }}", },
-                new object[] { $"{{ amount: 200, currency: '{CurrentCultureCode}' }}" },
-                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 200 }}" },
-                new object[] { $"{{ currency: '{CurrentCultureCode}', amount: '200' }}" }
-            };
-
-            public static IEnumerable<object[]> InvalidJsonData => new[]
-            {
-                new object[] { "{ amount: '200' }" },
-                new object[] { "{ amount: 200 }" },
-                new object[] { $"{{ currency: '{CurrentCultureCode}' }}" },
-                //new object[] { $"{{ currency: '{CurrentCultureCode}', amount: 'ABC' }}" }, /=> formatexception without telling wich meber
-            };
 
             public static IEnumerable<object[]> ValidNestedJsonData => new[]
             {
@@ -65,32 +48,18 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             };
 
             [Theory]
-            [MemberData("ValidJsonData")]
-            public void WhenDeserializing_ThenThisShouldSucceed(string json)
+            [ClassData(typeof(ValidJsonTestData))]
+            public void WhenDeserializing_ThenThisShouldSucceed(string json, Money expected)
             {
-                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
-
-                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                //{
-                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
-                //};
-
-                // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json);
 
-                clone.Should().Be(money);
+                clone.Should().Be(expected);
             }
 
             [Theory]
-            [MemberData("InvalidJsonData")]
+            [ClassData(typeof(InvalidJsonTestData))]
             public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
             {
-                var money = new Money(200, Currency.FromCode(CurrentCultureCode));
-
-                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                //{
-                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
-                //};
 
                 var exception = Record.Exception(() =>
                     JsonConvert.DeserializeObject<Money>(json)
@@ -105,15 +74,10 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
 
             [Theory]
-            [MemberData("ValidNestedJsonData")]
+            [MemberData(nameof(ValidNestedJsonData))]
             public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
-
-                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                //{
-                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
-                //};
 
                 // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<TypeWithMoneyProperty>(json);
@@ -127,15 +91,10 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
 
             [Theory]
-            [MemberData("ValidNestedNullableJsonData")]
+            [MemberData(nameof(ValidNestedNullableJsonData))]
             public void WhenDeserializingWithNestedNullable_ThenThisShouldSucceed(string json)
             {
                 var money = new Money(200, Currency.FromCode(CurrentCultureCode));
-
-                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                //{
-                //    Converters = new List<JsonConverter> { new MoneyJsonConverter() }
-                //};
 
                 // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<TypeWithNullableMoneyProperty>(json);
@@ -158,7 +117,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             };
 
             [Theory]
-            [MemberData("TestData")]
+            [MemberData(nameof(TestData))]
             public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money)
             {
                 string json = JsonConvert.SerializeObject(money.Currency);
@@ -169,7 +128,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
 
             [Theory]
-            [MemberData("TestData")]
+            [MemberData(nameof(TestData))]
             public void WhenSerializingMoney_ThenThisShouldSucceed(Money money)
             {
                 string json = JsonConvert.SerializeObject(money);
@@ -180,10 +139,10 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             }
 
             [Theory]
-            [MemberData("TestData")]
+            [MemberData(nameof(TestData))]
             public void WhenSerializingArticle_ThenThisShouldSucceed(Money money)
             {
-                var article = new Article
+                var article = new Order
                 {
                     Id = 123,
                     Price = money,
@@ -192,7 +151,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
 
                 string json = JsonConvert.SerializeObject(article);
                 Console.WriteLine(json);
-                var clone = JsonConvert.DeserializeObject<Article>(json);
+                var clone = JsonConvert.DeserializeObject<Order>(json);
 
                 clone.Price.Should().Be(money);
             }
@@ -268,7 +227,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingArticle_ThenThisShouldSucceed()
             {
-                var article = new Article
+                var article = new Order
                 {
                     Id = 123,
                     Price = Money.Euro(27.15),
@@ -277,7 +236,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
 
                 Console.WriteLine(StreamToString(Serialize(article)));
 
-                article.Price.Should().Be(Clone<Article>(article).Price);
+                article.Price.Should().Be(Clone<Order>(article).Price);
             }
 
             public static Stream Serialize(object source)
@@ -328,7 +287,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingArticle_ThenThisShouldSucceed()
             {
-                var article = new Article
+                var article = new Order
                 {
                     Id = 123,
                     Price = Money.Euro(27.15),
@@ -337,7 +296,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
 
                 Console.WriteLine(StreamToString(Serialize(article)));
 
-                article.Price.Should().Be(Clone<Article>(article).Price);
+                article.Price.Should().Be(Clone<Order>(article).Price);
             }
 
             public static Stream Serialize(object source)
@@ -385,7 +344,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingArticle_ThenThisShouldSucceed()
             {
-                var article = new Article
+                var article = new Order
                 {
                     Id = 123,
                     Price = Money.Euro(27.15),
@@ -394,7 +353,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
 
                 Console.WriteLine(StreamToString(Serialize(article)));
 
-                article.Price.Should().Be(Clone<Article>(article).Price);
+                article.Price.Should().Be(Clone<Order>(article).Price);
             }
 
             public static Stream Serialize(object source)
@@ -416,17 +375,6 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             {
                 return Deserialize<T>(Serialize(source));
             }
-        }
-
-        [DataContract][Serializable]
-        public class Article
-        {
-            [DataMember]
-            public int Id { get; set; }
-            [DataMember]
-            public string Name { get; set; }
-            [DataMember]
-            public Money Price { get; set; }
         }
     }
 }

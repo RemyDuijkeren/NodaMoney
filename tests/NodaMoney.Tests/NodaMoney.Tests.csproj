@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" />
     <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
   </ItemGroup>
 
@@ -28,6 +29,10 @@
     <Reference Include="System.Xml.XmlSerializer" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
 
   <ItemGroup>
