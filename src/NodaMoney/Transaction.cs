@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NodaMoney
+﻿namespace NodaMoney
 {
+    /// <summary>Represents a general transaction done in a webshop.</summary>
     public class Transaction
     {
-        Money Value { get; set; }
+        /// <summary>Gets or sets the transaction amount of the transaction in the local currency of the customer.</summary>
+        public Money Value { get; set; }
 
-        ExchangeRate ExchangeRate { get; set; }
+        /// <summary>Gets or sets the exchange rate to the base currency of the shop at the time of the transaction.</summary>
+        public ExchangeRate ExchangeRate { get; set; }
 
-        Money Tax { get; set; }
+        /// <summary>Gets or sets the tax amount of the transaction.</summary>
+        public Money Tax { get; set; }
 
-        Money Discount { get; set; }
+        /// <summary>Gets or sets the optional discount of the transaction.</summary>
+        public Money Discount { get; set; }
     }
 }

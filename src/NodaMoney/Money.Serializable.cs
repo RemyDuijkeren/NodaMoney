@@ -11,6 +11,50 @@ namespace NodaMoney
     [Serializable]
     public partial struct Money : IXmlSerializable, ISerializable
     {
+        /// <summary>Initializes a new instance of the <see cref="Money"/> struct.Initializes a new instace of <see cref="Money"/> with serialized data.</summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the <see cref="Money"/>.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
+        private Money(SerializationInfo info, StreamingContext context)
+            : this()
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            decimal amount;
+            try
+            {
+                amount = info.GetDecimal("Amount");
+            }
+            catch (FormatException ex)
+            {
+                throw new SerializationException("Member 'Amount' was not in a correct number format.", ex);
+            }
+            catch (SerializationException)
+            {
+                try
+                {
+                    amount = info.GetDecimal("amount");
+                }
+                catch (FormatException ex)
+                {
+                    throw new SerializationException("Member 'Amount' was not in a correct number format.", ex);
+                }
+            }
+
+            string currency;
+            try
+            {
+                currency = info.GetString("Currency");
+            }
+            catch (SerializationException)
+            {
+                currency = info.GetString("currency");
+            }
+
+            Currency = Currency.FromCode(currency);
+            Amount = Round(amount, Currency, MidpointRounding.ToEven);
+        }
+
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply
         /// the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute" /> to the class.</summary>
@@ -56,57 +100,6 @@ namespace NodaMoney
         {
             info.AddValue("Amount", Amount);
             info.AddValue("Currency", Currency.Code);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Money"/> struct.Initializes a new instace of <see cref="Money"/> with serialized data.</summary>
-        /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the <see cref="Money"/>.</param>
-        /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
-        private Money(SerializationInfo info, StreamingContext context)
-            : this()
-        {
-            decimal amount;
-            try
-            {
-                amount = info.GetDecimal("Amount");
-            }
-            catch (SerializationException)
-            {
-                amount = info.GetDecimal("amount");
-            }
-
-            string currency;
-            try
-            {
-                currency = info.GetString("Currency");
-            }
-            catch (SerializationException)
-            {
-                currency = info.GetString("currency");
-            }
-
-            Currency = Currency.FromCode(currency);
-            Amount = Round(amount, Currency, MidpointRounding.ToEven);
-
-            //        if (reader == null)
-            //            throw new ArgumentNullException(nameof(reader));
-
-            //        if (reader.TokenType == JsonToken.Null)
-            //            return null;
-
-            //        JObject jsonObject = JObject.Load(reader);
-            //        var properties = jsonObject.Properties().ToList();
-
-            //        var amountProperty = properties.SingleOrDefault(pr => string.Compare(pr.Name, "amount", StringComparison.OrdinalIgnoreCase) == 0);
-            //        var currencyProperty = properties.SingleOrDefault(pr => string.Compare(pr.Name, "currency", StringComparison.OrdinalIgnoreCase) == 0);
-
-            //        if (amountProperty == null)
-            //            throw new ArgumentNullException("Ammount needs to be defined", "amount");
-
-            //        if (currencyProperty == null)
-            //            throw new ArgumentNullException("Currency needs to be defined", "currency");
-
-            //        return new Money((decimal)amountProperty.Value, Currency.FromCode((string)currencyProperty.Value));
         }
     }
 }
