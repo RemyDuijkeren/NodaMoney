@@ -22,11 +22,16 @@ namespace NodaMoney
     public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>A singleton instance of the currencies registry.</summary>
+        [NonSerialized]
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
 
+        /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
+        /// <param name="code">The code.</param>
+        /// <param name="namespace">The namepspace.</param>
+        /// <remarks>Used in serialization.</remarks>
         internal Currency(string code, string @namespace = "ISO-4217")
         {
-            var c = FromCode(code, @namespace);
+            Currency c = FromCode(code, @namespace);
 
             Code = c.Code;
             Number = c.Number;
@@ -74,6 +79,7 @@ namespace NodaMoney
             ValidTo = validTo;
             ValidFrom = validFrom;
         }
+
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
@@ -83,19 +89,19 @@ namespace NodaMoney
         public static string CurrencySign => CultureInfo.InvariantCulture.NumberFormat.CurrencySymbol;
 
         /// <summary>Gets the currency symbol.</summary>
-        public string Symbol { get; private set; }
+        public string Symbol { get; }
 
         /// <summary>Gets the english name of the currency.</summary>
-        public string EnglishName { get; private set; }
+        public string EnglishName { get; }
 
         /// <summary>Gets the three-character ISO-4217 currency code.</summary>
-        public string Code { get; private set; }
+        public string Code { get; }
 
         /// <summary>Gets the numeric ISO-4217 currency code.</summary>
-        public string Number { get; private set; }
+        public string Number { get; }
 
         /// <summary>Gets the namespace of the currency.</summary>
-        public string Namespace { get; private set; }
+        public string Namespace { get; }
 
         /// <summary>Gets the number of digits after the decimal separator.</summary>
         /// <remarks>
@@ -113,7 +119,7 @@ namespace NodaMoney
         /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
         /// </para>
         /// </remarks>
-        public double DecimalDigits { get; private set; }
+        public double DecimalDigits { get; }
 
         /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
@@ -290,15 +296,15 @@ namespace NodaMoney
 
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
         /// return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply
-        /// the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute" /> to the class.</summary>
-        /// <returns>An <see cref="T:System.Xml.Schema.XmlSchema" /> that describes the XML representation of the object that is
-        /// produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)" /> method and
-        /// consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)" /> method.
+        /// the <see cref="XmlSchemaProviderAttribute" /> to the class.</summary>
+        /// <returns>An <see cref="XmlSchema" /> that describes the XML representation of the object that is
+        /// produced by the <see cref="IXmlSerializable.WriteXml(XmlWriter)" /> method and
+        /// consumed by the <see cref="IXmlSerializable.ReadXml(XmlReader)" /> method.
         /// </returns>
         public XmlSchema GetSchema() => null;
 
         /// <summary>Generates an object from its XML representation.</summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        /// <param name="reader">The <see cref="XmlReader" /> stream from which the object is deserialized.</param>
         /// <exception cref="ArgumentNullException">The value of 'reader' cannot be null. </exception>
         public void ReadXml(XmlReader reader)
         {
@@ -311,7 +317,7 @@ namespace NodaMoney
         /// <summary>
         /// Converts an object into its XML representation.
         /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <param name="writer">The <see cref="XmlWriter" /> stream to which the object is serialized.</param>
         /// <exception cref="ArgumentNullException">The value of 'writer' cannot be null.</exception>
         public void WriteXml(XmlWriter writer)
         {

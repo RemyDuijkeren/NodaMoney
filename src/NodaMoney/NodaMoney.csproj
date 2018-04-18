@@ -13,7 +13,11 @@
   <ItemGroup>
     <None Remove="stylecop.json" />
     <AdditionalFiles Include="stylecop.json" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.0" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.0" />
+    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="2.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />
+    <PackageReference Include="Text.Analyzers" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' ">

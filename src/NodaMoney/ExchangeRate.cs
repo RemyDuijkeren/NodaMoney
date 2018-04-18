@@ -17,11 +17,11 @@ namespace NodaMoney
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
             : this()
         {
-            if (baseCurrency == null)
+            if (baseCurrency == default(Currency))
                 throw new ArgumentNullException(nameof(baseCurrency));
             if (rate < 0)
                 throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
-            if (quoteCurrency == null)
+            if (quoteCurrency == default(Currency))
                 throw new ArgumentNullException(nameof(quoteCurrency));
             if (baseCurrency == quoteCurrency)
                 throw new ArgumentException("The base and quote currency can't be equal!");
@@ -56,17 +56,6 @@ namespace NodaMoney
         public ExchangeRate(string baseCode, string quoteCode, double rate)
             : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
         {
-        }
-
-        /// <summary>Deconstructs the current instance into its components.</summary>
-        /// <param name="baseCurrency">The base currency.</param>
-        /// <param name="quoteCurrency">The quote currency.</param>
-        /// <param name="rate">The rate of the exchange.</param>
-        public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
-        {
-            baseCurrency = BaseCurrency;
-            quoteCurrency = QuoteCurrency;
-            rate = Value;
         }
 
         /// <summary>Gets the base currency.</summary>
@@ -149,6 +138,17 @@ namespace NodaMoney
 
                 return false;
             }
+        }
+
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="baseCurrency">The base currency.</param>
+        /// <param name="quoteCurrency">The quote currency.</param>
+        /// <param name="rate">The rate of the exchange.</param>
+        public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
+        {
+            baseCurrency = BaseCurrency;
+            quoteCurrency = QuoteCurrency;
+            rate = Value;
         }
 
         /// <summary>Converts the specified money.</summary>
