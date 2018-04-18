@@ -263,7 +263,7 @@ namespace NodaMoney
                 ["ISO-4217::UYI"] = new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.CurrencySign), // List two
                 ["ISO-4217::UYU"] = new Currency("UYU", "858", 2, "Uruguayan peso", "$"), // or $U
                 ["ISO-4217::UZS"] = new Currency("UZS", "860", 2, "Uzbekistan som", "лв"), // or сўм ?
-                ["ISO-4217::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs."), // or Bs.F.
+                ["ISO-4217::VES"] = new Currency("VES", "928", 2, "Venezuelan Bolívar Soberano", "Bs."), // or Bs.F.
                 ["ISO-4217::VND"] = new Currency("VND", "704", 0, "Vietnamese dong", "₫"),
                 ["ISO-4217::VUV"] = new Currency("VUV", "548", 0, "Vanuatu vatu", "VT"),
                 ["ISO-4217::WST"] = new Currency("WST", "882", 2, "Samoan tala", "WS$"), // sometimes SAT, ST or T
@@ -288,10 +288,11 @@ namespace NodaMoney
                 ["ISO-4217::ZAR"] = new Currency("ZAR", "710", 2, "South African rand", "R"),
                 ["ISO-4217::ZMW"] = new Currency("ZMW", "967", 2, "Zambian kwacha", "ZK"), // or ZMW
                 ["ISO-4217::ZWL"] = new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$"),
-                ["ISO-4217::STD"] = new Currency("STN", "930", 2, "Dobra", "Db", validFrom: new DateTime(2018, 1, 1)), // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
+                ["ISO-4217::STN"] = new Currency("STN", "930", 2, "Dobra", "Db", validFrom: new DateTime(2018, 1, 1)), // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
                 ["ISO-4217::STD"] = new Currency("STD", "678", 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
 
                 // Historic ISO-4217 currencies (list three)
+                ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2018, 6, 4)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
                 ["ISO-4217-HISTORIC::ESA"] = new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
                 ["ISO-4217-HISTORIC::ESB"] = new Currency("ESB", "995", NotApplicable, "Spanish peseta (account B)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
