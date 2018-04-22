@@ -71,8 +71,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            Currency currency;
-            if (!Currency.Registry.TryRemove(code, @namespace, out currency))
+            if (!Currency.Registry.TryRemove(code, @namespace, out Currency currency))
                 throw new ArgumentException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
 
             return currency;
@@ -87,9 +86,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(Symbol))
                 Symbol = Currency.CurrencySign;
 
-            var currency = new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
-
-            return currency;
+            return new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
         }
 
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>

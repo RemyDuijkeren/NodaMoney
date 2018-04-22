@@ -82,7 +82,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
 
             Action action = () => { var result = money1 + money2; };
 
-            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
         [Theory, MemberData("TestData")]
@@ -93,7 +93,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
 
             Action action = () => { Money.Add(money1, money2); };
 
-            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
         [Theory, MemberData("TestData")]
@@ -104,7 +104,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
 
             Action action = () => { var result = money1 - money2; };
 
-            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
         [Theory, MemberData("TestData")]
@@ -115,7 +115,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
 
             Action action = () => { Money.Subtract(money1, money2); };
 
-            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
         [Theory, MemberData("TestData")]

@@ -71,6 +71,6 @@ namespace NodaMoney
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        //  IsValid(ITypeDescriptorContext, Object)
+        // IsValid(ITypeDescriptorContext, Object)
     }
 }

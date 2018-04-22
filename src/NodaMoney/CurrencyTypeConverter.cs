@@ -6,6 +6,7 @@ using System.Text;
 
 namespace NodaMoney
 {
+    /// <summary>Converter for the type <see cref="string"/> to and from the type <see cref="Currency"/>.</summary>
     public class CurrencyTypeConverter : TypeConverter
     {
         /// <summary>Returns whether this converter can convert an object of the given type to the type of this converter, using the specified context.</summary>
@@ -46,8 +47,8 @@ namespace NodaMoney
         {
             if (value is string)
             {
-                string[] v = ((string)value).Split(new char[] { ' ' });
-                if (v.Length == 1)
+                string[] v = ((string)value).Split(new[] { ';' });
+                if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]))
                 {
                     return new Currency(v[0]);
                 }
@@ -79,13 +80,13 @@ namespace NodaMoney
                 }
                 else
                 {
-                    return $"{c.Code} {c.Namespace}";
+                    return $"{c.Code};{c.Namespace}";
                 }
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        //  IsValid(ITypeDescriptorContext, Object)
+        // IsValid(ITypeDescriptorContext, Object)
     }
 }

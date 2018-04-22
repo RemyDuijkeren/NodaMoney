@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -51,7 +52,7 @@ namespace NodaMoney
                 currency = info.GetString("currency");
             }
 
-            Currency = Currency.FromCode(currency);
+            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
             Amount = Round(amount, Currency, MidpointRounding.ToEven);
         }
 
@@ -77,7 +78,7 @@ namespace NodaMoney
                 throw new SerializationException("Couldn't find content element with name Money!");
 
             Amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
-            Currency = Currency.FromCode(reader["Currency"]);
+            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(reader["Currency"]);
         }
 
         /// <summary>Converts an object into its XML representation.</summary>
@@ -89,7 +90,7 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(writer));
 
             writer.WriteAttributeString("Amount", Amount.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("Currency", Currency.Code);
+            writer.WriteAttributeString("Currency", TypeDescriptor.GetConverter(typeof(Currency)).ConvertToString(Currency));
         }
 
         /// <summary>Populates a <see cref="SerializationInfo" /> with the data needed to serialize the target object.</summary>
@@ -99,7 +100,7 @@ namespace NodaMoney
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Amount", Amount);
-            info.AddValue("Currency", Currency.Code);
+            info.AddValue("Currency", TypeDescriptor.GetConverter(typeof(Currency)).ConvertToString(Currency));
         }
     }
 }

@@ -52,7 +52,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         {
             Action action = () => _yen.ToString((string)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         {
             Action action = () => _yen.ToString((NumberFormatInfo)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
     }
 

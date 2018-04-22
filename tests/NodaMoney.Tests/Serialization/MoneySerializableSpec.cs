@@ -31,7 +31,7 @@ namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
         {
             Action action = () => JsonConvert.DeserializeObject<Money>(json);
 
-            action.ShouldThrow<SerializationException>().WithMessage("Member '*");
+            action.Should().Throw<SerializationException>().WithMessage("Member '*");
         }
 
         [Theory]
@@ -40,7 +40,7 @@ namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
         {
             var clone = JsonConvert.DeserializeObject<Order>(json);
 
-            clone.ShouldBeEquivalentTo(expected);
+            clone.Should().BeEquivalentTo(expected);
             clone.Discount.Should().BeNull();
         }
     }
@@ -92,7 +92,7 @@ namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
             Console.WriteLine(json);
             var clone = JsonConvert.DeserializeObject<Order>(json);
 
-            clone.ShouldBeEquivalentTo(order);
+            clone.Should().BeEquivalentTo(order);
         }
     }
 

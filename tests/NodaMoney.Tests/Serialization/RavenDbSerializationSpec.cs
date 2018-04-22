@@ -52,7 +52,7 @@ namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
             SampleData sample = new SampleData { Name = "Test", Price = new Money(123.56, "EUR"), BaseCurrency = Currency.FromCode("USD") };
             using (var store = NewDocumentStore(configureStore: s => s.Configuration.Storage.Voron.AllowOn32Bits = true))
             {
-            //using (var store = new DocumentStore { Url = "http://obelix:8081/", DefaultDatabase = "Example" })
+            //using (var store = new DocumentStore { Url = "http://127.0.0.1:8080/", DefaultDatabase = "Example" })
             //{
                 //store.Conventions.CustomizeJsonSerializer += serializer =>
                 //    serializer.Converters.Add(new MoneyRavenDbConverter());

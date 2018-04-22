@@ -244,7 +244,7 @@ namespace NodaMoney.Tests.MoneySpec
         {
             Action action = () => new Money(123.25M, "XYZ");
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
     }
 
@@ -278,9 +278,19 @@ namespace NodaMoney.Tests.MoneySpec
         [Theory]
         [InlineData(0.03, 0.03)]
         [InlineData(0.3333333333333333, 0.33)]
-        public void WhenValueIsDouble_ThenMoneyShouldBeCorrect(double input, decimal expected)
+        public void WhenValueIsDoubleAndWithCurrency_ThenMoneyShouldBeCorrect(double input, decimal expected)
         {
             var money = new Money(input, "EUR");
+
+            money.Amount.Should().Be(expected);
+        }
+
+        [Theory]
+        [InlineData(0.03, 0.03)]
+        [InlineData(0.3333333333333333, 0.33)]
+        public void WhenValueIsDoubleWithoutCurrency_ThenMoneyShouldBeCorrect(double input, decimal expected)
+        {
+            var money = new Money(input);
 
             money.Amount.Should().Be(expected);
         }
