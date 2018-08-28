@@ -1,7 +1,7 @@
 #tool nuget:?package=xunit.runner.console
 #tool nuget:?package=GitVersion.CommandLine
 #tool nuget:?package=OpenCover
-#tool nuget:?package=coveralls.net&version=0.7.0
+#tool nuget:?package=coveralls.net
 #addin nuget:?package=Cake.Figlet
 #addin nuget:?package=Cake.Coveralls
 
@@ -48,21 +48,21 @@ Does(() =>
     var versionInfo = GitVersion();
     var buildVersion = EnvironmentVariable("APPVEYOR_BUILD_NUMBER") ?? "0";
     var assemblyVersion =  versionInfo.Major + ".0.0.0"; // Minor and Patch versions should work with base Major version
-	var fileVersion = versionInfo.MajorMinorPatch + "." + buildVersion;
-	var informationalVersion = versionInfo.FullSemVer;
-	var nuGetVersion = versionInfo.NuGetVersion;
+    var fileVersion = versionInfo.MajorMinorPatch + "." + buildVersion;
+    var informationalVersion = versionInfo.FullSemVer;
+    var nuGetVersion = versionInfo.NuGetVersion;
 
     Information("BuildVersion: " + buildVersion);
     Information("AssemblyVersion: " + assemblyVersion);
     Information("FileVersion: " + fileVersion);
     Information("InformationalVersion: " + informationalVersion);
     Information("NuGetVersion: " + nuGetVersion);
-	
+    
     if (AppVeyor.IsRunningOnAppVeyor)
     {
         AppVeyor.UpdateBuildVersion(informationalVersion + ".build." + buildVersion);
     }	
-	
+    
     Information("Update Directory.build.props");
     var file = File("./src/Directory.build.props");
     XmlPoke(file, "/Project/PropertyGroup/Version", nuGetVersion);
