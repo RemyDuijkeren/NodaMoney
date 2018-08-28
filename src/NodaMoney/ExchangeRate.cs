@@ -28,15 +28,16 @@ namespace NodaMoney
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
-            Value = Math.Round(rate, 6); // value is a ratio
+            Value = rate; // value is a ratio
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
-        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate)
-            : this(baseCurrency, quoteCurrency, (decimal)rate)
+        /// <param name="numberOfDecimals">The number of decimals to round the exchange rate to.</param>
+        public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate, int numberOfDecimals = 6)
+            : this(baseCurrency, quoteCurrency, Math.Round((decimal)rate, numberOfDecimals))
         {
         }
 
@@ -53,8 +54,9 @@ namespace NodaMoney
         /// <param name="baseCode">The code of the base currency.</param>
         /// <param name="quoteCode">The code of the quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
-        public ExchangeRate(string baseCode, string quoteCode, double rate)
-            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
+        /// <param name="numberOfDecimals">The number of decimals to round the exchange rate to.</param>
+        public ExchangeRate(string baseCode, string quoteCode, double rate, int numberOfDecimals = 6)
+            : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate, numberOfDecimals)
         {
         }
 

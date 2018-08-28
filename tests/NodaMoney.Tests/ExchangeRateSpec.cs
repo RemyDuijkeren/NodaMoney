@@ -59,14 +59,23 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         private readonly Currency _dollar = Currency.FromCode("USD");
 
         [Fact]
-        public void WhenRateIsDouble_ThenCreatingShouldSucceed()
+        public void WhenRateIsDoubleAndNoNumberRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedToSixDecimals()
         {
-            var fx = new ExchangeRate(_euro, _dollar, 1.2591);
+            var fx = new ExchangeRate(_euro, _dollar, 1.2591478D);
 
             fx.BaseCurrency.Should().Be(_euro);
             fx.QuoteCurrency.Should().Be(_dollar);
-            // TODO: Can doubles be compared for equality? See https://github.com/dennisdoomen/fluentassertions/wiki
-            fx.Value.Should().Be(1.2591M);
+            fx.Value.Should().Be(1.259148M);
+        }
+
+        [Fact]
+        public void WhenRateIsDoubleAndANumberOfRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedThatNumberOfDecimals()
+        {
+            var fx = new ExchangeRate(_euro, _dollar, 1.2591478D, 3);
+
+            fx.BaseCurrency.Should().Be(_euro);
+            fx.QuoteCurrency.Should().Be(_dollar);
+            fx.Value.Should().Be(1.259M);
         }
 
         [Fact]
@@ -80,13 +89,23 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         }
 
         [Fact]
-        public void WhenRateIsFloat_ThenCreatingShouldSucceed()
+        public void WhenRateIsFloatAndNoNumberRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedToSixDecimals()
         {
-            var fx = new ExchangeRate(_euro, _dollar, 1.2591F);
+            var fx = new ExchangeRate(_euro, _dollar, 1.2591478F);
 
             fx.BaseCurrency.Should().Be(_euro);
             fx.QuoteCurrency.Should().Be(_dollar);
-            fx.Value.Should().Be(1.2591M);
+            fx.Value.Should().Be(1.259148M);
+        }
+
+        [Fact]
+        public void WhenRateIsFloatAndANumberOfRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedThatNumberOfDecimals()
+        {
+            var fx = new ExchangeRate(_euro, _dollar, 1.2591478F, 3);
+
+            fx.BaseCurrency.Should().Be(_euro);
+            fx.QuoteCurrency.Should().Be(_dollar);
+            fx.Value.Should().Be(1.259M);
         }
 
         [Fact]
@@ -141,14 +160,23 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         private readonly Currency _dollar = Currency.FromCode("USD");
 
         [Fact]
-        public void WhenRateIsDouble_ThenCreatingShouldSucceed()
+        public void WhenRateIsDoubleAndNoNumberRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedToSixDecimals()
         {
-            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591);
+            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591478D);
 
             fx.BaseCurrency.Should().Be(_euro);
             fx.QuoteCurrency.Should().Be(_dollar);
-            // TODO: Can doubles be compared for equality? See https://github.com/dennisdoomen/fluentassertions/wiki
-            fx.Value.Should().Be(1.2591M);
+            fx.Value.Should().Be(1.259148M);
+        }
+
+        [Fact]
+        public void WhenRateIsDoubleAndANumberOfRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedThatNumberOfDecimals()
+        {
+            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591478D, 3);
+
+            fx.BaseCurrency.Should().Be(_euro);
+            fx.QuoteCurrency.Should().Be(_dollar);
+            fx.Value.Should().Be(1.259M);
         }
 
         [Fact]
@@ -162,13 +190,23 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         }
 
         [Fact]
-        public void WhenRateIsFloat_ThenCreatingShouldSucceed()
+        public void WhenRateIsFloatAndNoNumberOfRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedToSixDecimals()
         {
-            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591F);
+            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591478F);
 
             fx.BaseCurrency.Should().Be(_euro);
             fx.QuoteCurrency.Should().Be(_dollar);
-            fx.Value.Should().Be(1.2591M);
+            fx.Value.Should().Be(1.259148M);
+        }
+
+        [Fact]
+        public void WhenRateIsFloatAndANumberOfRoundingDecimalsIsGiven_ThenCreatingShouldSucceedWithValueRoundedThatNumberOfDecimals()
+        {
+            var fx = new ExchangeRate(_euroAsString, _dollarAsString, 1.2591478F, 3);
+
+            fx.BaseCurrency.Should().Be(_euro);
+            fx.QuoteCurrency.Should().Be(_dollar);
+            fx.Value.Should().Be(1.259M);
         }
 
         [Fact]
