@@ -224,7 +224,7 @@ namespace NodaMoney
                 ["ISO-4217::PAB"] = new Currency("PAB", "590", 2, "Panamanian balboa", "B/."),
                 ["ISO-4217::PEN"] = new Currency("PEN", "604", 2, "Peruvian sol", "S/."),
                 ["ISO-4217::PGK"] = new Currency("PGK", "598", 2, "Papua New Guinean kina", "K"),
-                ["ISO-4217::PHP"] = new Currency("PHP", "608", 2, "Philippine Piso", "₱"), // or P or PHP or PhP
+                ["ISO-4217::PHP"] = new Currency("PHP", "608", 2, "Philippine Peso", "₱"), // or P or PHP or PhP
                 ["ISO-4217::PKR"] = new Currency("PKR", "586", 2, "Pakistani rupee", "Rs"),
                 ["ISO-4217::PLN"] = new Currency("PLN", "985", 2, "Polish złoty", "zł"),
                 ["ISO-4217::PYG"] = new Currency("PYG", "600", 0, "Paraguayan guaraní", "₲"),
