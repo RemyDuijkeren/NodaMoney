@@ -1,9 +1,9 @@
 #tool nuget:?package=xunit.runner.console
 #tool nuget:?package=GitVersion.CommandLine
 #tool nuget:?package=OpenCover
-#tool nuget:?package=coveralls.net
+//#tool nuget:?package=coveralls.net
 #addin nuget:?package=Cake.Figlet
-#addin nuget:?package=Cake.Coveralls
+//#addin nuget:?package=Cake.Coveralls
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -48,21 +48,21 @@ Does(() =>
     var versionInfo = GitVersion();
     var buildVersion = EnvironmentVariable("APPVEYOR_BUILD_NUMBER") ?? "0";
     var assemblyVersion =  versionInfo.Major + ".0.0.0"; // Minor and Patch versions should work with base Major version
-	var fileVersion = versionInfo.MajorMinorPatch + "." + buildVersion;
-	var informationalVersion = versionInfo.FullSemVer;
-	var nuGetVersion = versionInfo.NuGetVersion;
+    var fileVersion = versionInfo.MajorMinorPatch + "." + buildVersion;
+    var informationalVersion = versionInfo.FullSemVer;
+    var nuGetVersion = versionInfo.NuGetVersion;
 
     Information("BuildVersion: " + buildVersion);
     Information("AssemblyVersion: " + assemblyVersion);
     Information("FileVersion: " + fileVersion);
     Information("InformationalVersion: " + informationalVersion);
     Information("NuGetVersion: " + nuGetVersion);
-	
+    
     if (AppVeyor.IsRunningOnAppVeyor)
     {
         AppVeyor.UpdateBuildVersion(informationalVersion + ".build." + buildVersion);
     }	
-	
+    
     Information("Update Directory.build.props");
     var file = File("./src/Directory.build.props");
     XmlPoke(file, "/Project/PropertyGroup/Version", nuGetVersion);
@@ -133,35 +133,35 @@ Task("Package")
     }
  });
 
-Task("Upload-Coverage-CoverallsIo")
-.WithCriteria(() => HasEnvironmentVariable("COVERALLS_REPO_TOKEN"))
-.WithCriteria(() => !AppVeyor.Environment.PullRequest.IsPullRequest)
-.IsDependentOn("Coverage")
-.Does(() =>
-{
-    if (AppVeyor.IsRunningOnAppVeyor)
-    {
-        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
-        {
-            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
-            CommitId = AppVeyor.Environment.Repository.Commit.Id,
-            CommitBranch = AppVeyor.Environment.Repository.Branch,
-            CommitAuthor = AppVeyor.Environment.Repository.Commit.Author,
-            CommitEmail = AppVeyor.Environment.Repository.Commit.Email,
-            CommitMessage = AppVeyor.Environment.Repository.Commit.Message,
-            JobId = Convert.ToInt32(EnvironmentVariable("APPVEYOR_BUILD_NUMBER")),
-            ServiceName = "appveyor"
-        });
-    }
-    else
-    {
-        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
-        {
-            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
-            ServiceName = "local"
-        });        
-    }
-});
+//Task("Upload-Coverage-CoverallsIo")
+//.WithCriteria(() => HasEnvironmentVariable("COVERALLS_REPO_TOKEN"))
+//.WithCriteria(() => !AppVeyor.Environment.PullRequest.IsPullRequest)
+//.IsDependentOn("Coverage")
+//.Does(() =>
+//{
+//    if (AppVeyor.IsRunningOnAppVeyor)
+//    {
+//        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
+//        {
+//            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
+//            CommitId = AppVeyor.Environment.Repository.Commit.Id,
+//            CommitBranch = AppVeyor.Environment.Repository.Branch,
+//            CommitAuthor = AppVeyor.Environment.Repository.Commit.Author,
+//            CommitEmail = AppVeyor.Environment.Repository.Commit.Email,
+//            CommitMessage = AppVeyor.Environment.Repository.Commit.Message,
+//            JobId = Convert.ToInt32(EnvironmentVariable("APPVEYOR_BUILD_NUMBER")),
+//            ServiceName = "appveyor"
+//        });
+//    }
+//    else
+//    {
+//        CoverallsNet(artifactsDir.Path + "/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
+//        {
+//            RepoToken = EnvironmentVariable("COVERALLS_REPO_TOKEN"),
+//            ServiceName = "local"
+//        });        
+//    }
+//});
 
 Task("Upload-AppVeyor-Artifacts")
 .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
@@ -195,7 +195,7 @@ Task("Default")
 Task("AppVeyor")
 .IsDependentOn("Package")
 .IsDependentOn("Upload-AppVeyor-Artifacts")
-.IsDependentOn("Upload-Coverage-CoverallsIo")
+//.IsDependentOn("Upload-Coverage-CoverallsIo")
 .IsDependentOn("Publish-NuGet");
 
 RunTarget(target);
