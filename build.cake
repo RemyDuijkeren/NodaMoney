@@ -1,7 +1,7 @@
 #tool nuget:?package=xunit.runner.console
 #tool nuget:?package=GitVersion.CommandLine
 #tool nuget:?package=OpenCover
-#tool nuget:?package=coveralls.net
+#tool nuget:?package=coveralls.net&version=0.7.0
 #addin nuget:?package=Cake.Figlet
 #addin nuget:?package=Cake.Coveralls
 
