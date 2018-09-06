@@ -251,7 +251,7 @@ namespace NodaMoney
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type and value.</summary>
         /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj) => (obj is Currency) && Equals((Currency)obj);
+        public override bool Equals(object obj) => obj is Currency currency && Equals(currency);
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="Currency"/> object represent the same value.</summary>
         /// <param name="other">A <see cref="Currency"/> object.</param>
@@ -259,16 +259,15 @@ namespace NodaMoney
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
         public bool Equals(Currency other)
         {
-            return this.Code == other.Code
-                && this.Namespace == other.Namespace
-                && this.DecimalDigits == other.DecimalDigits
-                && this.EnglishName == other.EnglishName
-                && this.MajorUnit == other.MajorUnit
-                && this.MinorUnit == other.MinorUnit
-
-                && this.Symbol == other.Symbol
-                && this.ValidFrom == other.ValidFrom
-                && this.ValidTo == other.ValidTo;
+            return Code == other.Code
+                && Namespace == other.Namespace
+                && DecimalDigits == other.DecimalDigits
+                && EnglishName == other.EnglishName
+                && MajorUnit == other.MajorUnit
+                && MinorUnit == other.MinorUnit
+                && Symbol == other.Symbol
+                && ValidFrom == other.ValidFrom
+                && ValidTo == other.ValidTo;
         }
 
         /// <summary>Returns the hash code for this instance.</summary>

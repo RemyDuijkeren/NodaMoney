@@ -118,9 +118,7 @@ namespace NodaMoney
         /// <remarks>See <see cref="decimal.TryParse(string, NumberStyles, IFormatProvider, out decimal)"/> for more info and remarks.</remarks>
         public static bool TryParse(string value, NumberStyles style, IFormatProvider provider, Currency currency, out Money result)
         {
-            decimal amount;
-            bool isParsingSuccessful = decimal.TryParse(value, style, GetFormatProvider(currency, provider), out amount);
-
+            bool isParsingSuccessful = decimal.TryParse(value, style, GetFormatProvider(currency, provider), out decimal amount);
             if (isParsingSuccessful)
             {
                 result = new Money(amount, currency);

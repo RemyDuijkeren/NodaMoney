@@ -247,7 +247,7 @@ namespace NodaMoney
         /// and value.</summary>
         /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj) => (obj is Money) && this.Equals((Money)obj);
+        public override bool Equals(object obj) => obj is Money money && this.Equals(money);
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer hash code.</returns>

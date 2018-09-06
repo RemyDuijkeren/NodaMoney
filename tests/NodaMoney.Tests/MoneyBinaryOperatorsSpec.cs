@@ -22,20 +22,20 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             new object[] { -100.999m, -0.9m, -101.899m } // negative
         };
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingAdditionOperator_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);
             var money2 = new Money(value2);
 
             var result = money1 + money2;
-            
+
             result.Should().Be(new Money(expected));
             result.Should().NotBeSameAs(money1);
             result.Should().NotBeSameAs(money2);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingAdditionMethod_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);
@@ -48,7 +48,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money2);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingSubstractionOperator_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
         {
             var money1 = new Money(value1);
@@ -61,7 +61,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money2);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingSubstractionMethod_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
         {
             var money1 = new Money(value1);
@@ -74,7 +74,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money2);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingAdditionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
@@ -85,18 +85,18 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingAdditionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
             var money2 = new Money(value2, "USD");
 
-            Action action = () => { Money.Add(money1, money2); };
+            Action action = () => Money.Add(money1, money2);
 
             action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingSubstractionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
@@ -107,18 +107,18 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         public void WhenUsingSubstractionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
             var money2 = new Money(value2, "USD");
 
-            Action action = () => { Money.Subtract(money1, money2); };
+            Action action = () => Money.Subtract(money1, money2);
 
             action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         [UseCulture("en-us")]
         public void WhenUsingAddtionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
@@ -133,7 +133,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result2.Should().NotBeSameAs(money1);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         [UseCulture("en-us")]
         public void WhenUsingAdditionMethodWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
@@ -145,7 +145,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money1);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         [UseCulture("en-us")]
         public void WhenUsingSubstractionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal expected, decimal value2, decimal value1)
         {
@@ -160,7 +160,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result2.Should().NotBeSameAs(money1);
         }
 
-        [Theory, MemberData("TestData")]
+        [Theory, MemberData(nameof(TestData))]
         [UseCulture("en-us")]
         public void WhenUsingSubstractionMethodWithDecimal_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
         {
@@ -184,7 +184,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             new object[] { -100.12m, 5m, -500.60m }
         };
 
-        [Theory, MemberData("TestDataDecimal")]
+        [Theory, MemberData(nameof(TestDataDecimal))]
         public void WhenUsingMultiplyOperatorWithDecimal_ThenMoneyShouldBeMultipled(decimal value, decimal multiplier, decimal expected)
         {
             var money = new Money(value);
@@ -198,7 +198,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result2.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataDecimal")]
+        [Theory, MemberData(nameof(TestDataDecimal))]
         public void WhenUsingMultiplyMethodWithDecimal_ThenMoneyShouldBeMultipled(decimal value, decimal multiplier, decimal expected)
         {
             var money = new Money(value);
@@ -209,7 +209,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataDecimal")]
+        [Theory, MemberData(nameof(TestDataDecimal))]
         public void WhenUsingDivisionOperatorWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
         {
             var money = new Money(value);
@@ -220,7 +220,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataDecimal")]
+        [Theory, MemberData(nameof(TestDataDecimal))]
         public void WhenUsingDivisionMethodWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
         {
             var money = new Money(value);
@@ -240,7 +240,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             new object[] { -100.12m, 5, -500.60m }
         };
 
-        [Theory, MemberData("TestDataInteger")]
+        [Theory, MemberData(nameof(TestDataInteger))]
         public void WhenUsingMultiplyOperatorWithInteger_ThenMoneyShouldBeMultipled(decimal value, int multiplier, decimal expected)
         {
             var money = new Money(value);
@@ -254,7 +254,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result2.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataInteger")]
+        [Theory, MemberData(nameof(TestDataInteger))]
         public void WhenUsingMultiplyMethodWithInteger_ThenMoneyShouldBeMultipled(decimal value, int multiplier, decimal expected)
         {
             var money = new Money(value);
@@ -265,7 +265,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataInteger")]
+        [Theory, MemberData(nameof(TestDataInteger))]
         public void WhenUsingDivisionOperatorWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
         {
             var money = new Money(value);
@@ -276,7 +276,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().NotBeSameAs(money);
         }
 
-        [Theory, MemberData("TestDataInteger")]
+        [Theory, MemberData(nameof(TestDataInteger))]
         public void WhenUsingDivisionMethodWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
         {
             var money = new Money(value);
@@ -290,10 +290,10 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         public static IEnumerable<object[]> TestDataMoney => new[]
         {
             new object[] { 150m, 15m, 10m },
-            new object[] { 100.12m, 3m, (100.12m/3m) },
+            new object[] { 100.12m, 3m, 100.12m/3m },
         };
 
-        [Theory, MemberData("TestDataMoney")]
+        [Theory, MemberData(nameof(TestDataMoney))]
         public void WhenUsingDivisionOperatorWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);
@@ -304,7 +304,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().Be(expected); // ratio
         }
 
-        [Theory, MemberData("TestDataMoney")]
+        [Theory, MemberData(nameof(TestDataMoney))]
         public void WhenUsingDivisionMethodWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1);

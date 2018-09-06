@@ -406,7 +406,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             new object[] { new ExchangeRate("AFN", "USD", 1.2591), new ExchangeRate("EUR", "USD", 1.2591), false }
         };
 
-        [Theory][MemberData("TestData")]
+        [Theory][MemberData(nameof(TestData))]
         public void WhenTheAreEquel_ThenComparingShouldBeTrueOtherwiseFalse(ExchangeRate fx1, ExchangeRate fx2, bool areEqual)
         {
             if (areEqual)

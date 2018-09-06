@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenRegisterAsSimpleAsPossible_ThenShouldBeAvailable()
         {
-            var result = new CurrencyBuilder("BTC4", "ISO-4217")
+            Currency result = new CurrencyBuilder("BTC4", "ISO-4217")
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
@@ -25,11 +25,13 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenRegisterBitCoinInIsoNamespace_ThenShouldBeAvailable()
         {
-            var builder = new CurrencyBuilder("BTC", "ISO-4217");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC", "ISO-4217")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Register();
 
@@ -41,11 +43,13 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenRegisterBitCoin_ThenShouldBeAvailableByExplicitNamespace()
         {
-            var builder = new CurrencyBuilder("BTC1", "virtual");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC1", "virtual")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Register();
 
@@ -57,11 +61,13 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenBuildBitCoin_ThenItShouldSuccedButNotBeRegistered()
         {
-            var builder = new CurrencyBuilder("BTC2", "virtual");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC2", "virtual")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Build();
             result.Symbol.Should().Be("฿");
@@ -136,7 +142,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenSymbolIsEmpty_ThenSymbolMustBeDefaultCurrencySign()
         {
-            var result = new CurrencyBuilder("BTC5", "ISO-4217")
+            Currency result = new CurrencyBuilder("BTC5", "ISO-4217")
             {
                 EnglishName = "Bitcoin",
                 //Symbol = "฿",
@@ -166,11 +172,13 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenUnregisterCustomCurrency_ThenThisMustSucceed()
         {
-            var builder = new CurrencyBuilder("XYZ", "virtual");
-            builder.EnglishName = "Xyz";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 4;
+            var builder = new CurrencyBuilder("XYZ", "virtual")
+            {
+                EnglishName = "Xyz",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 4
+            };
 
             builder.Register();
             Currency xyz = Currency.FromCode("XYZ", "virtual"); // should work
@@ -243,4 +251,4 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             newEuro.DecimalDigits.Should().Be(1);
         }
     }
-}    
+}

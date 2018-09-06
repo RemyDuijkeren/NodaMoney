@@ -193,7 +193,7 @@ namespace NodaMoney
         /// <param name="obj">Another object to compare to.</param>
         /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise,
         /// false.</returns>
-        public override bool Equals(object obj) => (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
+        public override bool Equals(object obj) => obj is ExchangeRate fx && this.Equals(fx);
 
         /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
