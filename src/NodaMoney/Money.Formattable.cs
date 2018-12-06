@@ -18,13 +18,8 @@ namespace NodaMoney
         /// using the specified format.</summary>
         /// <param name="format">A numeric format string.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format.</returns>
-        /// <exception cref="ArgumentNullException">The value of 'format' cannot be null.</exception>
         public string ToString(string format)
         {
-            // http://msdn.microsoft.com/en-us/library/syy068tk.aspx
-            if (format == null)
-                throw new ArgumentNullException(nameof(format));
-
             return ConvertToString(format, null);
         }
 
@@ -32,12 +27,8 @@ namespace NodaMoney
         /// specified culture-specific format information.</summary>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of this <see cref="Money"/> instance as specified by formatProvider.</returns>
-        /// <exception cref="ArgumentNullException">The value of 'formatProvider' cannot be null.</exception>
         public string ToString(IFormatProvider formatProvider)
         {
-            if (formatProvider == null)
-                throw new ArgumentNullException(nameof(formatProvider));
-
             return ConvertToString(null, formatProvider);
         }
 

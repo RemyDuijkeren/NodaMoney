@@ -48,11 +48,11 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
 
         [Fact]
-        public void WhenNullFormat_ThenThisShouldThrow()
+        public void WhenNullFormat_ThenThisShouldNotThrow()
         {
             Action action = () => _yen.ToString((string)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.ShouldNotThrow<ArgumentNullException>();
         }
 
         [Fact]
@@ -80,12 +80,31 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
 
         [Fact]
-        public void WhenNullFormatNumberFormatIsUsed_ThenThisShouldThrow()
+        public void WhenNullFormatNumberFormatIsUsed_ThenThisShouldNotThrow()
         {
             Action action = () => _yen.ToString((NumberFormatInfo)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.ShouldNotThrow<ArgumentNullException>();
         }
+
+        [Fact]
+        public void WhenUsingToStringWithOneStringArgument_ThenExpectsTheSameAsWithTwoArguments()
+        {
+            Func<string> oneParameter = () => _yen.ToString((string)null);
+            Func<string> twoParameter = () => _yen.ToString((string)null, null);
+
+            oneParameter().Should().Be(twoParameter());
+        }
+
+        [Fact]
+        public void WhenUsingToStringWithOneProviderArgument_ThenExpectsTheSameAsWithTwoArguments()
+        {
+            Func<string> oneParameter = () => _yen.ToString((IFormatProvider)null);
+            Func<string> twoParameter = () => _yen.ToString(null, null);
+
+            oneParameter().Should().Be(twoParameter());
+        }
+
     }
 
     public class GivenIWantMoneyAsStringWithCurrencySymbol
