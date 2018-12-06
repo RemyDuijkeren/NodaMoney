@@ -105,6 +105,23 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
             oneParameter().Should().Be(twoParameter());
         }
 
+        [Fact]
+        public void WhenUsingToStringWithGFormat_ThenReturnsTheSameAsTheDefaultFormat()
+        {
+            // according to https://docs.microsoft.com/en-us/dotnet/api/system.iformattable.tostring?view=netframework-4.7.2#notes-to-implementers
+            // the result of using "G" should return the same result as using <null>
+            _yen.ToString("G", null).Should().Be(_yen.ToString(null, null));
+        }
+
+        [Fact]
+        public void WhenUsingToStringWithGFormatWithCulture_ThenReturnsTheSameAsTheDefaultFormatWithThatCulture()
+        {
+            _yen.ToString("G", CultureInfo.InvariantCulture).Should().Be(_yen.ToString(null, CultureInfo.InvariantCulture));
+            _yen.ToString("G", CultureInfo.GetCultureInfo("nl-NL")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("nl-NL")));
+            _yen.ToString("G", CultureInfo.GetCultureInfo("fr-FR")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("fr-FR")));
+        }
+
+
     }
 
     public class GivenIWantMoneyAsStringWithCurrencySymbol

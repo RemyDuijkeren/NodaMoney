@@ -122,6 +122,11 @@ namespace NodaMoney
                 provider = GetFormatProvider(Currency, formatProvider);
             }
 
+            if (format == null || format == "G")
+            {
+                format = "C";
+            }
+
             return Amount.ToString(format ?? "C", provider);
         }
     }
