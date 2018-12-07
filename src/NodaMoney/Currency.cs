@@ -152,6 +152,16 @@ namespace NodaMoney
         /// <returns>The result of the operator.</returns>
         public static bool operator !=(Currency left, Currency right) => !(left == right);
 
+        /// <summary>Check whether the currency is valid at the given date.</summary>
+        /// <param name="date">The date at which the Currency should be valid</param>
+        /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>;</returns>
+        public bool IsValidAt(DateTime date)
+        {
+            return
+                (!ValidFrom.HasValue || ValidFrom <= date) &&
+                (!ValidTo.HasValue || ValidTo >= date);
+        }
+
         /// <summary>Create an instance of the <see cref="Currency"/>, based on a ISO 4217 currency code.</summary>
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
