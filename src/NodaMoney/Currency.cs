@@ -80,6 +80,11 @@ namespace NodaMoney
             ValidFrom = validFrom;
         }
 
+        private Currency(SerializationInfo info, StreamingContext context)
+        : this(info.GetString("code"), info.GetString("namespace"))
+        {
+        }
+
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
@@ -334,11 +339,6 @@ namespace NodaMoney
         {
             info.AddValue("code", Code);
             info.AddValue("namespace", Namespace);
-        }
-
-        private Currency(SerializationInfo info, StreamingContext context)
-            : this(info.GetString("code"), info.GetString("namespace"))
-        {
         }
     }
 }

@@ -13,15 +13,15 @@
   <ItemGroup>
     <None Remove="stylecop.json" />
     <AdditionalFiles Include="stylecop.json" />
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.1">
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.9.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.1">
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.9.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="2.6.1">
+    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="2.9.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
