@@ -19,8 +19,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenToStringAndCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureUS()
         {
-            _yen.ToString().Should().Be("¥765");
-            _euro.ToString().Should().Be("€765.43");
+            _yen.ToString().Should().Be("ï¿½765");
+            _euro.ToString().Should().Be("ï¿½765.43");
             _dollar.ToString().Should().Be("$765.43");
             _dinar.ToString().Should().Be("BD765.432");
         }
@@ -30,8 +30,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenToStringAndCurrentCultureNL_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
-            _yen.ToString().Should().Be("¥ 765");
-            _euro.ToString().Should().Be("€ 765,43");
+            _yen.ToString().Should().Be("ï¿½ 765");
+            _euro.ToString().Should().Be("ï¿½ 765,43");
             _dollar.ToString().Should().Be("$ 765,43");
             _dinar.ToString().Should().Be("BD 765,432");
         }
@@ -41,14 +41,14 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenToStringAndCurrentCultureFR_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-FR");
-            _yen.ToString().Should().Be("765 ¥");
-            _euro.ToString().Should().Be("765,43 €");
+            _yen.ToString().Should().Be("765 ï¿½");
+            _euro.ToString().Should().Be("765,43 ï¿½");
             _dollar.ToString().Should().Be("765,43 $");
             _dinar.ToString().Should().Be("765,432 BD");
         }
 
         [Fact]
-        public void WhenNullFormat_ThenThisShouldThrow()
+        public void WhenNullFormat_ThenThisShouldNotThrow()
         {
             Action action = () => _yen.ToString((string)null);
 
@@ -61,8 +61,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         {
             var ci = new CultureInfo("nl-NL");
 
-            _yen.ToString(ci).Should().Be("¥ 765");
-            _euro.ToString(ci).Should().Be("€ 765,43");
+            _yen.ToString(ci).Should().Be("ï¿½ 765");
+            _euro.ToString(ci).Should().Be("ï¿½ 765,43");
             _dollar.ToString(ci).Should().Be("$ 765,43");
             _dinar.ToString(ci).Should().Be("BD 765,432");
         }
@@ -73,19 +73,55 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         {
             var nfi = new CultureInfo("nl-NL").NumberFormat;
 
-            _yen.ToString(nfi).Should().Be("¥ 765");
-            _euro.ToString(nfi).Should().Be("€ 765,43");
+            _yen.ToString(nfi).Should().Be("ï¿½ 765");
+            _euro.ToString(nfi).Should().Be("ï¿½ 765,43");
             _dollar.ToString(nfi).Should().Be("$ 765,43");
             _dinar.ToString(nfi).Should().Be("BD 765,432");
         }
 
         [Fact]
-        public void WhenNullFormatNumberFormatIsUsed_ThenThisShouldThrow()
+        public void WhenNullFormatNumberFormatIsUsed_ThenThisShouldNotThrow()
         {
             Action action = () => _yen.ToString((NumberFormatInfo)null);
 
-            action.Should().Throw<ArgumentNullException>();
+            action.ShouldThrow<ArgumentNullException>();
         }
+
+        [Fact]
+        public void WhenUsingToStringWithOneStringArgument_ThenExpectsTheSameAsWithTwoArguments()
+        {
+            Func<string> oneParameter = () => _yen.ToString((string)null);
+            Func<string> twoParameter = () => _yen.ToString((string)null, null);
+
+            oneParameter().Should().Be(twoParameter());
+        }
+
+        [Fact]
+        public void WhenUsingToStringWithOneProviderArgument_ThenExpectsTheSameAsWithTwoArguments()
+        {
+            Func<string> oneParameter = () => _yen.ToString((IFormatProvider)null);
+            Func<string> twoParameter = () => _yen.ToString(null, null);
+
+            oneParameter().Should().Be(twoParameter());
+        }
+
+        [Fact]
+        public void WhenUsingToStringWithGFormat_ThenReturnsTheSameAsTheDefaultFormat()
+        {
+            // according to https://docs.microsoft.com/en-us/dotnet/api/system.iformattable.tostring?view=netframework-4.7.2#notes-to-implementers
+            // the result of using "G" should return the same result as using <null>
+            _yen.ToString("G", null).Should().Be(_yen.ToString(null, null));
+        }
+
+        [Fact]
+        public void WhenUsingToStringWithGFormatWithCulture_ThenReturnsTheSameAsTheDefaultFormatWithThatCulture()
+        {
+            _yen.ToString("G", CultureInfo.InvariantCulture).Should().Be(_yen.ToString(null, CultureInfo.InvariantCulture));
+            _yen.ToString("G", CultureInfo.GetCultureInfo("nl-NL")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("nl-NL")));
+            _yen.ToString("G", CultureInfo.GetCultureInfo("fr-FR")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("fr-FR")));
+        }
+
+
     }
 
     public class GivenIWantMoneyAsStringWithCurrencySymbol
@@ -99,8 +135,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenCurrentCulturUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
         {
-            _yen.ToString("C").Should().Be("¥765");
-            _euro.ToString("C").Should().Be("€765.43");
+            _yen.ToString("C").Should().Be("ï¿½765");
+            _euro.ToString("C").Should().Be("ï¿½765.43");
             _dollar.ToString("C").Should().Be("$765.43");
             _dinar.ToString("C").Should().Be("BD765.432");
         }
@@ -110,8 +146,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenCurrentCultureNL_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
-            _yen.ToString("C").Should().Be("¥ 765");
-            _euro.ToString("C").Should().Be("€ 765,43");
+            _yen.ToString("C").Should().Be("ï¿½ 765");
+            _euro.ToString("C").Should().Be("ï¿½ 765,43");
             _dollar.ToString("C").Should().Be("$ 765,43");
             _dinar.ToString("C").Should().Be("BD 765,432");
         }
@@ -121,8 +157,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenCurrentCultureFR_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-FR");
-            _yen.ToString("C").Should().Be("765 ¥");
-            _euro.ToString("C").Should().Be("765,43 €");
+            _yen.ToString("C").Should().Be("765 ï¿½");
+            _euro.ToString("C").Should().Be("765,43 ï¿½");
             _dollar.ToString("C").Should().Be("765,43 $");
             _dinar.ToString("C").Should().Be("765,432 BD");
         }
@@ -131,8 +167,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenZeroDecimals_ThenThisShouldSucceed()
         {
-            _yen.ToString("C0").Should().Be("¥765");
-            _euro.ToString("C0").Should().Be("€765");
+            _yen.ToString("C0").Should().Be("ï¿½765");
+            _euro.ToString("C0").Should().Be("ï¿½765");
             _dollar.ToString("C0").Should().Be("$765");
             _dinar.ToString("C0").Should().Be("BD765");
         }
@@ -141,8 +177,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenOneDecimals_ThenThisShouldSucceed()
         {
-            _yen.ToString("C1").Should().Be("¥765.0");
-            _euro.ToString("C1").Should().Be("€765.4");
+            _yen.ToString("C1").Should().Be("ï¿½765.0");
+            _euro.ToString("C1").Should().Be("ï¿½765.4");
             _dollar.ToString("C1").Should().Be("$765.4");
             _dinar.ToString("C1").Should().Be("BD765.4");
         }
@@ -151,8 +187,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenTwoDecimals_ThenThisShouldSucceed()
         {
-            _yen.ToString("C2").Should().Be("¥765.00");
-            _euro.ToString("C2").Should().Be("€765.43");
+            _yen.ToString("C2").Should().Be("ï¿½765.00");
+            _euro.ToString("C2").Should().Be("ï¿½765.43");
             _dollar.ToString("C2").Should().Be("$765.43");
             _dinar.ToString("C2").Should().Be("BD765.43");
         }
@@ -161,8 +197,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenThreeDecimals_ThenThisShouldSucceed()
         {
-            _yen.ToString("C3").Should().Be("¥765.000");
-            _euro.ToString("C3").Should().Be("€765.430");
+            _yen.ToString("C3").Should().Be("ï¿½765.000");
+            _euro.ToString("C3").Should().Be("ï¿½765.430");
             _dollar.ToString("C3").Should().Be("$765.430");
             _dinar.ToString("C3").Should().Be("BD765.432");
         }
@@ -171,8 +207,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [UseCulture("en-US")]
         public void WhenFourDecimals_ThenThisShouldSucceed()
         {
-            _yen.ToString("C4").Should().Be("¥765.0000");
-            _euro.ToString("C4").Should().Be("€765.4300");
+            _yen.ToString("C4").Should().Be("ï¿½765.0000");
+            _euro.ToString("C4").Should().Be("ï¿½765.4300");
             _dollar.ToString("C4").Should().Be("$765.4300");
             _dinar.ToString("C4").Should().Be("BD765.4320");
         }
