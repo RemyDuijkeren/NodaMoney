@@ -32,12 +32,19 @@ namespace NodaMoney.Serialization.JsonNet
 
             Money money = (Money)value;
 
-            writer.WriteStartObject();
-            writer.WritePropertyName("amount");
-            serializer.Serialize(writer, money.Amount.ToString(CultureInfo.InvariantCulture));
-            writer.WritePropertyName("currency");
-            serializer.Serialize(writer, money.Currency.Code);
-            writer.WriteEndObject();
+            if (money == default)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("amount");
+                serializer.Serialize(writer, money.Amount.ToString(CultureInfo.InvariantCulture));
+                writer.WritePropertyName("currency");
+                serializer.Serialize(writer, money.Currency.Code);
+                writer.WriteEndObject();
+            }
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
@@ -53,7 +60,7 @@ namespace NodaMoney.Serialization.JsonNet
                 throw new ArgumentNullException(nameof(reader));
 
             if (reader.TokenType == JsonToken.Null)
-                return null;
+                return default(Money);
 
             JObject jsonObject = JObject.Load(reader);
             var properties = jsonObject.Properties().ToList();
