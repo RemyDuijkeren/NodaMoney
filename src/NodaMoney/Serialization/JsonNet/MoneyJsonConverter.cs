@@ -32,7 +32,7 @@ namespace NodaMoney.Serialization.JsonNet
 
             Money money = (Money)value;
 
-            if (money == default)
+            if (money == default(Money))
             {
                 writer.WriteNull();
             }
