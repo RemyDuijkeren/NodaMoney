@@ -33,7 +33,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
                 string json = JsonConvert.SerializeObject(yen);
-                Console.WriteLine(json);
+                // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json);
 
                 clone.Should().Be(yen);
@@ -43,7 +43,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
                 string json = JsonConvert.SerializeObject(euro, Formatting.None, new MoneyJsonConverter());
-                Console.WriteLine(json);
+                // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Money>(json, new MoneyJsonConverter());
 
                 clone.Should().Be(euro);
@@ -60,7 +60,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                 };
 
                 string json = JsonConvert.SerializeObject(article, Formatting.None, new MoneyJsonConverter());
-                Console.WriteLine(json);
+                // Console.WriteLine(json);
                 var clone = JsonConvert.DeserializeObject<Article>(json, new MoneyJsonConverter());
 
                 clone.Id.Should().Be(article.Id);
@@ -95,7 +95,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
-                Console.WriteLine(StreamToString(Serialize(yen)));
+                // Console.WriteLine(StreamToString(Serialize(yen)));
 
                 yen.Should().Be(Clone<Money>(yen));
             }
@@ -103,7 +103,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
-                Console.WriteLine(StreamToString(Serialize(euro)));
+                // Console.WriteLine(StreamToString(Serialize(euro)));
 
                 euro.Should().Be(Clone<Money>(euro));
             }
@@ -118,7 +118,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                     Name = "Foo"
                 };
 
-                Console.WriteLine(StreamToString(Serialize(article)));
+                // Console.WriteLine(StreamToString(Serialize(article)));
 
                 article.Amount.Should().Be(Clone<Article>(article).Amount);
             }
@@ -155,7 +155,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingYen_ThenThisShouldSucceed()
             {
-                Console.WriteLine(StreamToString(Serialize(yen)));
+                // Console.WriteLine(StreamToString(Serialize(yen)));
 
                 yen.Should().Be(Clone<Money>(yen));
             }
@@ -163,7 +163,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
             [Fact]
             public void WhenSerializingEuro_ThenThisShouldSucceed()
             {
-                Console.WriteLine(StreamToString(Serialize(euro)));
+                // Console.WriteLine(StreamToString(Serialize(euro)));
 
                 euro.Should().Be(Clone<Money>(euro));
             }
@@ -178,7 +178,7 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                     Name = "Foo"
                 };
 
-                Console.WriteLine(StreamToString(Serialize(article)));
+                // Console.WriteLine(StreamToString(Serialize(article)));
 
                 article.Amount.Should().Be(Clone<Article>(article).Amount);
             }

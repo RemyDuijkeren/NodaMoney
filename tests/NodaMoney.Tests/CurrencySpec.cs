@@ -103,7 +103,7 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.Symbol.Should().Be("€");
             currency.Code.Should().Be("EUR");
             currency.EnglishName.Should().Be("Euro");
-            currency.IsObsolete.Should().BeFalse();
+            currency.IsValid.Should().BeTrue();
         }
 
         [Fact]
@@ -129,7 +129,7 @@ namespace NodaMoney.Tests.CurrencySpec
 
             currency.Should().NotBeNull();
             currency.Symbol.Should().Be("kr");
-            currency.IsObsolete.Should().BeTrue();
+            currency.IsValid.Should().BeFalse();
         }
 
     }
@@ -488,7 +488,7 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.ValidFrom.Should().BeNull();
             currency.ValidTo.Should().BeNull();
 
-            currency.IsValidAt(DateTime.Today).Should().BeTrue();
+            currency.IsValidOn(DateTime.Today).Should().BeTrue();
         }
 
         [Fact]
@@ -499,14 +499,14 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.ValidFrom.Should().BeNull();
             currency.ValidTo.Should().Be(new DateTime(2008, 1, 1));
 
-            currency.IsValidAt(DateTime.MinValue).Should().BeTrue();
-            currency.IsValidAt(DateTime.MaxValue).Should().BeFalse();
-            currency.IsValidAt(new DateTime(2007, 12, 31)).Should().BeTrue();
+            currency.IsValidOn(DateTime.MinValue).Should().BeTrue();
+            currency.IsValidOn(DateTime.MaxValue).Should().BeFalse();
+            currency.IsValidOn(new DateTime(2007, 12, 31)).Should().BeTrue();
             // assumes that the until date given in the wikipedia article is excluding.
             // assumption based on the fact that some dates are the first of the month/year
             // and that the euro started at 1999-01-01. Given that the until date of e.g. the Dutch guilder
             // is 1999-01-01, the until date must be excluding
-            currency.IsValidAt(new DateTime(2008, 1, 1)).Should().BeTrue("the until date is excluding");
+            currency.IsValidOn(new DateTime(2008, 1, 1)).Should().BeTrue("the until date is excluding");
         }
 
         [Fact]
@@ -517,10 +517,10 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.ValidFrom.Should().Be(new DateTime(2018, 8, 20));
             currency.ValidTo.Should().BeNull();
 
-            currency.IsValidAt(DateTime.MinValue).Should().BeFalse();
-            currency.IsValidAt(DateTime.MaxValue).Should().BeTrue();
-            currency.IsValidAt(new DateTime(2018, 8, 19)).Should().BeFalse();
-            currency.IsValidAt(new DateTime(2018, 8, 20)).Should().BeTrue();
+            currency.IsValidOn(DateTime.MinValue).Should().BeFalse();
+            currency.IsValidOn(DateTime.MaxValue).Should().BeTrue();
+            currency.IsValidOn(new DateTime(2018, 8, 19)).Should().BeFalse();
+            currency.IsValidOn(new DateTime(2018, 8, 20)).Should().BeTrue();
         }
     }
 
@@ -593,7 +593,7 @@ namespace NodaMoney.Tests.CurrencySpec
 
             var notDefinedCurrencies =
                 _definedCurrencies
-                .Where(c => c.IsValidAt(Date))
+                .Where(c => c.IsValidOn(Date))
                 .Where(c => !string.IsNullOrEmpty(c.Number))
                 .Where(c => !_isoCurrencies.Any(a => a.Currency == c.Code))
                 .ToList();

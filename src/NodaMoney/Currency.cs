@@ -136,9 +136,9 @@ namespace NodaMoney
             }
         }
 
-        /// <summary>Gets a value indicating whether currency is obsolete.</summary>
-        /// <value><c>true</c> if this instance is obsolete; otherwise, <c>false</c>.</value>
-        public bool IsObsolete => ValidTo.HasValue && ValidTo.Value < DateTime.Today;
+        /// <summary>Gets a value indicating whether currency is valid.</summary>
+        /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
+        public bool IsValid => IsValidOn(DateTime.Today);
 
         /// <summary>Implements the operator ==.</summary>
         /// <param name="left">The left Currency.</param>
@@ -152,10 +152,10 @@ namespace NodaMoney
         /// <returns>The result of the operator.</returns>
         public static bool operator !=(Currency left, Currency right) => !(left == right);
 
-        /// <summary>Check whether the currency is valid at the given date.</summary>
-        /// <param name="date">The date at which the Currency should be valid</param>
+        /// <summary>Check a value indication whether currency is valid on a given date.</summary>
+        /// <param name="date">The date on which the Currency should be valid</param>
         /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>;</returns>
-        public bool IsValidAt(DateTime date)
+        public bool IsValidOn(DateTime date)
         {
             return
                 (!ValidFrom.HasValue || ValidFrom <= date) &&
