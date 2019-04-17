@@ -7,6 +7,9 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Threading.Tasks;
+using System.Net;
 
 namespace NodaMoney.Tests.CurrencySpec
 {
@@ -88,7 +91,7 @@ namespace NodaMoney.Tests.CurrencySpec
             }
         }
     }
-
+    
     public class GivenIWantCurrencyFromIsoCode
     {
         [Fact]
@@ -100,7 +103,7 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.Symbol.Should().Be("€");
             currency.Code.Should().Be("EUR");
             currency.EnglishName.Should().Be("Euro");
-            currency.IsObsolete.Should().BeFalse();
+            currency.IsValid.Should().BeTrue();
         }
 
         [Fact]
@@ -126,7 +129,7 @@ namespace NodaMoney.Tests.CurrencySpec
 
             currency.Should().NotBeNull();
             currency.Symbol.Should().Be("kr");
-            currency.IsObsolete.Should().BeTrue();
+            currency.IsValid.Should().BeFalse();
         }
 
     }
@@ -472,6 +475,202 @@ namespace NodaMoney.Tests.CurrencySpec
             code.Should().Be("EUR");
             number.Should().Be("978");
             symbol.Should().Be("€");
+        }
+    }
+
+    public class GivenIWantToValidateTheDateRange
+    {
+        [Fact]
+        public void WhenValidatingACurrencyThatIsAlwaysValid_ThenShouldSucceed()
+        {
+            var currency = Currency.FromCode("EUR");
+
+            currency.ValidFrom.Should().BeNull();
+            currency.ValidTo.Should().BeNull();
+
+            currency.IsValidOn(DateTime.Today).Should().BeTrue();
+        }
+
+        [Fact]
+        public void WhenValidatingACurrencyThatIsValidUntilACertainDate_ThenShouldBeValidStrictlyBeforeThatDate()
+        {
+            var currency = Currency.FromCode("VEB");
+
+            currency.ValidFrom.Should().BeNull();
+            currency.ValidTo.Should().Be(new DateTime(2008, 1, 1));
+
+            currency.IsValidOn(DateTime.MinValue).Should().BeTrue();
+            currency.IsValidOn(DateTime.MaxValue).Should().BeFalse();
+            currency.IsValidOn(new DateTime(2007, 12, 31)).Should().BeTrue();
+            // assumes that the until date given in the wikipedia article is excluding.
+            // assumption based on the fact that some dates are the first of the month/year
+            // and that the euro started at 1999-01-01. Given that the until date of e.g. the Dutch guilder
+            // is 1999-01-01, the until date must be excluding
+            currency.IsValidOn(new DateTime(2008, 1, 1)).Should().BeTrue("the until date is excluding");
+        }
+
+        [Fact]
+        public void WhenValidatingACurrencyThatIsValidFromACertainDate_ThenShouldBeValidFromThatDate()
+        {
+            var currency = Currency.FromCode("VES");
+
+            currency.ValidFrom.Should().Be(new DateTime(2018, 8, 20));
+            currency.ValidTo.Should().BeNull();
+
+            currency.IsValidOn(DateTime.MinValue).Should().BeFalse();
+            currency.IsValidOn(DateTime.MaxValue).Should().BeTrue();
+            currency.IsValidOn(new DateTime(2018, 8, 19)).Should().BeFalse();
+            currency.IsValidOn(new DateTime(2018, 8, 20)).Should().BeTrue();
+        }
+    }
+
+    public class GivenIWantToCompareCurrenciesToIsoXML
+    {
+        private IEnumerable<Currency> _definedCurrencies;
+        private IEnumerable<IsoCurrency> _isoCurrencies;
+
+        private const string FilePath = @"..\..\iso.xml";
+        private bool FileFound { get; set; }
+        private DateTime Date { get; set; }
+
+        private class IsoCurrency
+        {
+            public string CountryName { get; set; }
+            public string CurrencyName { get; set; }
+            public string Currency { get; set; }
+            public string CurrencyNumber { get; set; }
+            public string CurrencyMinorUnits { get; set; }
+        }
+
+        public GivenIWantToCompareCurrenciesToIsoXML()
+        {
+            _definedCurrencies =
+                Currency.GetAllCurrencies()
+                .ToList();
+
+            FileFound = File.Exists(FilePath);
+            if (!FileFound) return;
+
+            var document = XDocument.Load(FilePath);
+
+            _isoCurrencies =
+                    document
+                    .Element("ISO_4217")
+                    .Element("CcyTbl")
+                    .Elements("CcyNtry")
+                    .Select(e =>
+                        new IsoCurrency
+                        {
+                            CountryName = e.Element("CtryNm").Value,
+                            CurrencyName = e.Element("CcyNm")?.Value,
+                            Currency = e.Element("Ccy")?.Value,
+                            CurrencyNumber = e.Element("CcyNbr")?.Value,
+                            CurrencyMinorUnits = e.Element("CcyMnrUnts")?.Value
+                        })
+                        .Where(a => !string.IsNullOrEmpty(a.Currency)) // ignore currencies without a currency name
+                        .ToList();
+
+            Date = DateTime.Parse(document.Element("ISO_4217").Attribute("Pblshd").Value);
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public void WhenCurrenciesInISOList_ThenShouldBeDefinedInRegistry()
+        {
+            if (!FileFound) return;
+
+            var missingCurrencies =
+                _isoCurrencies
+                .Where(a => !_definedCurrencies.Any(c => c.Code == a.Currency))
+                .ToList();
+
+            missingCurrencies.Should().HaveCount(0, $"expected defined currencies to contain {string.Join(", ", missingCurrencies.Select(a => a.Currency + " " + a.CurrencyName))}");
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public void WhenCurrenciesInRegistryAndCurrent_ThenTheyShouldAlsoBeDefinedInTheIsoList()
+        {
+            if (!FileFound) return;
+
+            var notDefinedCurrencies =
+                _definedCurrencies
+                .Where(c => c.IsValidOn(Date))
+                .Where(c => !string.IsNullOrEmpty(c.Number))
+                .Where(c => !_isoCurrencies.Any(a => a.Currency == c.Code))
+                .ToList();
+
+            notDefinedCurrencies.Should().HaveCount(0, $"did not expect currencies to contain {string.Join(", ", notDefinedCurrencies.Select(a => a.Code))}");
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameEnglishName()
+        {
+            if (!FileFound) return;
+
+            var differences = new List<string>();
+            foreach (var c in _definedCurrencies)
+            {
+                var found = _isoCurrencies.Where(x => x.Currency == c.Code).ToList();
+
+                if (found.Count == 0) continue;
+                var a = found.First();
+                // ignore casing (for now)
+                if (!string.Equals(c.EnglishName, a.CurrencyName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    differences.Add($"{ c.Code}: expected '{a.CurrencyName}' but found '{c.EnglishName}'");
+                }
+            }
+            differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumber()
+        {
+            if (!FileFound) return;
+
+            var differences = new List<string>();
+            foreach (var c in _definedCurrencies)
+            {
+                var found = _isoCurrencies.Where(x => x.Currency == c.Code).ToList();
+
+                if (found.Count == 0) continue;
+                var a = found.First();
+                // ignore casing (for now)
+                if (!string.Equals(c.Number, a.CurrencyNumber, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    differences.Add($"{c.Code}: expected {a.CurrencyNumber} but found {c.Number}");
+                }
+            }
+            differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumberOfMinorDigits()
+        {
+            if (!FileFound) return;
+
+            var differences = new List<string>();
+            foreach (var c in _definedCurrencies)
+            {
+                var found = _isoCurrencies.Where(x => x.Currency == c.Code).ToList();
+
+                if (found.Count == 0) continue;
+                var a = found.First();
+                if (!string.Equals(c.DecimalDigits.ToString(), a.CurrencyMinorUnits, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (c.DecimalDigits == -1 && a.CurrencyMinorUnits == "N.A.") continue;
+                    differences.Add($"{c.Code}: expected {a.CurrencyMinorUnits} minor units but found {c.DecimalDigits}");
+                }
+            }
+            differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
+        }
+
+        [Fact(Skip = "For debugging.")]
+        public async Task UpdateTheStoredIsoFileOnDisk()
+        {
+            using (var client = new WebClient())
+            {
+                await client.DownloadFileTaskAsync(new Uri("https://www.currency-iso.org/dam/downloads/lists/list_one.xml"), FilePath);
+            }
         }
     }
 }

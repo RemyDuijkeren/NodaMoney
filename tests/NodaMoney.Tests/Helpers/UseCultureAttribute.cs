@@ -31,8 +31,8 @@ namespace NodaMoney.Tests.Helpers
         /// <param name="uiCulture">The name of the UI culture.</param>
         public UseCultureAttribute(string culture, string uiCulture)
         {
-            this.Culture = new CultureInfo(culture);
-            this.UICulture = new CultureInfo(uiCulture);
+            this.Culture = new CultureInfo(culture, false);
+            this.UICulture = new CultureInfo(uiCulture, false);
         }
 
         /// <summary>Gets the culture.</summary>
