@@ -32,12 +32,19 @@ namespace NodaMoney.Serialization.JsonNet
 
             Money money = (Money)value;
 
-            writer.WriteStartObject();
-            writer.WritePropertyName("amount");
-            serializer.Serialize(writer, money.Amount.ToString(CultureInfo.InvariantCulture));
-            writer.WritePropertyName("currency");
-            serializer.Serialize(writer, money.Currency.Code);
-            writer.WriteEndObject();
+            if (money == default(Money))
+            {
+                writer.WriteValue(0);
+            }
+            else
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("amount");
+                serializer.Serialize(writer, money.Amount.ToString(CultureInfo.InvariantCulture));
+                writer.WritePropertyName("currency");
+                serializer.Serialize(writer, money.Currency.Code);
+                writer.WriteEndObject();
+            }
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
@@ -52,6 +59,14 @@ namespace NodaMoney.Serialization.JsonNet
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
+            if (reader.TokenType == JsonToken.Integer)
+            {
+                if ((long)reader.Value != 0)
+                    throw new ArgumentException("Only a zero integer is allowed");
+
+                return default(Money);
+            }
+
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
@@ -62,7 +77,7 @@ namespace NodaMoney.Serialization.JsonNet
             var currencyProperty = properties.SingleOrDefault(pr => string.Compare(pr.Name, "currency", StringComparison.OrdinalIgnoreCase) == 0);
 
             if (amountProperty == null)
-                throw new ArgumentNullException("Ammount needs to be defined", "amount");
+                throw new ArgumentNullException("Amount needs to be defined", "amount");
 
             if (currencyProperty == null)
                 throw new ArgumentNullException("Currency needs to be defined", "currency");

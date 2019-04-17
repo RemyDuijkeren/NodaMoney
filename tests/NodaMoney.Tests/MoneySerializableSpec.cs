@@ -68,6 +68,24 @@ namespace NodaMoney.Tests.MoneySerializableSpec
                 clone.Amount.Should().Be(article.Amount);
                 //clone.Should().Be(article);
             }
+
+            [Fact]
+            public void WhenSerializingDefault_ThenThisShouldSucceed()
+            {
+                var expected = new MyType();
+                var json = JsonConvert.SerializeObject(expected);
+                var actual = JsonConvert.DeserializeObject<MyType>(json);
+                actual.Should().NotBeNull();
+                actual.Money.Should().Be(default(Money));
+                actual.Money.Currency.Should().Be(expected.Money.Currency);
+                actual.Money.Amount.Should().Be(expected.Money.Amount);
+            }
+
+            private class MyType
+            {
+                //[JsonConverter(typeof(MoneyJsonConverter))]
+                public Money Money { get; set; }
+            }
         }
         public class GivenIWantToSerializeMoneyWithDataContractSerializer
         {
