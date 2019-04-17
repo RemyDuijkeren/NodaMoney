@@ -44,19 +44,17 @@ namespace NodaMoney
 
         private static IFormatProvider GetFormatProvider(Currency currency, IFormatProvider formatProvider, bool useCode = false)
         {
-            var cc = CultureInfo.CurrentCulture;
+            CultureInfo cc = CultureInfo.CurrentCulture;
 
             // var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
             var numberFormatInfo = (NumberFormatInfo)cc.NumberFormat.Clone();
 
             if (formatProvider != null)
             {
-                var ci = formatProvider as CultureInfo;
-                if (ci != null)
+                if (formatProvider is CultureInfo ci)
                     numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
 
-                var nfi = formatProvider as NumberFormatInfo;
-                if (nfi != null)
+                if (formatProvider is NumberFormatInfo nfi)
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
@@ -112,7 +110,7 @@ namespace NodaMoney
 
             // TODO: Hacked solution, solve with better implementation
             IFormatProvider provider;
-            if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I") && format.Length >= 1 && format.Length <= 2)
+            if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
             {
                 format = format.Replace("I", "C");
                 provider = GetFormatProvider(Currency, formatProvider, true);

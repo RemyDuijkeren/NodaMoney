@@ -1,24 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <AssemblyName>NodaMoney.Tests</AssemblyName>
     <PackageId>NodaMoney.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" />
     <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="FluentAssertions.Analyzers" Version="0.11.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="RavenDB.TestDriver" Version="4.1.5" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="FluentAssertions" Version="4.19.4" />
-    <PackageReference Include="RavenDB.Tests.Helpers" Version="3.5.4" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="FluentAssertions" Version="5.6.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
@@ -27,6 +33,10 @@
     <Reference Include="System.Xml.XmlSerializer" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
 
   <ItemGroup>

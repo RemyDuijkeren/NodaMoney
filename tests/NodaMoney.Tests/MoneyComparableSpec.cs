@@ -108,7 +108,7 @@ namespace NodaMoney.Tests.MoneyComparableSpec
         {
             Action action = () => _tenEuro1.CompareTo(_tenDollar);
 
-            action.ShouldThrow<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace NodaMoney.Tests.MoneyComparableSpec
         {
             Action action = () => _tenEuro1.CompareTo("10.00");
 
-            action.ShouldThrow<ArgumentException>().WithMessage("obj is not the same type as this instance*");
+            action.Should().Throw<ArgumentException>().WithMessage("obj is not the same type as this instance*");
         }
     }
 }

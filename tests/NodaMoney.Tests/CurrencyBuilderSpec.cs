@@ -7,51 +7,73 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
     public class GivenIWantToCreateCustomCurrency
     {
         [Fact]
+        public void WhenRegisterAsSimpleAsPossible_ThenShouldBeAvailable()
+        {
+            Currency result = new CurrencyBuilder("BTC4", "ISO-4217")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8,
+            }.Register();
+
+            Currency bitcoin = Currency.FromCode("BTC4");
+            bitcoin.Symbol.Should().Be("฿");
+            bitcoin.Should().BeEquivalentTo(result);
+        }
+
+        [Fact]
         public void WhenRegisterBitCoinInIsoNamespace_ThenShouldBeAvailable()
         {
-            var builder = new CurrencyBuilder("BTC", "ISO-4217");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC", "ISO-4217")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Register();
 
             Currency bitcoin = Currency.FromCode("BTC");
             bitcoin.Symbol.Should().Be("฿");
-            bitcoin.ShouldBeEquivalentTo(result);
+            bitcoin.Should().BeEquivalentTo(result);
         }
 
         [Fact]
         public void WhenRegisterBitCoin_ThenShouldBeAvailableByExplicitNamespace()
         {
-            var builder = new CurrencyBuilder("BTC1", "virtual");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC1", "virtual")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Register();
 
             Currency bitcoin = Currency.FromCode("BTC1", "virtual");
             bitcoin.Symbol.Should().Be("฿");
-            bitcoin.ShouldBeEquivalentTo(result);
+            bitcoin.Should().BeEquivalentTo(result);
         }
 
         [Fact]
         public void WhenBuildBitCoin_ThenItShouldSuccedButNotBeRegistered()
         {
-            var builder = new CurrencyBuilder("BTC2", "virtual");
-            builder.EnglishName = "Bitcoin";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 8;
+            var builder = new CurrencyBuilder("BTC2", "virtual")
+            {
+                EnglishName = "Bitcoin",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8
+            };
 
             Currency result = builder.Build();
             result.Symbol.Should().Be("฿");
 
             Action action = () => Currency.FromCode("BTC2", "virtual");
-            action.ShouldThrow<ArgumentException>().WithMessage("BTC2 is an unknown virtual currency code!");
+            action.Should().Throw<ArgumentException>().WithMessage("BTC2 is an unknown virtual currency code!");
         }
 
         [Fact]
@@ -82,7 +104,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
 
             Action action = () => builder.Register();
 
-            action.ShouldThrow<InvalidOperationException>().WithMessage("The custom currency is already registered.");
+            action.Should().Throw<InvalidOperationException>().WithMessage("The custom currency is already registered.");
         }
 
         [Fact]
@@ -90,7 +112,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => new CurrencyBuilder(null, "virtual");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -98,7 +120,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => new CurrencyBuilder("", "virtual");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -106,7 +128,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => new CurrencyBuilder("BTC4", null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -114,7 +136,23 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => new CurrencyBuilder("BTC4", "");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void WhenSymbolIsEmpty_ThenSymbolMustBeDefaultCurrencySign()
+        {
+            Currency result = new CurrencyBuilder("BTC5", "ISO-4217")
+            {
+                EnglishName = "Bitcoin",
+                //Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 8,
+            }.Register();
+
+            Currency bitcoin = Currency.FromCode("BTC5");
+            bitcoin.Symbol.Should().Be(Currency.CurrencySign); // ¤
+            bitcoin.Should().BeEquivalentTo(result);
         }
     }
 
@@ -128,17 +166,19 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             CurrencyBuilder.Unregister("PEN", "ISO-4217");
             Action action = () => Currency.FromCode("PEN");
 
-            action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
+            action.Should().Throw<ArgumentException>().WithMessage("*unknown*currency*");
         }
 
         [Fact]
         public void WhenUnregisterCustomCurrency_ThenThisMustSucceed()
         {
-            var builder = new CurrencyBuilder("XYZ", "virtual");
-            builder.EnglishName = "Xyz";
-            builder.Symbol = "฿";
-            builder.ISONumber = "123"; // iso number
-            builder.DecimalDigits = 4;
+            var builder = new CurrencyBuilder("XYZ", "virtual")
+            {
+                EnglishName = "Xyz",
+                Symbol = "฿",
+                ISONumber = "123", // iso number
+                DecimalDigits = 4
+            };
 
             builder.Register();
             Currency xyz = Currency.FromCode("XYZ", "virtual"); // should work
@@ -146,7 +186,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             CurrencyBuilder.Unregister("XYZ", "virtual");
             Action action = () => Currency.FromCode("XYZ", "virtual");
 
-            action.ShouldThrow<ArgumentException>().WithMessage("*unknown*currency*");
+            action.Should().Throw<ArgumentException>().WithMessage("*unknown*currency*");
         }
 
         [Fact]
@@ -154,7 +194,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister("ABC", "virtual");
 
-            action.ShouldThrow<ArgumentException>().WithMessage("*specifies a currency that is not found*");
+            action.Should().Throw<ArgumentException>().WithMessage("*specifies a currency that is not found*");
         }
 
         [Fact]
@@ -162,7 +202,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister(null, "ISO-4217");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -170,7 +210,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister("", "ISO-4217");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -178,7 +218,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister("EUR", null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -186,7 +226,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister("EUR", "");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
     }
 
@@ -211,4 +251,4 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             newEuro.DecimalDigits.Should().Be(1);
         }
     }
-}    
+}

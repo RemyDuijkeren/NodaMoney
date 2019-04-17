@@ -111,7 +111,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromCode("AAA");
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromCode(null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromRegion((RegionInfo)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -171,7 +171,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromRegion((string)null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -190,7 +190,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromCulture(null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -198,7 +198,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromCulture(new CultureInfo("en"));
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -339,7 +339,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency(null, "978", 2, "Euro", "€"); };
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -347,7 +347,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", null, 2, "Euro", "€"); };
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -355,7 +355,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", "978", 2, null, "€"); };
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -363,7 +363,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", "978", 2, "Euro", null); };
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -371,7 +371,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => { var eur = new Currency("EUR", "978", -2, "Euro", "€"); };
 
-            action.ShouldThrow<ArgumentOutOfRangeException>();
+            action.Should().Throw<ArgumentOutOfRangeException>();
         }
     }
 
@@ -431,12 +431,12 @@ namespace NodaMoney.Tests.CurrencySpec
 
     public class GiveIWantToUseALotOfCurrencies
     {
-        [Fact(Skip = "Performance Test")]
+        [Fact]
         public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
         {
             var sw = Stopwatch.StartNew();
             var c = Currency.FromCode("EUR");
-            Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
+            // Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
 
             double max = 1000000;
             Action action = () =>
@@ -454,12 +454,12 @@ namespace NodaMoney.Tests.CurrencySpec
                     sw.Stop();
                 };
 
-            action.ExecutionTime().ShouldNotExceed(4.Seconds());
-            Console.WriteLine(
-                "{0} ms for creating {1:N0} currencies (avg {2:F5} ms).",
-                sw.ElapsedMilliseconds,
-                max,
-                sw.ElapsedMilliseconds / (max));
+            action.ExecutionTime().Should().BeLessOrEqualTo(new TimeSpan(0, 0, 4));
+            // Console.WriteLine(
+            //    "{0} ms for creating {1:N0} currencies (avg {2:F5} ms).",
+            //    sw.ElapsedMilliseconds,
+            //    max,
+            //    sw.ElapsedMilliseconds / (max));
         }
     }
 

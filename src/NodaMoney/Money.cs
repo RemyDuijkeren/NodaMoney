@@ -1,7 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 namespace NodaMoney
 {
@@ -83,20 +83,7 @@ namespace NodaMoney
             : this()
         {
             Currency = currency;
-
-            if (Currency.DecimalDigits == CurrencyRegistry.NotApplicable)
-            {
-                Amount = Math.Round(amount);
-            }
-            else if (Currency.DecimalDigits == CurrencyRegistry.Z07)
-            {
-                // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
-                Amount = Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
-            }
-            else
-            {
-                Amount = Math.Round(amount, (int)Currency.DecimalDigits, rounding);
-            }
+            Amount = Round(amount, currency, rounding);
         }
 
         // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
@@ -232,21 +219,10 @@ namespace NodaMoney
         {
         }
 
-        /// <summary>Deconstructs the current instance into its components.</summary>
-        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-        /// <param name="currency">The Currency of the money.</param>
-        public void Deconstruct(out decimal amount, out Currency currency)
-        {
-            amount = Amount;
-            currency = Currency;
-        }
-
         /// <summary>Gets the amount of money.</summary>
-        [DataMember]
         public decimal Amount { get; private set; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-        [DataMember]
         public Currency Currency { get; private set; }
 
         /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
@@ -271,7 +247,7 @@ namespace NodaMoney
         /// and value.</summary>
         /// <param name="obj">An <see cref="object"/>.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj) => (obj is Money) && this.Equals((Money)obj);
+        public override bool Equals(object obj) => obj is Money money && this.Equals(money);
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
@@ -279,12 +255,39 @@ namespace NodaMoney
         {
             unchecked
             {
-                return Amount.GetHashCode() ^ (397 * Currency.GetHashCode());
+                int hash = 17;
+                hash = (hash * 23) + Amount.GetHashCode();
+                return (hash * 23) + Currency.GetHashCode();
+            }
+        }
+
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+        /// <param name="currency">The Currency of the money.</param>
+        public void Deconstruct(out decimal amount, out Currency currency)
+        {
+            amount = Amount;
+            currency = Currency;
+        }
+
+        private static decimal Round(decimal amount, Currency currency, MidpointRounding rounding)
+        {
+            switch (currency.DecimalDigits)
+            {
+                case CurrencyRegistry.NotApplicable:
+                    return Math.Round(amount);
+
+                case CurrencyRegistry.Z07:
+                    // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
+                    return Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
+
+                default:
+                    return Math.Round(amount, (int)currency.DecimalDigits, rounding);
             }
         }
 
         [SuppressMessage(
-            "Microsoft.Globalization",
+                    "Microsoft.Globalization",
             "CA1305:SpecifyIFormatProvider",
             MessageId = "System.String.Format(System.String,System.Object[])",
             Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]

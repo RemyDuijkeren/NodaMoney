@@ -92,7 +92,7 @@ namespace NodaMoney.Tests.Extensions
             {               
                 Action action = () => _euro1.SafeDivide(-1).ToList();
 
-                action.ShouldThrow<ArgumentOutOfRangeException>();
+                action.Should().Throw<ArgumentOutOfRangeException>();
             }
 
             [Fact]
@@ -100,7 +100,7 @@ namespace NodaMoney.Tests.Extensions
             {
                 Action action = () => _euro1.SafeDivide(new[] { 2, -1, 3 }).ToList();
 
-                action.ShouldThrow<ArgumentOutOfRangeException>()
+                action.Should().Throw<ArgumentOutOfRangeException>()
                     .WithMessage("*1*");
             }
         }

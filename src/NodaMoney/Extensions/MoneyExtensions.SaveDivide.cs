@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace NodaMoney.Extensions
 {
-    /// <summary>Extensions for <see cref="T:NodaMoney.Money"/>.</summary>
+    /// <summary>Extensions for <see cref="Money"/>.</summary>
     public static class MoneyExtensions
     {
         /// <summary>Divide the Money in equal shares, without losing Money.</summary>
-        /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>
+        /// <param name="money">The <see cref="Money"/> instance.</param>
         /// <param name="shares">The number of shares to divide in.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
@@ -20,7 +20,7 @@ namespace NodaMoney.Extensions
         public static IEnumerable<Money> SafeDivide(this Money money, int shares) => SafeDivide(money, shares, MidpointRounding.ToEven);
 
         /// <summary>Divide the Money in equal shares, without losing Money.</summary>
-        /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>
+        /// <param name="money">The <see cref="Money"/> instance.</param>
         /// <param name="shares">The number of shares to divide in.</param>
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
@@ -31,20 +31,25 @@ namespace NodaMoney.Extensions
             if (shares <= 1)
                 throw new ArgumentOutOfRangeException(nameof(shares), "Number of shares must be greater than 1");
 
-            decimal shareAmount = Math.Round(money.Amount / shares, (int)money.Currency.DecimalDigits, rounding);
-            decimal remainder = money.Amount;
+            return SafeDivideIterator();
 
-            for (int i = 0; i < shares - 1; i++)
+            IEnumerable<Money> SafeDivideIterator()
             {
-                remainder -= shareAmount;
-                yield return new Money(shareAmount, money.Currency);
-            }
+                decimal shareAmount = Math.Round(money.Amount / shares, (int)money.Currency.DecimalDigits, rounding);
+                decimal remainder = money.Amount;
 
-            yield return new Money(remainder, money.Currency);
+                for (int i = 0; i < shares - 1; i++)
+                {
+                    remainder -= shareAmount;
+                    yield return new Money(shareAmount, money.Currency);
+                }
+
+                yield return new Money(remainder, money.Currency);
+            }
         }
 
         /// <summary>Divide the Money in shares with a specific ratio, without losing Money.</summary>
-        /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>
+        /// <param name="money">The <see cref="NodaMoney.Money"/> instance.</param>
         /// <param name="ratios">The number of shares as an array of ratios.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">ratios;Sum of ratios must be greater than 1</exception>
@@ -55,31 +60,36 @@ namespace NodaMoney.Extensions
         public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios) => SafeDivide(money, ratios, MidpointRounding.ToEven);
 
         /// <summary>Divide the Money in shares with a specific ratio, without losing Money.</summary>
-        /// <param name="money">The <see cref="T:NodaMoney.Money"/> instance.</param>
+        /// <param name="money">The <see cref="NodaMoney.Money"/> instance.</param>
         /// <param name="ratios">The number of shares as an array of ratios.</param>
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
         public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios, MidpointRounding rounding)
         {
             if (ratios.Any(ratio => ratio < 1))
-                throw new ArgumentOutOfRangeException("ratios", "All ratios must be greater or equal than 1");
+                throw new ArgumentOutOfRangeException(nameof(ratios), "All ratios must be greater or equal than 1");
 
-            decimal remainder = money.Amount;
+            return SafeDivideIterator();
 
-            for (int i = 0; i < ratios.Length - 1; i++)
+            IEnumerable<Money> SafeDivideIterator()
             {
-                decimal ratioAmount = Math.Round(
-                    money.Amount * ratios[i] / ratios.Sum(),
-                    (int)money.Currency.DecimalDigits,
-                    rounding);
+                decimal remainder = money.Amount;
 
-                remainder -= ratioAmount;
+                for (int i = 0; i < ratios.Length - 1; i++)
+                {
+                    decimal ratioAmount = Math.Round(
+                        money.Amount * ratios[i] / ratios.Sum(),
+                        (int)money.Currency.DecimalDigits,
+                        rounding);
 
-                yield return new Money(ratioAmount, money.Currency);
+                    remainder -= ratioAmount;
+
+                    yield return new Money(ratioAmount, money.Currency);
+                }
+
+                yield return new Money(remainder, money.Currency);
             }
-
-            yield return new Money(remainder, money.Currency);
         }
     }
 }

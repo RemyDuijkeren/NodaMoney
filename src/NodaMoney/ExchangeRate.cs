@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.Serialization;
 
 namespace NodaMoney
 {
     /// <summary>A conversion of money of one currency into money of another currency</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>
-    [DataContract]
     public struct ExchangeRate : IEquatable<ExchangeRate>
     {
         /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
@@ -19,11 +17,11 @@ namespace NodaMoney
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
             : this()
         {
-            if (baseCurrency == null)
+            if (baseCurrency == default(Currency))
                 throw new ArgumentNullException(nameof(baseCurrency));
             if (rate < 0)
                 throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
-            if (quoteCurrency == null)
+            if (quoteCurrency == default(Currency))
                 throw new ArgumentNullException(nameof(quoteCurrency));
             if (baseCurrency == quoteCurrency)
                 throw new ArgumentException("The base and quote currency can't be equal!");
@@ -60,17 +58,6 @@ namespace NodaMoney
         public ExchangeRate(string baseCode, string quoteCode, double rate, int numberOfDecimals = 6)
             : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate, numberOfDecimals)
         {
-        }
-
-        /// <summary>Deconstructs the current instance into its components.</summary>
-        /// <param name="baseCurrency">The base currency.</param>
-        /// <param name="quoteCurrency">The quote currency.</param>
-        /// <param name="rate">The rate of the exchange.</param>
-        public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
-        {
-            baseCurrency = BaseCurrency;
-            quoteCurrency = QuoteCurrency;
-            rate = Value;
         }
 
         /// <summary>Gets the base currency.</summary>
@@ -155,6 +142,17 @@ namespace NodaMoney
             }
         }
 
+        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <param name="baseCurrency">The base currency.</param>
+        /// <param name="quoteCurrency">The quote currency.</param>
+        /// <param name="rate">The rate of the exchange.</param>
+        public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
+        {
+            baseCurrency = BaseCurrency;
+            quoteCurrency = QuoteCurrency;
+            rate = Value;
+        }
+
         /// <summary>Converts the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The converted money.</returns>
@@ -195,7 +193,7 @@ namespace NodaMoney
         /// <param name="obj">Another object to compare to.</param>
         /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise,
         /// false.</returns>
-        public override bool Equals(object obj) => (obj is ExchangeRate) && this.Equals((ExchangeRate)obj);
+        public override bool Equals(object obj) => obj is ExchangeRate fx && this.Equals(fx);
 
         /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
         /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>

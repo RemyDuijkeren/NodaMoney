@@ -56,7 +56,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
             // ¥ symbol is used for Japanese yen and Chinese yuan
             Action action = () => Money.Parse("¥ 765");
 
-            action.ShouldThrow<FormatException>().WithMessage("*multiple known currencies*");
+            action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
         }
 
         [Fact, UseCulture("en-US")]
@@ -81,7 +81,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
             // $ symbol is used for multiple currencies
             Action action = () => Money.Parse("$ 765,43");
 
-            action.ShouldThrow<FormatException>().WithMessage("*multiple known currencies*");
+            action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
         }
 
         [Fact, UseCulture("en-US")]
@@ -97,7 +97,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse(null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse("");
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact, UseCulture("nl-NL")]
@@ -113,7 +113,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse("XYZ 765,43");
 
-            action.ShouldThrow<FormatException>().WithMessage("*unknown currency*");
+            action.Should().Throw<FormatException>().WithMessage("*unknown currency*");
         }
     }
 
@@ -181,7 +181,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse("€ 765,43", Currency.FromCode("USD"));
 
-            action.ShouldThrow<FormatException>(); //.WithMessage("Input string was not in a correct format.");                
+            action.Should().Throw<FormatException>(); //.WithMessage("Input string was not in a correct format.");                
         }
 
         [Fact, UseCulture("nl-NL")]
@@ -189,7 +189,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse(null, Currency.FromCode("EUR"));
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact, UseCulture("nl-NL")]
@@ -197,7 +197,23 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         {
             Action action = () => Money.Parse("", Currency.FromCode("EUR"));
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact, UseCulture("nl-NL")]
+        public void WhenValueIsNullWithOverrideMethod_ThenThowExeception()
+        {
+            Action action = () => Money.Parse(null, NumberStyles.Currency, null, Currency.FromCode("EUR"));
+
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact, UseCulture("nl-NL")]
+        public void WhenValueIsEmptyWithOverrideMethod_ThenThowExeception()
+        {
+            Action action = () => Money.Parse("", NumberStyles.Currency, null, Currency.FromCode("EUR"));
+
+            action.Should().Throw<ArgumentNullException>();
         }
     }
 

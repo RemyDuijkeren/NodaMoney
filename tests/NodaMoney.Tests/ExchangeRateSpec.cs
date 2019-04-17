@@ -40,6 +40,16 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             revert.Currency.Should().Be(_euro);
             revert.Amount.Should().Be(100.99M);
         }
+
+        [Fact]
+        public void WhenConvertingWithExchangeRateWithDifferentCurrencies_ThenThrowException()
+        {
+            // Arrange, Act
+            Action action = () => _exchangeRate.Convert(Money.Yen(324));
+
+            // Assert
+            action.Should().Throw<ArgumentException>().WithMessage("Money should have the same currency as the base currency or the quote currency!*");
+        }
     }
 
     public class GivenIWantToCreateAnExchangeRateWithCurrencies
@@ -105,7 +115,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             Action action = () => new ExchangeRate(_euro, _euro, 1.2591F);
 
             // Assert
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -115,7 +125,27 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             Action action = () => new ExchangeRate(_euro, _euro, -1.2F);
 
             // Assert
-            action.ShouldThrow<ArgumentOutOfRangeException>();
+            action.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [Fact]
+        public void WhenBaseCurrencyIsNull_ThenThrowException()
+        {
+            // Arrange, Act
+            Action action = () => new ExchangeRate(default(Currency), _dollar, 1.2591);
+
+            // Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void WhenQuoteCurrencyIsNull_ThenThrowException()
+        {
+            // Arrange, Act
+            Action action = () => new ExchangeRate(_euro, default(Currency), 1.2591);
+
+            // Assert
+            action.Should().Throw<ArgumentNullException>();
         }
     }
 
@@ -186,7 +216,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             Action action = () => new ExchangeRate(_euroAsString, _euroAsString, 1.2591F);
 
             // Assert
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
     }
 
@@ -246,7 +276,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         {
             Action action = () => ExchangeRate.Parse("EUR/USD 1,ABC");
 
-            action.ShouldThrow<FormatException>();
+            action.Should().Throw<FormatException>();
         }
 
         [Fact, UseCulture("en-US")]
@@ -254,7 +284,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         {
             Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
 
-            action.ShouldThrow<FormatException>();
+            action.Should().Throw<FormatException>();
         }
 
         [Fact]
@@ -262,7 +292,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         {
             Action action = () => ExchangeRate.Parse(null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -270,7 +300,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         {
             Action action = () => ExchangeRate.Parse("");
 
-            action.ShouldThrow<FormatException>();
+            action.Should().Throw<FormatException>();
         }
     }
 
@@ -376,7 +406,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             new object[] { new ExchangeRate("AFN", "USD", 1.2591), new ExchangeRate("EUR", "USD", 1.2591), false }
         };
 
-        [Theory][MemberData("TestData")]
+        [Theory][MemberData(nameof(TestData))]
         public void WhenTheAreEquel_ThenComparingShouldBeTrueOtherwiseFalse(ExchangeRate fx1, ExchangeRate fx2, bool areEqual)
         {
             if (areEqual)

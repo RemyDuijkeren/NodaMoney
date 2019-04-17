@@ -66,6 +66,10 @@ Money money = (Money)6.54; // need explict cast from double data type
 // also known as banker's rounding 
 var euro = new Money(765.425m, "EUR"); // EUR 765.42
 var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
+
+// deconstruct money
+var money = new Money(10m, "EUR");
+var (amount, currency) = money;
 ```
 
 **Money operations**
