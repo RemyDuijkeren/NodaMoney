@@ -431,12 +431,12 @@ namespace NodaMoney.Tests.CurrencySpec
 
     public class GiveIWantToUseALotOfCurrencies
     {
-        [Fact(Skip = "Performance Test")]
+        [Fact]
         public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
         {
             var sw = Stopwatch.StartNew();
             var c = Currency.FromCode("EUR");
-            Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
+            // Console.WriteLine("{0} ms for first call.", sw.ElapsedMilliseconds);
 
             double max = 1000000;
             Action action = () =>
@@ -455,11 +455,11 @@ namespace NodaMoney.Tests.CurrencySpec
                 };
 
             action.ExecutionTime().Should().BeLessOrEqualTo(new TimeSpan(0, 0, 4));
-            Console.WriteLine(
-                "{0} ms for creating {1:N0} currencies (avg {2:F5} ms).",
-                sw.ElapsedMilliseconds,
-                max,
-                sw.ElapsedMilliseconds / (max));
+            // Console.WriteLine(
+            //    "{0} ms for creating {1:N0} currencies (avg {2:F5} ms).",
+            //    sw.ElapsedMilliseconds,
+            //    max,
+            //    sw.ElapsedMilliseconds / (max));
         }
     }
 
