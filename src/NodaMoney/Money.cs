@@ -153,7 +153,7 @@ namespace NodaMoney
         /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
         /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
         /// initialize a Money object using an integer literal, without the suffix, as follows:
-        /// <code>Money money = new Money(10, Currency.FromIsoSymbol("EUR"));</code></remarks>
+        /// <code>Money money = new Money(10, "EUR");</code></remarks>
         public Money(long amount)
             : this((decimal)amount)
         {
@@ -212,7 +212,7 @@ namespace NodaMoney
         /// <param name="currency">The Currency of the money.</param>
         /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
         /// initialize a Money object using an integer literal, without the suffix, as follows:
-        /// <code>Money money = new Money(10, Currency.FromIsoSymbol("EUR"));</code></remarks>
+        /// <code>Money money = new Money(10, "EUR");</code></remarks>
         [CLSCompliant(false)]
         public Money(ulong amount, Currency currency)
             : this((decimal)amount, currency)

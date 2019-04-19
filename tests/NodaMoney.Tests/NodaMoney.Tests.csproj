@@ -5,6 +5,7 @@
     <AssemblyName>NodaMoney.Tests</AssemblyName>
     <PackageId>NodaMoney.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

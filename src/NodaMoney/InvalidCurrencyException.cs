@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace NodaMoney
 {
@@ -38,5 +39,15 @@ namespace NodaMoney
             : this($"The requested operation expected the currency {expected.Code}, but the actual value was the currency {actual.Code}!")
         {
         }
+
+#if !NETSTANDARD1_3
+        /// <summary>Initializes a new instance of the <see cref="InvalidCurrencyException"/> class.</summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        protected InvalidCurrencyException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
     }
 }

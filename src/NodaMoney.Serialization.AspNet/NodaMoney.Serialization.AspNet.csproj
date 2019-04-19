@@ -7,7 +7,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>NodaMoney.Serialization.AspNet</PackageId>
     <PackageTags>Noda;Money;Currency;ExchangeRate;Serialization</PackageTags>   
-    <TargetFrameworks>net40;net45</TargetFrameworks>
+    <TargetFrameworks>net40;net45</TargetFrameworks>   
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

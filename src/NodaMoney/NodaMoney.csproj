@@ -8,20 +8,21 @@
     <PackageId>NodaMoney</PackageId>
     <PackageTags>Noda;Money;Currency;ExchangeRate</PackageTags>
     <TargetFrameworks>netstandard1.3;netstandard2.0;net40;net45</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
  
   <ItemGroup>
     <None Remove="stylecop.json" />
     <AdditionalFiles Include="stylecop.json" />
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.9.1">
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.9.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.9.1">
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.9.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="2.9.1">
+    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="2.9.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

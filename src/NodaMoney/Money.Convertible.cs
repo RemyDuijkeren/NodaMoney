@@ -81,7 +81,67 @@ namespace NodaMoney
         /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
         public static decimal ToDecimal(Money money) => money.Amount;
 
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="long"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="long"/> instance, converted to a <see cref="Money"/>.</returns>
+        public static Money FromInt64(long money)
+        {
+            return money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="ulong"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="ulong"/> instance, converted to a <see cref="Money"/>.</returns>
+        [CLSCompliant(false)]
+        public static Money FromUInt64(ulong money)
+        {
+            return money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="byte"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="byte"/> instance, converted to a <see cref="Money"/>.</returns>
+        public static Money FromByte(long money)
+        {
+            return money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="ushort"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="ushort"/> instance, converted to a <see cref="Money"/>.</returns>
+        [CLSCompliant(false)]
+        public static Money FromUInt16(ushort money)
+        {
+            return money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="uint"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="uint"/> instance, converted to a <see cref="Money"/>.</returns>
+        [CLSCompliant(false)]
+        public static Money FromUInt32(uint money)
+        {
+            return money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="double"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="double"/> instance, converted to a <see cref="Money"/>.</returns>
+        public static Money FromDouble(double money)
+        {
+            return (Money)money;
+        }
+
+        /// <summary>Converts the value to a <see cref="Money"/> struct, based on the current culture.</summary>
+        /// <param name="money">The <see cref="decimal"/> value on which the returned <see cref="Money"/> should be based.</param>
+        /// <returns>The value of the <see cref="decimal"/> instance, converted to a <see cref="Money"/>.</returns>
+        public static Money FromDecimal(decimal money)
+        {
+            return money;
+        }
+
 #if !NETSTANDARD1_3
+#pragma warning disable CA1822 // Mark members as static => Needed for implimentation of IConvertible
         /// <summary>
         /// Returns the <see cref="TypeCode"/> for this instance.
         /// </summary>
@@ -89,6 +149,7 @@ namespace NodaMoney
         /// The enumerated constant that is the <see cref="TypeCode"/> of the class or value type that implements this interface.
         /// </returns>
         public TypeCode GetTypeCode() => TypeCode.Object;
+#pragma warning restore CA1822 // Mark members as static
 #endif
 
         /// <summary>Converts the value of this instance to an equivalent Boolean value using the specified culture-specific
