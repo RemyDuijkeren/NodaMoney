@@ -104,6 +104,15 @@ namespace NodaMoney.Tests.Serialization
             // Discount explicit null
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": 234.25, \"Currency\": \"EUR\" }, \"Discount\": null }", order); // Amount as number
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": \"234.25\", \"Currency\": \"EUR\" }, \"Discount\": null }", order); // Amount as string
+
+            var orderWithDefault = new Order
+            {
+                Id = 123,
+                Name = "Abc",
+            };
+
+            Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": 0, \"Currency\": \"\" } }", orderWithDefault); // Amount as number
+            Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": \"0\", \"Currency\": \"\" } }", orderWithDefault); // Amount as string
         }
     }
 

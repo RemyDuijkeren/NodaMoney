@@ -52,8 +52,16 @@ namespace NodaMoney
                 currency = info.GetString("currency");
             }
 
-            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
-            Amount = Round(amount, Currency, MidpointRounding.ToEven);
+            if ((currency == ";" || String.IsNullOrEmpty(currency)) && amount == 0)
+            {
+                Currency = default;
+                Amount = 0;
+            }
+            else
+            {
+                Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
+                Amount = Round(amount, Currency, MidpointRounding.ToEven);
+            }
         }
 
         /// <summary>This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should
