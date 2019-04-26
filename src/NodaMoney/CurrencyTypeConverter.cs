@@ -47,6 +47,11 @@ namespace NodaMoney
         {
             if (value is string valueAsString)
             {
+                if (valueAsString == ";")
+                {
+                    return default(Currency);
+                }
+
                 string[] v = valueAsString.Split(new[] { ';' });
                 if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]))
                 {
