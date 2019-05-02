@@ -125,6 +125,12 @@ namespace NodaMoney
                 format = "C";
             }
 
+            if (format.StartsWith("F", StringComparison.CurrentCulture))
+            {
+                format = format.Replace("F", "N");
+                return $"{Amount.ToString(format, provider)} {Currency.EnglishName}";
+            }
+
             return Amount.ToString(format ?? "C", provider);
         }
     }
