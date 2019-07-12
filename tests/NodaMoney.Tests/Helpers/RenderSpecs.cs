@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.Helpers
 {
     public class RenderSpecs
     {
-        [Fact(Skip = "Write Spec")]
+        [Fact]
         public void Rendering()
         {
             Render("", Console.Out);

@@ -75,50 +75,6 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        public void WhenUsingAdditionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
-        {
-            var money1 = new Money(value1, "EUR");
-            var money2 = new Money(value2, "USD");
-
-            Action action = () => { var result = money1 + money2; };
-
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
-        }
-
-        [Theory, MemberData(nameof(TestData))]
-        public void WhenUsingAdditionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
-        {
-            var money1 = new Money(value1, "EUR");
-            var money2 = new Money(value2, "USD");
-
-            Action action = () => Money.Add(money1, money2);
-
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
-        }
-
-        [Theory, MemberData(nameof(TestData))]
-        public void WhenUsingSubstractionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
-        {
-            var money1 = new Money(value1, "EUR");
-            var money2 = new Money(value2, "USD");
-
-            Action action = () => { var result = money1 - money2; };
-
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
-        }
-
-        [Theory, MemberData(nameof(TestData))]
-        public void WhenUsingSubstractionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
-        {
-            var money1 = new Money(value1, "EUR");
-            var money2 = new Money(value2, "USD");
-
-            Action action = () => Money.Subtract(money1, money2);
-
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
-        }
-
-        [Theory, MemberData(nameof(TestData))]
         [UseCulture("en-us")]
         public void WhenUsingAddtionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
@@ -171,6 +127,52 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             result.Should().Be(new Money(expected, "EUR"));
             result.Should().NotBeSameAs(money1);
         }
+
+        [Theory, MemberData(nameof(TestData))]
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
+        public void WhenUsingAdditionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { var result = money1 + money2; };
+
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingAdditionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => Money.Add(money1, money2);
+
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingSubstractionOperatorWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => { var result = money1 - money2; };
+
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingSubstractionMethodWithDifferentCurrency_ThenThrowException(decimal value1, decimal value2, decimal expected)
+        {
+            var money1 = new Money(value1, "EUR");
+            var money2 = new Money(value2, "USD");
+
+            Action action = () => Money.Subtract(money1, money2);
+
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        }
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
     }
 
     public class GivenIWantToMultiplyAndDivideMoney

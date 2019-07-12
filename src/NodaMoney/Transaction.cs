@@ -4,7 +4,7 @@
     public class Transaction
     {
         /// <summary>Gets or sets the transaction amount of the transaction in the local currency of the customer.</summary>
-        public Money Value { get; set; }
+        public Money Amount { get; set; }
 
         /// <summary>Gets or sets the exchange rate to the base currency of the shop at the time of the transaction.</summary>
         public ExchangeRate ExchangeRate { get; set; }
