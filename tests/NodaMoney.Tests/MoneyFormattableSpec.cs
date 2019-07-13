@@ -316,10 +316,10 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenCurrentCulturePTBR_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCulturePtBRAndCurrencyNameIsInEnglish()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("pt-BR");
-            _yen.ToString("F").Should().Be("765,00 Japanese yen");
+            _yen.ToString("F").Should().Be("765 Japanese yen");
             _euro.ToString("F").Should().Be("765,43 Euro");
             _dollar.ToString("F").Should().Be("765,43 United States dollar");
-            _dinar.ToString("F").Should().Be("765,43 Bahraini dinar");
+            _dinar.ToString("F").Should().Be("765,432 Bahraini dinar");
         }
 
         [Fact]
@@ -327,10 +327,10 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         public void WhenCurrentCultureEnUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureEnUSAndCurrencyNameIsInEnglish()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-            _yen.ToString("F").Should().Be("765.00 Japanese yen");
+            _yen.ToString("F").Should().Be("765 Japanese yen");
             _euro.ToString("F").Should().Be("765.43 Euro");
             _dollar.ToString("F").Should().Be("765.43 United States dollar");
-            _dinar.ToString("F").Should().Be("765.43 Bahraini dinar");
+            _dinar.ToString("F").Should().Be("765.432 Bahraini dinar");
         }
 
         [Fact]
