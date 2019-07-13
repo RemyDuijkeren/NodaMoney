@@ -21,6 +21,10 @@ namespace NodaMoney
     [TypeConverter(typeof(CurrencyTypeConverter))]
     public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
+        /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
+        /// <remarks>https://en.wikipedia.org/wiki/Currency_sign_(typography) </remarks>
+        public const string GenericCurrencySign = "¤";
+
         /// <summary>A singleton instance of the currencies registry.</summary>
         [NonSerialized]
         internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
@@ -59,22 +63,16 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
-            if (number == null)
-                throw new ArgumentNullException(nameof(number));
-            if (string.IsNullOrWhiteSpace(englishName))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(englishName));
-            if (string.IsNullOrWhiteSpace(symbol))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(symbol));
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
             if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
                 throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
 
             Code = code;
-            Number = number;
+            Number = number ?? string.Empty;
             DecimalDigits = decimalDigits;
-            EnglishName = englishName;
-            Symbol = symbol;
+            EnglishName = englishName ?? string.Empty;
+            Symbol = symbol ?? GenericCurrencySign;
             Namespace = @namespace;
             ValidTo = validTo;
             ValidFrom = validFrom;
@@ -89,23 +87,19 @@ namespace NodaMoney
         /// <value>The Currency that represents the country/region used by the current thread.</value>
         public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
 
-        /// <summary>Gets the currency sign (¤), a character used to denote an unspecified currency.</summary>
-        /// <remarks>https://en.wikipedia.org/wiki/Currency_sign_(typography) </remarks>
-        public static string CurrencySign => CultureInfo.InvariantCulture.NumberFormat.CurrencySymbol;
-
         /// <summary>Gets the currency symbol.</summary>
         public string Symbol { get; }
 
         /// <summary>Gets the english name of the currency.</summary>
         public string EnglishName { get; }
 
-        /// <summary>Gets the three-character ISO-4217 currency code.</summary>
+        /// <summary>Gets the three-character (ISO-4217) currency code.</summary>
         public string Code { get; }
 
-        /// <summary>Gets the numeric ISO-4217 currency code.</summary>
+        /// <summary>Gets the numeric (ISO-4217) currency number.</summary>
         public string Number { get; }
 
-        /// <summary>Gets the namespace of the currency.</summary>
+        /// <summary>Gets the namespace of the currency, like ISO-4217.</summary>
         public string Namespace { get; }
 
         /// <summary>Gets the number of digits after the decimal separator.</summary>

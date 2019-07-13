@@ -190,6 +190,7 @@ var builder = new CurrencyBuilder("BTC", "virtual")
 				{
 					EnglishName = "Bitcoin",
 					Symbol = "฿",
+                    ISONumber = "123", // iso number
 					DecimalDigits = 8
 				};
 

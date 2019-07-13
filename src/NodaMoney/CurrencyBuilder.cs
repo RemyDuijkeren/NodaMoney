@@ -84,7 +84,7 @@ namespace NodaMoney
         {
             // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
             if (string.IsNullOrWhiteSpace(Symbol))
-                Symbol = Currency.CurrencySign;
+                Symbol = Currency.GenericCurrencySign;
 
             return new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
         }

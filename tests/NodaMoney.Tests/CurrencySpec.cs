@@ -343,27 +343,27 @@ namespace NodaMoney.Tests.CurrencySpec
         }
 
         [Fact]
-        public void WhenNumberIsNull_ThenCreatingShouldThrow()
+        public void WhenNumberIsNull_ThenNumberShouldDefaultToEmpty()
         {
-            Action action = () => { var eur = new Currency("EUR", null, 2, "Euro", "€"); };
+            var eur = new Currency("EUR", null, 2, "Euro", "€");
 
-            action.Should().Throw<ArgumentNullException>();
+            eur.Number.Should().Be(string.Empty);
         }
 
         [Fact]
-        public void WhenEnglishNameIsNull_ThenCreatingShouldThrow()
+        public void WhenEnglishNameIsNull_ThenEnglishNameShouldDefaultToEmpty()
         {
-            Action action = () => { var eur = new Currency("EUR", "978", 2, null, "€"); };
+            var eur = new Currency("EUR", "978", 2, null, "€");
 
-            action.Should().Throw<ArgumentException>();
+            eur.EnglishName.Should().Be(string.Empty);
         }
 
         [Fact]
-        public void WhenSignIsNull_ThenCreatingShouldThrow()
+        public void WhenSignIsNull_ThenSignShouldDefaultToGenericCurrencySign()
         {
-            Action action = () => { var eur = new Currency("EUR", "978", 2, "Euro", null); };
+            var eur = new Currency("EUR", "978", 2, "Euro", null);
 
-            action.Should().Throw<ArgumentException>();
+            eur.Symbol.Should().Be(Currency.GenericCurrencySign);
         }
 
         [Fact]
