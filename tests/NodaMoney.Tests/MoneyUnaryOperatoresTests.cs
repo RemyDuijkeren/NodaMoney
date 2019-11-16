@@ -91,6 +91,22 @@ namespace NodaMoney.Tests
                 r2.Amount.Should().Be(10.00m);
                 r2.Currency.Code.Should().Be("EUR");
             }
+
+            [Fact]
+            public void WhenUsingUnaryMinOperatorWithDefault_ThenThisSucceed()
+            {
+                (-new Money(0, "USD")).Should().Be(default(Money));
+                (-new Money(0, "USD")).Currency.Code.Should().Be("USD");
+
+                (+default(Money)).Should().Be(-default(Money)).And.Be(default(Money));
+            }
+
+            [Fact]
+            public void WhenUsingUnaryPlusOperatorWithDefault_ThenThisSucceed()
+            {
+                (+new Money(0, "USD")).Should().Be(default(Money));
+                (+new Money(0, "USD")).Currency.Code.Should().Be("USD");
+            }
         }
     }
 }

@@ -26,12 +26,18 @@
         /// <summary>Pluses the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result.</returns>
-        public static Money Plus(Money money) => new Money(+money.Amount, money.Currency);
+        public static Money Plus(Money money) =>
+            money.Currency == default(Currency) && money == default(Money)
+            ? default(Money)
+            : new Money(+money.Amount, money.Currency);
 
         /// <summary>Negates the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result.</returns>
-        public static Money Negate(Money money) => new Money(-money.Amount, money.Currency);
+        public static Money Negate(Money money) =>
+            money.Currency == default(Currency) && money == default(Money)
+            ? default(Money)
+            : new Money(-money.Amount, money.Currency);
 
         /// <summary>Increments the specified money.</summary>
         /// <param name="money">The money.</param>

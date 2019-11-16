@@ -183,7 +183,8 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
             new object[] { 100.12m, 0.5m, 50.06m },
             new object[] { 100.12m, 5m, 500.60m },
             new object[] { -100.12m, 0.5m, -50.06m },
-            new object[] { -100.12m, 5m, -500.60m }
+            new object[] { -100.12m, 5m, -500.60m },
+            new object[] { 0, 5m, 0 }
         };
 
         [Theory, MemberData(nameof(TestDataDecimal))]
@@ -316,5 +317,114 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
 
             result.Should().Be(expected); // ratio
         }
+    }
+
+    public class GivenIWantToAddAndSubstractDefaultMoney
+    {
+        public static IEnumerable<object[]> TestData => new[]
+        {
+            new object[] { default(Money), 99, 99 },
+            new object[] { default(Money), 0, 0 },
+            new object[] { default(Money), -99, -99 }
+        };
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingAdditionOperatorWithDefaultAndMoney_ThenMoneyShouldBeAdded(Money money1, decimal value2, decimal expected)
+        {
+            var result1 = money1 + new Money(value2, "EUR");
+            var result2 = new Money(value2, "EUR") + money1;
+            result1.Should().Be(new Money(expected, "EUR"));
+            result2.Should().Be(new Money(expected, "EUR"));
+        }
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingSubtractionOperatorWithDefaultAndMoney_ThenMoneyShouldBeAdded(Money money1, decimal value2, decimal expected)
+        {
+            var result1 = money1 - new Money(value2, "EUR");
+            var result2 = new Money(value2, "EUR") - money1;
+            result1.Should().Be(-new Money(expected, "EUR"));
+            result2.Should().Be(new Money(expected, "EUR"));
+        }
+
+        [Fact]
+        public void WhenUsingAdditionOperatorWithDefault_ThenMoneyShouldBeDefault()
+        {
+            (default(Money) + default(Money)).Should().Be(default(Money));
+
+            var result = new Money(0, "USD") + default(Money);
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+
+            result = default(Money) + new Money(0, "USD");
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+        }
+
+        [Fact]
+        public void WhenUsingSubtractionOperatorWithDefault_ThenMoneyShouldBeDefault()
+        {
+            (default(Money) - default(Money)).Should().Be(default(Money));
+
+            var result = (new Money(0, "USD") - default(Money));
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+
+            result = default(Money) - new Money(0, "USD");
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+
+        }
+    }
+
+    public class GivenIWantToMultiplyAndDivideDefaultMoney
+    {
+        public static IEnumerable<object[]> TestData => new[]
+        {
+            new object[] { default(Money), 0, default(Money) },
+            new object[] { default(Money), 1, default(Money) },
+            new object[] { default(Money), -1, default(Money) }
+        };
+
+        public static IEnumerable<object[]> DivideTestData => new[]
+        {
+            new object[] { default(Money), 3, default(Money) },
+            new object[] { default(Money), -3, default(Money) }
+        };
+
+        [Theory, MemberData(nameof(TestData))]
+        public void WhenUsingMultiplyOperatorWithDefault_ThenMoneyShouldBeMultiplied(Money money1, decimal multiplier, Money expected)
+        {
+            var result = money1 * multiplier;
+            result.Should().Be(expected);
+        }
+
+        [Theory, MemberData(nameof(DivideTestData))]
+        public void WhenUsingDivideOperatorWithDefaultAndDecimal_ThenMoneyShouldBeDivided(Money money1, decimal divisor, Money expected)
+        {
+            var result = money1 / divisor;
+            result.Should().Be(expected);
+        }
+
+        [Theory, MemberData(nameof(DivideTestData))]
+        public void WhenUsingDivideOperatorWithDefaultAndMoney_ThenMoneyShouldBeDivided(Money money1, decimal divisor, Money expected)
+        {
+            var result = money1 / new Money(divisor, "USD");
+            result.Should().Be(0);
+        }
+
+        [Fact]
+        public void WhenUsingMultiplyOperatorWithDefault_ThenMoneyShouldBeDefault()
+        {
+            default(Money).Should().Be(default(Money) * 0).And.Be(0 * default(Money));
+
+            var result = new Money(0, "USD") * 0;
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+
+            result = 0 * new Money(0, "USD");
+            result.Should().Be(default(Money));
+            result.Currency.Code.Should().Be("USD");
+        }
+
     }
 }

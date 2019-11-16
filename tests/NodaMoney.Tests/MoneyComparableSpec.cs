@@ -6,6 +6,8 @@ namespace NodaMoney.Tests.MoneyComparableSpec
 {
     public class GivenIWantToCompareMoney
     {
+        private Money _default = default(Money);
+        private Money _zeroEuro = new Money(0m, "EUR");
         private Money _tenEuro1 = new Money(10.00m, "EUR");
         private Money _tenEuro2 = new Money(10.00m, "EUR");
         private Money _twentyEuro = new Money(20.00m, "EUR");
@@ -54,13 +56,35 @@ namespace NodaMoney.Tests.MoneyComparableSpec
             (_tenEuro1 == _twentyDollar).Should().BeFalse(); //using Euality operators
             (_tenEuro1 != _twentyDollar).Should().BeTrue(); //using Euality operators
             _tenEuro1.GetHashCode().Should().NotBe(_twentyDollar.GetHashCode()); //using GetHashCode()
+
+            (_tenEuro1 == default).Should().BeFalse();
+            (_tenEuro1 != default).Should().BeTrue();
+            (_tenEuro1.Equals(default)).Should().BeFalse();
+            (_zeroEuro.Equals(default)).Should().BeTrue();
+            (_tenEuro1.CompareTo(default)).Should().NotBe(0);
         }
 
         [Fact]
         public void WhenComparingWithNull_ThenMoneyShouldNotBeEqual()
         {
-            (_tenEuro1 == null).Should().BeFalse();
-            _tenEuro1.CompareTo(null).Should().Be(1);
+            (_default == null).Should().BeFalse();
+            _default.CompareTo(null).Should().NotBe(0);
+        }
+
+        [Fact]
+        public void When0IsComparedWith0_ThenMoneyShouldBeEqual()
+        {
+            (_default == 0).Should().BeTrue();
+            _default.CompareTo(0).Should().Be(0);
+            Money.Compare(_default, 0).Should().Be(0);
+        }
+
+        [Fact]
+        public void WhenComparingWith0_ThenMoneyShouldNotBeEqual()
+        {
+            (_tenEuro1 == 0).Should().BeFalse();
+            _tenEuro1.CompareTo(0).Should().Be(1);
+            Money.Compare(_tenEuro1, 0).Should().Be(1);
         }
 
         [Fact]
@@ -117,6 +141,20 @@ namespace NodaMoney.Tests.MoneyComparableSpec
             Action action = () => _tenEuro1.CompareTo("10.00");
 
             action.Should().Throw<ArgumentException>().WithMessage("obj is not the same type as this instance*");
+        }
+
+        [Fact]
+        public void WhenComparingWith0_ThenComparingShouldNotBeEqual()
+        {
+            _tenEuro1.CompareTo(_default).Should().NotBe(0); //using CompareTo()
+            _tenEuro1.CompareTo((object)_default).Should().NotBe(0); //using CompareTo()
+            Money.Compare(_tenEuro1, _default).Should().NotBe(0); //using static Compare
+
+            //using Compareble operators
+            (_tenEuro1 <= _default).Should().BeFalse();
+            (_tenEuro1 >= _default).Should().BeTrue();
+            (_tenEuro1 > _default).Should().BeTrue();
+            (_tenEuro1 < _default).Should().BeFalse();
         }
     }
 }

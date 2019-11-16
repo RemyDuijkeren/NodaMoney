@@ -71,6 +71,11 @@
         /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
         public static Money Add(Money money1, Money money2)
         {
+            if (money1 == default && money1.Currency == default)
+                return money2;
+            else if (money2 == default && money2.Currency == default)
+                return money1;
+
             AssertIsSameCurrency(money1, money2);
             return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
         }
@@ -87,6 +92,11 @@
         /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
         public static Money Subtract(Money money1, Money money2)
         {
+            if (money1 == default && money1.Currency == default)
+                return -money2;
+            else if (money2 == default && money2.Currency == default)
+                return money1;
+
             AssertIsSameCurrency(money1, money2);
             return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
         }
@@ -101,14 +111,20 @@
         /// <param name="money">The money.</param>
         /// <param name="multiplier">The multiplier.</param>
         /// <returns>The result as <see cref="Money"/> after multiplying.</returns>
-        public static Money Multiply(Money money, decimal multiplier) => new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
+        public static Money Multiply(Money money, decimal multiplier) =>
+            money.Currency == default(Currency) && money == default(Money)
+            ? default(Money)
+            : new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
 
         /// <summary>Divides the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <param name="divisor">The divider.</param>
         /// <returns>The division as <see cref="Money"/>.</returns>
         /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
-        public static Money Divide(Money money, decimal divisor) => new Money(decimal.Divide(money.Amount, divisor), money.Currency);
+        public static Money Divide(Money money, decimal divisor) =>
+            money.Currency == default(Currency) && money == default(Money)
+            ? default(Money)
+            : new Money(decimal.Divide(money.Amount, divisor), money.Currency);
 
         /// <summary>Divides the specified money.</summary>
         /// <param name="money1">The money.</param>
@@ -117,6 +133,11 @@
         /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
         public static decimal Divide(Money money1, Money money2)
         {
+            if (money1 == default(Money))
+                return 0;
+            else if (money2 == default(Money))
+                throw new System.DivideByZeroException();
+
             AssertIsSameCurrency(money1, money2);
             return decimal.Divide(money1.Amount, money2.Amount);
         }

@@ -82,7 +82,7 @@ namespace NodaMoney
         public Money(decimal amount, Currency currency, MidpointRounding rounding)
             : this()
         {
-            Currency = currency;
+            Currency = currency == default(Currency) ? throw new ArgumentNullException("currency") : currency;
             Amount = Round(amount, currency, rounding);
         }
 
@@ -241,7 +241,9 @@ namespace NodaMoney
         /// value.</summary>
         /// <param name="other">A <see cref="Money"/> object.</param>
         /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-        public bool Equals(Money other) => Amount == other.Amount && Currency == other.Currency;
+        public bool Equals(Money other) =>
+            (this.Amount == 0 && other.Amount == 0) ||
+            (Amount == other.Amount && Currency == other.Currency);
 
         /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
         /// and value.</summary>

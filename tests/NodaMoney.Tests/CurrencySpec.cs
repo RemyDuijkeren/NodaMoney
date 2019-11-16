@@ -256,6 +256,13 @@ namespace NodaMoney.Tests.CurrencySpec
         }
 
         [Fact]
+        public void WhenComparingWithEqualityOperatorWithDefault_ThenCurrencyShouldBeEqual()
+        {
+            (default(Money) == 0).Should().BeTrue();
+            (default(Money) != 0).Should().BeFalse();
+        }
+
+        [Fact]
         public void WhenComparingHashCodes_ThenCurrencyShouldBeEqual()
         {
             // Compare using GetHashCode()

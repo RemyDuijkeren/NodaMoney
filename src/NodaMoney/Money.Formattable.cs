@@ -115,6 +115,10 @@ namespace NodaMoney
                 format = format.Replace("I", "C");
                 provider = GetFormatProvider(Currency, formatProvider, true);
             }
+            else if (Currency == default(Currency))
+            {
+                return string.Empty;
+            }
             else
             {
                 provider = GetFormatProvider(Currency, formatProvider);
