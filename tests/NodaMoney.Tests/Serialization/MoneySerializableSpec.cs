@@ -94,6 +94,23 @@ namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
 
             clone.Should().BeEquivalentTo(order);
         }
+
+        [Fact]
+        public void WhenSerializingDefaultMoneyInComplexType_ThenThisShouldSucceed()
+        {
+            var expected = new MyClass { Value = default, NullableValue = default };
+            string json = JsonConvert.SerializeObject(expected);
+
+            var clone = JsonConvert.DeserializeObject<MyClass>(json);
+            clone.Value.Should().Be(expected.Value);
+            clone.NullableValue.Should().Be(expected.NullableValue);
+        }
+
+        private class MyClass
+        {
+            public Money Value { get; set; }
+            public Money? NullableValue { get; set; }
+        }
     }
 
     public class GivenIWantToSerializeMoneyWithDataContractSerializer
@@ -130,6 +147,25 @@ namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
             // Console.WriteLine(Serialize(article).ReadToString());
 
             article.Price.Should().Be(Clone<Order>(article).Price);
+        }
+
+        [Fact]
+        public void WhenSerializingDefaultMoneyInComplexType_ThenThisShouldSucceed()
+        {
+            var expected = new MyClass { Value = default, NullableValue = default };
+            var actual = Clone<MyClass>(expected);
+            actual.Value.Should().Be(expected.Value);
+            actual.NullableValue.Should().Be(expected.NullableValue);
+        }
+
+        [DataContract]
+        private class MyClass
+        {
+            [DataMember]
+            public Money Value { get; set; }
+
+            [DataMember]
+            public Money? NullableValue { get; set; }
         }
 
         public static Stream Serialize(object source)

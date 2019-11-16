@@ -50,7 +50,7 @@ namespace NodaMoney
                 string[] v = valueAsString.Split(new[] { ';' });
                 if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]))
                 {
-                    return new Currency(v[0]);
+                    return string.IsNullOrWhiteSpace(v[0]) ? default : new Currency(v[0]);
                 }
                 else
                 {
