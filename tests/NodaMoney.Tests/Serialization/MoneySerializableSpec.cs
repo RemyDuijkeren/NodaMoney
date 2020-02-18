@@ -14,7 +14,7 @@ using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Serialization.Tests.MoneySerializableSpec
 {
-    public class GivenIWantToDeserializeMoneyWithJavaScriptConverter
+    public class GivenIWantToDeserializeMoneyWithJsonNetSerializer
     {
         [Theory]
         [ClassData(typeof(ValidJsonTestData))]

@@ -104,6 +104,10 @@ namespace NodaMoney
             return numberFormatInfo;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Globalization",
+            "CA1307:Specify StringComparison",
+            Justification = "Invalid overload; known bug in code analysis, see https://github.com/dotnet/roslyn-analyzers/issues/1552")]
         private string ConvertToString(string format, IFormatProvider formatProvider)
         {
             // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
@@ -112,7 +116,11 @@ namespace NodaMoney
             IFormatProvider provider;
             if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
             {
+#if NETFRAMEWORK || NETSTANDARD2_0
                 format = format.Replace("I", "C");
+#else
+                format = format.Replace("I", "C", StringComparison.Ordinal);
+#endif
                 provider = GetFormatProvider(Currency, formatProvider, true);
             }
             else
@@ -127,7 +135,11 @@ namespace NodaMoney
 
             if (format.StartsWith("F", StringComparison.Ordinal))
             {
+#if NETFRAMEWORK || NETSTANDARD2_0
                 format = format.Replace("F", "N");
+#else
+                format = format.Replace("F", "N", StringComparison.Ordinal);
+#endif
                 if (format.Length == 1)
                 {
                     format += Currency.DecimalDigits;

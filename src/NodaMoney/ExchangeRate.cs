@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace NodaMoney
 {
-    /// <summary>A conversion of money of one currency into money of another currency</summary>
+    /// <summary>A conversion of money of one currency into money of another currency.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>
     public struct ExchangeRate : IEquatable<ExchangeRate>
     {
@@ -12,8 +12,8 @@ namespace NodaMoney
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>
         /// <exception cref="ArgumentNullException">The value of 'baseCurrency' or 'quoteCurrency' cannot be null. </exception>
-        /// <exception cref="ArgumentOutOfRangeException">Rate must be greater than zero!</exception>
-        /// <exception cref="ArgumentException">The base and quote currency can't be equal!</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Rate must be greater than zero.</exception>
+        /// <exception cref="ArgumentException">The base and quote currency can't be equal.</exception>
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
             : this()
         {
@@ -87,7 +87,7 @@ namespace NodaMoney
         /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
         /// <param name="rate">The string representation of the exchange rate to convert.</param>
         /// <returns>The equivalent to the exchange rate contained in rate.</returns>
-        /// <exception cref="System.FormatException">rate is not in the correct format!</exception>
+        /// <exception cref="System.FormatException">rate is not in the correct format.</exception>
         public static ExchangeRate Parse(string rate)
         {
             if (rate == null)
@@ -135,7 +135,7 @@ namespace NodaMoney
                              {
                                  BaseCurrency = Currency.FromCode("XXX"),
                                  QuoteCurrency = Currency.FromCode("XXX"),
-                                 Value = 0
+                                 Value = 0,
                              };
 
                 return false;
@@ -156,8 +156,7 @@ namespace NodaMoney
         /// <summary>Converts the specified money.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The converted money.</returns>
-        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote
-        /// currency!</exception>
+        /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote currency.</exception>
         public Money Convert(Money money)
         {
             if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)

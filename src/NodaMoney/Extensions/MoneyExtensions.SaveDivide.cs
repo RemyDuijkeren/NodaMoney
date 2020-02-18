@@ -12,7 +12,7 @@ namespace NodaMoney.Extensions
         /// <param name="money">The <see cref="Money"/> instance.</param>
         /// <param name="shares">The number of shares to divide in.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1.</exception>
         /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="System.MidpointRounding"/>).
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
@@ -24,7 +24,7 @@ namespace NodaMoney.Extensions
         /// <param name="shares">The number of shares to divide in.</param>
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">shares;Number of shares must be greater than 1.</exception>
         [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "number-1", Justification = "Can't be lower than zero.")]
         public static IEnumerable<Money> SafeDivide(this Money money, int shares, MidpointRounding rounding)
         {
@@ -52,7 +52,7 @@ namespace NodaMoney.Extensions
         /// <param name="money">The <see cref="NodaMoney.Money"/> instance.</param>
         /// <param name="ratios">The number of shares as an array of ratios.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">ratios;Sum of ratios must be greater than 1</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">ratios;Sum of ratios must be greater than 1.</exception>
         /// <remarks>As rounding mode, MidpointRounding.ToEven is used (<seealso cref="System.MidpointRounding"/>).
         /// The behavior of this method follows IEEE Standard 754, section 4. This kind of rounding is sometimes called
         /// rounding to nearest, or banker's rounding. It minimizes rounding errors that result from consistently rounding a
@@ -64,9 +64,11 @@ namespace NodaMoney.Extensions
         /// <param name="ratios">The number of shares as an array of ratios.</param>
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>An <see cref="IEnumerable{Money}"/> of Money.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">shares;Number of shares must be greater than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">shares;Number of shares must be greater than 1.</exception>
         public static IEnumerable<Money> SafeDivide(this Money money, int[] ratios, MidpointRounding rounding)
         {
+            if (ratios == null)
+                throw new ArgumentNullException(nameof(ratios));
             if (ratios.Any(ratio => ratio < 1))
                 throw new ArgumentOutOfRangeException(nameof(ratios), "All ratios must be greater or equal than 1");
 

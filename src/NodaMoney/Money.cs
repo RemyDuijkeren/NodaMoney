@@ -73,7 +73,7 @@ namespace NodaMoney
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="Money"/> struct</summary>
+        /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <param name="currency">The Currency of the money.</param>
         /// <param name="rounding">The rounding mode.</param>
@@ -287,7 +287,7 @@ namespace NodaMoney
         }
 
         [SuppressMessage(
-                    "Microsoft.Globalization",
+            "Microsoft.Globalization",
             "CA1305:SpecifyIFormatProvider",
             MessageId = "System.String.Format(System.String,System.Object[])",
             Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]

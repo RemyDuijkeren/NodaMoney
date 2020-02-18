@@ -92,8 +92,7 @@ namespace NodaMoney
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
         /// <returns>A <see cref="Currency"/> instance that is build and registered.</returns>
         /// <exception cref="InvalidOperationException">
-        ///     <para>The custom currency is already registered</para>
-        ///     <para>-or-</para>
+        ///     <para>The custom currency is already registered -or-.</para>
         ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
         /// </exception>
         public Currency Register()

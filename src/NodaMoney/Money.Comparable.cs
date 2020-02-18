@@ -82,7 +82,7 @@ namespace NodaMoney
         /// </item>
         /// </list>
         /// </returns>
-        /// <exception cref="ArgumentException">object is not the same type as this instance</exception>
+        /// <exception cref="ArgumentException">object is not the same type as this instance.</exception>
         public int CompareTo(object obj)
         {
             if (obj == null)

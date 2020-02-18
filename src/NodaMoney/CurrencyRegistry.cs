@@ -13,7 +13,7 @@ namespace NodaMoney
         /// khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
         /// a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
         /// used. E.g. 1.2 UM.
-        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7.
         /// </summary>
         internal const double Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
 
@@ -21,7 +21,7 @@ namespace NodaMoney
         internal const double NotApplicable = -1;
 
         private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default(byte), ["ISO-4217-HISTORIC"] = default(byte) });
+        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default });
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
@@ -44,7 +44,7 @@ namespace NodaMoney
             }
 
             currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
-            return !currency.Equals(default(Currency));
+            return !currency.Equals(default);
         }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
@@ -63,6 +63,7 @@ namespace NodaMoney
             return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
         }
 
+#pragma warning disable CA1822 // Member TryAdd does not access instance data and can be marked as static.
         /// <summary>Attempts to add the <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
@@ -76,9 +77,10 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            Namespaces[@namespace] = default(byte);
+            Namespaces[@namespace] = default;
             return Currencies.TryAdd(@namespace + "::" + code, currency);
         }
+#pragma warning restore CA1822 // Member TryAdd does not access instance data and can be marked as static.
 
         /// <summary>Attempts to remove the <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>

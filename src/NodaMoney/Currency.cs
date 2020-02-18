@@ -22,12 +22,12 @@ namespace NodaMoney
     public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
-        /// <remarks>https://en.wikipedia.org/wiki/Currency_sign_(typography) </remarks>
+        /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
         public const string GenericCurrencySign = "¤";
 
         /// <summary>A singleton instance of the currencies registry.</summary>
         [NonSerialized]
-        internal static readonly CurrencyRegistry Registry = new CurrencyRegistry();
+        internal static CurrencyRegistry Registry = new CurrencyRegistry();
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
@@ -56,8 +56,8 @@ namespace NodaMoney
         /// <param name="namespace">The namespace of the currency.</param>
         /// <param name="validTo">The valid until the specified date.</param>
         /// <param name="validFrom">The valid from the specified date.</param>
-        /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero!</exception>
+        /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero.</exception>
         internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
@@ -78,10 +78,12 @@ namespace NodaMoney
             ValidFrom = validFrom;
         }
 
+#pragma warning disable CA1801 // Parameter context of method.ctor is never used.
         private Currency(SerializationInfo info, StreamingContext context)
         : this(info.GetString("code"), info.GetString("namespace"))
         {
         }
+#pragma warning restore CA1801 // Parameter context of method.ctor is never used.
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
@@ -115,7 +117,7 @@ namespace NodaMoney
         /// used. E.g. 1.2 UM.
         /// </para>
         /// <para>
-        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7
+        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7.
         /// </para>
         /// </remarks>
         public double DecimalDigits { get; }
@@ -164,7 +166,7 @@ namespace NodaMoney
         /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
-        /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
+        /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
         public static Currency FromCode(string code)
         {
             if (!Registry.TryGet(code, out Currency currency))
@@ -178,7 +180,7 @@ namespace NodaMoney
         /// <param name="namespace">A namespace, like ISO-4217.</param>
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown!</exception>
+        /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown.</exception>
         public static Currency FromCode(string code, string @namespace)
         {
             if (!Registry.TryGet(code, @namespace, out Currency currency))
@@ -191,7 +193,7 @@ namespace NodaMoney
         /// <param name="region"><see cref="RegionInfo"/> to get a <see cref="Currency"/> for.</param>
         /// <returns>The <see cref="Currency"/> instance used within the specified <see cref="RegionInfo"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'region' cannot be null.</exception>
-        /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code!</exception>
+        /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
         public static Currency FromRegion(RegionInfo region)
         {
             if (region == null)
@@ -206,7 +208,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentNullException">The value of 'culture' cannot be null.</exception>
         /// <exception cref="ArgumentException">
         /// Culture is a neutral culture, from which no region information can be extracted -or-
-        /// The 'code' is an unknown ISO 4217 currency code!
+        /// The 'code' is an unknown ISO 4217 currency code.
         /// </exception>
         public static Currency FromCulture(CultureInfo culture)
         {
@@ -276,8 +278,10 @@ namespace NodaMoney
             unchecked
             {
                 int hash = 17;
+#pragma warning disable CA1307 // Specify StringComparison
                 hash = (hash * 23) + (Code?.GetHashCode() ?? 0);
                 return (hash * 23) + (Namespace?.GetHashCode() ?? 0);
+#pragma warning restore CA1307 // Specify StringComparison
             }
         }
 
@@ -293,8 +297,8 @@ namespace NodaMoney
         }
 
         /// <summary>Check a value indication whether currency is valid on a given date.</summary>
-        /// <param name="date">The date on which the Currency should be valid</param>
-        /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>;</returns>
+        /// <param name="date">The date on which the Currency should be valid.</param>
+        /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
         public bool IsValidOn(DateTime date)
         {
             return
@@ -341,6 +345,9 @@ namespace NodaMoney
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission. </exception>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
             info.AddValue("code", Code);
             info.AddValue("namespace", Namespace);
         }
