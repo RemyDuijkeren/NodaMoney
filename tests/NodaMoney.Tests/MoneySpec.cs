@@ -10,6 +10,54 @@ using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.MoneySpec
 {
+    public class GivenIWantMoneyImpliciet
+    {
+        private readonly decimal _decimalValue = 1234.567m;
+
+        [Fact]
+        [UseCulture("en-US")]
+        public void WhenCurrentCultureIsUS_ThenCreatingShouldSucceed()
+        {            
+            var money = new Money(_decimalValue);
+
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
+            money.Currency.Should().Be(Currency.FromCode("USD"));
+            money.Amount.Should().Be(1234.57m);
+        }
+
+        [Fact]
+        [UseCulture("nl-NL")]
+        public void WhenCurrentCultureIsNL_ThenCreatingShouldSucceed()
+        {
+            var money = new Money(_decimalValue);
+
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+            money.Currency.Should().Be(Currency.FromCode("EUR"));
+            money.Amount.Should().Be(1234.57m);
+        }
+
+        [Fact]
+        [UseCulture("ja-JP")]
+        public void WhenCurrentCultureIsJP_ThenCreatingShouldSucceed()
+        {
+            var money = new Money(_decimalValue);
+
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be("ja-JP");
+            money.Currency.Should().Be(Currency.FromCode("JPY"));
+            money.Amount.Should().Be(1235m);
+        }
+
+        [Fact]
+        [UseCulture(null)]
+        public void WhenCurrentCultureIsInvariant_ThenThisShouldThrowException()
+        {
+            Action action = () => { var money = new Money(_decimalValue); };
+
+            Thread.CurrentThread.CurrentCulture.Should().Be(CultureInfo.InvariantCulture);
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("*Invariant*");
+        }
+    }
+
     public class GivenIWantMoneyFromNumericTypeAndAnExplicitCurrencyObject
     {
         private readonly Currency _euro = Currency.FromCode("EUR");
