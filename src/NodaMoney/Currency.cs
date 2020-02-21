@@ -57,7 +57,7 @@ namespace NodaMoney
         /// <param name="validTo">The valid until the specified date.</param>
         /// <param name="validFrom">The valid from the specified date.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits of code must be greater or equal to zero.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable.</exception>
         internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
@@ -65,8 +65,8 @@ namespace NodaMoney
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
-            if (decimalDigits < 0 && decimalDigits != CurrencyRegistry.NotApplicable)
-                throw new ArgumentOutOfRangeException(nameof(code), "DecimalDigits must greater or equal to zero!");
+            if (decimalDigits != CurrencyRegistry.NotApplicable && (decimalDigits < 0 || decimalDigits > 28))
+                throw new ArgumentOutOfRangeException(nameof(decimalDigits), "DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable!");
 
             Code = code;
             Number = number ?? string.Empty;
@@ -87,7 +87,17 @@ namespace NodaMoney
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
-        public static Currency CurrentCurrency => FromRegion(RegionInfo.CurrentRegion);
+        public static Currency CurrentCurrency
+        {
+            get
+            {
+                var currentRegion = RegionInfo.CurrentRegion;
+                if (currentRegion.Name == "IV")
+                    throw new InvalidCurrencyException("Current culture is Invariant, from which no specific currency can be extracted!");
+
+                return FromRegion(currentRegion);
+            }
+        }
 
         /// <summary>Gets the currency symbol.</summary>
         public string Symbol { get; }

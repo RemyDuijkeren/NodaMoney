@@ -7,6 +7,8 @@ namespace NodaMoney
     /// <summary>Defines a custom currency that is new or based on another currency.</summary>
     public class CurrencyBuilder
     {
+        private double _decimalDigits;
+
         /// <summary>Initializes a new instance of the <see cref="CurrencyBuilder"/> class.</summary>
         /// <param name="code">The code of the currency, normally the three-character ISO 4217 currency code.</param>
         /// <param name="namespace">The namespace for the currency.</param>
@@ -33,7 +35,17 @@ namespace NodaMoney
         public string ISONumber { get; set; }
 
         /// <summary>Gets or sets the number of digits after the decimal separator.</summary>
-        public double DecimalDigits { get; set; }
+        public double DecimalDigits
+        {
+            get => _decimalDigits;
+            set
+            {
+                if (value != CurrencyRegistry.NotApplicable && (value < 0 || value > 28))
+                    throw new ArgumentOutOfRangeException(nameof(value), "DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable!");
+
+                _decimalDigits = value;
+            }
+        }
 
         /// <summary>Gets the namespace of the currency.</summary>
         public string Namespace { get; }

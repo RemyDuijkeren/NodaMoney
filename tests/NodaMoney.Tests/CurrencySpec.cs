@@ -131,7 +131,6 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.Symbol.Should().Be("kr");
             currency.IsValid.Should().BeFalse();
         }
-
     }
 
     public class GivenIWantCurrencyFromRegionOrCulture
