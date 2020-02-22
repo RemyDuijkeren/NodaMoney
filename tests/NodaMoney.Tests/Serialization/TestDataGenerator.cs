@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace NodaMoney.Tests.Serialization
@@ -75,7 +74,7 @@ namespace NodaMoney.Tests.Serialization
             Add("{ Amount: '234.25' }"); // PascalCase, Amount as string, No Currency member
             Add("{ currency: 'EUR' }"); // camelCase, No Amount member
 
-            Add("{ \"Amount\": \"ABC\", \"Currency\": \"EUR\" }"); // => formatexception without telling wich member
+            Add("{ \"Amount\": \"ABC\", \"Currency\": \"EUR\" }"); // => format exception without telling which member
         }
     }
 
@@ -93,7 +92,7 @@ namespace NodaMoney.Tests.Serialization
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": 234.25, \"Currency\": \"EUR\" } }", order); // Amount as number
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Amount\": \"234.25\", \"Currency\": \"EUR\" } }", order); // Amount as string
 
-            // Reversed mebers
+            // Reversed members
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Currency\": \"EUR\", \"Amount\": 234.25 } }", order); // Amount as number
             Add("{ \"Id\": 123, \"Name\": \"Abc\", \"Price\": { \"Currency\": \"EUR\", \"Amount\": \"234.25\" } }", order); // Amount as string
 

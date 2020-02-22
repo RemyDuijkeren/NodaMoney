@@ -141,7 +141,7 @@ namespace NodaMoney
         }
 
 #if !NETSTANDARD1_3
-#pragma warning disable CA1822 // Mark members as static => Needed for implimentation of IConvertible
+#pragma warning disable CA1822 // Mark members as static => Needed for implementation of IConvertible
         /// <summary>
         /// Returns the <see cref="TypeCode"/> for this instance.
         /// </summary>

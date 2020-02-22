@@ -10,9 +10,9 @@
     <PackageLicenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/remyvd/NodaMoney</RepositoryUrl>
-    <Version>1.0.4-improve-serializ0001</Version>
+    <Version>1.0.6</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.4.0</FileVersion>
-    <InformationalVersion>1.0.4-improve-serializing.1+4</InformationalVersion>
+    <FileVersion>1.0.6.0</FileVersion>
+    <InformationalVersion>1.0.6+37</InformationalVersion>
   </PropertyGroup>
 </Project>

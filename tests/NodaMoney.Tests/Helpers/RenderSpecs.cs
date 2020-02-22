@@ -15,7 +15,7 @@ namespace NodaMoney.Tests.Helpers
             Render("", Console.Out);
         }
 
-        [Fact(Skip = "Write Spec")]
+        [Fact]
         public void RenderAllSpecs()
         {
             using (var stream = File.Open(@"Specs.txt", FileMode.Create))
@@ -60,7 +60,7 @@ namespace NodaMoney.Tests.Helpers
                     foreach (var spec in context.OrderBy(spec => spec.When).ThenBy(spec => spec.Then))
                     {
                         output.WriteLine("        " + spec.When + ", " + spec.Then);
-                        Console.WriteLine("\t" + spec.Phrase);
+                        // Console.WriteLine("\t" + spec.Phrase);
                     }
                 }
             }

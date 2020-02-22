@@ -92,8 +92,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [Fact]
         public void WhenUsingToStringWithOneStringArgument_ThenExpectsTheSameAsWithTwoArguments()
         {
-            Func<string> oneParameter = () => _yen.ToString((string)null);
-            Func<string> twoParameter = () => _yen.ToString((string)null, null);
+            string oneParameter() => _yen.ToString((string)null);
+            string twoParameter() => _yen.ToString(null, null);
 
             oneParameter().Should().Be(twoParameter());
         }
@@ -101,8 +101,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         [Fact]
         public void WhenUsingToStringWithOneProviderArgument_ThenExpectsTheSameAsWithTwoArguments()
         {
-            Func<string> oneParameter = () => _yen.ToString((IFormatProvider)null);
-            Func<string> twoParameter = () => _yen.ToString(null, null);
+            string oneParameter() => _yen.ToString((IFormatProvider)null);
+            string twoParameter() => _yen.ToString(null, null);
 
             oneParameter().Should().Be(twoParameter());
         }
@@ -143,7 +143,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
 
         [Fact]
         [UseCulture("en-US")]
-        public void WhenCurrentCulturUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
+        public void WhenCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
             _yen.ToString("C").Should().Be("¥765");
@@ -239,7 +239,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
 
         [Fact]
         [UseCulture("en-US")]
-        public void WhenCurrentCulturUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
+        public void WhenCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
         {
             Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
             _yen.ToString("I").Should().Be("JPY 765");
