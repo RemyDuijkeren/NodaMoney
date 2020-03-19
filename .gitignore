@@ -7,6 +7,7 @@
 *.sln.docstates
 .vs
 .vscode
+.cr
 
 #DOTNET Core
 project.lock.json
