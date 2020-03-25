@@ -36,22 +36,12 @@ class Build : NukeBuild
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
+    [CI] readonly AppVeyor AppVeyor;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     AbsolutePath CoverageFile => RootDirectory / "artifacts" / "coverage.xml";
-    AppVeyor BuildServer => AppVeyor.Instance;
-
-    protected override void OnBuildInitialized()
-    {
-        if (BuildServer != null)
-        {
-            BuildServer.UpdateBuildNumber($"{BuildServer.BuildNumber}-{GitRepository.Branch} {GitVersion.FullSemVer}");
-        }
-
-        base.OnBuildInitialized();
-    }
 
     Target Clean => _ => _
         .Before(Restore)
@@ -114,8 +104,8 @@ class Build : NukeBuild
 
     Target NuGetPush => _ => _
         .Requires(() => NuGetApiKey)
-        .Requires(() => BuildServer)
-        .Requires(() => BuildServer.RepositoryTag) // if build has started by pushed tag
+        .Requires(() => AppVeyor)
+        .Requires(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
         .DependsOn(Pack)
         .Executes(() =>
         {
@@ -131,19 +121,19 @@ class Build : NukeBuild
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
         {
-            if (BuildServer != null)
+            if (AppVeyor != null)
             {
                 CoverallsNet(s => s
                     .SetRepoToken(CoverallsRepoToken)
                     .EnableOpenCover()
                     .SetInput(CoverageFile) 
-                    .SetCommitId(BuildServer.RepositoryCommitSha)
-                    .SetCommitBranch(BuildServer.RepositoryBranch)
-                    .SetCommitAuthor(BuildServer.RepositoryCommitAuthor)
-                    .SetCommitEmail(BuildServer.RepositoryCommitAuthorEmail)
-                    .SetCommitMessage(BuildServer.RepositoryCommitMessage)
-                    .SetJobId(BuildServer.BuildNumber)
-                    .SetServiceName(BuildServer.GetType().Name));
+                    .SetCommitId(AppVeyor.RepositoryCommitSha)
+                    .SetCommitBranch(AppVeyor.RepositoryBranch)
+                    .SetCommitAuthor(AppVeyor.RepositoryCommitAuthor)
+                    .SetCommitEmail(AppVeyor.RepositoryCommitAuthorEmail)
+                    .SetCommitMessage(AppVeyor.RepositoryCommitMessage)
+                    .SetJobId(AppVeyor.BuildNumber)
+                    .SetServiceName(AppVeyor.GetType().Name));
             }
             else
             {
