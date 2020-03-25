@@ -103,10 +103,10 @@ class Build : NukeBuild
         });
 
     Target NuGetPush => _ => _
+        .DependsOn(Pack)
         .Requires(() => NuGetApiKey)
         .Requires(() => AppVeyor)
         .OnlyWhenStatic(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
-        .DependsOn(Pack)
         .Executes(() =>
         {
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
@@ -118,6 +118,7 @@ class Build : NukeBuild
         });
 
     Target Coverage => _ => _
+        .DependsOn(Test)
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
         {
@@ -148,5 +149,5 @@ class Build : NukeBuild
         });
 
     Target Publish  => _ => _
-        .DependsOn(Clean, Test, Pack, Coverage, NuGetPush);
+        .DependsOn(Clean, Pack, Coverage, NuGetPush);
 }
