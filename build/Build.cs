@@ -105,7 +105,7 @@ class Build : NukeBuild
     Target NuGetPush => _ => _
         .Requires(() => NuGetApiKey)
         .Requires(() => AppVeyor)
-        .Requires(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
+        .OnlyWhenStatic(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
         .DependsOn(Pack)
         .Executes(() =>
         {
