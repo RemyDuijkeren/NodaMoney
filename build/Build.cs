@@ -82,7 +82,7 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .EnableNoBuild()
                 .EnableNoRestore()
-                .When(InvokedTargets.Contains(Coverage), s => s
+                .When(ExecutingTargets.Contains(Coverage), s => s
                     .EnableCollectCoverage()
                     .SetCoverletOutput(CoverageFile)
                     .SetCoverletOutputFormat(CoverletOutputFormat.opencover)));
