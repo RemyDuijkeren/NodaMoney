@@ -1,15 +1,11 @@
-#---------------------------------#
+##---------------------------------#
 #      general configuration      #
 #---------------------------------#
-version: '{build}-{branch}'
 image: Visual Studio 2019
 branches:
   except:
     - gh-pages
 
-#---------------------------------#
-#    environment configuration    #
-#---------------------------------#
 environment:
   COVERALLS_REPO_TOKEN:
     secure: Pn67B/ELnBY8YWJUBE4s4oIx98wS5NRLTOrP7AP/EiuU2l9brndSCF2cPL6+JUBe
@@ -19,15 +15,14 @@ environment:
 #---------------------------------#
 #       build configuration       #
 #---------------------------------#
-configuration: Release
-
-nuget:
-  disable_publish_on_pr: true
- 
 build_script:
   - ps: .\build.ps1 --target Publish
  
 test: off
+
+artifacts:
+  - path: artifacts/coverage.xml
+  - path: artifacts/*.nupkg
 
 #---------------------------------#
 #     deployment configuration    #
@@ -42,8 +37,3 @@ deploy:
   on:
     branch: master
     appveyor_repo_tag: true
-
-#---------------------------------#
-#         notifications           #
-#---------------------------------#
-notifications:

@@ -17,9 +17,12 @@ using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.CoverallsNet.CoverallsNetTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.GitHub.GitHubTasks;
+using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
+[AppVeyor(AppVeyorImage.VisualStudioLatest, InvokedTargets = new [] { nameof(Publish) })]
 class Build : NukeBuild
 {
     public static int Main () => Execute<Build>(x => x.Compile);
