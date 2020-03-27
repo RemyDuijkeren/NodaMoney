@@ -106,9 +106,10 @@ class Build : NukeBuild
 
     Target NuGetPush => _ => _
         .DependsOn(Pack)
+        .OnlyWhenStatic(() => AppVeyor.PullRequestNumber == 0) // if build not started by PR
+        .OnlyWhenStatic(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
         .Requires(() => NuGetApiKey)
         .Requires(() => AppVeyor)
-        .OnlyWhenStatic(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
         .Executes(() =>
         {
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
@@ -121,6 +122,7 @@ class Build : NukeBuild
 
     Target Coverage => _ => _
         .DependsOn(Test)
+        .OnlyWhenStatic(() => AppVeyor.PullRequestNumber == 0) // if build not started by PR
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
         {
