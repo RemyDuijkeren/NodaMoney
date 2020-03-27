@@ -1,18 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Project>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
   <PropertyGroup>
     <Company>DynamicHands B.V.</Company>
     <Copyright>Copyright Remy van Duijkeren</Copyright>
     <Authors>Remy van Duijkeren</Authors>
     <NeutralLanguage>en</NeutralLanguage>
-    <PackageReleaseNotes>See https://github.com/remyvd/NodaMoney/releases/</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/remyvd/NodaMoney/releases/ </PackageReleaseNotes>
+    <PackageIcon>logo_nodamoney.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png</PackageIconUrl>
     <PackageProjectUrl>http://www.nodamoney.org/</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/remyvd/NodaMoney/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/remyvd/NodaMoney</RepositoryUrl>
-    <Version>1.0.4-improve-serializ0001</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.4.0</FileVersion>
-    <InformationalVersion>1.0.4-improve-serializing.1+4</InformationalVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\logo_nodamoney.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>

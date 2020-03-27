@@ -26,9 +26,11 @@ namespace NodaMoney.Tests.MoneyCalculationsSpec
         //[Fact]
         //public void When1_Then()
         //{
-        //    var x = default(Money);
-        //    var c = default(Currency);
-        //    Console.WriteLine();
+        //    Currency x = default;
+        //    Money c = default;
+
+        //    //Console.WriteLine(c);
+        //    //Console.WriteLine(x);
         //}
     }
 }

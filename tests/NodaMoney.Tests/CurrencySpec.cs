@@ -428,7 +428,7 @@ namespace NodaMoney.Tests.CurrencySpec
         }
     }
 
-    public class GiveIWantToUseALotOfCurrencies
+    public class GivenIWantToUseALotOfCurrencies
     {
         [Fact]
         public void WhenCreatingOneMillion_ThenItShouldBeWithinFourSeconds()
@@ -465,7 +465,7 @@ namespace NodaMoney.Tests.CurrencySpec
     public class GivenIWantToDeconstructCurrency
     {
         [Fact]
-        public void WhenDeconstructing_ThenShouldSucceed()
+        public void WhenDeConstructing_ThenShouldSucceed()
         {
             var currency = Currency.FromCode("EUR");
 

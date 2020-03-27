@@ -1,5 +1,7 @@
+next-version: 1.0
+assembly-versioning-scheme: MajorMinor
+assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{env:APPVEYOR_BUILD_NUMBER ?? 0}'
 mode: ContinuousDelivery
-next-version: 1.0.0
 branches: {}
 ignore:
   sha: []

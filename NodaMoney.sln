@@ -1,13 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C8B3C22E-2C66-43E1-B1C3-71E7A384B2C2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		appveyor.yml = appveyor.yml
-		build.cake = build.cake
 		src\CustomDictionary.xml = src\CustomDictionary.xml
 		src\Directory.build.props = src\Directory.build.props
 		README.md = README.md
@@ -18,6 +17,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodaMoney.Serialization.AspNet", "src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj", "{6BBD36B9-D035-4A5D-8770-CC7E30B636A6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodaMoney.Tests", "tests\NodaMoney.Tests\NodaMoney.Tests.csproj", "{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{324D342A-2588-4422-AFB1-FA0359EE825D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +39,8 @@ Global
 		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{324D342A-2588-4422-AFB1-FA0359EE825D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324D342A-2588-4422-AFB1-FA0359EE825D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

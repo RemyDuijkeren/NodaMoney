@@ -11,7 +11,7 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/r/remyvd/NodaMoney)
+[![Coverage Status](https://coveralls.io/repos/github/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/github/remyvd/NodaMoney?branch=master)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 

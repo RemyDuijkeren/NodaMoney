@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.MoneySpec
 {
-    public class GivenIWantMoneyImpliciet
+    public class GivenIWantMoneyImplicit
     {
         private readonly decimal _decimalValue = 1234.567m;
 
@@ -162,14 +162,19 @@ namespace NodaMoney.Tests.MoneySpec
             money.Amount.Should().Be(800m);
         }
 
-        [Fact]
-        public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
+        [Theory]
+        [InlineData(0.03, 0.03)]
+        [InlineData(0.3333333333333333, 0.33)]
+        [InlineData(251426433.75935, 251426433.76)]
+        [InlineData(7922816251426433.7593543950335, 7922816251426433.76)]
+        [InlineData(79228162514264337593543.950335, 79228162514264337593543.95)]
+        [InlineData(0.0079228162514264337593543950335, 0.01)]
+        public void WhenValueIsDecimal_ThenCreatingShouldSucceed(decimal input, decimal expected)
         {
-            const decimal decimalValue = 900;
-            var money = new Money(decimalValue, _euro);
+            var money = new Money(input, _euro);
 
             money.Currency.Should().Be(_euro);
-            money.Amount.Should().Be(900m);
+            money.Amount.Should().Be(expected);
         }
     }
 
@@ -288,7 +293,7 @@ namespace NodaMoney.Tests.MoneySpec
         }
 
         [Fact]
-        public void WhenUnknownIsoCurrencySymbol_ThenThrowEception()
+        public void WhenUnknownIsoCurrencySymbol_ThenThrowException()
         {
             Action action = () => new Money(123.25M, "XYZ");
 
@@ -385,110 +390,10 @@ namespace NodaMoney.Tests.MoneySpec
         }
     }
 
-    public class GivenIWantToConvertDoubleToDecimal
-    {
-        private readonly Currency _euro = Currency.FromCode("EUR");
-
-        private readonly ITestOutputHelper _output;
-
-        public GivenIWantToConvertDoubleToDecimal(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
-        [Fact]
-        public void WhenValueIsNormalValue_ThenCreatingShouldSucceed()
-        {
-            decimal value = 251426433.75935m;
-            double value1 = 251426433.75935;
-            decimal value2 = new decimal(value1);
-            decimal value3 = (decimal)value1;
-            decimal value4 = decimal.Parse(value1.ToString());
-
-            string result0 = value.ToString(CultureInfo.InvariantCulture);
-            string result1 = value1.ToString(CultureInfo.InvariantCulture);
-            string result2 = value2.ToString(CultureInfo.InvariantCulture);
-            string result3 = value3.ToString(CultureInfo.InvariantCulture);
-            string result4 = value4.ToString(CultureInfo.InvariantCulture);
-
-            _output.WriteLine(result0);
-            _output.WriteLine(result1);
-            _output.WriteLine(result2);
-            _output.WriteLine(result3);
-            _output.WriteLine(result4);
-        }
-
-        [Fact]
-        public void WhenValueIsBigValue_ThenCreatingShouldSucceed()
-        {
-            decimal value = 7922816251426433.7593543950335m;
-            double value1 = 7922816251426433.7593543950335;
-            decimal value2 = new Decimal(value1);
-            decimal value3 = (decimal)value1;
-            //decimal value4 = Decimal.Parse(value1.ToString());
-
-            string result0 = value.ToString(CultureInfo.InvariantCulture);
-            string result1 = value1.ToString(CultureInfo.InvariantCulture);
-            string result2 = value2.ToString(CultureInfo.InvariantCulture);
-            string result3 = value3.ToString(CultureInfo.InvariantCulture);
-            //string result4 = value4.ToString(CultureInfo.InvariantCulture);
-
-            _output.WriteLine(result0);
-            _output.WriteLine(result1);
-            _output.WriteLine(result2);
-            _output.WriteLine(result3);
-            //_output.WriteLine(result4);
-        }
-
-        [Fact]
-        public void WhenValueIsVeryBigValue_ThenCreatingShouldSucceed()
-        {
-            decimal value = 79228162514264337593543.950335m;
-            double value1 = 79228162514264337593543.950335;
-            decimal value2 = new Decimal(value1);
-            decimal value3 = (decimal)value1;
-            //decimal value4 = Decimal.Parse(value1.ToString());
-
-            string result0 = value.ToString(CultureInfo.InvariantCulture);
-            string result1 = value1.ToString(CultureInfo.InvariantCulture);
-            string result2 = value2.ToString(CultureInfo.InvariantCulture);
-            string result3 = value3.ToString(CultureInfo.InvariantCulture);
-            //string result4 = value4.ToString(CultureInfo.InvariantCulture);
-
-            _output.WriteLine(result0);
-            _output.WriteLine(result1);
-            _output.WriteLine(result2);
-            _output.WriteLine(result3);
-            //_output.WriteLine(result4);
-        }
-
-        [Fact]
-        public void WhenValueIsVerySmall_ThenCreatingShouldSucceed()
-        {
-            decimal value = 0.0079228162514264337593543950335m;
-            double value1 = 0.0079228162514264337593543950335;
-            decimal value2 = new Decimal(value1);
-            decimal value3 = (decimal)value1;
-            decimal value4 = Decimal.Parse(value1.ToString());
-
-            string result0 = value.ToString(CultureInfo.InvariantCulture);
-            string result1 = value1.ToString(CultureInfo.InvariantCulture);
-            string result2 = value2.ToString(CultureInfo.InvariantCulture);
-            string result3 = value3.ToString(CultureInfo.InvariantCulture);
-            string result4 = value4.ToString(CultureInfo.InvariantCulture);
-
-            _output.WriteLine(result0);
-            _output.WriteLine(result1);
-            _output.WriteLine(result2);
-            _output.WriteLine(result3);
-            _output.WriteLine(result4);
-        }
-    }
-
     public class GivenIWantToDeconstructMoney
     {
         [Fact]
-        public void WhenDeconstructing_ThenShouldSucceed()
+        public void WhenDeConstructing_ThenShouldSucceed()
         {
             var money = new Money(10m, "EUR");
 
