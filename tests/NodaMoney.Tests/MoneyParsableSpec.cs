@@ -1,13 +1,12 @@
 using System;
 using System.Globalization;
-using System.Threading;
-
 using FluentAssertions;
-using Xunit;
 using NodaMoney.Tests.Helpers;
+using Xunit;
 
 namespace NodaMoney.Tests.MoneyParsableSpec
 {
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToParseImplicitCurrency
     {
         [Fact, UseCulture("nl-BE")]
@@ -117,6 +116,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToParseExplicitCurrency
     {
         [Fact, UseCulture("nl-NL")]
@@ -217,6 +217,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToParseNegativeMoney
     {
         [Fact, UseCulture("en-US")]
@@ -274,6 +275,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToParseMoneyWithMoreDecimalPossibleForCurrency
     {
         [Fact, UseCulture("ja-JP")]
@@ -293,6 +295,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToTryParseImplicitCurrency
     {
         [Fact, UseCulture("nl-BE")]
@@ -397,6 +400,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToTryParseExplicitCurrency
     {
         [Fact, UseCulture("nl-NL")]

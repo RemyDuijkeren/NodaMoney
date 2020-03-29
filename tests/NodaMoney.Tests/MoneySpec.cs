@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using FluentAssertions;
-using Xunit;
 using NodaMoney.Tests.Helpers;
-
-using Xunit.Abstractions;
+using Xunit;
 
 namespace NodaMoney.Tests.MoneySpec
 {

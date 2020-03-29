@@ -1,10 +1,11 @@
-﻿using System;
+﻿#if !NETCOREAPP
+ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Web.Script.Serialization;
 
-namespace NodaMoney.Serialization.AspNet
+namespace NodaMoney.Serialization
 {
     /// <summary>Provides a custom Money converter for the JavaScriptSerializer in ASP.NET.</summary>
     /// <code>
@@ -63,3 +64,4 @@ namespace NodaMoney.Serialization.AspNet
         }
     }
 }
+#endif

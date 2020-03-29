@@ -4,7 +4,7 @@ using FluentAssertions;
 using Xunit;
 using NodaMoney.Extensions;
 
-namespace NodaMoney.Tests.Extensions
+namespace NodaMoney.Tests.Extensions.MoneyExtensionsSafeDivideSpec
 {
     public class GivenIWantToSafelyDivideMoney
     {

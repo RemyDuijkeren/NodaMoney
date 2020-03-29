@@ -1,9 +1,11 @@
 ﻿using System;
 using FluentAssertions;
 using Xunit;
+using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.CurrencyBuilderSpec
 {
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToCreateCustomCurrency
     {
         [Fact]
@@ -151,6 +153,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToUnregisterCurrency
     {
         [Fact]
@@ -225,6 +228,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToReplaceIsoCurrencyWithOwnVersion
     {
         [Fact]

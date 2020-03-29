@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using FluentAssertions;
 using Xunit;
 using NodaMoney.Tests.Helpers;
@@ -220,6 +219,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToConvertExchangeRateToString
     {
         ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
@@ -237,6 +237,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToParseACurrencyPair
     {
         [Fact, UseCulture("en-US")]
@@ -304,6 +305,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantToTryParseACurrencyPair
     {
         [Fact, UseCulture("en-US")]

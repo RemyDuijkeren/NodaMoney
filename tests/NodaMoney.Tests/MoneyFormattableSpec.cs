@@ -7,6 +7,7 @@ using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyFormattableSpec
 {
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantMoneyAsString
     {
         private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));
@@ -134,6 +135,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantMoneyAsStringWithCurrencySymbol
     {
         private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));
@@ -230,6 +232,7 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
         }
     }
 
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantMoneyAsStringWithCurrencyCode
     {
         private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));
@@ -325,7 +328,8 @@ namespace NodaMoney.Tests.MoneyFormattableSpec
             _dinar.ToString("I4").Should().Be("BHD 765.4320");
         }
     }
-
+    
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantMoneyAsStringWithEnglishCurrencyName
     {
         private Money _yen = new Money(765.4321m, Currency.FromCode("JPY"));

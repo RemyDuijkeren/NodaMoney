@@ -1,0 +1,11 @@
+29/3 Baseline
+
+|         Method |     Mean |   Error |  StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|--------------- |---------:|--------:|--------:|-------:|------:|------:|----------:|
+| CreateCurrency | 611.6 ns | 5.56 ns | 5.20 ns | 0.1354 |     - |     - |     429 B |
+|    CreateMoney | 725.9 ns | 3.37 ns | 2.99 ns | 0.1354 |     - |     - |     429 B |
+
+|                     Method |     Mean |   Error |  StdDev |       Gen 0 |     Gen 1 |     Gen 2 | Allocated |
+|--------------------------- |---------:|--------:|--------:|------------:|----------:|----------:|----------:|
+| CreatingOneMillionCurrency | 660.3 ms | 3.74 ms | 3.50 ms | 137000.0000 | 1000.0000 | 1000.0000 | 458.38 MB |
+|    CreatingOneMillionMoney | 787.5 ms | 8.06 ms | 7.54 ms | 137000.0000 | 1000.0000 | 1000.0000 | 473.63 MB |

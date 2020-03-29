@@ -9,13 +9,13 @@ namespace NodaMoney.Tests.Helpers
 {
     public class RenderSpecs
     {
-        [Fact(Skip="x")]
+        // [Fact]
         public void Rendering()
         {
             Render("", Console.Out);
         }
 
-        [Fact]
+        // [Fact]
         public void RenderAllSpecs()
         {
             using (var stream = File.Open(@"Specs.txt", FileMode.Create))

@@ -6,11 +6,10 @@ using System.Xml.Serialization;
 using FluentAssertions;
 using Xunit;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 
-namespace NodaMoney.Tests.Serialization
+namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
 {
     public class GivenIWantToDeserializeMoneyWithJsonNetSerializer
     {

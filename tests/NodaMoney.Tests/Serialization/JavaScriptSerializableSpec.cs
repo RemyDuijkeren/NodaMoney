@@ -1,12 +1,13 @@
-﻿using System;
+﻿#if !NETCOREAPP
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Web.Script.Serialization;
 using FluentAssertions;
-using NodaMoney.Serialization.AspNet;
+using NodaMoney.Serialization;
 using Xunit;
 
-namespace NodaMoney.Tests.Serialization.AspNet
+namespace NodaMoney.Tests.Serialization.JavaScriptSerializableSpec
 {
     public class GivenIWantToSerializeMoneyWithJavaScriptSerializer
     {
@@ -142,3 +143,4 @@ namespace NodaMoney.Tests.Serialization.AspNet
         }
     }
 }
+#endif
