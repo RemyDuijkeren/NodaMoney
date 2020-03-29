@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,8 +136,7 @@ namespace NodaMoney
                 ["ISO-4217::BSD"] = new Currency("BSD", "044", 2, "Bahamian dollar", "$"),
                 ["ISO-4217::BTN"] = new Currency("BTN", "064", 2, "Bhutanese ngultrum", "Nu."),
                 ["ISO-4217::BWP"] = new Currency("BWP", "072", 2, "Botswana pula", "P"),
-                ["ISO-4217::BYR"] = new Currency("BYR", "974", 0, "Belarusian ruble", "Br", validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
-                ["ISO-4217::BYN"] = new Currency("BYN", "974", 0, "Belarusian ruble", "Br", validFrom: new DateTime(2006, 06, 01)),
+                ["ISO-4217::BYN"] = new Currency("BYN", "933", 2, "Belarusian ruble", "Br", validFrom: new DateTime(2006, 06, 01)),
                 ["ISO-4217::BZD"] = new Currency("BZD", "084", 2, "Belize dollar", "BZ$"),
                 ["ISO-4217::CAD"] = new Currency("CAD", "124", 2, "Canadian dollar", "$"),
                 ["ISO-4217::CDF"] = new Currency("CDF", "976", 2, "Congolese franc", "FC"),
@@ -152,7 +151,7 @@ namespace NodaMoney
                 ["ISO-4217::CRC"] = new Currency("CRC", "188", 2, "Costa Rican colon", "₡"),
                 ["ISO-4217::CUC"] = new Currency("CUC", "931", 2, "Cuban convertible peso", "CUC$"), // $ or CUC
                 ["ISO-4217::CUP"] = new Currency("CUP", "192", 2, "Cuban peso", "$"), // or ₱ (obsolete?)
-                ["ISO-4217::CVE"] = new Currency("CVE", "132", 0, "Cape Verde escudo", "$"),
+                ["ISO-4217::CVE"] = new Currency("CVE", "132", 2, "Cape Verde escudo", "$"),
                 ["ISO-4217::CZK"] = new Currency("CZK", "203", 2, "Czech koruna", "Kč"),
                 ["ISO-4217::DJF"] = new Currency("DJF", "262", 0, "Djiboutian franc", "Fdj"),
                 ["ISO-4217::DKK"] = new Currency("DKK", "208", 2, "Danish krone", "kr."),
@@ -181,7 +180,7 @@ namespace NodaMoney
                 ["ISO-4217::ILS"] = new Currency("ILS", "376", 2, "Israeli new shekel", "₪"),
                 ["ISO-4217::INR"] = new Currency("INR", "356", 2, "Indian rupee", "₹"),
                 ["ISO-4217::IQD"] = new Currency("IQD", "368", 3, "Iraqi dinar", "د.ع"),
-                ["ISO-4217::IRR"] = new Currency("IRR", "364", 0, "Iranian rial", "ريال"),
+                ["ISO-4217::IRR"] = new Currency("IRR", "364", 2, "Iranian rial", "ريال"),
                 ["ISO-4217::ISK"] = new Currency("ISK", "352", 0, "Icelandic króna", "kr"),
                 ["ISO-4217::JMD"] = new Currency("JMD", "388", 2, "Jamaican dollar", "J$"), // or $
                 ["ISO-4217::JOD"] = new Currency("JOD", "400", 3, "Jordanian dinar", "د.ا.‏"),
@@ -190,13 +189,13 @@ namespace NodaMoney
                 ["ISO-4217::KGS"] = new Currency("KGS", "417", 2, "Kyrgyzstani som", "сом"),
                 ["ISO-4217::KHR"] = new Currency("KHR", "116", 2, "Cambodian riel", "៛"),
                 ["ISO-4217::KMF"] = new Currency("KMF", "174", 0, "Comorian Franc", "CF"), // COMOROS (THE)
-                ["ISO-4217::KPW"] = new Currency("KPW", "408", 0, "North Korean won", "₩"),
+                ["ISO-4217::KPW"] = new Currency("KPW", "408", 2, "North Korean won", "₩"),
                 ["ISO-4217::KRW"] = new Currency("KRW", "410", 0, "South Korean won", "₩"),
                 ["ISO-4217::KWD"] = new Currency("KWD", "414", 3, "Kuwaiti dinar", "د.ك"), // or K.D.
                 ["ISO-4217::KYD"] = new Currency("KYD", "136", 2, "Cayman Islands dollar", "$"),
                 ["ISO-4217::KZT"] = new Currency("KZT", "398", 2, "Kazakhstani tenge", "₸"),
-                ["ISO-4217::LAK"] = new Currency("LAK", "418", 0, "Lao Kip", "₭"), // or ₭N,  LAO PEOPLE’S DEMOCRATIC REPUBLIC(THE), ISO says minor unit=2 but wiki syas Historically, one kip was divided into 100 att (ອັດ).
-                ["ISO-4217::LBP"] = new Currency("LBP", "422", 0, "Lebanese pound", "ل.ل"),
+                ["ISO-4217::LAK"] = new Currency("LAK", "418", 2, "Lao Kip", "₭"), // or ₭N,  LAO PEOPLE’S DEMOCRATIC REPUBLIC(THE), ISO says minor unit=2 but wiki says Historically, one kip was divided into 100 att (ອັດ).
+                ["ISO-4217::LBP"] = new Currency("LBP", "422", 2, "Lebanese pound", "ل.ل"),
                 ["ISO-4217::LKR"] = new Currency("LKR", "144", 2, "Sri Lankan rupee", "Rs"), // or රු
                 ["ISO-4217::LRD"] = new Currency("LRD", "430", 2, "Liberian dollar", "$"), // or L$, LD$
                 ["ISO-4217::LSL"] = new Currency("LSL", "426", 2, "Lesotho loti", "L"), // L or M (pl.)
@@ -204,8 +203,8 @@ namespace NodaMoney
                 ["ISO-4217::MAD"] = new Currency("MAD", "504", 2, "Moroccan dirham", "د.م."),
                 ["ISO-4217::MDL"] = new Currency("MDL", "498", 2, "Moldovan leu", "L"),
                 ["ISO-4217::MGA"] = new Currency("MGA", "969", Z07, "Malagasy ariary", "Ar"),  // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
-                ["ISO-4217::MKD"] = new Currency("MKD", "807", 0, "Macedonian denar", "ден"),
-                ["ISO-4217::MMK"] = new Currency("MMK", "104", 0, "Myanma kyat", "K"),
+                ["ISO-4217::MKD"] = new Currency("MKD", "807", 2, "Macedonian denar", "ден"),
+                ["ISO-4217::MMK"] = new Currency("MMK", "104", 2, "Myanma kyat", "K"),
                 ["ISO-4217::MNT"] = new Currency("MNT", "496", 2, "Mongolian tugrik", "₮"),
                 ["ISO-4217::MOP"] = new Currency("MOP", "446", 2, "Macanese pataca", "MOP$"),
                 ["ISO-4217::MRU"] = new Currency("MRU", "929", Z07, "Mauritanian ouguiya", "UM", validFrom: new DateTime(2018, 01, 01)), // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
@@ -242,7 +241,7 @@ namespace NodaMoney
                 ["ISO-4217::SEK"] = new Currency("SEK", "752", 2, "Swedish krona/kronor", "kr"),
                 ["ISO-4217::SGD"] = new Currency("SGD", "702", 2, "Singapore dollar", "S$"), // or $
                 ["ISO-4217::SHP"] = new Currency("SHP", "654", 2, "Saint Helena pound", "£"),
-                ["ISO-4217::SLL"] = new Currency("SLL", "694", 0, "Sierra Leonean leone", "Le"),
+                ["ISO-4217::SLL"] = new Currency("SLL", "694", 2, "Sierra Leonean leone", "Le"),
                 ["ISO-4217::SOS"] = new Currency("SOS", "706", 2, "Somali shilling", "S"), // or Sh.So.
                 ["ISO-4217::SRD"] = new Currency("SRD", "968", 2, "Surinamese dollar", "$"),
                 ["ISO-4217::SSP"] = new Currency("SSP", "728", 2, "South Sudanese pound", "£"), // not sure about symbol...
@@ -259,7 +258,7 @@ namespace NodaMoney
                 ["ISO-4217::TWD"] = new Currency("TWD", "901", 2, "New Taiwan dollar", "NT$"), // or $
                 ["ISO-4217::TZS"] = new Currency("TZS", "834", 2, "Tanzanian shilling", "x/y"), // or TSh
                 ["ISO-4217::UAH"] = new Currency("UAH", "980", 2, "Ukrainian hryvnia", "₴"),
-                ["ISO-4217::UGX"] = new Currency("UGX", "800", 2, "Ugandan shilling", "USh"),
+                ["ISO-4217::UGX"] = new Currency("UGX", "800", 0, "Ugandan shilling", "USh"),
                 ["ISO-4217::USD"] = new Currency("USD", "840", 2, "United States dollar", "$"), // or US$
                 ["ISO-4217::USN"] = new Currency("USN", "997", 2, "United States dollar (next day) (funds code)", "$"),
                 ["ISO-4217::UYI"] = new Currency("UYI", "940", 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.GenericCurrencySign), // List two
@@ -292,9 +291,10 @@ namespace NodaMoney
                 ["ISO-4217::ZWL"] = new Currency("ZWL", "932", 2, "Zimbabwean dollar", "$"),
                 ["ISO-4217::STN"] = new Currency("STN", "930", 2, "Dobra", "Db", validFrom: new DateTime(2018, 1, 1)), // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
                 ["ISO-4217::STD"] = new Currency("STD", "678", 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
-                ["ISO-4217::UYW"] = new Currency("UYW", "927", 2, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
+                ["ISO-4217::UYW"] = new Currency("UYW", "927", 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
 
                 // Historic ISO-4217 currencies (list three)
+                ["ISO-4217-HISTORIC::BYR"] = new Currency("BYR", "974", 0, "Belarusian ruble", "Br", "ISO-4217-HISTORIC", validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
                 ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
                 ["ISO-4217-HISTORIC::ESA"] = new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
@@ -404,7 +404,7 @@ namespace NodaMoney
                 ["ISO-4217-HISTORIC::NFD"] = new Currency("NFD", string.Empty, 2, "Newfoundland dollar", "$", "ISO-4217-HISTORIC", new DateTime(1949, 12, 31), new DateTime(1865, 1, 1)), // replaced by CAD
 
                 // Added historic currencies of amendment 164 (research dates and other info)
-                ["ISO-4217-HISTORIC::VNC"] = new Currency("VNC", "704", 2, "Dong", "$", "ISO-4217-HISTORIC"), // VIETNAM
+                ["ISO-4217-HISTORIC::VNC"] = new Currency("VNC", "704", 2, "Old Dong", "₫", "ISO-4217-HISTORIC", new DateTime(2014, 1, 1)), // VIETNAM, replaced by VND with same number! Formerly, it was subdivided into 10 hào.
                 ["ISO-4217-HISTORIC::GNS"] = new Currency("GNS", "324", NotApplicable, "Guinean Syli", Currency.GenericCurrencySign, "ISO-4217-HISTORIC", new DateTime(1970, 12, 31)), // GUINEA, replaced by GNE?
                 ["ISO-4217-HISTORIC::UGW"] = new Currency("UGW", "800", NotApplicable, "Old Shilling", Currency.GenericCurrencySign, "ISO-4217-HISTORIC", new DateTime(2017, 9, 22)), // UGANDA
                 ["ISO-4217-HISTORIC::RHD"] = new Currency("RHD", "716", NotApplicable, "Rhodesian Dollar", Currency.GenericCurrencySign, "ISO-4217-HISTORIC", new DateTime(2017, 9, 22)), // SOUTHERN RHODESIA
