@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Linq;
 namespace NodaMoney
 {
     /// <summary>Represent the central thread-safe registry for currencies.</summary>
-    internal class CurrencyRegistry
+    internal static class CurrencyRegistry
     {
         /// <summary>
         /// The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
@@ -23,12 +23,19 @@ namespace NodaMoney
         private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
         private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default });
 
+        // static CurrencyRegistry()
+        // {
+        //    int concurrency = Environment.ProcessorCount * 4;
+        //    Currencies = new ConcurrentDictionary<string, Currency>(concurrency, InitializeIsoCurrencies(), StringComparer.OrdinalIgnoreCase);
+        //    Namespaces = new ConcurrentDictionary<string, byte>(concurrency, new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default }, StringComparer.OrdinalIgnoreCase);
+        // }
+
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
-        public bool TryGet(string code, out Currency currency)
+        public static bool TryGet(string code, out Currency currency)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
@@ -53,7 +60,7 @@ namespace NodaMoney
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        public bool TryGet(string code, string @namespace, out Currency currency)
+        public static bool TryGet(string code, string @namespace, out Currency currency)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
@@ -70,7 +77,7 @@ namespace NodaMoney
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if the <see cref="Currency"/> with the specified code is added; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        public bool TryAdd(string code, string @namespace, Currency currency)
+        public static bool TryAdd(string code, string @namespace, Currency currency)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
@@ -88,7 +95,7 @@ namespace NodaMoney
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if the <see cref="Currency"/> with the specified code is removed; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        public bool TryRemove(string code, string @namespace, out Currency currency)
+        public static bool TryRemove(string code, string @namespace, out Currency currency)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
@@ -101,7 +108,7 @@ namespace NodaMoney
 
         /// <summary>Get all registered currencies.</summary>
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
-        public IEnumerable<Currency> GetAllCurrencies()
+        public static IEnumerable<Currency> GetAllCurrencies()
         {
             return Currencies.Values.AsEnumerable();
         }

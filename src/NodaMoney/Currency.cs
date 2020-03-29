@@ -4,12 +4,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("NodaMoney.Tests")]
+[assembly: InternalsVisibleTo("NodaMoney.Tests")]
 [assembly: CLSCompliant(true)]
 
 namespace NodaMoney
@@ -19,15 +20,11 @@ namespace NodaMoney
     [Serializable]
     [DebuggerDisplay("{Code}")]
     [TypeConverter(typeof(CurrencyTypeConverter))]
-    public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
+    public readonly struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
         /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
         public const string GenericCurrencySign = "¤";
-
-        /// <summary>A singleton instance of the currencies registry.</summary>
-        [NonSerialized]
-        internal static CurrencyRegistry Registry = new CurrencyRegistry();
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
@@ -134,11 +131,11 @@ namespace NodaMoney
 
         /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
-        public DateTime? ValidFrom { get; internal set; }
+        public DateTime? ValidFrom { get; }
 
         /// <summary>Gets the date when the currency is valid to.</summary>
         /// <value>The to date when the currency is valid.</value>
-        public DateTime? ValidTo { get; internal set; }
+        public DateTime? ValidTo { get; }
 
         /// <summary>Gets the major currency unit.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
@@ -179,7 +176,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
         public static Currency FromCode(string code)
         {
-            if (!Registry.TryGet(code, out Currency currency))
+            if (!CurrencyRegistry.TryGet(code, out Currency currency))
                 throw new ArgumentException($"{code} is an unknown currency code!");
 
             return currency;
@@ -193,7 +190,7 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown.</exception>
         public static Currency FromCode(string code, string @namespace)
         {
-            if (!Registry.TryGet(code, @namespace, out Currency currency))
+            if (!CurrencyRegistry.TryGet(code, @namespace, out Currency currency))
                 throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
 
             return currency;
@@ -250,7 +247,7 @@ namespace NodaMoney
 
         /// <summary>Get all currencies.</summary>
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
-        public static IEnumerable<Currency> GetAllCurrencies() => Registry.GetAllCurrencies();
+        public static IEnumerable<Currency> GetAllCurrencies() => CurrencyRegistry.GetAllCurrencies();
 
         /// <summary>Returns a value indicating whether two specified instances of <see cref="Currency"/> represent the same value.</summary>
         /// <param name="left">The first <see cref="Currency"/> object.</param>
@@ -333,7 +330,7 @@ namespace NodaMoney
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            this = FromCode(reader["Currency"]);
+            Unsafe.AsRef(this) = FromCode(reader["Currency"]);
         }
 
         /// <summary>

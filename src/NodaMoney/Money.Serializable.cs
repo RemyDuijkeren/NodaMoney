@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace NodaMoney
 {
@@ -79,8 +80,10 @@ namespace NodaMoney
             if (reader.MoveToContent() != XmlNodeType.Element)
                 throw new SerializationException("Couldn't find content element with name Money!");
 
-            Amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
-            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(reader["Currency"]);
+            var amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
+            var currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(reader["Currency"]);
+
+            Unsafe.AsRef(this) = new Money(amount, currency);
         }
 
         /// <summary>Converts an object into its XML representation.</summary>

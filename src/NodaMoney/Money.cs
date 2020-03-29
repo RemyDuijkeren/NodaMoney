@@ -12,7 +12,7 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Money : IEquatable<Money>
+    public readonly partial struct Money : IEquatable<Money>
     {
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -220,10 +220,10 @@ namespace NodaMoney
         }
 
         /// <summary>Gets the amount of money.</summary>
-        public decimal Amount { get; private set; }
+        public decimal Amount { get; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-        public Currency Currency { get; private set; }
+        public Currency Currency { get; }
 
         /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>
