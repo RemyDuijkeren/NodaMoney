@@ -20,38 +20,63 @@ namespace NodaMoney
         /// <summary>Used for indication that the number of decimal digits doesn't matter, for example for gold or silver.</summary>
         internal const double NotApplicable = -1;
 
-        private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default });
+        private static Currency[] Currencies;
+        private static readonly Dictionary<string, int> KeyLookup;
+        //private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
+        private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default };
 
-        // static CurrencyRegistry()
-        // {
-        //    int concurrency = Environment.ProcessorCount * 4;
-        //    Currencies = new ConcurrentDictionary<string, Currency>(concurrency, InitializeIsoCurrencies(), StringComparer.OrdinalIgnoreCase);
-        //    Namespaces = new ConcurrentDictionary<string, byte>(concurrency, new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default }, StringComparer.OrdinalIgnoreCase);
-        // }
+        static CurrencyRegistry()
+        {
+            IDictionary<string, Currency> x = InitializeIsoCurrencies();
+            int i = 0;
+            KeyLookup = new Dictionary<string, int>(x.Count);
+            Currencies = new Currency[x.Count];
+            foreach (var keyValuePair in x)
+            {
+                KeyLookup[keyValuePair.Key] = i;
+                Currencies[i] = keyValuePair.Value;
+                i++;
+            }
+        }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
-        public static bool TryGet(string code, out Currency currency)
+        //public static bool TryGet(string code, out Currency currency)
+        //{
+        //    if (string.IsNullOrWhiteSpace(code))
+        //        throw new ArgumentNullException(nameof(code));
+
+        //    var found = new List<Currency>();
+        //    foreach (var ns in Namespaces.Keys)
+        //    {
+        //        // don't use string.Format(), string concat much faster in this case!
+        //        if (Currencies.TryGetValue(ns + "::" + code, out Currency c))
+        //        {
+        //            found.Add(c);
+        //        }
+        //    }
+
+        //    currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
+        //    return !currency.Equals(default);
+        //}
+
+        public static ref Currency Get(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
 
-            var found = new List<Currency>();
             foreach (var ns in Namespaces.Keys)
             {
-                // don't use string.Format(), string concat much faster in this case!
-                if (Currencies.TryGetValue(ns + "::" + code, out Currency c))
+                if (KeyLookup.TryGetValue(ns + "::" + code, out int index))
                 {
-                    found.Add(c);
+                    return ref Currencies[index]; // TODO: If more than one, sort by prio.
                 }
             }
 
-            currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
-            return !currency.Equals(default);
+            throw new InvalidCurrencyException($"Currency {code} is unknown!");
         }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
@@ -60,14 +85,25 @@ namespace NodaMoney
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        public static bool TryGet(string code, string @namespace, out Currency currency)
+        //public static bool TryGet(string code, string @namespace, out Currency currency)
+        //{
+        //    if (string.IsNullOrWhiteSpace(code))
+        //        throw new ArgumentNullException(nameof(code));
+        //    if (string.IsNullOrWhiteSpace(@namespace))
+        //        throw new ArgumentNullException(nameof(@namespace));
+
+        //    return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
+        //}
+
+        public static ref Currency Get(string code, string @namespace)
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
+            int index = KeyLookup[@namespace + "::" + code];
+            return ref Currencies[index];
         }
 
 #pragma warning disable CA1822 // Member TryAdd does not access instance data and can be marked as static.
@@ -84,8 +120,15 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
+            //Namespaces[@namespace] = default;
+            //return Currencies.TryAdd(@namespace + "::" + code, currency);
+
             Namespaces[@namespace] = default;
-            return Currencies.TryAdd(@namespace + "::" + code, currency);
+            KeyLookup.Add(@namespace + "::" + code, Currencies.Length);
+            Array.Resize(ref Currencies, Currencies.Length + 1);
+            Currencies[Currencies.Length - 1] = currency;
+
+            return true;
         }
 #pragma warning restore CA1822 // Member TryAdd does not access instance data and can be marked as static.
 
@@ -103,14 +146,25 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(@namespace));
 
             // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
-            return Currencies.TryRemove(@namespace + "::" + code, out currency);
+            //return Currencies.TryRemove(@namespace + "::" + code, out currency);
+
+            int index = KeyLookup[@namespace + "::" + code];
+            if (KeyLookup.Remove(@namespace + "::" + code))
+            {
+                currency = Currencies[index];
+                return true;
+            }
+
+            currency = default;
+            return false;
         }
 
         /// <summary>Get all registered currencies.</summary>
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
         public static IEnumerable<Currency> GetAllCurrencies()
         {
-            return Currencies.Values.AsEnumerable();
+            //return Currencies.Values.AsEnumerable();
+            return Currencies.AsEnumerable();
         }
 
         private static IDictionary<string, Currency> InitializeIsoCurrencies()

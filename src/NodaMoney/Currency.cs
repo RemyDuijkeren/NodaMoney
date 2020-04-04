@@ -32,7 +32,7 @@ namespace NodaMoney
         /// <remarks>Used in serialization.</remarks>
         internal Currency(string code, string @namespace = "ISO-4217")
         {
-            Currency c = FromCode(code, @namespace);
+            ref Currency c = ref FromCode(code, @namespace);
 
             Code = c.Code;
             Number = c.Number;
@@ -84,7 +84,7 @@ namespace NodaMoney
 
         /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
         /// <value>The Currency that represents the country/region used by the current thread.</value>
-        public static Currency CurrentCurrency
+        public static ref Currency CurrentCurrency
         {
             get
             {
@@ -92,7 +92,7 @@ namespace NodaMoney
                 if (currentRegion.Name == "IV")
                     throw new InvalidCurrencyException("Current culture is Invariant, from which no specific currency can be extracted!");
 
-                return FromRegion(currentRegion);
+                return ref FromRegion(currentRegion);
             }
         }
 
@@ -174,12 +174,14 @@ namespace NodaMoney
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
-        public static Currency FromCode(string code)
+        public static ref Currency FromCode(string code)
         {
-            if (!CurrencyRegistry.TryGet(code, out Currency currency))
-                throw new ArgumentException($"{code} is an unknown currency code!");
+            //if (!CurrencyRegistry.TryGet(code, out Currency currency))
+            //    throw new ArgumentException($"{code} is an unknown currency code!");
 
-            return currency;
+            //return currency;
+
+            return ref CurrencyRegistry.Get(code);
         }
 
         /// <summary>Create an instance of the <see cref="Currency"/> of the given code and namespace.</summary>
@@ -188,12 +190,14 @@ namespace NodaMoney
         /// <returns>An instance of the type <see cref="Currency"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
         /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown.</exception>
-        public static Currency FromCode(string code, string @namespace)
+        public static ref Currency FromCode(string code, string @namespace)
         {
-            if (!CurrencyRegistry.TryGet(code, @namespace, out Currency currency))
-                throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
+            //if (!CurrencyRegistry.TryGet(code, @namespace, out Currency currency))
+            //    throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
 
-            return currency;
+            //return currency;
+
+            return ref CurrencyRegistry.Get(code, @namespace);
         }
 
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified <see cref="RegionInfo"/>.</summary>
@@ -201,12 +205,12 @@ namespace NodaMoney
         /// <returns>The <see cref="Currency"/> instance used within the specified <see cref="RegionInfo"/>.</returns>
         /// <exception cref="ArgumentNullException">The value of 'region' cannot be null.</exception>
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
-        public static Currency FromRegion(RegionInfo region)
+        public static ref Currency FromRegion(RegionInfo region)
         {
             if (region == null)
                 throw new ArgumentNullException(nameof(region));
 
-            return FromCode(region.ISOCurrencySymbol, "ISO-4217");
+            return ref FromCode(region.ISOCurrencySymbol, "ISO-4217");
         }
 
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified <see cref="CultureInfo"/>.</summary>
@@ -217,14 +221,14 @@ namespace NodaMoney
         /// Culture is a neutral culture, from which no region information can be extracted -or-
         /// The 'code' is an unknown ISO 4217 currency code.
         /// </exception>
-        public static Currency FromCulture(CultureInfo culture)
+        public static ref Currency FromCulture(CultureInfo culture)
         {
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
             if (culture.IsNeutralCulture)
                 throw new ArgumentException("Culture {0} is a neutral culture, from which no region information can be extracted!", culture.Name);
 
-            return FromRegion(culture.Name);
+            return ref FromRegion(culture.Name);
         }
 
         /// <summary>Creates an instance of the <see cref="Currency"/> used within the specified name of the region or culture.</summary>
@@ -237,12 +241,12 @@ namespace NodaMoney
         /// </param>
         /// <returns>The <see cref="Currency"/> instance used within the specified region.</returns>
         /// <exception cref="ArgumentNullException">The value of 'name' cannot be null.</exception>
-        public static Currency FromRegion(string name)
+        public static ref Currency FromRegion(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return FromRegion(new RegionInfo(name));
+            return ref FromRegion(new RegionInfo(name));
         }
 
         /// <summary>Get all currencies.</summary>
@@ -306,7 +310,7 @@ namespace NodaMoney
         /// <summary>Check a value indication whether currency is valid on a given date.</summary>
         /// <param name="date">The date on which the Currency should be valid.</param>
         /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
-        public bool IsValidOn(DateTime date)
+        public bool IsValidOn(in DateTime date)
         {
             return
                 (!ValidFrom.HasValue || ValidFrom <= date) &&

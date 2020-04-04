@@ -294,7 +294,7 @@ namespace NodaMoney.Tests.MoneySpec
         {
             Action action = () => new Money(123.25M, "XYZ");
 
-            action.Should().Throw<ArgumentException>();
+            action.Should().Throw<InvalidCurrencyException>();
         }
     }
 

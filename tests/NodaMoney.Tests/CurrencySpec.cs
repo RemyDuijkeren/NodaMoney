@@ -107,7 +107,7 @@ namespace NodaMoney.Tests.CurrencySpec
         {
             Action action = () => Currency.FromCode("AAA");
 
-            action.Should().Throw<ArgumentException>();
+            action.Should().Throw<InvalidCurrencyException>();
         }
 
         [Fact]

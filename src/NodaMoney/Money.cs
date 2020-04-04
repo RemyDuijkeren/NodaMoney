@@ -82,7 +82,7 @@ namespace NodaMoney
         public Money(decimal amount, Currency currency, MidpointRounding rounding)
             : this()
         {
-            Currency = currency;
+            this.Currency = currency;
             Amount = Round(amount, currency, rounding);
         }
 
@@ -270,7 +270,7 @@ namespace NodaMoney
             currency = Currency;
         }
 
-        private static decimal Round(decimal amount, Currency currency, MidpointRounding rounding)
+        private static decimal Round(in decimal amount, in Currency currency, in MidpointRounding rounding)
         {
             switch (currency.DecimalDigits)
             {
@@ -291,7 +291,7 @@ namespace NodaMoney
             "CA1305:SpecifyIFormatProvider",
             MessageId = "System.String.Format(System.String,System.Object[])",
             Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
-        private static void AssertIsSameCurrency(Money left, Money right)
+        private static void AssertIsSameCurrency(in Money left, in Money right)
         {
             if (left.Currency != right.Currency)
                 throw new InvalidCurrencyException(left.Currency, right.Currency);
