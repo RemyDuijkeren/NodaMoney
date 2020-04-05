@@ -26,20 +26,18 @@ namespace NodaMoney
         private const int ISO4217_HISTORIC = 1;
 
         private static Currency[] Currencies;
-        private static readonly Dictionary<string, int> KeyLookup;
+        private static readonly Dictionary<int, short> KeyLookup;
         private static string[] Namespaces = { "ISO-4217", "ISO-4217-HISTORIC" };
-        // private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
-        // private static readonly Dictionary<string, byte> Namespaces = new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default };
 
         static CurrencyRegistry()
         {
             IDictionary<string, Currency> x = InitializeIsoCurrencies();
-            int i = 0;
-            KeyLookup = new Dictionary<string, int>(x.Count);
+            short i = 0;
+            KeyLookup = new Dictionary<int, short>(x.Count);
             Currencies = new Currency[x.Count];
             foreach (var keyValuePair in x)
             {
-                KeyLookup[keyValuePair.Key] = i;
+                KeyLookup[keyValuePair.Value.GetHashCode()] = i;
                 Currencies[i] = keyValuePair.Value;
                 i++;
             }
@@ -74,9 +72,10 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
 
-            foreach (var ns in Namespaces)
+            for (byte i = 0; i < Namespaces.Length; i++)
             {
-                if (KeyLookup.TryGetValue(ns + "::" + code, out int index))
+                int hash = Currency.GetHashCode(code, i);
+                if (KeyLookup.TryGetValue(hash, out short index))
                 {
                     return ref Currencies[index]; // TODO: If more than one, sort by prio.
                 }
@@ -108,7 +107,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            int index = KeyLookup[@namespace + "::" + code];
+            int index = KeyLookup[Currency.GetHashCode(code, FindNamespaceIndex(@namespace))];
             return ref Currencies[index];
         }
 
@@ -135,7 +134,7 @@ namespace NodaMoney
                 Namespaces[Namespaces.Length - 1] = @namespace;
             }
 
-            KeyLookup.Add(@namespace + "::" + code, Currencies.Length);
+            KeyLookup.Add(Currency.GetHashCode(code, FindNamespaceIndex(@namespace)), (short)Currencies.Length);
             Array.Resize(ref Currencies, Currencies.Length + 1);
             Currencies[Currencies.Length - 1] = currency;
 
@@ -159,8 +158,8 @@ namespace NodaMoney
             // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
             //return Currencies.TryRemove(@namespace + "::" + code, out currency);
 
-            int index = KeyLookup[@namespace + "::" + code];
-            if (KeyLookup.Remove(@namespace + "::" + code))
+            int index = KeyLookup[Currency.GetHashCode(code, FindNamespaceIndex(@namespace))];
+            if (KeyLookup.Remove(Currency.GetHashCode(code, FindNamespaceIndex(@namespace))))
             {
                 currency = Currencies[index];
                 return true;
@@ -178,12 +177,12 @@ namespace NodaMoney
             return Currencies.AsEnumerable();
         }
 
-        internal static string GetNamespace(byte index)
+        internal static string GetNamespace(in byte index)
         {
             return Namespaces[index];
         }
 
-        internal static byte FindNamespaceIndex(string @namespace)
+        internal static byte FindNamespaceIndex(in string @namespace)
         {
             for (var i = 0; i < Namespaces.Length; i++)
             {
@@ -191,7 +190,7 @@ namespace NodaMoney
                     return (byte)i;
             }
 
-            throw new System.ArgumentOutOfRangeException(nameof(@namespace), $"Namespace {@namespace} is not found!");
+            throw new ArgumentOutOfRangeException(nameof(@namespace), $"Namespace {@namespace} is not found!");
         }
 
         private static IDictionary<string, Currency> InitializeIsoCurrencies()

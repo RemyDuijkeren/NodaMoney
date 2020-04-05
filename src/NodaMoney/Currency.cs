@@ -314,8 +314,20 @@ namespace NodaMoney
                 int hash = 17;
 #pragma warning disable CA1307 // Specify StringComparison
                 hash = (hash * 23) + (Code?.GetHashCode() ?? 0);
-                return (hash * 23) + (Namespace?.GetHashCode() ?? 0);
 #pragma warning restore CA1307 // Specify StringComparison
+                return (hash * 23) + _namespace.GetHashCode();
+            }
+        }
+
+        internal static int GetHashCode(in string code, in byte @namespace)
+        {
+            unchecked
+            {
+                int hash = 17;
+#pragma warning disable CA1307 // Specify StringComparison
+                hash = (hash * 23) + (code?.GetHashCode() ?? 0);
+#pragma warning restore CA1307 // Specify StringComparison
+                return (hash * 23) + @namespace.GetHashCode();
             }
         }
 

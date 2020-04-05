@@ -13,10 +13,10 @@ Intel Core i5-4690K CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 |-------------- |---------:|--------:|--------:|-------:|------:|------:|----------:|
 |      FromCode | 611.5 ns | 7.71 ns | 7.21 ns | 0.1354 |     - |     - |     429 B |
 #### after
-|        Method |      Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|-------------- |----------:|---------:|---------:|-------:|------:|------:|----------:|
-|      FromCode | 100.48 ns | 0.513 ns | 0.455 ns | 0.0126 |     - |     - |      40 B |
-| FromCodeBeRef |  84.08 ns | 0.473 ns | 0.395 ns | 0.0126 |     - |     - |      40 B |
+|        Method |     Mean |    Error |   StdDev | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|-------------- |---------:|---------:|---------:|------:|------:|------:|----------:|
+|      FromCode | 42.42 ns | 0.176 ns | 0.165 ns |     - |     - |     - |         - |
+| FromCodeBeRef | 26.27 ns | 0.112 ns | 0.105 ns |     - |     - |     - |         - |
 
 ## InitializingMoney
 #### before
@@ -25,26 +25,20 @@ Intel Core i5-4690K CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 |            ExplicitCurrencyAsString | 716.46 ns | 2.483 ns | 2.322 ns |  1.00 | 0.1354 |     - |     - |     429 B |
 | ExplicitCurrencyAsStringAndRounding | 721.48 ns | 5.749 ns | 5.378 ns |  1.01 | 0.1354 |     - |     - |     429 B |
 |            ExplicitCurrencyFromCode | 721.87 ns | 5.770 ns | 5.397 ns |  1.01 | 0.1354 |     - |     - |     429 B |
-|                    HelperMethodEuro | 762.76 ns | 3.969 ns | 3.315 ns |  1.06 | 0.1354 |     - |     - |     429 B |
-|                HelperMethodUSDollar | 756.89 ns | 3.969 ns | 3.713 ns |  1.06 | 0.1354 |     - |     - |     429 B |
-|           HelperMethodPoundSterling | 754.99 ns | 5.144 ns | 4.812 ns |  1.05 | 0.1354 |     - |     - |     429 B |
-|                     HelperMethodYen | 742.89 ns | 4.413 ns | 4.128 ns |  1.04 | 0.1354 |     - |     - |     429 B |
+|                        HelperMethod | 762.76 ns | 3.969 ns | 3.315 ns |  1.06 | 0.1354 |     - |     - |     429 B |
 |       ImplicitCurrencyByConstructor | 263.90 ns | 1.635 ns | 1.529 ns |  0.37 | 0.0124 |     - |     - |      40 B |
 |           ImplicitCurrencyByCasting | 286.37 ns | 1.883 ns | 1.761 ns |  0.40 | 0.0124 |     - |     - |      40 B |
 |                         Deconstruct |  63.05 ns | 0.328 ns | 0.307 ns |  0.09 |      - |     - |     - |         - |
 #### after
-|                              Method |      Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|------------------------------------ |----------:|---------:|---------:|------:|-------:|------:|------:|----------:|
-|            ExplicitCurrencyAsString | 161.53 ns | 0.419 ns | 0.350 ns |  1.00 | 0.0126 |     - |     - |      40 B |
-| ExplicitCurrencyAsStringAndRounding | 162.13 ns | 0.908 ns | 0.849 ns |  1.00 | 0.0126 |     - |     - |      40 B |
-|            ExplicitCurrencyFromCode | 160.02 ns | 1.427 ns | 1.335 ns |  0.99 | 0.0126 |     - |     - |      40 B |
-|                    HelperMethodEuro | 192.43 ns | 1.105 ns | 1.034 ns |  1.19 | 0.0126 |     - |     - |      40 B |
-|                HelperMethodUSDollar | 185.27 ns | 1.072 ns | 1.003 ns |  1.15 | 0.0126 |     - |     - |      40 B |
-|           HelperMethodPoundSterling | 185.70 ns | 0.796 ns | 0.665 ns |  1.15 | 0.0126 |     - |     - |      40 B |
-|                     HelperMethodYen | 191.52 ns | 0.631 ns | 0.492 ns |  1.19 | 0.0126 |     - |     - |      40 B |
-|       ImplicitCurrencyByConstructor | 178.10 ns | 0.837 ns | 0.783 ns |  1.10 | 0.0126 |     - |     - |      40 B |
-|           ImplicitCurrencyByCasting | 203.81 ns | 0.851 ns | 0.796 ns |  1.26 | 0.0126 |     - |     - |      40 B |
-|                         Deconstruct |  50.74 ns | 0.135 ns | 0.126 ns |  0.31 |      - |     - |     - |         - |
+|                              Method |      Mean |    Error |   StdDev | Ratio | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------------------ |----------:|---------:|---------:|------:|------:|------:|------:|----------:|
+|            ExplicitCurrencyAsString | 102.11 ns | 0.467 ns | 0.437 ns |  1.00 |     - |     - |     - |         - |
+| ExplicitCurrencyAsStringAndRounding | 101.62 ns | 0.747 ns | 0.699 ns |  1.00 |     - |     - |     - |         - |
+|            ExplicitCurrencyFromCode | 101.75 ns | 0.305 ns | 0.254 ns |  1.00 |     - |     - |     - |         - |
+|                        HelperMethod | 134.17 ns | 0.639 ns | 0.598 ns |  1.31 |     - |     - |     - |         - |
+|       ImplicitCurrencyByConstructor | 126.04 ns | 0.607 ns | 0.568 ns |  1.23 |     - |     - |     - |         - |
+|           ImplicitCurrencyByCasting | 155.17 ns | 0.992 ns | 0.928 ns |  1.52 |     - |     - |     - |         - |
+|                         Deconstruct |  50.74 ns | 0.253 ns | 0.237 ns |  0.50 |     - |     - |     - |         - |
 
 
 ## MoneyOperations
@@ -61,13 +55,13 @@ Intel Core i5-4690K CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 #### after
 |                   Method |      Mean |    Error |   StdDev | Gen 0 | Gen 1 | Gen 2 | Allocated |
 |------------------------- |----------:|---------:|---------:|------:|------:|------:|----------:|
-|                 Addition | 527.26 ns | 2.747 ns | 2.569 ns |     - |     - |     - |         - |
-|              Subtraction | 527.67 ns | 2.006 ns | 1.876 ns |     - |     - |     - |         - |
-|      CompareSameCurrency |  77.80 ns | 0.548 ns | 0.513 ns |     - |     - |     - |         - |
-| CompareDifferentCurrency | 135.25 ns | 0.599 ns | 0.561 ns |     - |     - |     - |         - |
-|            CompareAmount | 453.81 ns | 1.592 ns | 1.489 ns |     - |     - |     - |         - |
-|                Increment | 737.24 ns | 7.947 ns | 7.434 ns |     - |     - |     - |         - |
-|                Decrement | 730.24 ns | 1.991 ns | 1.862 ns |     - |     - |     - |         - |
+|                 Addition | 529.47 ns | 2.835 ns | 2.652 ns |     - |     - |     - |         - |
+|              Subtraction | 525.55 ns | 2.973 ns | 2.781 ns |     - |     - |     - |         - |
+|      CompareSameCurrency |  77.35 ns | 0.288 ns | 0.270 ns |     - |     - |     - |         - |
+| CompareDifferentCurrency | 134.72 ns | 1.245 ns | 1.164 ns |     - |     - |     - |         - |
+|            CompareAmount | 454.07 ns | 2.597 ns | 2.429 ns |     - |     - |     - |         - |
+|                Increment | 726.17 ns | 3.534 ns | 2.951 ns |     - |     - |     - |         - |
+|                Decrement | 729.73 ns | 4.295 ns | 3.807 ns |     - |     - |     - |         - |
 
 ## MoneyFormatting
 #### before
@@ -80,10 +74,10 @@ Intel Core i5-4690K CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 #### after
 |             Method |     Mean |   Error |  StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |------------------- |---------:|--------:|--------:|-------:|------:|------:|----------:|
-|           Implicit | 299.3 ns | 0.95 ns | 0.84 ns | 0.0520 |     - |     - |     164 B |
-| ImplicitWithFormat | 315.3 ns | 1.90 ns | 1.77 ns | 0.0520 |     - |     - |     164 B |
-|           Explicit | 369.0 ns | 1.57 ns | 1.47 ns | 0.0939 |     - |     - |     296 B |
-| ExplicitWithFormat | 388.7 ns | 1.30 ns | 1.16 ns | 0.0939 |     - |     - |     296 B |
+|           Implicit | 298.0 ns | 2.30 ns | 2.15 ns | 0.0520 |     - |     - |     164 B |
+| ImplicitWithFormat | 318.9 ns | 3.14 ns | 2.93 ns | 0.0520 |     - |     - |     164 B |
+|           Explicit | 369.6 ns | 1.17 ns | 1.10 ns | 0.0939 |     - |     - |     296 B |
+| ExplicitWithFormat | 387.8 ns | 2.46 ns | 2.18 ns | 0.0939 |     - |     - |     296 B |
 
 ## MoneyParsing
 #### before
@@ -96,10 +90,10 @@ Intel Core i5-4690K CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 #### after
 |      Method |       Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |------------ |-----------:|---------:|---------:|-------:|------:|------:|----------:|
-|    Implicit | 1,206.5 ns |  3.29 ns |  2.74 ns | 0.1869 |     - |     - |     593 B |
-| ImplicitTry | 1,215.7 ns | 10.76 ns | 10.06 ns | 0.1869 |     - |     - |     593 B |
-|    Explicit |   693.0 ns |  4.83 ns |  4.52 ns | 0.1383 |     - |     - |     437 B |
-| ExplicitTry |   677.4 ns |  3.34 ns |  3.13 ns | 0.1383 |     - |     - |     437 B |
+|    Implicit | 1,102.5 ns |  5.30 ns |  4.96 ns | 0.1621 |     - |     - |     513 B |
+| ImplicitTry | 1,090.2 ns | 13.29 ns | 12.43 ns | 0.1621 |     - |     - |     513 B |
+|    Explicit |   620.4 ns |  3.04 ns |  2.84 ns | 0.1259 |     - |     - |     397 B |
+| ExplicitTry |   614.0 ns |  5.72 ns |  5.35 ns | 0.1259 |     - |     - |     397 B |
 
 ## AddingCustomCurrency
 #### before
@@ -128,7 +122,7 @@ Benchmarks with issues:
 | CreatingOneMillionCurrency | 665.3 ms | 3.53 ms | 3.30 ms | 137000.0000 | 1000.0000 | 1000.0000 | 458.37 MB |
 |    CreatingOneMillionMoney | 788.5 ms | 6.80 ms | 6.36 ms | 137000.0000 | 1000.0000 | 1000.0000 | 473.63 MB |
 #### after
-|                     Method |     Mean |   Error |  StdDev |      Gen 0 |    Gen 1 |    Gen 2 | Allocated |
-|--------------------------- |---------:|--------:|--------:|-----------:|---------:|---------:|----------:|
-| CreatingOneMillionCurrency | 119.5 ms | 0.84 ms | 0.79 ms | 13000.0000 | 400.0000 | 400.0000 |  76.35 MB |
-|    CreatingOneMillionMoney | 193.4 ms | 1.20 ms | 1.12 ms | 13000.0000 | 333.3333 | 333.3333 |  91.61 MB |
+|                     Method |      Mean |    Error |   StdDev |    Gen 0 |    Gen 1 |    Gen 2 | Allocated |
+|--------------------------- |----------:|---------:|---------:|---------:|---------:|---------:|----------:|
+| CreatingOneMillionCurrency |  64.14 ms | 1.284 ms | 1.201 ms | 875.0000 | 875.0000 | 875.0000 |  38.15 MB |
+|    CreatingOneMillionMoney | 134.87 ms | 0.454 ms | 0.402 ms | 750.0000 | 750.0000 | 750.0000 |  53.41 MB |
