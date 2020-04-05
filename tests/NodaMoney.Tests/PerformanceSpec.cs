@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.PerformanceSpec
 
     public class GivenIWantToUseALotOfCurrencies
     {
-        [Fact(Skip = "")]
+        [Fact]
         public void StartBenchmark()
         {
             var initalizingCurrencyReport = BenchmarkRunner.Run<InitalizingCurrencyBenchmarks>();
@@ -244,17 +244,17 @@ namespace NodaMoney.Tests.PerformanceSpec
             _builder.Build();
         }
 
-        [Benchmark]
-        public void Register()
-        {
-            _builder.Register();
-        }
+        //[Benchmark]
+        //public void Register()
+        //{
+        //    _builder.Register();
+        //}
 
-        [Benchmark]
-        public void Unregister()
-        {
-            var dollar = CurrencyBuilder.Unregister("USD", "ISO-4217");
-        }
+        //[Benchmark]
+        //public void Unregister()
+        //{
+        //    var dollar = CurrencyBuilder.Unregister("USD", "ISO-4217");
+        //}
 
         [Benchmark]
         public void Replace()
