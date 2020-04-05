@@ -26,6 +26,9 @@ namespace NodaMoney
         /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
         public const string GenericCurrencySign = "¤";
 
+        private readonly byte _decimalDigits;
+        private readonly byte _namespace;
+
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
         /// <param name="namespace">The namepspace.</param>
@@ -36,10 +39,10 @@ namespace NodaMoney
 
             Code = c.Code;
             Number = c.Number;
-            DecimalDigits = c.DecimalDigits;
+            _decimalDigits = c._decimalDigits;
             EnglishName = c.EnglishName;
             Symbol = c.Symbol;
-            Namespace = c.Namespace;
+            _namespace = c._namespace;
             ValidTo = c.ValidTo;
             ValidFrom = c.ValidFrom;
         }
@@ -55,22 +58,22 @@ namespace NodaMoney
         /// <param name="validFrom">The valid from the specified date.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable.</exception>
-        internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
+        internal Currency(string code, short number, byte decimalDigits, string englishName, string symbol, byte @namespace = 0, DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
-            if (string.IsNullOrWhiteSpace(@namespace))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
-            if (decimalDigits != CurrencyRegistry.NotApplicable && (decimalDigits < 0 || decimalDigits > 28))
-                throw new ArgumentOutOfRangeException(nameof(decimalDigits), "DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable!");
+            //if (string.IsNullOrWhiteSpace(@namespace))
+            //    throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
+            if (decimalDigits != CurrencyRegistry.B_Z07 && decimalDigits != CurrencyRegistry.B_NA && (decimalDigits < 0 || decimalDigits > 28))
+                throw new ArgumentOutOfRangeException(nameof(decimalDigits), $"For code {code} DecimalDigits must greater or equal to zero and smaller or equal to 28, or 255 if not applicable!");
 
             Code = code;
-            Number = number ?? string.Empty;
-            DecimalDigits = decimalDigits;
+            Number = number;
+            _decimalDigits = decimalDigits;
             EnglishName = englishName ?? string.Empty;
             Symbol = symbol ?? GenericCurrencySign;
-            Namespace = @namespace;
+            _namespace = @namespace;
             ValidTo = validTo;
             ValidFrom = validFrom;
         }
@@ -102,14 +105,23 @@ namespace NodaMoney
         /// <summary>Gets the english name of the currency.</summary>
         public string EnglishName { get; }
 
-        /// <summary>Gets the three-character (ISO-4217) currency code.</summary>
+        /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>
         public string Code { get; }
 
-        /// <summary>Gets the numeric (ISO-4217) currency number.</summary>
-        public string Number { get; }
+        /// <summary>Gets the (ISO-4217) number of the currency.</summary>
+        public short Number { get; }
+
+        /// <summary>Gets the (ISO-4217) three-digit code number of the currency.</summary>
+        public string IsoNumber => Number.ToString("D3", CultureInfo.InvariantCulture);
 
         /// <summary>Gets the namespace of the currency, like ISO-4217.</summary>
-        public string Namespace { get; }
+        public string Namespace
+        {
+            get
+            {
+                return CurrencyRegistry.GetNamespace(_namespace);
+            }
+        }
 
         /// <summary>Gets the number of digits after the decimal separator.</summary>
         /// <remarks>
@@ -127,7 +139,18 @@ namespace NodaMoney
         /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7.
         /// </para>
         /// </remarks>
-        public double DecimalDigits { get; }
+        public double DecimalDigits
+        {
+            get
+            {
+                return _decimalDigits switch
+                {
+                    255 => CurrencyRegistry.NotApplicable,
+                    254 => CurrencyRegistry.Z07,
+                    _ => _decimalDigits,
+                };
+            }
+        }
 
         /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
@@ -298,12 +321,12 @@ namespace NodaMoney
 
         /// <summary>Deconstructs the current instance into its components.</summary>
         /// <param name="code">The code.</param>
-        /// <param name="number">The number.</param>
+        /// <param name="isoNumber">The ISO4127 three-digit code number.</param>
         /// <param name="symbol">The currency symbol.</param>
-        public void Deconstruct(out string code, out string number, out string symbol)
+        public void Deconstruct(out string code, out string isoNumber, out string symbol)
         {
             code = Code;
-            number = Number;
+            isoNumber = IsoNumber;
             symbol = Symbol;
         }
 

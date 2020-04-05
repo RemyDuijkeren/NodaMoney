@@ -77,7 +77,7 @@ namespace NodaMoney.Tests.Iso4127Spec
             var notDefinedCurrencies =
                 Currency.GetAllCurrencies()
                 .Where(c => c.IsValidOn(_iso4127List.PublishDate))
-                .Where(c => !string.IsNullOrEmpty(c.Number))
+                .Where(c => !string.IsNullOrEmpty(c.IsoNumber))
                 .Where(c => !_iso4127List.currencies.Any(a => a.Currency == c.Code))
                 .ToList();
 
@@ -116,7 +116,7 @@ namespace NodaMoney.Tests.Iso4127Spec
                     continue;
                 var a = found.First();
                 // ignore casing (for now)
-                if (!string.Equals(c.Number, a.CurrencyNumber, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(c.IsoNumber, a.CurrencyNumber, StringComparison.InvariantCultureIgnoreCase))
                 {
                     differences.Add($"{c.Code}: expected {a.CurrencyNumber} but found {c.Number}");
                 }

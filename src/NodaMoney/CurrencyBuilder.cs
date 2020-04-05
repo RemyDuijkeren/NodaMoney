@@ -7,7 +7,8 @@ namespace NodaMoney
     /// <summary>Defines a custom currency that is new or based on another currency.</summary>
     public class CurrencyBuilder
     {
-        private double _decimalDigits;
+        private byte _decimalDigits;
+        private short _number;
 
         /// <summary>Initializes a new instance of the <see cref="CurrencyBuilder"/> class.</summary>
         /// <param name="code">The code of the currency, normally the three-character ISO 4217 currency code.</param>
@@ -31,8 +32,19 @@ namespace NodaMoney
         public string Symbol { get; set; }
 
         /// <summary>Gets or sets the numeric ISO 4217 currency code.</summary>
-        // ReSharper disable once InconsistentNaming
-        public string ISONumber { get; set; }
+        public string IsoNumber
+        {
+            get => _number.ToString("D3");
+            set
+            {
+                if (!short.TryParse(value, out short result))
+                {
+                    throw new ArgumentException("Not a number!");
+                }
+
+                _number = result;
+            }
+        }
 
         /// <summary>Gets or sets the number of digits after the decimal separator.</summary>
         public double DecimalDigits
@@ -40,10 +52,11 @@ namespace NodaMoney
             get => _decimalDigits;
             set
             {
+                // TODO: Fix constraints
                 if (value != CurrencyRegistry.NotApplicable && (value < 0 || value > 28))
                     throw new ArgumentOutOfRangeException(nameof(value), "DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable!");
 
-                _decimalDigits = value;
+                _decimalDigits = (byte)value;
             }
         }
 
@@ -98,7 +111,8 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(Symbol))
                 Symbol = Currency.GenericCurrencySign;
 
-            return new Currency(Code, ISONumber, DecimalDigits, EnglishName, Symbol, Namespace, ValidTo, ValidFrom);
+            var nsIndex = CurrencyRegistry.FindNamespaceIndex(Namespace);
+            return new Currency(Code, _number, _decimalDigits, EnglishName, Symbol, nsIndex, ValidTo, ValidFrom);
         }
 
         /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
@@ -142,7 +156,7 @@ namespace NodaMoney
         {
             EnglishName = currency.EnglishName;
             Symbol = currency.Symbol;
-            ISONumber = currency.Number;
+            IsoNumber = currency.IsoNumber;
             DecimalDigits = currency.DecimalDigits;
             ValidFrom = currency.ValidFrom;
             ValidTo = currency.ValidTo;

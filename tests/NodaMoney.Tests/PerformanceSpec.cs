@@ -6,19 +6,25 @@ using System.Globalization;
 
 namespace NodaMoney.Tests.PerformanceSpec
 {
-
-    public class GivenIWantToUseALotOfCurrencies
+    public class GivenIWantToBenchmark
     {
         [Fact]
-        public void StartBenchmark()
+        public void ExecuteBenchmark()
         {
             var initalizingCurrencyReport = BenchmarkRunner.Run<InitalizingCurrencyBenchmarks>();
             var initalizingMoneyReport = BenchmarkRunner.Run<InitalizingMoneyBenchmarks>();
             var moneyOperationsReport = BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
             var moneyFormattingReport = BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
             var moneyParsingReport = BenchmarkRunner.Run<MoneyParsingBenchmarks>();
-            var addingCustomCurrencyReport = BenchmarkRunner.Run<AddingCustomCurrencyBenchmarks>();
+            //var addingCustomCurrencyReport = BenchmarkRunner.Run<AddingCustomCurrencyBenchmarks>();
             var highLoadBenchReport = BenchmarkRunner.Run<HighLoadBenchmarks>();
+        }
+
+        [Fact]
+        public void SizeOfString()
+        {
+            int size = System.Text.ASCIIEncoding.Unicode.GetByteCount("123");
+            Console.WriteLine($"size is {size}");
         }
     }
 
@@ -63,27 +69,9 @@ namespace NodaMoney.Tests.PerformanceSpec
         }
 
         [Benchmark]
-        public void HelperMethodEuro()
+        public void HelperMethod()
         {
             var money = Money.Euro(6.54m);
-        }
-
-        [Benchmark]
-        public void HelperMethodUSDollar()
-        {
-            var money = Money.USDollar(6.54m);
-        }
-
-        [Benchmark]
-        public void HelperMethodPoundSterling()
-        {
-            var money = Money.PoundSterling(6.54m);
-        }
-
-        [Benchmark]
-        public void HelperMethodYen()
-        {
-            var money = Money.Yen(6.54m);
         }
 
         [Benchmark]
@@ -222,7 +210,7 @@ namespace NodaMoney.Tests.PerformanceSpec
         {
             EnglishName = "Bitcoin",
             Symbol = "฿",
-            ISONumber = "123", // iso number
+            IsoNumber = "123", // iso number
             DecimalDigits = 8
         };
 
@@ -233,7 +221,7 @@ namespace NodaMoney.Tests.PerformanceSpec
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 8
             };
         }
@@ -244,19 +232,19 @@ namespace NodaMoney.Tests.PerformanceSpec
             _builder.Build();
         }
 
-        //[Benchmark]
-        //public void Register()
-        //{
-        //    _builder.Register();
-        //}
+        // [Benchmark]
+        public void Register()
+        {
+            _builder.Register();
+        }
 
-        //[Benchmark]
-        //public void Unregister()
-        //{
-        //    var dollar = CurrencyBuilder.Unregister("USD", "ISO-4217");
-        //}
+        // [Benchmark]
+        public void Unregister()
+        {
+            var dollar = CurrencyBuilder.Unregister("USD", "ISO-4217");
+        }
 
-        [Benchmark]
+        // [Benchmark]
         public void Replace()
         {
             Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");

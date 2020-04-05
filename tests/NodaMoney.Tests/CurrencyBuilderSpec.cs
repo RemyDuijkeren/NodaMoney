@@ -26,7 +26,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 8
             };
 
@@ -44,7 +44,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 8
             };
 
@@ -62,7 +62,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 8
             };
 
@@ -85,7 +85,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             builder.Namespace.Should().Be("virtual");
             builder.EnglishName.Should().Be(euro.EnglishName);
             builder.Symbol.Should().Be(euro.Symbol);
-            builder.ISONumber.Should().Be(euro.Number);
+            builder.IsoNumber.Should().Be(euro.IsoNumber);
             builder.DecimalDigits.Should().Be(euro.DecimalDigits);
             builder.ValidFrom.Should().Be(euro.ValidFrom);
             builder.ValidTo.Should().Be(euro.ValidTo);
@@ -143,7 +143,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             {
                 EnglishName = "Bitcoin",
                 //Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 8,
             }.Register();
 
@@ -174,7 +174,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             {
                 EnglishName = "Xyz",
                 Symbol = "฿",
-                ISONumber = "123", // iso number
+                IsoNumber = "123", // iso number
                 DecimalDigits = 4
             };
 
