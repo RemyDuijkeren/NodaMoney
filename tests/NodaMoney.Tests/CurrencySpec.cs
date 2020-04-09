@@ -488,4 +488,31 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.IsValidOn(new DateTime(2018, 8, 20)).Should().BeTrue();
         }
     }
+
+    public class GivenIWantDefaultCurrency
+    {
+        [Fact]
+        public void WhenCreatingDefault_ThenItShouldBeNoCurrency()
+        {
+            var NoCurrency = Currency.FromCode("XXX");
+
+            Currency currency = default;
+
+            currency.Should().NotBeNull();
+            currency.Should().Be(NoCurrency);
+            currency.Symbol.Should().Be(NoCurrency.Symbol);
+            currency.Code.Should().Be(NoCurrency.Code);
+            currency.EnglishName.Should().Be(NoCurrency.EnglishName);
+            currency.IsValid.Should().Be(NoCurrency.IsValid);
+        }
+
+        [Fact]
+        public void WhenNoCurrency_ThenItShouldBeEqualToDefault()
+        {
+            Currency noCurrency = Currency.FromCode("XXX");
+
+            noCurrency.Should().NotBeNull();
+            noCurrency.Should().Be(default(Currency));
+        }
+    }
 }

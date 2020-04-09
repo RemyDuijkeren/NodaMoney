@@ -28,6 +28,12 @@ namespace NodaMoney
 
         private readonly byte _decimalDigits;
         private readonly byte _namespace;
+        private readonly short _number;
+        private readonly string _code;
+        private readonly string _symbol;
+        private readonly string _englishName;
+        private readonly DateTime? _validFrom;
+        private readonly DateTime? _validTo;
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
@@ -37,14 +43,14 @@ namespace NodaMoney
         {
             ref Currency c = ref FromCode(code, @namespace);
 
-            Code = c.Code;
-            Number = c.Number;
+            _code = c.Code;
+            _number = c.Number;
             _decimalDigits = c._decimalDigits;
-            EnglishName = c.EnglishName;
-            Symbol = c.Symbol;
+            _englishName = c.EnglishName;
+            _symbol = c.Symbol;
             _namespace = c._namespace;
-            ValidTo = c.ValidTo;
-            ValidFrom = c.ValidFrom;
+            _validTo = c.ValidTo;
+            _validFrom = c.ValidFrom;
         }
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
@@ -63,19 +69,19 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
-            //if (string.IsNullOrWhiteSpace(@namespace))
+            //TODO: if (string.IsNullOrWhiteSpace(@namespace))
             //    throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
             if (decimalDigits != CurrencyRegistry.B_Z07 && decimalDigits != CurrencyRegistry.B_NA && (decimalDigits < 0 || decimalDigits > 28))
                 throw new ArgumentOutOfRangeException(nameof(decimalDigits), $"For code {code} DecimalDigits must greater or equal to zero and smaller or equal to 28, or 255 if not applicable!");
 
-            Code = code;
-            Number = number;
+            _code = code;
+            _number = number;
             _decimalDigits = decimalDigits;
-            EnglishName = englishName ?? string.Empty;
-            Symbol = symbol ?? GenericCurrencySign;
+            _englishName = englishName ?? string.Empty;
+            _symbol = symbol ?? GenericCurrencySign;
             _namespace = @namespace;
-            ValidTo = validTo;
-            ValidFrom = validFrom;
+            _validTo = validTo;
+            _validFrom = validFrom;
         }
 
 #pragma warning disable CA1801 // Parameter context of method.ctor is never used.
@@ -99,17 +105,53 @@ namespace NodaMoney
             }
         }
 
+        /// <summary>Check if default(currecy) is used. I so, then initialize it to {XXX, 999, No currency}.</summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void IfDefaultThenInitializeToNoCurrency()
+        {
+            if (_code == null)
+                Unsafe.AsRef(this) = FromCode("XXX");
+        }
+
         /// <summary>Gets the currency symbol.</summary>
-        public string Symbol { get; }
+        public string Symbol
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _symbol;
+            }
+        }
 
         /// <summary>Gets the english name of the currency.</summary>
-        public string EnglishName { get; }
+        public string EnglishName
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _englishName;
+            }
+        }
 
         /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>
-        public string Code { get; }
+        public string Code
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _code;
+            }
+        }
 
         /// <summary>Gets the (ISO-4217) number of the currency.</summary>
-        public short Number { get; }
+        public short Number
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _number;
+            }
+        }
 
         /// <summary>Gets the (ISO-4217) three-digit code number of the currency.</summary>
         public string IsoNumber => Number.ToString("D3", CultureInfo.InvariantCulture);
@@ -143,6 +185,7 @@ namespace NodaMoney
         {
             get
             {
+                IfDefaultThenInitializeToNoCurrency();
                 return _decimalDigits switch
                 {
                     255 => CurrencyRegistry.NotApplicable,
@@ -154,11 +197,25 @@ namespace NodaMoney
 
         /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
-        public DateTime? ValidFrom { get; }
+        public DateTime? ValidFrom
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _validFrom;
+            }
+        }
 
         /// <summary>Gets the date when the currency is valid to.</summary>
         /// <value>The to date when the currency is valid.</value>
-        public DateTime? ValidTo { get; }
+        public DateTime? ValidTo
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return _validTo;
+            }
+        }
 
         /// <summary>Gets the major currency unit.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
@@ -169,6 +226,8 @@ namespace NodaMoney
         {
             get
             {
+                IfDefaultThenInitializeToNoCurrency();
+
                 if (DecimalDigits == CurrencyRegistry.NotApplicable)
                     return MajorUnit;
 

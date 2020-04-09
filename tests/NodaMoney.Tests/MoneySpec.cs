@@ -400,4 +400,17 @@ namespace NodaMoney.Tests.MoneySpec
             currency.Should().Be(Currency.FromCode("EUR"));
         }
     }
+
+    public class GivenIWantDefaultMoney
+    {
+        [Fact]
+        public void WhenCreatingDefault_ThenItShouldBeNoCurrency()
+        {
+            Money money = default;
+
+            money.Should().NotBeNull();
+            money.Currency.Should().Be(default(Currency));
+            money.Amount.Should().Be(default(decimal));
+        }
+    }
 }

@@ -48,8 +48,10 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
         {
                 new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
                 new object[] { new Money(765.4321m, Currency.FromCode("EUR")) },
-                new object[] { new Money(765.4321m, Currency.FromCode("USD")) },
-                new object[] { new Money(765.4321m, Currency.FromCode("BHD")) }
+                new object[] { new Money(765.4321m, Currency.FromCode("USD")) }, 
+                new object[] { new Money(765.4321m, Currency.FromCode("BHD")) },
+                new object[] { default(Money) },
+                new object[] { default(Money?) }
         };
 
         [Theory]
