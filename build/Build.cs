@@ -29,7 +29,7 @@ using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
     suffix: null,
     image: AzurePipelinesImage.WindowsLatest,
     AutoGenerate = true,
-    InvokedTargets = new[] { nameof(Test), nameof(Publish), nameof(Benchmark) },
+    InvokedTargets = new[] { nameof(Test), nameof(Publish) },
     NonEntryTargets = new[] { nameof(Restore), nameof(NuGetPush) },
     ExcludedTargets = new[] { nameof(Clean) },
     TriggerBranchesExclude = new[] { "gh-pages" },

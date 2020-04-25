@@ -77,14 +77,3 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd NuGetPush Publish --skip'
-      - job: Benchmark
-        displayName: '📊 Benchmark'
-        dependsOn: [  ]
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: './build.cmd Benchmark --skip'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              artifactName: BenchmarkResults
-              pathtoPublish: 'artifacts/BenchmarkResults'
