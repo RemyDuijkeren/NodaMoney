@@ -30,50 +30,10 @@ stages:
     pool:
       vmImage: 'windows-latest'
     jobs:
-      - job: Compile
-        displayName: '⚙️ Compile'
+      - job: Publish
+        displayName: '🚚 Publish'
         dependsOn: [  ]
         steps:
           - task: CmdLine@2
             inputs:
-              script: './build.cmd Restore Compile --skip'
-      - job: Test
-        displayName: '🚦 Test'
-        dependsOn: [ Compile ]
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: './build.cmd Test --skip'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              artifactName: coverage.xml
-              pathtoPublish: 'artifacts/coverage.xml'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              artifactName: TestResults
-              pathtoPublish: 'artifacts/TestResults'
-      - job: Coverage
-        displayName: '📊 Coverage'
-        dependsOn: [ Test ]
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: './build.cmd Coverage --skip'
-      - job: Pack
-        displayName: '📦 Pack'
-        dependsOn: [ Compile ]
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: './build.cmd Pack --skip'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              artifactName: artifacts
-              pathtoPublish: 'artifacts'
-      - job: Publish
-        displayName: '🚚 Publish'
-        dependsOn: [ Pack, Coverage ]
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: './build.cmd NuGetPush Publish --skip'
+              script: './build.cmd Restore Compile Pack NuGetPush Restore Compile Test Coverage Restore Compile Pack Publish --skip'

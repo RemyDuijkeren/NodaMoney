@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
@@ -29,8 +30,8 @@ using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
     suffix: null,
     image: AzurePipelinesImage.WindowsLatest,
     AutoGenerate = true,
-    InvokedTargets = new[] { nameof(Test), nameof(Publish) },
-    NonEntryTargets = new[] { nameof(Restore), nameof(NuGetPush) },
+    InvokedTargets = new[] { nameof(Publish) },
+    NonEntryTargets = new[] { nameof(Restore), nameof(Compile), nameof(Test), nameof(Pack), nameof(Coverage), nameof(NuGetPush) },
     ExcludedTargets = new[] { nameof(Clean) },
     TriggerBranchesExclude = new[] { "gh-pages" },
     TriggerPathsExclude = new[] { "docs/" , "tools/" }
@@ -108,10 +109,16 @@ partial class Build : NukeBuild
                     .SetCoverletOutput(CoverageFile)
                     .SetCoverletOutputFormat(CoverletOutputFormat.opencover)));
 
-            AzurePipelines?.PublishTestResults(
-                title: AzurePipelines.StageDisplayName,
-                type: AzurePipelinesTestResultsType.XUnit,
-                files: testResults.GlobFiles("*.trx").Select(file => $"{file}").ToArray());
+            //AzurePipelines?.PublishTestResults(
+            //    title: AzurePipelines.StageDisplayName,
+            //    type: AzurePipelinesTestResultsType.XUnit,
+            //    files: testResults.GlobFiles("*.trx").Select(file => $"{file}").ToArray());
+
+            testResults.GlobFiles("*.trx").ForEach(x =>
+                AzurePipelines?.PublishTestResults(
+                    type: AzurePipelinesTestResultsType.XUnit,
+                    title: $"{Path.GetFileNameWithoutExtension(x)} ({AzurePipelines.StageDisplayName})",
+                    files: new string[] { x }));
         });
 
     Target Benchmark => _ => _
