@@ -3,6 +3,7 @@ using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.AppVeyor;
+using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
@@ -11,7 +12,9 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.CoverallsNet;
 using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.Xunit;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
@@ -22,7 +25,17 @@ using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
-class Build : NukeBuild
+[AzurePipelines(
+    suffix: null,
+    image: AzurePipelinesImage.WindowsLatest,
+    AutoGenerate = true,
+    InvokedTargets = new[] { nameof(Test), nameof(Publish), nameof(Benchmark) },
+    NonEntryTargets = new[] { nameof(Restore), nameof(NuGetPush) },
+    ExcludedTargets = new[] { nameof(Clean) },
+    TriggerBranchesExclude = new[] { "gh-pages" },
+    TriggerPathsExclude = new[] { "docs/" , "tools/" }
+    )]
+partial class Build : NukeBuild
 {
     public static int Main () => Execute<Build>(x => x.Compile);
 
@@ -38,7 +51,7 @@ class Build : NukeBuild
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
-    [CI] readonly AppVeyor AppVeyor;
+    [CI] readonly AzurePipelines AzurePipelines;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
@@ -77,17 +90,52 @@ class Build : NukeBuild
     Target Test => _ => _
         .DependsOn(Compile)
         .Produces(CoverageFile)
+        .Produces(ArtifactsDirectory / "TestResults" / "*.trx")
         .Executes(() =>
         {
+            var testResults = ArtifactsDirectory / "TestResults";
+
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
+                .SetFilter("FullyQualifiedName!~PerformanceSpec")
+                .SetLogger("trx")
+                .SetResultsDirectory(testResults)
                 .EnableNoBuild()
                 .EnableNoRestore()
                 .When(ExecutingTargets.Contains(Coverage), s => s
                     .EnableCollectCoverage()
                     .SetCoverletOutput(CoverageFile)
                     .SetCoverletOutputFormat(CoverletOutputFormat.opencover)));
+
+            AzurePipelines?.PublishTestResults(
+                title: AzurePipelines.StageDisplayName,
+                type: AzurePipelinesTestResultsType.XUnit,
+                files: testResults.GlobFiles("*.trx").Select(file => $"{file}").ToArray());
+        });
+
+    Target Benchmark => _ => _
+        .After(Compile)
+        .Produces(ArtifactsDirectory / "BenchmarkResults")
+        .Executes(() =>
+        {
+            // Use test methods to execute the benchmarks (xunit.shadowCopy=false && build=Release)
+            DotNetTest(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration.Release)
+                .SetFilter("FullyQualifiedName~PerformanceSpec")
+                .SetFramework("net48")
+                .When(ExecutingTargets.Contains(Compile) && Configuration == Configuration.Release, s => s
+                    .SetNoBuild(true)
+                    .SetNoRestore(true)));
+
+            TestsDirectory.GlobDirectories("**/BenchmarkDotNet.Artifacts/results").ForEach(d =>
+                    CopyDirectoryRecursively(
+                        source: d,
+                        target: ArtifactsDirectory / "BenchmarkResults",
+                        DirectoryExistsPolicy.Merge,
+                        FileExistsPolicy.OverwriteIfNewer));
+            
         });
 
     Target Pack => _ => _
@@ -106,10 +154,12 @@ class Build : NukeBuild
 
     Target NuGetPush => _ => _
         .DependsOn(Pack)
-        .OnlyWhenStatic(() => AppVeyor.PullRequestNumber == 0) // if build not started by PR
-        .OnlyWhenStatic(() => AppVeyor.RepositoryTag) // if build has started by pushed tag
+        .OnlyWhenStatic(() => GitRepository.IsOnMasterBranch())
+        .OnlyWhenStatic(() => false) // if build has started by pushed tag
+        .OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest)
         .Requires(() => NuGetApiKey)
-        .Requires(() => AppVeyor)
+        .Requires(() => AzurePipelines)
+        .Requires(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
@@ -122,23 +172,23 @@ class Build : NukeBuild
 
     Target Coverage => _ => _
         .DependsOn(Test)
-        .OnlyWhenStatic(() => AppVeyor.PullRequestNumber == 0) // if build not started by PR
+        .OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest) // if build not started by PR
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
         {
-            if (AppVeyor != null)
+            if (AzurePipelines != null)
             {
                 CoverallsNet(s => s
                     .SetRepoToken(CoverallsRepoToken)
                     .EnableOpenCover()
-                    .SetInput(CoverageFile) 
-                    .SetCommitId(AppVeyor.RepositoryCommitSha)
-                    .SetCommitBranch(AppVeyor.RepositoryBranch)
-                    .SetCommitAuthor(AppVeyor.RepositoryCommitAuthor)
-                    .SetCommitEmail(AppVeyor.RepositoryCommitAuthorEmail)
-                    .SetCommitMessage(AppVeyor.RepositoryCommitMessage)
-                    .SetJobId(AppVeyor.BuildNumber)
-                    .SetServiceName(AppVeyor.GetType().Name));
+                    .SetInput(CoverageFile)
+                    .SetCommitId(AzurePipelines.SourceVersion)
+                    .SetCommitBranch(AzurePipelines.SourceBranchName)
+                    .SetCommitAuthor(AzurePipelines.RequestedFor)
+                    .SetCommitEmail(AzurePipelines.RequestedForEmail)
+                    //.SetCommitMessage(AzurePipelines.Sou) // Build.SourceVersionMessage
+                    .SetJobId(int.Parse(AzurePipelines.BuildNumber))
+                    .SetServiceName(AzurePipelines.GetType().Name));                
             }
             else
             {

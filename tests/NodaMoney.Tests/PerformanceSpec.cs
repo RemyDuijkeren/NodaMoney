@@ -4,32 +4,28 @@ using BenchmarkDotNet.Running;
 using System;
 using System.Globalization;
 
-namespace NodaMoney.Tests.PerformanceSpec
+namespace NodaMoney.Tests
 {
-    public class GivenIWantToBenchmark
+    public class PerformanceSpec
     {
+#if RELEASE
         [Fact]
+#endif
         public void ExecuteBenchmark()
         {
-            var initalizingCurrencyReport = BenchmarkRunner.Run<InitalizingCurrencyBenchmarks>();
-            var initalizingMoneyReport = BenchmarkRunner.Run<InitalizingMoneyBenchmarks>();
-            var moneyOperationsReport = BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
-            var moneyFormattingReport = BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
-            var moneyParsingReport = BenchmarkRunner.Run<MoneyParsingBenchmarks>();
+            var initializingCurrencyReport = BenchmarkRunner.Run<InitializingCurrencyBenchmarks>();
+            //var initializingMoneyReport = BenchmarkRunner.Run<InitializingMoneyBenchmarks>();
+            //var moneyOperationsReport = BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
+            //var moneyFormattingReport = BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
+            //var moneyParsingReport = BenchmarkRunner.Run<MoneyParsingBenchmarks>();
             //var addingCustomCurrencyReport = BenchmarkRunner.Run<AddingCustomCurrencyBenchmarks>();
-            var highLoadBenchReport = BenchmarkRunner.Run<HighLoadBenchmarks>();
-        }
-
-        [Fact]
-        public void SizeOfString()
-        {
-            int size = System.Text.ASCIIEncoding.Unicode.GetByteCount("123");
-            Console.WriteLine($"size is {size}");
+            //var highLoadBenchReport = BenchmarkRunner.Run<HighLoadBenchmarks>();
         }
     }
 
+
     [MemoryDiagnoser]
-    public class InitalizingCurrencyBenchmarks
+    public class InitializingCurrencyBenchmarks
     {
         [Benchmark]
         public void FromCode()
@@ -45,7 +41,7 @@ namespace NodaMoney.Tests.PerformanceSpec
     }
 
     [MemoryDiagnoser]
-    public class InitalizingMoneyBenchmarks
+    public class InitializingMoneyBenchmarks
     {
         private readonly Currency _euro = Currency.FromCode("EUR");
         private readonly Money _money = new Money(10m, "EUR");
