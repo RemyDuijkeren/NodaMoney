@@ -98,14 +98,12 @@ namespace NodaMoney
             get
             {
                 var currentRegion = RegionInfo.CurrentRegion;
-                if (currentRegion.Name == "IV")
-                    throw new InvalidCurrencyException("Current culture is Invariant, from which no specific currency can be extracted!");
 
-                return ref FromRegion(currentRegion);
+                return ref currentRegion.Name == "IV" ? ref FromCode("XXX") : ref FromRegion(currentRegion);
             }
         }
 
-        /// <summary>Check if default(currecy) is used. I so, then initialize it to {XXX, 999, No currency}.</summary>
+        /// <summary>Check if default(currency) is used. I so, then initialize it to {XXX, 999, No currency}.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void IfDefaultThenInitializeToNoCurrency()
         {
@@ -378,7 +376,7 @@ namespace NodaMoney
             }
         }
 
-        internal static int GetHashCode(in string code, in byte @namespace)
+        internal static int GetHashCode(in string code, in int @namespace)
         {
             unchecked
             {
@@ -386,7 +384,7 @@ namespace NodaMoney
 #pragma warning disable CA1307 // Specify StringComparison
                 hash = (hash * 23) + (code?.GetHashCode() ?? 0);
 #pragma warning restore CA1307 // Specify StringComparison
-                return (hash * 23) + @namespace.GetHashCode();
+                return (hash * 23) + ((byte)@namespace).GetHashCode();
             }
         }
 

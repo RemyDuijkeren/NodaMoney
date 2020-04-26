@@ -6,6 +6,7 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 using System.Xml.Serialization;
+using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.CurrencySpec
 {
@@ -17,7 +18,7 @@ namespace NodaMoney.Tests.CurrencySpec
             var currencies = Currency.GetAllCurrencies();
 
             currencies.Should().NotBeEmpty();
-            currencies.Count().Should().BeGreaterThan(100);
+            currencies.Should().HaveCountGreaterThan(100);
         }
 
         //// [Fact(Skip = "For debugging.")]
@@ -206,13 +207,36 @@ namespace NodaMoney.Tests.CurrencySpec
             currency.Code.Should().Be("EUR");
             currency.EnglishName.Should().Be("Euro");
         }
+    }
 
+    [Collection(nameof(NoParallelization))]
+    public class GivenIWantCurrentCurrency
+    {
         [Fact]
-        public void WhenUsingCurrentCurrency_ThenCreatingShouldSucceed()
+        [UseCulture("en-US")]
+        public void WhenCurrentCultureIsUS_ThenCurrencyIsDollar()
         {
             var currency = Currency.CurrentCurrency;
 
-            currency.Should().Be(Currency.FromRegion(RegionInfo.CurrentRegion));
+            currency.Should().Be(Currency.FromCode("USD"));
+        }
+
+        [Fact]
+        [UseCulture("nl-NL")]
+        public void WhenCurrentCultureIsNL_ThenCurrencyIsEuro()
+        {
+            var currency = Currency.CurrentCurrency;
+
+            currency.Should().Be(Currency.FromCode("EUR"));
+        }
+
+        [Fact]
+        [UseCulture(null)]
+        public void WhenCurrentCultureIsInvariant_ThenCurrencyIsDefault()
+        {
+            var currency = Currency.CurrentCurrency;
+
+            currency.Should().Be(default(Currency));
         }
     }
 

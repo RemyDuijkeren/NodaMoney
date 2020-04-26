@@ -10,7 +10,7 @@ Packages on this feed are alpha and beta and, while they've passed all our tests
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
+[![Build Status](https://dev.azure.com/dynamichands/GitHub/_apis/build/status/DynamicHands.NodaMoney?branchName=master)](https://dev.azure.com/dynamichands/GitHub/_build/latest?definitionId=9&branchName=master)
 [![Coverage Status](https://coveralls.io/repos/github/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/github/remyvd/NodaMoney?branch=master)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.

@@ -23,14 +23,14 @@ namespace NodaMoney.Tests.MoneyCalculationsSpec
         //    // Money result = subject.Perform(fx);
         //}
 
-        //[Fact]
-        //public void When1_Then()
-        //{
-        //    Currency x = default;
-        //    Money c = default;
+        [Fact]
+        public void When1_Then()
+        {
+            Currency x = default;
+            Money c = default;
 
-        //    //Console.WriteLine(c);
-        //    //Console.WriteLine(x);
-        //}
+            Console.WriteLine(c);
+            Console.WriteLine(x);
+        }
     }
 }

@@ -17,6 +17,7 @@ using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.Xunit;
 using Nuke.Common.Utilities.Collections;
+using static Nuke.Common.Logger;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.CoverallsNet.CoverallsNetTasks;
@@ -29,7 +30,7 @@ using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 [AzurePipelines(
     suffix: null,
     image: AzurePipelinesImage.WindowsLatest,
-    AutoGenerate = true,
+    AutoGenerate = false,
     InvokedTargets = new[] { nameof(Publish) },
     NonEntryTargets = new[] { nameof(Restore), nameof(Compile), nameof(Test), nameof(Pack), nameof(Coverage), nameof(NuGetPush) },
     ExcludedTargets = new[] { nameof(Clean) },
@@ -114,6 +115,7 @@ partial class Build : NukeBuild
             //    type: AzurePipelinesTestResultsType.XUnit,
             //    files: testResults.GlobFiles("*.trx").Select(file => $"{file}").ToArray());
 
+            Info("PublishTestResults:");
             testResults.GlobFiles("*.trx").ForEach(x =>
                 AzurePipelines?.PublishTestResults(
                     type: AzurePipelinesTestResultsType.XUnit,

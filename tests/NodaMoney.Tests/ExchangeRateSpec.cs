@@ -121,30 +121,30 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         public void WhenRateIsLessThenZero_ThenThrowException()
         {
             // Arrange, Act
-            Action action = () => new ExchangeRate(_euro, _euro, -1.2F);
+            Action action = () => new ExchangeRate(_euro, _dollar, -1.2F);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>();
         }
 
         [Fact]
-        public void WhenBaseCurrencyIsNull_ThenThrowException()
+        public void WhenBaseCurrencyIsDefault_ThenCreatingShouldSucceed()
         {
-            // Arrange, Act
-            Action action = () => new ExchangeRate(default(Currency), _dollar, 1.2591);
+            var fx = new ExchangeRate(default, _dollar, 1.2591M);
 
-            // Assert
-            action.Should().Throw<ArgumentNullException>();
+            fx.BaseCurrency.Should().Be(default(Currency));
+            fx.QuoteCurrency.Should().Be(_dollar);
+            fx.Value.Should().Be(1.2591M);
         }
 
         [Fact]
-        public void WhenQuoteCurrencyIsNull_ThenThrowException()
+        public void WhenQuoteCurrencyIsDefault_ThenCreatingShouldSucceed()
         {
-            // Arrange, Act
-            Action action = () => new ExchangeRate(_euro, default(Currency), 1.2591);
+            var fx = new ExchangeRate(_euro, default, 1.2591M);
 
-            // Assert
-            action.Should().Throw<ArgumentNullException>();
+            fx.BaseCurrency.Should().Be(_euro);
+            fx.QuoteCurrency.Should().Be(default(Currency));
+            fx.Value.Should().Be(1.2591M);
         }
     }
 
@@ -358,6 +358,8 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx.BaseCurrency.Code.Should().Be("XXX");
             fx.QuoteCurrency.Code.Should().Be("XXX");
             fx.Value.Should().Be(0M);
+
+            fx.Should().Be(default(ExchangeRate));
         }
 
         [Fact, UseCulture("en-US")]
@@ -370,6 +372,8 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx.BaseCurrency.Code.Should().Be("XXX");
             fx.QuoteCurrency.Code.Should().Be("XXX");
             fx.Value.Should().Be(0M);
+
+            fx.Should().Be(default(ExchangeRate));
         }
 
         [Fact]
@@ -382,6 +386,8 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx.BaseCurrency.Code.Should().Be("XXX");
             fx.QuoteCurrency.Code.Should().Be("XXX");
             fx.Value.Should().Be(0M);
+
+            fx.Should().Be(default(ExchangeRate));
         }
 
         [Fact]
@@ -394,6 +400,8 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx.BaseCurrency.Code.Should().Be("XXX");
             fx.QuoteCurrency.Code.Should().Be("XXX");
             fx.Value.Should().Be(0M);
+
+            fx.Should().Be(default(ExchangeRate));
         }
     }
 
@@ -409,7 +417,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
         };
 
         [Theory][MemberData(nameof(TestData))]
-        public void WhenTheAreEquel_ThenComparingShouldBeTrueOtherwiseFalse(ExchangeRate fx1, ExchangeRate fx2, bool areEqual)
+        public void WhenTheAreEqual_ThenComparingShouldBeTrueOtherwiseFalse(ExchangeRate fx1, ExchangeRate fx2, bool areEqual)
         {
             if (areEqual)
                 fx1.Should().Be(fx2);
@@ -423,15 +431,15 @@ namespace NodaMoney.Tests.ExchangeRateSpec
 
             fx1.Equals(fx2).Should().Be(areEqual); //using Equal()
             ExchangeRate.Equals(fx1, fx2).Should().Be(areEqual); //using static Equals()            
-            (fx1 == fx2).Should().Be(areEqual); //using Euality operators
-            (fx1 != fx2).Should().Be(!areEqual); //using Euality operators
+            (fx1 == fx2).Should().Be(areEqual); //using Equality operators
+            (fx1 != fx2).Should().Be(!areEqual); //using Equality operators
         }
     }
 
     public class GivenIWantToDeconstructExchangeRate
     {
         [Fact]
-        public void WhenDeconstructing_ThenShouldSucceed()
+        public void WhenDeconstruct_ThenShouldSucceed()
         {
             var fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591m);
 

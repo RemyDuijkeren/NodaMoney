@@ -70,7 +70,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             result.Symbol.Should().Be("฿");
 
             Action action = () => Currency.FromCode("BTC2", "virtual");
-            action.Should().Throw<ArgumentException>().WithMessage("BTC2 is an unknown virtual currency code!");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("BTC2 is an unknown virtual currency code!");
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         }
 
         [Fact]
-        public void WhenRegisterExistingCurrency_ThenThrowExeception()
+        public void WhenRegisterExistingCurrency_ThenThrowException()
         {
             var builder = new CurrencyBuilder("EUR", "ISO-4217");
 
@@ -101,7 +101,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
 
             Action action = () => builder.Register();
 
-            action.Should().Throw<InvalidOperationException>().WithMessage("The custom currency is already registered.");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("*is already registered*");
         }
 
         [Fact]
@@ -159,12 +159,12 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         [Fact]
         public void WhenUnregisterIsoCurrency_ThenThisMustSucceed()
         {
-            var euro = Currency.FromCode("PEN"); // should work
+            var money = Currency.FromCode("PEN"); // should work
 
             CurrencyBuilder.Unregister("PEN", "ISO-4217");
             Action action = () => Currency.FromCode("PEN");
 
-            action.Should().Throw<ArgumentException>().WithMessage("*unknown*currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("*unknown*currency*");
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
             CurrencyBuilder.Unregister("XYZ", "virtual");
             Action action = () => Currency.FromCode("XYZ", "virtual");
 
-            action.Should().Throw<ArgumentException>().WithMessage("*unknown*currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("*unknown*currency*");
         }
 
         [Fact]
@@ -192,7 +192,7 @@ namespace NodaMoney.Tests.CurrencyBuilderSpec
         {
             Action action = () => CurrencyBuilder.Unregister("ABC", "virtual");
 
-            action.Should().Throw<ArgumentException>().WithMessage("*specifies a currency that is not found*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("*specifies a currency that is not found*");
         }
 
         [Fact]

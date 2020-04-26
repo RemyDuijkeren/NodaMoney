@@ -17,14 +17,10 @@ namespace NodaMoney
         public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
             : this()
         {
-            if (baseCurrency == default(Currency))
-                throw new ArgumentNullException(nameof(baseCurrency));
-            if (rate < 0)
-                throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
-            if (quoteCurrency == default(Currency))
-                throw new ArgumentNullException(nameof(quoteCurrency));
             if (baseCurrency == quoteCurrency)
                 throw new ArgumentException("The base and quote currency can't be equal!");
+            if (rate < 0)
+                throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
@@ -131,18 +127,12 @@ namespace NodaMoney
                 if (!(ex is FormatException) && !(ex is OverflowException) && !(ex is ArgumentException))
                     throw;
 
-                result = new ExchangeRate
-                             {
-                                 BaseCurrency = Currency.FromCode("XXX"),
-                                 QuoteCurrency = Currency.FromCode("XXX"),
-                                 Value = 0,
-                             };
-
+                result = default;
                 return false;
             }
         }
 
-        /// <summary>Deconstructs the current instance into its components.</summary>
+        /// <summary>Deconstruct the current instance into its components.</summary>
         /// <param name="baseCurrency">The base currency.</param>
         /// <param name="quoteCurrency">The quote currency.</param>
         /// <param name="rate">The rate of the exchange.</param>

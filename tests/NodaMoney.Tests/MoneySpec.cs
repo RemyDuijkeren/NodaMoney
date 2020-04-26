@@ -7,51 +7,49 @@ using Xunit;
 
 namespace NodaMoney.Tests.MoneySpec
 {
+    [Collection(nameof(NoParallelization))]
     public class GivenIWantMoneyImplicit
     {
         private readonly decimal _decimalValue = 1234.567m;
 
         [Fact]
         [UseCulture("en-US")]
-        public void WhenCurrentCultureIsUS_ThenCreatingShouldSucceed()
+        public void WhenCurrentCultureIsUS_ThenCurrencyIsDollar()
         {            
             var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
             money.Currency.Should().Be(Currency.FromCode("USD"));
             money.Amount.Should().Be(1234.57m);
         }
 
         [Fact]
         [UseCulture("nl-NL")]
-        public void WhenCurrentCultureIsNL_ThenCreatingShouldSucceed()
+        public void WhenCurrentCultureIsNL_ThenCurrencyIsEuro()
         {
             var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
             money.Currency.Should().Be(Currency.FromCode("EUR"));
             money.Amount.Should().Be(1234.57m);
         }
 
         [Fact]
         [UseCulture("ja-JP")]
-        public void WhenCurrentCultureIsJP_ThenCreatingShouldSucceed()
+        public void WhenCurrentCultureIsJP_ThenCurrencyIsYen()
         {
             var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Name.Should().Be("ja-JP");
             money.Currency.Should().Be(Currency.FromCode("JPY"));
             money.Amount.Should().Be(1235m);
         }
 
         [Fact]
         [UseCulture(null)]
-        public void WhenCurrentCultureIsInvariant_ThenThisShouldThrowException()
+        public void WhenCurrentCultureIsInvariant_ThenCurrencyIsDefault()
         {
-            Action action = () => { var money = new Money(_decimalValue); };
+            var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Should().Be(CultureInfo.InvariantCulture);
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("*Invariant*");
+            money.Currency.Should().Be(default(Currency));
+            money.Amount.Should().Be(1235m);
         }
     }
 

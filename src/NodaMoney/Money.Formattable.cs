@@ -116,7 +116,7 @@ namespace NodaMoney
             IFormatProvider provider;
             if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
             {
-#if NETFRAMEWORK || NETSTANDARD2_0
+#if NETSTANDARD2_0
                 format = format.Replace("I", "C");
 #else
                 format = format.Replace("I", "C", StringComparison.Ordinal);
@@ -135,7 +135,7 @@ namespace NodaMoney
 
             if (format.StartsWith("F", StringComparison.Ordinal))
             {
-#if NETFRAMEWORK || NETSTANDARD2_0
+#if NETSTANDARD2_0
                 format = format.Replace("F", "N");
 #else
                 format = format.Replace("F", "N", StringComparison.Ordinal);

@@ -1,7 +1,7 @@
 ﻿Test are structured in a BDD way (Spec), see http://blogs.clariusconsulting.net/kzu/writing-meaningful-self-documenting-behavior-oriented-tests/
 
 Here’s the way we write tests:
-
+```C#
 namespace NodaMoney.Tests.JoinSpec
 {
    public class GivenAJoinWithTwoPredecessorsAndOneSuccessor
@@ -21,6 +21,7 @@ namespace NodaMoney.Tests.JoinSpec
      }
    }
 }
+```
 
 How it works:
 - The last part of the namespace becomes the logical grouping of the tests. This typically is the name of the class under test
@@ -47,8 +48,9 @@ Key benefits of this approach:
 We use this as a guideline. There’s no requirement that we have a context class. Sometimes, it’s just not worth it because
 you’re testing a very small unit. In this case, the *Spec becomes the class, such as below. This is typically more the
 exception than the rule, though.
-
+```C#
 namespace NodaMoney.Tests
 {
    public class FinalSpec   {   }
 }
+```

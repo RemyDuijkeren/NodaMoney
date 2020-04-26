@@ -97,7 +97,7 @@ namespace NodaMoney
                 throw new ArgumentNullException(nameof(@namespace));
 
             if (!CurrencyRegistry.TryRemove(code, @namespace, out Currency currency))
-                throw new ArgumentException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
+                throw new InvalidCurrencyException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
 
             return currency;
         }
@@ -111,7 +111,7 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(Symbol))
                 Symbol = Currency.GenericCurrencySign;
 
-            var nsIndex = CurrencyRegistry.FindNamespaceIndex(Namespace);
+            var nsIndex = (byte)CurrencyRegistry.GetOrAddNamespaceIndex(Namespace);
             return new Currency(Code, _number, _decimalDigits, EnglishName, Symbol, nsIndex, ValidTo, ValidFrom);
         }
 
@@ -125,7 +125,7 @@ namespace NodaMoney
         {
             Currency currency = Build();
             if (!CurrencyRegistry.TryAdd(Code, Namespace, currency))
-                throw new InvalidOperationException("The custom currency is already registered.");
+                throw new InvalidCurrencyException($"The currency {Code} is already registered in {Namespace}.");
 
             return currency;
         }
