@@ -231,5 +231,5 @@ partial class Build : NukeBuild
         });
 
     Target Publish  => _ => _
-        .DependsOn(Clean, Pack, Coverage, NuGetPush);
+        .DependsOn(Clean, Pack, Test, Coverage, NuGetPush);
 }
