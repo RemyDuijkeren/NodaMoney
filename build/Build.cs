@@ -26,15 +26,16 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.GitHub.GitHubTasks;
 using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
+using static Nuke.Common.IO.CompressionTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
 [AzurePipelines(
     suffix: null,
     image: AzurePipelinesImage.WindowsLatest,
-    AutoGenerate = false,
-    InvokedTargets = new[] { nameof(Publish) },
-    NonEntryTargets = new[] { nameof(Restore), nameof(Compile), nameof(Test), nameof(Pack), nameof(Coverage), nameof(NuGetPush) },
+    AutoGenerate = true,
+    InvokedTargets = new[] { nameof(Test), nameof(Pack) },
+    NonEntryTargets = new[] { nameof(Restore), nameof(Compile), nameof(Coverage), nameof(CoverageCoveralls) },
     ExcludedTargets = new[] { nameof(Clean) },
     TriggerBranchesExclude = new[] { "gh-pages" },
     TriggerPathsExclude = new[] { "docs/" , "tools/" }
@@ -57,9 +58,13 @@ partial class Build : NukeBuild
     [GitVersion] readonly GitVersion GitVersion;
     [CI] readonly AzurePipelines AzurePipelines;
 
+    [PathExecutable]
+    readonly Tool Git;
+
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath TestResultDirectory => ArtifactsDirectory / "TestResults";
 
     Target Clean => _ => _
         .Before(Restore)
@@ -92,8 +97,8 @@ partial class Build : NukeBuild
 
     Target Test => _ => _
         .DependsOn(Compile)
-        .Produces(ArtifactsDirectory / "TestResults" / "*.trx")
-        .Produces(ArtifactsDirectory / "TestResults" / "*.xml")
+        .Produces(TestResultDirectory / "*.trx")
+        .Produces(TestResultDirectory / "*.xml")
         .Executes(() =>
         {
             var testResults = ArtifactsDirectory / "TestResults";
@@ -117,56 +122,13 @@ partial class Build : NukeBuild
                 .When(IsServerBuild, s => s
                     .EnableUseSourceLink()));
 
-            //Info("PublishTestResults:");
-            //AzurePipelines?.PublishTestResults(
-            //    title: AzurePipelines.StageDisplayName,
-            //    type: AzurePipelinesTestResultsType.VSTest,
-            //    files: new string[] { testResults / "*.trx" });
-
             Info("PublishTestResults:");
-            testResults.GlobFiles("*.trx").ForEach(x =>
+            TestResultDirectory.GlobFiles("*.trx").ForEach(f =>
                 AzurePipelines?.PublishTestResults(
                     type: AzurePipelinesTestResultsType.VSTest,
                     title: $"{AzurePipelines.StageDisplayName}",
-                    files: new string[] { x }));
+                    files: new string[] { f }));
 
-            Info("Generate Report:");
-            ReportGenerator(s => s
-                .SetReports(testResults / "*.xml")
-                .SetReportTypes(ReportTypes.HtmlInline)
-                .SetTargetDirectory(ArtifactsDirectory / "coverage-report")
-                .SetFramework("netcoreapp2.1"));
-
-            Info("PublishCoverageResults:");
-            testResults.GlobFiles("*.xml").ForEach(x =>
-                AzurePipelines?.PublishCodeCoverage(
-                    coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
-                    x,
-                    ArtifactsDirectory / "coverage-report"));
-        });
-
-    Target Benchmark => _ => _
-        .After(Compile)
-        .Produces(ArtifactsDirectory / "BenchmarkResults")
-        .Executes(() =>
-        {
-            // Use test methods to execute the benchmarks (xunit.shadowCopy=false && build=Release)
-            DotNetTest(s => s
-                .SetProjectFile(Solution)
-                .SetConfiguration(Configuration.Release)
-                .SetFilter("FullyQualifiedName~PerformanceSpec")
-                .SetFramework("net48")
-                .When(ExecutingTargets.Contains(Compile) && Configuration == Configuration.Release, s => s
-                    .SetNoBuild(true)
-                    .SetNoRestore(true)));
-
-            TestsDirectory.GlobDirectories("**/BenchmarkDotNet.Artifacts/results").ForEach(d =>
-                    CopyDirectoryRecursively(
-                        source: d,
-                        target: ArtifactsDirectory / "BenchmarkResults",
-                        DirectoryExistsPolicy.Merge,
-                        FileExistsPolicy.OverwriteIfNewer));
-            
         });
 
     Target Pack => _ => _
@@ -183,8 +145,34 @@ partial class Build : NukeBuild
                 .EnableNoBuild());
         });
 
-    Target NuGetPush => _ => _
-        .DependsOn(Pack)
+    Target Benchmark => _ => _
+        .After(Compile)
+        .Produces(ArtifactsDirectory / "BenchmarkResults")
+        .Executes(() =>
+        {
+            Info("Use test methods to execute the benchmarks (xunit.shadowCopy=false && build=Release)");
+            DotNetTest(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration.Release)
+                .SetFilter("FullyQualifiedName~PerformanceSpec")
+                .SetFramework("net48")
+                .When(ExecutingTargets.Contains(Compile) && Configuration == Configuration.Release, s => s
+                    .SetNoBuild(true)
+                    .SetNoRestore(true)));
+
+            Info("Move Benchmark results to Artifacts folder:");
+            TestsDirectory.GlobDirectories("**/BenchmarkDotNet.Artifacts/results").ForEach(d =>
+                    CopyDirectoryRecursively(
+                        source: d,
+                        target: ArtifactsDirectory / "BenchmarkResults",
+                        DirectoryExistsPolicy.Merge,
+                        FileExistsPolicy.OverwriteIfNewer));
+
+        });
+
+    Target Publish => _ => _
+        .DependsOn(Clean, Test, Pack)
+        .Consumes(Pack)
         .OnlyWhenStatic(() => GitRepository.IsOnMasterBranch())
         .OnlyWhenStatic(() => false) // if build has started by pushed tag
         .OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest)
@@ -201,9 +189,38 @@ partial class Build : NukeBuild
                 .SetApiKey(NuGetApiKey));
         });
 
+    AbsolutePath CoverageReportDirectory => ArtifactsDirectory / "coverage-report";
+    AbsolutePath CoverageReportArchive => ArtifactsDirectory / "coverage-report.zip";
+
     Target Coverage => _ => _
+        .DependsOn(Test)
+        .Consumes(Test)
+        .TriggeredBy(Test)
+        .Produces(CoverageReportArchive)
+        .Executes(() =>
+        {
+            ReportGenerator(s => s
+                .SetReports(TestResultDirectory / "*.xml")
+                .SetReportTypes(ReportTypes.HtmlInline_AzurePipelines)
+                .SetTargetDirectory(CoverageReportDirectory)
+                .SetFramework("netcoreapp2.1"));
+
+            TestResultDirectory.GlobFiles("*.xml").ForEach(f =>
+                AzurePipelines?.PublishCodeCoverage(
+                    coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
+                    summaryFile: f,
+                    reportDirectory: ArtifactsDirectory / "coverage-report"));
+
+            CompressZip(
+                directory: CoverageReportDirectory,
+                archiveFile: CoverageReportArchive,
+                fileMode: FileMode.Create);
+        });
+
+    Target CoverageCoveralls => _ => _
         .DependsOn(Compile)
-        .Produces(ArtifactsDirectory / "coverage.xml")
+        .TriggeredBy(Coverage)
+        .Produces(ArtifactsDirectory / "coverage-opencover.xml")
         //.OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest) // if build not started by PR
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
@@ -216,15 +233,13 @@ partial class Build : NukeBuild
                 .EnableNoBuild()
                 .EnableNoRestore()
                 .EnableCollectCoverage()
-                .SetCoverletOutput(ArtifactsDirectory / "coverage.xml")
+                .SetCoverletOutput(ArtifactsDirectory / "coverage-opencover.xml")
                 .SetCoverletOutputFormat(CoverletOutputFormat.opencover));
-
-            var file = ArtifactsDirectory / "coverage.net48.xml";
 
             CoverallsNet(s => s
                 .SetRepoToken(CoverallsRepoToken)
                 .EnableOpenCover()
-                .SetInput(ArtifactsDirectory / "coverage.net48.xml")
+                .SetInput(ArtifactsDirectory / "coverage-opencover.net48.xml")
                 .SetCommitId(GitVersion.Sha)
                 .SetCommitBranch(GitVersion.BranchName)
                 .When(IsServerBuild, s => s
@@ -235,6 +250,14 @@ partial class Build : NukeBuild
                     .SetServiceName(AzurePipelines.GetType().Name)));
         });
 
-    Target Publish  => _ => _
-        .DependsOn(Clean, Pack, Test, Coverage, NuGetPush);
+    void FinishReleaseOrHotfix()
+    {
+        Git($"checkout master");
+        Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+        Git($"tag {GitVersion.MajorMinorPatch}");
+
+        Git($"branch -D {GitRepository.Branch}");
+
+        Git($"push origin master {GitVersion.MajorMinorPatch}");
+    }
 }

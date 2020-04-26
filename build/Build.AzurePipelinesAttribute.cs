@@ -29,11 +29,12 @@ partial class Build
                                  { nameof(Test), "🚦" },
                                  { nameof(Pack), "📦" },
                                  { nameof(Coverage), "📊" },
+                                 { nameof(CoverageCoveralls), "📊" },
                                  { nameof(Benchmark), "📊" },
                                  { nameof(Publish), "🚚" },
                                  // { nameof(Announce), "🗣" }
                              };
-            var symbol = dictionary.GetValueOrDefault(job.Name).NotNull("symbol != null");
+            var symbol = dictionary.GetValueOrDefault(job.Name).NotNull($"{job.Name} symbol != null");
 
             job.DisplayName = job.PartitionName == null
                 ? $"{symbol} {job.DisplayName}"
