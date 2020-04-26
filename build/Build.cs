@@ -17,6 +17,7 @@ using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.Xunit;
 using Nuke.Common.Utilities.Collections;
+using Nuke.Common.Tools.ReportGenerator;
 using static Nuke.Common.Logger;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
@@ -24,6 +25,7 @@ using static Nuke.Common.Tools.CoverallsNet.CoverallsNetTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.GitHub.GitHubTasks;
 using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
+using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -96,10 +98,10 @@ partial class Build : NukeBuild
         {
             var testResults = ArtifactsDirectory / "TestResults";
 
-            //var publishConfigurations =
-            //    from project in Solution.GetProjects("*.Tests")
-            //    from framework in project.GetTargetFrameworks()
-            //    select new { project, framework };
+            var publishConfigurations =
+                from project in Solution.GetProjects("*.Tests")
+                from framework in project.GetTargetFrameworks()
+                select new { project, framework };
 
             DotNetTest(s => s
                 .SetProjectFile(Solution)
@@ -116,17 +118,31 @@ partial class Build : NukeBuild
                     .EnableUseSourceLink()));
 
             Info("PublishTestResults:");
-            AzurePipelines?.PublishTestResults(
-                title: AzurePipelines.StageDisplayName,
-                type: AzurePipelinesTestResultsType.VSTest,
-                files: new string[] { testResults / "*.trx" });
+            //AzurePipelines?.PublishTestResults(
+            //    title: AzurePipelines.StageDisplayName,
+            //    type: AzurePipelinesTestResultsType.VSTest,
+            //    files: new string[] { testResults / "*.trx" });
 
-            //Info("PublishTestResults:");
-            //testResults.GlobFiles("*.trx").ForEach(x =>
-            //    AzurePipelines?.PublishTestResults(
-            //        type: AzurePipelinesTestResultsType.VSTest,
-            //        title: $"{AzurePipelines.StageDisplayName}",
-            //        files: new string[] { x }));
+            Info("PublishTestResults:");
+            testResults.GlobFiles("*.trx").ForEach(x =>
+                AzurePipelines?.PublishTestResults(
+                    type: AzurePipelinesTestResultsType.VSTest,
+                    title: $"{AzurePipelines.StageDisplayName}",
+                    files: new string[] { x }));
+
+            Info("Generate Report:");
+            ReportGenerator(s => s
+                .SetReports(testResults / "*.xml")
+                .SetReportTypes(ReportTypes.HtmlInline)
+                .SetTargetDirectory(ArtifactsDirectory / "coverage-report")
+                .SetFramework("netcoreapp2.1"));
+
+            Info("PublishCoverageResults:");
+            testResults.GlobFiles("*.xml").ForEach(x =>
+                AzurePipelines?.PublishCodeCoverage(
+                    coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
+                    x,
+                    ArtifactsDirectory / "coverage-report"));
         });
 
     Target Benchmark => _ => _
@@ -204,30 +220,19 @@ partial class Build : NukeBuild
                 .SetCoverletOutputFormat(CoverletOutputFormat.opencover));
 
             var file = ArtifactsDirectory / "coverage.net48.xml";
-            if (IsServerBuild)
-            {
-                CoverallsNet(s => s
-                    .SetRepoToken(CoverallsRepoToken)
-                    .EnableOpenCover()
-                    .SetInput(ArtifactsDirectory / "coverage.net48.xml")
-                    .SetCommitId(AzurePipelines.SourceVersion)
-                    .SetCommitBranch(AzurePipelines.SourceBranchName)
+
+            CoverallsNet(s => s
+                .SetRepoToken(CoverallsRepoToken)
+                .EnableOpenCover()
+                .SetInput(ArtifactsDirectory / "coverage.net48.xml")
+                .SetCommitId(GitVersion.Sha)
+                .SetCommitBranch(GitVersion.BranchName)
+                .When(IsServerBuild, s => s
                     .SetCommitAuthor(AzurePipelines.RequestedFor)
                     .SetCommitEmail(AzurePipelines.RequestedForEmail)
                     //.SetCommitMessage(AzurePipelines.Sou) // Build.SourceVersionMessage
-                    //.SetJobId(int.Parse(AzurePipelines.BuildNumber))
-                    .SetServiceName(AzurePipelines.GetType().Name));           
-            }
-            else
-            {
-                CoverallsNet(s => s
-                    .SetRepoToken(CoverallsRepoToken)
-                    .EnableOpenCover()
-                    .SetInput(ArtifactsDirectory / "coverage.net48.xml")
-                    .SetCommitId(GitVersion.Sha)
-                    .SetCommitBranch(GitVersion.BranchName)
-                    .SetServiceName("Local"));
-            }
+                    .SetJobId(int.Parse(AzurePipelines.BuildUri))
+                    .SetServiceName(AzurePipelines.GetType().Name)));
         });
 
     Target Publish  => _ => _
