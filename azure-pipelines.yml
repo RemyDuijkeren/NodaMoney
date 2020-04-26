@@ -36,4 +36,4 @@ stages:
         steps:
           - task: CmdLine@2
             inputs:
-              script: './build.cmd Restore Compile Pack NuGetPush Restore Compile Test Coverage Restore Compile Pack Publish --skip'
+              script: './build.cmd Publish'

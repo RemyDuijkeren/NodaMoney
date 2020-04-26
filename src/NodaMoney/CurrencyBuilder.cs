@@ -34,7 +34,7 @@ namespace NodaMoney
         /// <summary>Gets or sets the numeric ISO 4217 currency code.</summary>
         public string IsoNumber
         {
-            get => _number.ToString("D3");
+            get => _number.ToString("D3", CultureInfo.InvariantCulture);
             set
             {
                 if (!short.TryParse(value, out short result))

@@ -22,8 +22,8 @@ namespace NodaMoney
         internal const double NotApplicable = -1;
         internal const byte B_NA = 255;
 
-        /// <summary>Shortcut for namespace indexes</summary>
-        private const int ISO4217 = 0;
+        /// <summary>Shortcut for namespace indexes.</summary>
+        /// private const int ISO4217 = 0;
         private const int ISO4217_HISTORIC = 1;
 
         private static Currency[] Currencies;

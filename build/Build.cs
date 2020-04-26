@@ -110,16 +110,16 @@ partial class Build : NukeBuild
                     .SetCoverletOutput(CoverageFile)
                     .SetCoverletOutputFormat(CoverletOutputFormat.opencover)));
 
-            //AzurePipelines?.PublishTestResults(
-            //    title: AzurePipelines.StageDisplayName,
-            //    type: AzurePipelinesTestResultsType.XUnit,
-            //    files: testResults.GlobFiles("*.trx").Select(file => $"{file}").ToArray());
+            AzurePipelines?.PublishTestResults(
+                title: AzurePipelines.StageDisplayName,
+                type: AzurePipelinesTestResultsType.XUnit,
+                files: new string[] { testResults / "*.trx" });
 
             Info("PublishTestResults:");
             testResults.GlobFiles("*.trx").ForEach(x =>
                 AzurePipelines?.PublishTestResults(
-                    type: AzurePipelinesTestResultsType.XUnit,
-                    title: $"{Path.GetFileNameWithoutExtension(x)} ({AzurePipelines.StageDisplayName})",
+                    type: AzurePipelinesTestResultsType.VSTest,
+                    title: $"{AzurePipelines.StageDisplayName}",
                     files: new string[] { x }));
         });
 
@@ -196,7 +196,7 @@ partial class Build : NukeBuild
                     .SetCommitAuthor(AzurePipelines.RequestedFor)
                     .SetCommitEmail(AzurePipelines.RequestedForEmail)
                     //.SetCommitMessage(AzurePipelines.Sou) // Build.SourceVersionMessage
-                    .SetJobId(int.Parse(AzurePipelines.BuildNumber))
+                    //.SetJobId(int.Parse(AzurePipelines.BuildNumber))
                     .SetServiceName(AzurePipelines.GetType().Name));                
             }
             else

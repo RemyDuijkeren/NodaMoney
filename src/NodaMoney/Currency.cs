@@ -37,7 +37,7 @@ namespace NodaMoney
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
-        /// <param name="namespace">The namepspace.</param>
+        /// <param name="namespace">The namespace.</param>
         /// <remarks>Used in serialization.</remarks>
         internal Currency(string code, string @namespace = "ISO-4217")
         {
@@ -69,8 +69,6 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
-            //TODO: if (string.IsNullOrWhiteSpace(@namespace))
-            //    throw new ArgumentException("Value cannot be null or whitespace.", nameof(@namespace));
             if (decimalDigits != CurrencyRegistry.B_Z07 && decimalDigits != CurrencyRegistry.B_NA && (decimalDigits < 0 || decimalDigits > 28))
                 throw new ArgumentOutOfRangeException(nameof(decimalDigits), $"For code {code} DecimalDigits must greater or equal to zero and smaller or equal to 28, or 255 if not applicable!");
 
@@ -101,14 +99,6 @@ namespace NodaMoney
 
                 return ref currentRegion.Name == "IV" ? ref FromCode("XXX") : ref FromRegion(currentRegion);
             }
-        }
-
-        /// <summary>Check if default(currency) is used. I so, then initialize it to {XXX, 999, No currency}.</summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void IfDefaultThenInitializeToNoCurrency()
-        {
-            if (_code == null)
-                Unsafe.AsRef(this) = FromCode("XXX");
         }
 
         /// <summary>Gets the currency symbol.</summary>
@@ -256,11 +246,6 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
         public static ref Currency FromCode(string code)
         {
-            //if (!CurrencyRegistry.TryGet(code, out Currency currency))
-            //    throw new ArgumentException($"{code} is an unknown currency code!");
-
-            //return currency;
-
             return ref CurrencyRegistry.Get(code);
         }
 
@@ -272,11 +257,6 @@ namespace NodaMoney
         /// <exception cref="ArgumentException">The 'code' in the given namespace is an unknown.</exception>
         public static ref Currency FromCode(string code, string @namespace)
         {
-            //if (!CurrencyRegistry.TryGet(code, @namespace, out Currency currency))
-            //    throw new ArgumentException($"{code} is an unknown {@namespace} currency code!");
-
-            //return currency;
-
             return ref CurrencyRegistry.Get(code, @namespace);
         }
 
@@ -376,18 +356,6 @@ namespace NodaMoney
             }
         }
 
-        internal static int GetHashCode(in string code, in int @namespace)
-        {
-            unchecked
-            {
-                int hash = 17;
-#pragma warning disable CA1307 // Specify StringComparison
-                hash = (hash * 23) + (code?.GetHashCode() ?? 0);
-#pragma warning restore CA1307 // Specify StringComparison
-                return (hash * 23) + ((byte)@namespace).GetHashCode();
-            }
-        }
-
         /// <summary>Deconstructs the current instance into its components.</summary>
         /// <param name="code">The code.</param>
         /// <param name="isoNumber">The ISO4127 three-digit code number.</param>
@@ -453,6 +421,30 @@ namespace NodaMoney
 
             info.AddValue("code", Code);
             info.AddValue("namespace", Namespace);
+        }
+
+        /// <summary>Returns a hash code for this instance.</summary>
+        /// <param name="code">The code.</param>
+        /// <param name="namespace">The @namespace.</param>
+        /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
+        internal static int GetHashCode(in string code, in int @namespace)
+        {
+            unchecked
+            {
+                int hash = 17;
+#pragma warning disable CA1307 // Specify StringComparison
+                hash = (hash * 23) + (code?.GetHashCode() ?? 0);
+#pragma warning restore CA1307 // Specify StringComparison
+                return (hash * 23) + ((byte)@namespace).GetHashCode();
+            }
+        }
+
+        /// <summary>Check if default(currency) is used. I so, then initialize it to {XXX, 999, No currency}.</summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void IfDefaultThenInitializeToNoCurrency()
+        {
+            if (_code == null)
+                Unsafe.AsRef(this) = FromCode("XXX");
         }
     }
 }
