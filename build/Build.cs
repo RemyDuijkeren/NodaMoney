@@ -231,7 +231,7 @@ partial class Build : NukeBuild
                     .SetCommitAuthor(AzurePipelines.RequestedFor)
                     .SetCommitEmail(AzurePipelines.RequestedForEmail)
                     //.SetCommitMessage(AzurePipelines.Sou) // Build.SourceVersionMessage
-                    .SetJobId(int.Parse(AzurePipelines.BuildUri))
+                    //.SetJobId(int.Parse(AzurePipelines.BuildUri))
                     .SetServiceName(AzurePipelines.GetType().Name)));
         });
 
