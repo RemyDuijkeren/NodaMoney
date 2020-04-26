@@ -117,7 +117,7 @@ partial class Build : NukeBuild
                 .When(IsServerBuild, s => s
                     .EnableUseSourceLink()));
 
-            Info("PublishTestResults:");
+            //Info("PublishTestResults:");
             //AzurePipelines?.PublishTestResults(
             //    title: AzurePipelines.StageDisplayName,
             //    type: AzurePipelinesTestResultsType.VSTest,
