@@ -58,7 +58,6 @@ partial class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-    AbsolutePath CoverageFile => RootDirectory / "artifacts" / "coverage.xml";
 
     Target Clean => _ => _
         .Before(Restore)
@@ -91,11 +90,16 @@ partial class Build : NukeBuild
 
     Target Test => _ => _
         .DependsOn(Compile)
-        .Produces(CoverageFile)
         .Produces(ArtifactsDirectory / "TestResults" / "*.trx")
+        .Produces(ArtifactsDirectory / "TestResults" / "*.xml")
         .Executes(() =>
         {
             var testResults = ArtifactsDirectory / "TestResults";
+
+            //var publishConfigurations =
+            //    from project in Solution.GetProjects("*.Tests")
+            //    from framework in project.GetTargetFrameworks()
+            //    select new { project, framework };
 
             DotNetTest(s => s
                 .SetProjectFile(Solution)
@@ -105,22 +109,24 @@ partial class Build : NukeBuild
                 .SetResultsDirectory(testResults)
                 .EnableNoBuild()
                 .EnableNoRestore()
-                .When(ExecutingTargets.Contains(Coverage), s => s
-                    .EnableCollectCoverage()
-                    .SetCoverletOutput(CoverageFile)
-                    .SetCoverletOutputFormat(CoverletOutputFormat.opencover)));
-
-            AzurePipelines?.PublishTestResults(
-                title: AzurePipelines.StageDisplayName,
-                type: AzurePipelinesTestResultsType.XUnit,
-                files: new string[] { testResults / "*.trx" });
+                .EnableCollectCoverage()
+                .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
+                .SetCoverletOutput(testResults / "coverage.xml")
+                .When(IsServerBuild, s => s
+                    .EnableUseSourceLink()));
 
             Info("PublishTestResults:");
-            testResults.GlobFiles("*.trx").ForEach(x =>
-                AzurePipelines?.PublishTestResults(
-                    type: AzurePipelinesTestResultsType.VSTest,
-                    title: $"{AzurePipelines.StageDisplayName}",
-                    files: new string[] { x }));
+            AzurePipelines?.PublishTestResults(
+                title: AzurePipelines.StageDisplayName,
+                type: AzurePipelinesTestResultsType.VSTest,
+                files: new string[] { testResults / "*.trx" });
+
+            //Info("PublishTestResults:");
+            //testResults.GlobFiles("*.trx").ForEach(x =>
+            //    AzurePipelines?.PublishTestResults(
+            //        type: AzurePipelinesTestResultsType.VSTest,
+            //        title: $"{AzurePipelines.StageDisplayName}",
+            //        files: new string[] { x }));
         });
 
     Target Benchmark => _ => _
@@ -180,31 +186,44 @@ partial class Build : NukeBuild
         });
 
     Target Coverage => _ => _
-        .DependsOn(Test)
-        .OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest) // if build not started by PR
+        .DependsOn(Compile)
+        .Produces(ArtifactsDirectory / "coverage.xml")
+        //.OnlyWhenStatic(() => AzurePipelines.BuildReason != AzurePipelinesBuildReason.PullRequest) // if build not started by PR
         .Requires(() => CoverallsRepoToken)
         .Executes(() =>
         {
-            if (AzurePipelines != null)
+            DotNetTest(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration)
+                .SetFilter("FullyQualifiedName!~PerformanceSpec")
+                .SetFramework("net48")
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .EnableCollectCoverage()
+                .SetCoverletOutput(ArtifactsDirectory / "coverage.xml")
+                .SetCoverletOutputFormat(CoverletOutputFormat.opencover));
+
+            var file = ArtifactsDirectory / "coverage.net48.xml";
+            if (IsServerBuild)
             {
                 CoverallsNet(s => s
                     .SetRepoToken(CoverallsRepoToken)
                     .EnableOpenCover()
-                    .SetInput(CoverageFile)
+                    .SetInput(ArtifactsDirectory / "coverage.net48.xml")
                     .SetCommitId(AzurePipelines.SourceVersion)
                     .SetCommitBranch(AzurePipelines.SourceBranchName)
                     .SetCommitAuthor(AzurePipelines.RequestedFor)
                     .SetCommitEmail(AzurePipelines.RequestedForEmail)
                     //.SetCommitMessage(AzurePipelines.Sou) // Build.SourceVersionMessage
                     //.SetJobId(int.Parse(AzurePipelines.BuildNumber))
-                    .SetServiceName(AzurePipelines.GetType().Name));                
+                    .SetServiceName(AzurePipelines.GetType().Name));           
             }
             else
             {
                 CoverallsNet(s => s
                     .SetRepoToken(CoverallsRepoToken)
                     .EnableOpenCover()
-                    .SetInput(CoverageFile)
+                    .SetInput(ArtifactsDirectory / "coverage.net48.xml")
                     .SetCommitId(GitVersion.Sha)
                     .SetCommitBranch(GitVersion.BranchName)
                     .SetServiceName("Local"));
