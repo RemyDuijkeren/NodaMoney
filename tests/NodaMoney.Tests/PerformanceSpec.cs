@@ -206,7 +206,7 @@ namespace NodaMoney.Tests
         {
             EnglishName = "Bitcoin",
             Symbol = "฿",
-            IsoNumber = "123", // iso number
+            NumericCode = "123", // iso number
             DecimalDigits = 8
         };
 
@@ -217,7 +217,7 @@ namespace NodaMoney.Tests
             {
                 EnglishName = "Bitcoin",
                 Symbol = "฿",
-                IsoNumber = "123", // iso number
+                NumericCode = "123", // iso number
                 DecimalDigits = 8
             };
         }

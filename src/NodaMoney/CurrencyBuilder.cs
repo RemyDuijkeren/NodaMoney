@@ -32,7 +32,7 @@ namespace NodaMoney
         public string Symbol { get; set; }
 
         /// <summary>Gets or sets the numeric ISO 4217 currency code.</summary>
-        public string IsoNumber
+        public string NumericCode
         {
             get => _number.ToString("D3", CultureInfo.InvariantCulture);
             set
@@ -156,7 +156,7 @@ namespace NodaMoney
         {
             EnglishName = currency.EnglishName;
             Symbol = currency.Symbol;
-            IsoNumber = currency.IsoNumber;
+            NumericCode = currency.NumericCode;
             DecimalDigits = currency.DecimalDigits;
             ValidFrom = currency.ValidFrom;
             ValidTo = currency.ValidTo;

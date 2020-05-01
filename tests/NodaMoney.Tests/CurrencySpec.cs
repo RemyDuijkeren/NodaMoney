@@ -283,7 +283,7 @@ namespace NodaMoney.Tests.CurrencySpec
         }
     }
 
-    public class GivenIWantToKnowMinorUnit
+    public class GivenIWantToKnowSmallestPossibleAmountOfCurrency
     {
         private Currency _eur = Currency.FromCode("EUR");
 
@@ -296,46 +296,46 @@ namespace NodaMoney.Tests.CurrencySpec
         private Currency _xau = Currency.FromCode("XAU"); // Gold            
 
         [Fact]
-        public void WhenAskingForEuro_ThenMinorUnitShouldBeOneCent()
+        public void WhenEuro_ThenShouldBeDividedBy100()
         {
-            _eur.MajorUnit.Should().Be(1m);
-            _eur.MinorUnit.Should().Be(0.01m);
+            _eur.MinorUnit.Should().Be(100);
+            _eur.MinimalAmount.Should().Be(0.01m);
             _eur.DecimalDigits.Should().Be(2);
         }
 
         [Fact]
-        public void WhenAskingForYen_ThenMinorUnitShouldBeOne()
+        public void WhenYen_ThenShouldBeDividedByNothing()
         {
-            _yen.MajorUnit.Should().Be(1m);
-            _yen.MinorUnit.Should().Be(1m);
+            _eur.MinorUnit.Should().Be(0);
+            _yen.MinimalAmount.Should().Be(1m);
             _yen.DecimalDigits.Should().Be(0);
         }
 
         [Fact]
-        public void WhenAskingForDinar_ThenMinorUnitShouldBeOneFils()
+        public void WhenDinar_ThenShouldBeDividedBy1000()
         {
-            _din.MajorUnit.Should().Be(1m);
-            _din.MinorUnit.Should().Be(0.001m);
+            _din.MinorUnit.Should().Be(1000);
+            _din.MinimalAmount.Should().Be(0.001m);
             _din.DecimalDigits.Should().Be(3);
         }
 
         [Fact]
-        public void WhenAskingForGold_ThenMinorUnitShouldBeOne()
+        public void WhenGold_ThenShouldBeDividedByNothing()
         {
-            _xau.MajorUnit.Should().Be(1m);
-            _xau.MinorUnit.Should().Be(1m);
-            _xau.DecimalDigits.Should().Be(-1); // DOT
+            _xau.MinorUnit.Should().Be(0); // N.A.
+            _xau.MinimalAmount.Should().Be(1m);
+            _xau.DecimalDigits.Should().Be(0);
         }
 
         [Fact]
-        public void WhenAskingForMalagasyAriary_ThenMinorUnitShouldBeOneFith()
+        public void WhenMalagasyAriary_ThenShouldBeDividedBy5()
         {
             // The Malagasy ariary are technically divided into five subunits, where the coins display "1/5" on their face and
             // are referred to as a "fifth"; These are not used in practice, but when written out, a single significant digit
             // is used. E.g. 1.2 UM.
-            _mga.MajorUnit.Should().Be(1m);
-            _mga.MinorUnit.Should().Be(0.2m);
-            _mga.DecimalDigits.Should().Be(0.69897000433601880478626110527551); // Z07:  Math.Log10(5);
+            _mga.MinorUnit.Should().Be(5); // 1/5
+            _mga.MinimalAmount.Should().Be(0.2m);
+            _mga.DecimalDigits.Should().Be(1); // According to ISO-4217 this is 2
         }
     }
 

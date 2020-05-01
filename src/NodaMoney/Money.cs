@@ -272,18 +272,35 @@ namespace NodaMoney
 
         private static decimal Round(in decimal amount, in Currency currency, in MidpointRounding rounding)
         {
-            switch (currency.DecimalDigits)
+            // https://stackoverflow.com/questions/43289478/how-can-i-tell-if-a-number-is-a-power-of-10-in-kotlin-or-java
+            static bool IsPowerOf10(long n)
             {
-                case CurrencyRegistry.NotApplicable:
-                    return Math.Round(amount);
+                while (n > 9 && n % 10 == 0)
+                {
+                    n /= 10;
+                }
 
-                case CurrencyRegistry.Z07:
-                    // divided into five subunits rather than by a power of ten. 5 is 10 to the power of log(5) = 0.69897...
-                    return Math.Round(amount / 0.2m, 0, rounding) * 0.2m;
-
-                default:
-                    return Math.Round(amount, (int)currency.DecimalDigits, rounding);
+                return n == 1;
             }
+
+            // NOT GOOD, IS ONLY FOR INT. EXTEND
+            static bool IsPowerOfTen(in double x)
+            {
+                return x == 1
+                    || x == 10
+                    || x == 100
+                    || x == 1000
+                    || x == 10000
+                    || x == 100000
+                    || x == 1000000
+                    || x == 10000000
+                    || x == 100000000
+                    || x == 1000000000;
+            }
+
+            return IsPowerOfTen(currency.MinorUnit)
+                ? Math.Round(amount, currency.DecimalDigits, rounding)
+                : Math.Round(amount / currency.MinimalAmount, 0, rounding) * currency.MinimalAmount;
         }
 
         [SuppressMessage(

@@ -35,10 +35,10 @@ namespace NodaMoney.Tests.UnaryOperatorsSpec
 
         public static TheoryData<Money, Currency, decimal> TestData => new TheoryData<Money, Currency, decimal>
         {
-            { new Money(765m, Currency.FromCode("JPY")), Currency.FromCode("JPY"), Currency.FromCode("JPY").MinorUnit },
-            { new Money(765.43m, Currency.FromCode("EUR")), Currency.FromCode("EUR"), Currency.FromCode("EUR").MinorUnit },
-            { new Money(765.43m, Currency.FromCode("USD")), Currency.FromCode("USD"), Currency.FromCode("USD").MinorUnit },
-            { new Money(765.432m, Currency.FromCode("BHD")), Currency.FromCode("BHD"), Currency.FromCode("BHD").MinorUnit }
+            { new Money(765m, Currency.FromCode("JPY")), Currency.FromCode("JPY"), Currency.FromCode("JPY").MinimalAmount },
+            { new Money(765.43m, Currency.FromCode("EUR")), Currency.FromCode("EUR"), Currency.FromCode("EUR").MinimalAmount },
+            { new Money(765.43m, Currency.FromCode("USD")), Currency.FromCode("USD"), Currency.FromCode("USD").MinimalAmount },
+            { new Money(765.432m, Currency.FromCode("BHD")), Currency.FromCode("BHD"), Currency.FromCode("BHD").MinimalAmount }
         };
     }
 

@@ -77,7 +77,7 @@ namespace NodaMoney.Tests.Iso4127Spec
             var notDefinedCurrencies =
                 Currency.GetAllCurrencies()
                 .Where(c => c.IsValidOn(_iso4127List.PublishDate))
-                .Where(c => !string.IsNullOrEmpty(c.IsoNumber))
+                .Where(c => !string.IsNullOrEmpty(c.NumericCode))
                 .Where(c => !_iso4127List.currencies.Any(a => a.Currency == c.Code))
                 .ToList();
 
@@ -88,17 +88,18 @@ namespace NodaMoney.Tests.Iso4127Spec
         public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameEnglishName()
         {
             var differences = new List<string>();
-            foreach (var c in Currency.GetAllCurrencies())
-            {
-                var found = _iso4127List.currencies.Where(x => x.Currency == c.Code).ToList();
 
-                if (found.Count == 0)
+            foreach (var nodaCurrency in Currency.GetAllCurrencies())
+            {
+                var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
+                
+                if (iso4127Currency == null)
                     continue;
-                var a = found.First();
+
                 // ignore casing (for now)
-                if (!string.Equals(c.EnglishName, a.CurrencyName, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(nodaCurrency.EnglishName, iso4127Currency.CurrencyName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    differences.Add($"{ c.Code}: expected '{a.CurrencyName}' but found '{c.EnglishName}'");
+                    differences.Add($"{ nodaCurrency.Code}: expected '{iso4127Currency.CurrencyName}' but found '{nodaCurrency.EnglishName}'");
                 }
             }
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
@@ -108,17 +109,18 @@ namespace NodaMoney.Tests.Iso4127Spec
         public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumber()
         {
             var differences = new List<string>();
-            foreach (var c in Currency.GetAllCurrencies())
-            {
-                var found = _iso4127List.currencies.Where(x => x.Currency == c.Code).ToList();
 
-                if (found.Count == 0)
+            foreach (var nodaCurrency in Currency.GetAllCurrencies())
+            {
+                var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
+                
+                if (iso4127Currency == null)
                     continue;
-                var a = found.First();
+
                 // ignore casing (for now)
-                if (!string.Equals(c.IsoNumber, a.CurrencyNumber, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(nodaCurrency.NumericCode, iso4127Currency.CurrencyNumber, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    differences.Add($"{c.Code}: expected {a.CurrencyNumber} but found {c.Number}");
+                    differences.Add($"{nodaCurrency.Code}: expected {iso4127Currency.CurrencyNumber} but found {nodaCurrency.Number}");
                 }
             }
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
@@ -128,23 +130,25 @@ namespace NodaMoney.Tests.Iso4127Spec
         public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumberOfMinorDigits()
         {
             var differences = new List<string>();
-            foreach (var c in Currency.GetAllCurrencies())
+
+            foreach (var nodaCurrency in Currency.GetAllCurrencies())
             {
-                var found = _iso4127List.currencies.Where(x => x.Currency == c.Code).ToList();
+                var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
 
-                if (found.Count == 0)
+                if (iso4127Currency == null)
                     continue;
-                var a = found.First();
-                if (!string.Equals(c.DecimalDigits.ToString(), a.CurrencyMinorUnits, StringComparison.InvariantCultureIgnoreCase))
+
+                if (!string.Equals(nodaCurrency.DecimalDigits.ToString(), iso4127Currency.CurrencyMinorUnits, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (c.DecimalDigits == CurrencyRegistry.NotApplicable && a.CurrencyMinorUnits == "N.A.")
+                    if (nodaCurrency.MinorUnit == 0 && iso4127Currency.CurrencyMinorUnits == "N.A.")
                         continue;
-                    if (c.DecimalDigits == CurrencyRegistry.Z07 && a.CurrencyMinorUnits == "2")
+                    if (nodaCurrency.MinorUnit == Math.Log10(5) && iso4127Currency.CurrencyMinorUnits == "2")
                         continue;
 
-                    differences.Add($"{c.Code}: expected {a.CurrencyMinorUnits} minor units but found {c.DecimalDigits}");
+                    differences.Add($"{nodaCurrency.Code}: expected {iso4127Currency.CurrencyMinorUnits} minor units but found {nodaCurrency.DecimalDigits}");
                 }
             }
+
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
         }
     }

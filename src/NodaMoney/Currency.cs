@@ -15,7 +15,7 @@ using System.Xml.Serialization;
 
 namespace NodaMoney
 {
-    /// <summary>A unit of exchange, a currency of <see cref="Money" />.</summary>
+    /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency .</remarks>
     [Serializable]
     [DebuggerDisplay("{Code}")]
@@ -26,7 +26,7 @@ namespace NodaMoney
         /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
         public const string GenericCurrencySign = "¤";
 
-        private readonly byte _decimalDigits;
+        private readonly byte _minorUnit;
         private readonly byte _namespace;
         private readonly short _number;
         private readonly string _code;
@@ -45,7 +45,7 @@ namespace NodaMoney
 
             _code = c.Code;
             _number = c.Number;
-            _decimalDigits = c._decimalDigits;
+            _minorUnit = c._minorUnit;
             _englishName = c.EnglishName;
             _symbol = c.Symbol;
             _namespace = c._namespace;
@@ -56,7 +56,7 @@ namespace NodaMoney
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
         /// <param name="number">The number.</param>
-        /// <param name="decimalDigits">The decimal digits.</param>
+        /// <param name="minorUnitAsPowerOfTen">The decimal digits.</param>
         /// <param name="englishName">Name of the english.</param>
         /// <param name="symbol">The currency symbol.</param>
         /// <param name="namespace">The namespace of the currency.</param>
@@ -64,17 +64,17 @@ namespace NodaMoney
         /// <param name="validFrom">The valid from the specified date.</param>
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable.</exception>
-        internal Currency(string code, short number, byte decimalDigits, string englishName, string symbol, byte @namespace = 0, DateTime? validTo = null, DateTime? validFrom = null)
+        internal Currency(string code, short number, byte minorUnitAsPowerOfTen, string englishName, string symbol, byte @namespace = 0, DateTime? validTo = null, DateTime? validFrom = null)
             : this()
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
-            if (decimalDigits != CurrencyRegistry.B_Z07 && decimalDigits != CurrencyRegistry.B_NA && (decimalDigits < 0 || decimalDigits > 28))
-                throw new ArgumentOutOfRangeException(nameof(decimalDigits), $"For code {code} DecimalDigits must greater or equal to zero and smaller or equal to 28, or 255 if not applicable!");
+            if (minorUnitAsPowerOfTen != CurrencyRegistry.Z07Byte && minorUnitAsPowerOfTen != CurrencyRegistry.NotApplicableByte && (minorUnitAsPowerOfTen < 0 || minorUnitAsPowerOfTen > 28))
+                throw new ArgumentOutOfRangeException(nameof(minorUnitAsPowerOfTen), $"For code {code} DecimalDigits must greater or equal to zero and smaller or equal to 28, or 255 if not applicable!");
 
             _code = code;
             _number = number;
-            _decimalDigits = decimalDigits;
+            _minorUnit = minorUnitAsPowerOfTen;
             _englishName = englishName ?? string.Empty;
             _symbol = symbol ?? GenericCurrencySign;
             _namespace = @namespace;
@@ -142,7 +142,7 @@ namespace NodaMoney
         }
 
         /// <summary>Gets the (ISO-4217) three-digit code number of the currency.</summary>
-        public string IsoNumber => Number.ToString("D3", CultureInfo.InvariantCulture);
+        public string NumericCode => Number.ToString("D3", CultureInfo.InvariantCulture);
 
         /// <summary>Gets the namespace of the currency, like ISO-4217.</summary>
         public string Namespace
@@ -157,29 +157,76 @@ namespace NodaMoney
         /// <remarks>
         /// <para>
         /// For example, the default number of fraction digits for the US Dollar and Euro is 2, while for the Japanese Yen it's 0.
-        /// In the case of pseudo-currencies, such as Gold or IMF Special Drawing Rights, -1 is returned.
+        /// In the case of pseudo-currencies, such as Gold or IMF Special Drawing Rights, 0 is returned.
         /// </para>
         /// <para>
-        /// The Malagasy ariary and the Mauritanian ouguiya are technically divided into five subunits (the iraimbilanja and
-        /// khoum respectively), rather than by a power of ten. The coins display "1/5" on their face and are referred to as
-        /// a "fifth" (Khoum/cinquième). These are not used in practice, but when written out, a single significant digit is
-        /// used. E.g. 1.2 UM.
-        /// </para>
-        /// <para>
-        /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7.
+        /// Mauritania does not use a decimal division of units, setting 1 ouguiya (UM) equal to 5 khoums, and Madagascar has 1 ariary =
+        /// 5 iraimbilanja. The coins display "1/5" on their face and are referred to as a "fifth". These are not used in practice, but when
+        /// written out, a single significant digit is used (E.g. 1.2 UM), so 1 is returned.
         /// </para>
         /// </remarks>
-        public double DecimalDigits
+        public int DecimalDigits
         {
             get
             {
                 IfDefaultThenInitializeToNoCurrency();
-                return _decimalDigits switch
+                return _minorUnit switch
                 {
-                    255 => CurrencyRegistry.NotApplicable,
-                    254 => CurrencyRegistry.Z07,
-                    _ => _decimalDigits,
+                    CurrencyRegistry.NotApplicableByte => 0,
+                    CurrencyRegistry.Z07Byte => 1,
+                    _ => _minorUnit,
                 };
+            }
+        }
+
+        /// <summary>Gets the smallest amount of the currency unit.</summary>
+        public decimal MinimalAmount
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return MinorUnit == 0 ? 1m : (decimal)(1.0 / Math.Pow(10, MinorUnit));
+            }
+        }
+
+        /// <summary>Gets the minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
+        /// <para>
+        /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so the exponent 2 will be returned.
+        /// </para>
+        /// <para>
+        /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5), which is
+        /// 10^log10(5) = 10^0.698970004, so the exponent 0.698970004 will be returned.
+        /// </para>
+        public double MinorUnit
+        {
+            get
+            {
+                // https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
+                // unit of recorded value (i.e. as recorded by banks) which is a division of the respective unit of currency or fund
+                IfDefaultThenInitializeToNoCurrency();
+                return _minorUnit switch
+                {
+                    CurrencyRegistry.NotApplicableByte => 0,
+                    CurrencyRegistry.Z07Byte => Math.Log10(5),
+                    _ => _minorUnit,
+                };
+            }
+        }
+
+        /// <summary>Gets the number of minor units by which the currency unit can be divided in.</summary>
+        /// <para>
+        /// The US dollar can be divided into 100 cents (1/100) so the 100 will be returned.
+        /// </para>
+        /// <para>
+        /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5),
+        /// so 5 will be returned.
+        /// </para>
+        public double MinorUnits
+        {
+            get
+            {
+                IfDefaultThenInitializeToNoCurrency();
+                return Math.Pow(10, MinorUnit);
             }
         }
 
@@ -202,24 +249,6 @@ namespace NodaMoney
             {
                 IfDefaultThenInitializeToNoCurrency();
                 return _validTo;
-            }
-        }
-
-        /// <summary>Gets the major currency unit.</summary>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
-        public decimal MajorUnit => 1;
-
-        /// <summary>Gets the minor currency unit.</summary>
-        public decimal MinorUnit
-        {
-            get
-            {
-                IfDefaultThenInitializeToNoCurrency();
-
-                if (DecimalDigits == CurrencyRegistry.NotApplicable)
-                    return MajorUnit;
-
-                return new decimal(1 / Math.Pow(10, DecimalDigits));
             }
         }
 
@@ -331,15 +360,14 @@ namespace NodaMoney
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
         public bool Equals(Currency other)
         {
-            return Code == other.Code
-                && Namespace == other.Namespace
-                && DecimalDigits == other.DecimalDigits
-                && EnglishName == other.EnglishName
-                && MajorUnit == other.MajorUnit
-                && MinorUnit == other.MinorUnit
-                && Symbol == other.Symbol
-                && ValidFrom == other.ValidFrom
-                && ValidTo == other.ValidTo;
+            IfDefaultThenInitializeToNoCurrency();
+            return _code == other._code
+                && _namespace == other._namespace
+                && _minorUnit == other._minorUnit
+                && _englishName == other._englishName
+                && _symbol == other._symbol
+                && _validFrom == other._validFrom
+                && _validTo == other._validTo;
         }
 
         /// <summary>Returns the hash code for this instance.</summary>
@@ -363,7 +391,7 @@ namespace NodaMoney
         public void Deconstruct(out string code, out string isoNumber, out string symbol)
         {
             code = Code;
-            isoNumber = IsoNumber;
+            isoNumber = NumericCode;
             symbol = Symbol;
         }
 
