@@ -360,14 +360,7 @@ namespace NodaMoney
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
         public bool Equals(Currency other)
         {
-            IfDefaultThenInitializeToNoCurrency();
-            return _code == other._code
-                && _namespace == other._namespace
-                && _minorUnit == other._minorUnit
-                && _englishName == other._englishName
-                && _symbol == other._symbol
-                && _validFrom == other._validFrom
-                && _validTo == other._validTo;
+            return Code == other.Code && Namespace == other.Namespace;
         }
 
         /// <summary>Returns the hash code for this instance.</summary>

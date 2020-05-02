@@ -186,15 +186,25 @@ namespace NodaMoney
                     int index = Index[key];
                     if (Index.Remove(key))
                     {
-                        // We leave currency in the array
                         currency = currencies[index];
+
+                        // replace space with last currency in array and make the array smaller
+                        int lastIndex = currencies.Length - 1;
+                        if (index != lastIndex)
+                        {
+                            currencies[index] = currencies[lastIndex];
+                            Index[currencies[index].GetHashCode()] = index;
+                        }
+
+                        Array.Resize(ref currencies, currencies.Length - 1);
+
+                        Debug.Assert(!currencies.Contains(currency), $"{nameof(Index)} and {nameof(currencies)} array should be equally mapped so it exist in both or it doesn't exist in both!");
 
                         return true;
                     }
                 }
             }
 
-            //Debug.Assert(Currencies.Contains(currency), $"{nameof(KeyLookup)} and {nameof(Currencies)} array should be equally mapped so it exist in both or it doesn't exist in both!");
             currency = default;
             return false;
         }

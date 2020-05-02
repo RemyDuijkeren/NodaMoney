@@ -520,27 +520,41 @@ namespace NodaMoney.Tests.CurrencySpec
     public class GivenIWantDefaultCurrency
     {
         [Fact]
-        public void WhenCreatingDefault_ThenItShouldBeNoCurrency()
+        public void WhenCreatingVariableWithDefault_ThenShouldBeEqualToNoCurrency()
         {
-            var NoCurrency = Currency.FromCode("XXX");
-
+            // Arrange / Act
             Currency currency = default;
 
+            // Assert
+            var expected = Currency.FromCode("XXX");
+
             currency.Should().NotBeNull();
-            currency.Should().Be(NoCurrency);
-            currency.Symbol.Should().Be(NoCurrency.Symbol);
-            currency.Code.Should().Be(NoCurrency.Code);
-            currency.EnglishName.Should().Be(NoCurrency.EnglishName);
-            currency.IsValid.Should().Be(NoCurrency.IsValid);
+            currency.Should().Be(expected);
+            currency.Code.Should().Be(expected.Code);
+            currency.Namespace.Should().Be(expected.Namespace);
+            currency.Symbol.Should().Be(expected.Symbol);
+            currency.EnglishName.Should().Be(expected.EnglishName);
+            currency.IsValid.Should().Be(expected.IsValid);
         }
 
         [Fact]
         public void WhenNoCurrency_ThenItShouldBeEqualToDefault()
         {
+            // Arrange / Act
             Currency noCurrency = Currency.FromCode("XXX");
 
+            // Assert
             noCurrency.Should().NotBeNull();
             noCurrency.Should().Be(default(Currency));
+
+            // Assert with XUnit methods, because https://stackoverflow.com/questions/61556309/fluent-assertions-be-vs-equals
+            Assert.Equal(default, noCurrency);
+            Assert.Equal(default(Currency), (object)noCurrency);
+            Assert.True(noCurrency == default);
+            Assert.True(noCurrency == default(Currency));
+            Assert.True(noCurrency.Equals(default));
+            Assert.True(noCurrency.Equals((object)default(Currency)));
+            Assert.True(object.Equals(noCurrency, default(Currency)));
         }
     }
 }
