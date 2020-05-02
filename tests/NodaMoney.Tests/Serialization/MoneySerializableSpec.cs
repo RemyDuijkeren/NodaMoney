@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -73,18 +73,38 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
             // Console.WriteLine(json);
             var clone = JsonConvert.DeserializeObject<Money>(json);
 
-            clone.Should().Be(money);
+            clone.Should().Equals(money);
+            // clone.Should().Be(money);
         }
 
         [Theory]
         [MemberData(nameof(TestData))]
-        public void WhenSerializingArticle_ThenThisShouldSucceed(Money money)
+        public void WhenSerializingArticleWithPrice_ThenThisShouldSucceed(Money money)
         {
             var order = new Order
             {
                 Id = 123,
+                Name = "Foo",
+                Price = money
+            };
+
+            string json = JsonConvert.SerializeObject(order);
+            // Console.WriteLine(json);
+            var clone = JsonConvert.DeserializeObject<Order>(json);
+
+            clone.Should().BeEquivalentTo(order);
+        }
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void WhenSerializingArticleWithPriceAndDiscount_ThenThisShouldSucceed(Money money)
+        {
+            var order = new Order
+            {
+                Id = 123,
+                Name = "Foo",
                 Price = money,
-                Name = "Foo"
+                Discount = money
             };
 
             string json = JsonConvert.SerializeObject(order);

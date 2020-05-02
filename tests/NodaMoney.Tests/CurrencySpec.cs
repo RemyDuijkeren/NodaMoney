@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,6 +7,7 @@ using FluentAssertions;
 using Xunit;
 using System.Xml.Serialization;
 using NodaMoney.Tests.Helpers;
+using FluentAssertions.Common;
 
 namespace NodaMoney.Tests.CurrencySpec
 {
@@ -298,7 +299,8 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenEuro_ThenShouldBeDividedBy100()
         {
-            _eur.MinorUnit.Should().Be(100);
+            _eur.MinorUnit.Should().Be(2);
+            // _eur.MinorUnit.Should().Be(100);
             _eur.MinimalAmount.Should().Be(0.01m);
             _eur.DecimalDigits.Should().Be(2);
         }
@@ -306,7 +308,7 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenYen_ThenShouldBeDividedByNothing()
         {
-            _eur.MinorUnit.Should().Be(0);
+            _yen.MinorUnit.Should().Be(0);
             _yen.MinimalAmount.Should().Be(1m);
             _yen.DecimalDigits.Should().Be(0);
         }
@@ -314,7 +316,8 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenDinar_ThenShouldBeDividedBy1000()
         {
-            _din.MinorUnit.Should().Be(1000);
+            _din.MinorUnit.Should().Be(3);
+            // _din.MinorUnit.Should().Be(1000);
             _din.MinimalAmount.Should().Be(0.001m);
             _din.DecimalDigits.Should().Be(3);
         }
@@ -333,7 +336,8 @@ namespace NodaMoney.Tests.CurrencySpec
             // The Malagasy ariary are technically divided into five subunits, where the coins display "1/5" on their face and
             // are referred to as a "fifth"; These are not used in practice, but when written out, a single significant digit
             // is used. E.g. 1.2 UM.
-            _mga.MinorUnit.Should().Be(5); // 1/5
+            _mga.MinorUnit.Should().Be(Math.Log10(5)); // 1/5 = 10^Log1010(5) => exponent Log10(5)
+            // _mga.MinorUnit.Should().Be(5); // 1/5
             _mga.MinimalAmount.Should().Be(0.2m);
             _mga.DecimalDigits.Should().Be(1); // According to ISO-4217 this is 2
         }
