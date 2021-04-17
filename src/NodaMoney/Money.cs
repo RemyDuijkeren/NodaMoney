@@ -12,8 +12,11 @@ namespace NodaMoney
     /// and ensure that two different currencies cannot be added or subtracted to each other.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Money : IEquatable<Money>
+    public readonly partial struct Money : IEquatable<Money>
     {
+        private readonly decimal amount;
+        private readonly Currency currency;
+
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
@@ -82,8 +85,8 @@ namespace NodaMoney
         public Money(decimal amount, Currency currency, MidpointRounding rounding)
             : this()
         {
-            Currency = currency;
-            Amount = Round(amount, currency, rounding);
+            this.currency = currency ?? throw new ArgumentNullException(nameof(currency));
+            this.amount = Round(amount, currency, rounding);
         }
 
         // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
@@ -220,10 +223,10 @@ namespace NodaMoney
         }
 
         /// <summary>Gets the amount of money.</summary>
-        public decimal Amount { get; private set; }
+        public readonly decimal Amount { get => amount; }
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-        public Currency Currency { get; private set; }
+        public readonly Currency Currency { get => currency; }
 
         /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
         /// <param name="left">A <see cref="Money"/> object on the left side.</param>

@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\NodaMoney.Serialization.JsonNet\NodaMoney.Serialization.JsonNet.csproj" />
     <ProjectReference Include="..\..\src\NodaMoney.Serialization.AspNet\NodaMoney.Serialization.AspNet.csproj" />
     <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
   </ItemGroup>

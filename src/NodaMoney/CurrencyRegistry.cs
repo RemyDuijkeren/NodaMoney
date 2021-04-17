@@ -44,7 +44,7 @@ namespace NodaMoney
             }
 
             currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
-            return !currency.Equals(default);
+            return currency != null;
         }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>

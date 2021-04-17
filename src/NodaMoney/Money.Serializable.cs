@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
@@ -53,8 +54,8 @@ namespace NodaMoney
                 currency = info.GetString("currency");
             }
 
-            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
-            Amount = Round(amount, Currency, MidpointRounding.ToEven);
+            this.currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
+            this.amount = Round(amount, Currency, MidpointRounding.ToEven);
         }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
 
@@ -71,7 +72,7 @@ namespace NodaMoney
         /// <param name="reader">The <see cref="XmlReader" /> stream from which the object is deserialized.</param>
         /// <exception cref="ArgumentNullException">The value of 'reader' cannot be null.</exception>
         /// <exception cref="SerializationException">The xml should have a content element with name Money.</exception>
-        public void ReadXml(XmlReader reader)
+        void IXmlSerializable.ReadXml(XmlReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -79,14 +80,15 @@ namespace NodaMoney
             if (reader.MoveToContent() != XmlNodeType.Element)
                 throw new SerializationException("Couldn't find content element with name Money!");
 
-            Amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
-            Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(reader["Currency"]);
+            var amount = decimal.Parse(reader["Amount"], CultureInfo.InvariantCulture);
+            var currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(reader["Currency"]);
+            Unsafe.AsRef(this) = new Money(amount, currency);
         }
 
         /// <summary>Converts an object into its XML representation.</summary>
         /// <param name="writer">The <see cref="XmlWriter" /> stream to which the object is serialized.</param>
         /// <exception cref="System.ArgumentNullException">The value of 'writer' cannot be null.</exception>
-        public void WriteXml(XmlWriter writer)
+        void IXmlSerializable.WriteXml(XmlWriter writer)
         {
             if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
@@ -99,7 +101,7 @@ namespace NodaMoney
         /// <param name="info">The <see cref="SerializationInfo" /> to populate with data. </param>
         /// <param name="context">The destination (see <see cref="StreamingContext" />) for this serialization. </param>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission. </exception>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));

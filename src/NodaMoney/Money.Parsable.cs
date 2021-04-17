@@ -36,6 +36,8 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException(nameof(value));
+            if (currency is null)
+                throw new ArgumentNullException(nameof(currency));
 
             return Parse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency);
         }
@@ -53,6 +55,8 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException(nameof(value));
+            if (currency is null)
+                throw new ArgumentNullException(nameof(currency));
 
             decimal amount = decimal.Parse(value, style, GetFormatProvider(currency, provider));
             return new Money(amount, currency);
@@ -101,6 +105,9 @@ namespace NodaMoney
         /// <remarks>See <see cref="decimal.TryParse(string, out decimal)"/> for more info and remarks.</remarks>
         public static bool TryParse(string value, Currency currency, out Money result)
         {
+            if (currency is null)
+                throw new ArgumentNullException(nameof(currency));
+
             return TryParse(value, NumberStyles.Currency, GetFormatProvider(currency, null), currency, out result);
         }
 
@@ -118,6 +125,9 @@ namespace NodaMoney
         /// <remarks>See <see cref="decimal.TryParse(string, NumberStyles, IFormatProvider, out decimal)"/> for more info and remarks.</remarks>
         public static bool TryParse(string value, NumberStyles style, IFormatProvider provider, Currency currency, out Money result)
         {
+            if (currency is null)
+                throw new ArgumentNullException(nameof(currency));
+
             bool isParsingSuccessful = decimal.TryParse(value, style, GetFormatProvider(currency, provider), out decimal amount);
             if (isParsingSuccessful)
             {

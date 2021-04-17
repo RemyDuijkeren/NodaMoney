@@ -140,6 +140,9 @@ namespace NodaMoney
         /// <param name="currency">The object whose properties will be used.</param>
         public void LoadDataFromCurrency(Currency currency)
         {
+            if (currency is null)
+                throw new ArgumentNullException(nameof(currency));
+
             EnglishName = currency.EnglishName;
             Symbol = currency.Symbol;
             ISONumber = currency.Number;

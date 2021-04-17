@@ -19,15 +19,14 @@ namespace NodaMoney
     [Serializable]
     [DebuggerDisplay("{Code}")]
     [TypeConverter(typeof(CurrencyTypeConverter))]
-    public struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
+    public sealed class Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
         /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
         public const string GenericCurrencySign = "¤";
 
-        /// <summary>A singleton instance of the currencies registry.</summary>
-        [NonSerialized]
-        internal static CurrencyRegistry Registry = new CurrencyRegistry();
+        /// <summary>Gets a singleton instance of the currencies registry.</summary>
+        internal static CurrencyRegistry Registry { get; } = new CurrencyRegistry();
 
         /// <summary>Initializes a new instance of the <see cref="Currency" /> struct.</summary>
         /// <param name="code">The code.</param>
@@ -59,7 +58,6 @@ namespace NodaMoney
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable.</exception>
         internal Currency(string code, string number, double decimalDigits, string englishName, string symbol, string @namespace = "ISO-4217", DateTime? validTo = null, DateTime? validFrom = null)
-            : this()
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
@@ -76,6 +74,10 @@ namespace NodaMoney
             Namespace = @namespace;
             ValidTo = validTo;
             ValidFrom = validFrom;
+        }
+
+        private Currency()
+        {
         }
 
 #pragma warning disable CA1801 // Parameter context of method.ctor is never used.
@@ -100,19 +102,19 @@ namespace NodaMoney
         }
 
         /// <summary>Gets the currency symbol.</summary>
-        public string Symbol { get; }
+        public string Symbol { get; private set; }
 
         /// <summary>Gets the english name of the currency.</summary>
-        public string EnglishName { get; }
+        public string EnglishName { get; private set; }
 
         /// <summary>Gets the three-character (ISO-4217) currency code.</summary>
-        public string Code { get; }
+        public string Code { get; private set; }
 
         /// <summary>Gets the numeric (ISO-4217) currency number.</summary>
-        public string Number { get; }
+        public string Number { get; private set; }
 
         /// <summary>Gets the namespace of the currency, like ISO-4217.</summary>
-        public string Namespace { get; }
+        public string Namespace { get; private set; }
 
         /// <summary>Gets the number of digits after the decimal separator.</summary>
         /// <remarks>
@@ -130,15 +132,15 @@ namespace NodaMoney
         /// To represent this in decimal we do the following steps: 5 is 10 to the power of log(5) = 0.69897... ~ 0.7.
         /// </para>
         /// </remarks>
-        public double DecimalDigits { get; }
+        public double DecimalDigits { get; private set; }
 
         /// <summary>Gets the date when the currency is valid from.</summary>
         /// <value>The from date when the currency is valid.</value>
-        public DateTime? ValidFrom { get; internal set; }
+        public DateTime? ValidFrom { get; private set; }
 
         /// <summary>Gets the date when the currency is valid to.</summary>
         /// <value>The to date when the currency is valid.</value>
-        public DateTime? ValidTo { get; internal set; }
+        public DateTime? ValidTo { get; private set; }
 
         /// <summary>Gets the major currency unit.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Member of Currency type! Implementation can change in the future.")]
@@ -164,7 +166,7 @@ namespace NodaMoney
         /// <param name="left">The left Currency.</param>
         /// <param name="right">The right Currency.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator ==(Currency left, Currency right) => left.Equals(right);
+        public static bool operator ==(Currency left, Currency right) => object.Equals(left, right);
 
         /// <summary>Implements the operator ==.</summary>
         /// <param name="left">The left Currency.</param>
@@ -270,6 +272,11 @@ namespace NodaMoney
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Calling override method")]
         public bool Equals(Currency other)
         {
+            if (other == null)
+            {
+                return false;
+            }
+
             return Code == other.Code
                 && Namespace == other.Namespace
                 && DecimalDigits == other.DecimalDigits
@@ -323,17 +330,25 @@ namespace NodaMoney
         /// produced by the <see cref="IXmlSerializable.WriteXml(XmlWriter)" /> method and
         /// consumed by the <see cref="IXmlSerializable.ReadXml(XmlReader)" /> method.
         /// </returns>
-        public XmlSchema GetSchema() => null;
+        XmlSchema IXmlSerializable.GetSchema() => null;
 
         /// <summary>Generates an object from its XML representation.</summary>
         /// <param name="reader">The <see cref="XmlReader" /> stream from which the object is deserialized.</param>
         /// <exception cref="ArgumentNullException">The value of 'reader' cannot be null. </exception>
-        public void ReadXml(XmlReader reader)
+        void IXmlSerializable.ReadXml(XmlReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            this = FromCode(reader["Currency"]);
+            var fromCode = FromCode(reader["Currency"]);
+            Code = fromCode.Code;
+            Namespace = fromCode.Namespace;
+            DecimalDigits = fromCode.DecimalDigits;
+            EnglishName = fromCode.EnglishName;
+            Number = fromCode.Number;
+            Symbol = fromCode.Symbol;
+            ValidFrom = fromCode.ValidFrom;
+            ValidTo = fromCode.ValidTo;
         }
 
         /// <summary>
@@ -341,7 +356,7 @@ namespace NodaMoney
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter" /> stream to which the object is serialized.</param>
         /// <exception cref="ArgumentNullException">The value of 'writer' cannot be null.</exception>
-        public void WriteXml(XmlWriter writer)
+        void IXmlSerializable.WriteXml(XmlWriter writer)
         {
             if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
@@ -353,7 +368,7 @@ namespace NodaMoney
         /// <param name="info">The <see cref="SerializationInfo" /> to populate with data. </param>
         /// <param name="context">The destination (see <see cref="StreamingContext" />) for this serialization. </param>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission. </exception>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));

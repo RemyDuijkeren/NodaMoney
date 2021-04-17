@@ -9,16 +9,19 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using NodaMoney.Serialization.JsonNet;
 
 namespace NodaMoney.Tests.Serialization
 {
     public class GivenIWantToDeserializeMoneyWithJsonNetSerializer
     {
+        private readonly JsonSerializerSettings settings = new JsonSerializerSettings().ConfigureForNodaMoney();
+
         [Theory]
         [ClassData(typeof(ValidJsonTestData))]
         public void WhenDeserializing_ThenThisShouldSucceed(string json, Money expected)
         {
-            var clone = JsonConvert.DeserializeObject<Money>(json);
+            var clone = JsonConvert.DeserializeObject<Money>(json, settings);
 
             clone.Should().Be(expected);
         }
@@ -27,16 +30,16 @@ namespace NodaMoney.Tests.Serialization
         [ClassData(typeof(InvalidJsonTestData))]
         public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
         {
-            Action action = () => JsonConvert.DeserializeObject<Money>(json);
+            Action action = () => JsonConvert.DeserializeObject<Money>(json, settings);
 
-            action.Should().Throw<SerializationException>().WithMessage("Member '*");
+            action.Should().Throw<JsonSerializationException>();
         }
 
         [Theory]
         [ClassData(typeof(NestedJsonTestData))]
         public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json, Order expected)
         {
-            var clone = JsonConvert.DeserializeObject<Order>(json);
+            var clone = JsonConvert.DeserializeObject<Order>(json, settings);
 
             clone.Should().BeEquivalentTo(expected);
             clone.Discount.Should().BeNull();
@@ -45,6 +48,8 @@ namespace NodaMoney.Tests.Serialization
 
     public class GivenIWantToSerializeMoneyWithJsonNetSerializer
     {
+        private readonly JsonSerializerSettings settings = new JsonSerializerSettings().ConfigureForNodaMoney();
+
         public static IEnumerable<object[]> TestData => new[]
         {
                 new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
@@ -68,9 +73,9 @@ namespace NodaMoney.Tests.Serialization
         [MemberData(nameof(TestData))]
         public void WhenSerializingMoney_ThenThisShouldSucceed(Money money)
         {
-            string json = JsonConvert.SerializeObject(money);
+            string json = JsonConvert.SerializeObject(money, settings);
             // Console.WriteLine(json);
-            var clone = JsonConvert.DeserializeObject<Money>(json);
+            var clone = JsonConvert.DeserializeObject<Money>(json, settings);
 
             clone.Should().Be(money);
         }
@@ -88,7 +93,7 @@ namespace NodaMoney.Tests.Serialization
 
             string json = JsonConvert.SerializeObject(order);
             // Console.WriteLine(json);
-            var clone = JsonConvert.DeserializeObject<Order>(json);
+            var clone = JsonConvert.DeserializeObject<Order>(json, settings);
 
             clone.Should().BeEquivalentTo(order);
         }
