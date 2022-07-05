@@ -17,6 +17,11 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |-------------- |---------:|---------:|---------:|------:|------:|------:|----------:|
 |      FromCode | 14.68 ns | 0.313 ns | 0.396 ns |     - |     - |     - |         - |
 | FromCodeBeRef | 16.54 ns | 0.644 ns | 1.897 ns |     - |     - |     - |         - |
+### after as class
+|        Method |     Mean |    Error |   StdDev | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|-------------- |---------:|---------:|---------:|------:|------:|------:|----------:|
+|      FromCode | 20.32 ns | 0.666 ns | 1.952 ns |     - |     - |     - |         - |
+| FromCodeBeRef | 21.68 ns | 0.661 ns | 1.949 ns |     - |     - |     - |         - |
 
 ## InitializingMoney
 #### before
@@ -39,7 +44,16 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |       ImplicitCurrencyByConstructor | 301.9183 ns | 6.0293 ns | 17.2992 ns | 298.9093 ns | 1.128 |    0.06 |     - |     - |     - |         - |
 |           ImplicitCurrencyByCasting | 290.5713 ns | 5.5149 ns |  5.4163 ns | 289.4430 ns | 1.066 |    0.03 |     - |     - |     - |         - |
 |                         Deconstruct |   0.0005 ns | 0.0019 ns |  0.0018 ns |   0.0000 ns | 0.000 |    0.00 |     - |     - |     - |         - |
-
+### after as class
+|                              Method |        Mean |     Error |     StdDev |      Median | Ratio | RatioSD | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------------------ |------------:|----------:|-----------:|------------:|------:|--------:|------:|------:|------:|----------:|
+|            ExplicitCurrencyAsString | 291.2011 ns | 5.7582 ns | 10.6731 ns | 292.0155 ns | 1.000 |    0.00 |     - |     - |     - |         - |
+| ExplicitCurrencyAsStringAndRounding | 291.1404 ns | 5.8337 ns | 12.3053 ns | 292.7434 ns | 0.997 |    0.05 |     - |     - |     - |         - |
+|            ExplicitCurrencyFromCode | 293.2023 ns | 5.8591 ns | 11.8356 ns | 293.2638 ns | 1.008 |    0.05 |     - |     - |     - |         - |
+|                        HelperMethod | 295.5661 ns | 5.9172 ns | 12.3514 ns | 293.7525 ns | 1.013 |    0.04 |     - |     - |     - |         - |
+|       ImplicitCurrencyByConstructor | 304.9541 ns | 6.0387 ns | 11.3421 ns | 306.0941 ns | 1.049 |    0.04 |     - |     - |     - |         - |
+|           ImplicitCurrencyByCasting | 304.1174 ns | 6.0599 ns | 12.2413 ns | 307.0236 ns | 1.044 |    0.05 |     - |     - |     - |         - |
+|                         Deconstruct |   0.0451 ns | 0.0231 ns |  0.0486 ns |   0.0345 ns | 0.000 |    0.00 |     - |     - |     - |         - |
 
 ## MoneyOperations
 #### before
@@ -62,6 +76,16 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |            CompareAmount |  57.70 ns | 1.177 ns | 1.571 ns |     - |     - |     - |         - |
 |                Increment | 689.64 ns | 9.313 ns | 8.256 ns |     - |     - |     - |         - |
 |                Decrement | 680.19 ns | 9.031 ns | 8.448 ns |     - |     - |     - |         - |
+### after as class
+|                   Method |      Mean |     Error |    StdDev | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------- |----------:|----------:|----------:|------:|------:|------:|----------:|
+|                 Addition | 301.01 ns |  5.962 ns | 11.198 ns |     - |     - |     - |         - |
+|              Subtraction | 299.39 ns |  5.959 ns | 10.745 ns |     - |     - |     - |         - |
+|      CompareSameCurrency |  28.17 ns |  0.586 ns |  1.196 ns |     - |     - |     - |         - |
+| CompareDifferentCurrency |  38.29 ns |  0.792 ns |  2.235 ns |     - |     - |     - |         - |
+|            CompareAmount |  37.34 ns |  0.768 ns |  2.115 ns |     - |     - |     - |         - |
+|                Increment | 674.86 ns | 13.303 ns | 24.986 ns |     - |     - |     - |         - |
+|                Decrement | 700.62 ns | 13.703 ns | 15.780 ns |     - |     - |     - |         - |
 
 ## MoneyFormatting
 #### before
@@ -78,6 +102,13 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ImplicitWithFormat | 206.8 ns | 3.87 ns | 3.62 ns | 0.0420 |     - |     - |     265 B |
 |           Explicit | 233.9 ns | 3.54 ns | 3.32 ns | 0.0763 |     - |     - |     481 B |
 | ExplicitWithFormat | 245.8 ns | 4.82 ns | 4.73 ns | 0.0763 |     - |     - |     481 B |
+### after as class
+|             Method |     Mean |   Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------- |---------:|--------:|---------:|-------:|------:|------:|----------:|
+|           Implicit | 255.7 ns | 5.10 ns | 12.33 ns | 0.0420 |     - |     - |     265 B |
+| ImplicitWithFormat | 265.4 ns | 5.29 ns | 14.11 ns | 0.0420 |     - |     - |     265 B |
+|           Explicit | 302.1 ns | 6.03 ns | 16.41 ns | 0.0763 |     - |     - |     481 B |
+| ExplicitWithFormat | 310.4 ns | 8.04 ns | 23.72 ns | 0.0763 |     - |     - |     481 B |
 
 ## MoneyParsing
 #### before
@@ -94,6 +125,13 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ImplicitTry | 1,119.2 ns | 22.26 ns | 19.74 ns | 0.1354 |     - |     - |     859 B |
 |    Explicit |   684.3 ns | 12.26 ns | 11.47 ns | 0.1030 |     - |     - |     650 B |
 | ExplicitTry |   760.5 ns | 20.91 ns | 61.66 ns | 0.1030 |     - |     - |     650 B |
+### after as class
+|      Method |       Mean |    Error |    StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------ |-----------:|---------:|----------:|-------:|------:|------:|----------:|
+|    Implicit | 1,345.5 ns | 34.66 ns | 102.19 ns | 0.1354 |     - |     - |     859 B |
+| ImplicitTry | 1,395.7 ns | 43.70 ns | 128.86 ns | 0.1354 |     - |     - |     859 B |
+|    Explicit |   794.9 ns | 16.03 ns |  47.28 ns | 0.1030 |     - |     - |     650 B |
+| ExplicitTry |   783.0 ns | 17.38 ns |  51.23 ns | 0.1030 |     - |     - |     650 B |
 
 ## AddingCustomCurrency
 #### before
@@ -113,6 +151,11 @@ Benchmarks with issues:
 |-------------- |---------:|---------:|---------:|-------:|------:|------:|----------:|
 | CreateBuilder | 94.72 ns | 2.983 ns | 8.796 ns | 0.0139 |     - |     - |      88 B |
 |         Build | 56.46 ns | 1.258 ns | 3.708 ns |      - |     - |     - |         - |
+### after as class
+|        Method |     Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|-------------- |---------:|---------:|---------:|-------:|------:|------:|----------:|
+| CreateBuilder | 97.77 ns | 2.649 ns | 7.810 ns | 0.0139 |     - |     - |      88 B |
+|         Build | 34.83 ns | 1.019 ns | 2.972 ns | 0.0127 |     - |     - |      80 B |
 
 ## HighLoad
 #### before
@@ -125,3 +168,8 @@ Benchmarks with issues:
 |--------------------------- |----------:|---------:|---------:|---------:|---------:|---------:|----------:|
 | CreatingOneMillionCurrency |  46.95 ms | 0.995 ms | 2.918 ms | 307.6923 | 307.6923 | 307.6923 |  61.04 MB |
 |    CreatingOneMillionMoney | 241.55 ms | 4.731 ms | 9.665 ms | 333.3333 | 333.3333 | 333.3333 |  76.29 MB |
+### after as class
+|                     Method |      Mean |    Error |   StdDev |    Gen 0 |    Gen 1 |    Gen 2 | Allocated |
+|--------------------------- |----------:|---------:|---------:|---------:|---------:|---------:|----------:|
+| CreatingOneMillionCurrency |  26.03 ms | 0.517 ms | 1.278 ms | 343.7500 | 343.7500 | 343.7500 |   7.63 MB |
+|    CreatingOneMillionMoney | 230.95 ms | 4.577 ms | 8.597 ms | 333.3333 | 333.3333 | 333.3333 |  22.89 MB |
