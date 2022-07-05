@@ -8,6 +8,7 @@
 .vs
 .vscode
 .cr
+.idea
 
 #DOTNET Core
 project.lock.json
