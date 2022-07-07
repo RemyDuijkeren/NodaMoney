@@ -8,6 +8,7 @@ using Xunit;
 using System.Xml.Serialization;
 using NodaMoney.Tests.Helpers;
 using FluentAssertions.Common;
+using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.CurrencySpec
 {
@@ -88,6 +89,33 @@ namespace NodaMoney.Tests.CurrencySpec
         //        }
         //    }
         //}
+
+        [Theory]
+        [InlineData("EUR")]
+        [InlineData("MYR")]
+        [InlineData("USD")]
+        public void WhenTryToFitCodeIn2Bytes_ThenItShouldBePossible(string currencyCode)
+        {
+            // EUR = 69, 85, 82 => 4, 20, 17
+            byte[] A_InputBytes = currencyCode.ToCharArray().Select(c => (byte)(c - 'A')).ToArray();
+            var A_InputArray = A_InputBytes.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')).ToArray();
+            
+            // store in ushort = 2bytes (15bits needed, 1bit left)
+            ushort B_Storage = (ushort)(A_InputBytes[0]<<10 | A_InputBytes[1]<<5| A_InputBytes[2]);
+            var B_StorageString = Convert.ToString(B_Storage, 2).PadLeft(16, '0');
+            string[] B_StorageArray = {B_StorageString.Substring(0, 8), B_StorageString.Substring(8, 8)};
+
+            // shift into bytes again with clearing left 3 bits (by using & 0b0001_1111 = 0x1F = 31)
+            var C_OutputBytes = new[] { (byte)(B_Storage>>10), (byte)(B_Storage>>5 & 0x1F), (byte)(B_Storage & 0x1F) };
+            var C_OutputArray = C_OutputBytes.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')).ToArray();
+            
+            var outputCode = new string(C_OutputBytes.Select(b => (char)(b + 'A')).ToArray());
+
+            outputCode.Should().Be(currencyCode);
+            
+            // ushort for storing code (2bytes) = 15bits needed, 1bit left => use 1bit to mark if ISO? ISO=0, 1=other?
+            // byte for storing namespace (4bits=15 or 3bits=7) and minor unit (4bits=15 or 35bit=31)? or use CurrencyInfo to retrieve?
+        }
     }
     
     public class GivenIWantCurrencyFromIsoCode

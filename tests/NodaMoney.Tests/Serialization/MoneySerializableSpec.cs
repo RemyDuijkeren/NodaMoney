@@ -72,9 +72,8 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
             string json = JsonConvert.SerializeObject(money);
             // Console.WriteLine(json);
             var clone = JsonConvert.DeserializeObject<Money>(json);
-
-            clone.Should().Equals(money);
-            // clone.Should().Be(money);
+            
+            clone.Should().Be(money);
         }
 
         [Theory]

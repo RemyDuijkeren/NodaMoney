@@ -27,8 +27,6 @@ using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 using static Nuke.Common.IO.CompressionTasks;
 
-[CheckBuildProjectConfigurations]
-[UnsetVisualStudioEnvironmentVariables]
 [AzurePipelines(
     suffix: null,
     image: AzurePipelinesImage.WindowsLatest,
@@ -111,7 +109,7 @@ partial class Build : NukeBuild
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
                 .SetFilter("FullyQualifiedName!~PerformanceSpec")
-                .SetLogger("trx")
+                .SetLoggers("trx")
                 .SetResultsDirectory(testResults)
                 .EnableNoBuild()
                 .EnableNoRestore()
@@ -183,7 +181,7 @@ partial class Build : NukeBuild
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
 
             DotNetNuGetPush(s => s
-                .SetWorkingDirectory(ArtifactsDirectory)
+                .SetProcessWorkingDirectory(ArtifactsDirectory)
                 .SetSource("https://api.nuget.org/v3/index.json")
                 .SetApiKey(NuGetApiKey));
         });
