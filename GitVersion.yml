@@ -1,7 +1,3 @@
-next-version: 1.0
 assembly-versioning-scheme: MajorMinor
 assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{env:BUILD_BUILDNUMBER ?? 0}'
-mode: ContinuousDelivery
-branches: {}
-ignore:
-  sha: []
+mode: Mainline

@@ -8,7 +8,6 @@ using Xunit;
 using System.Xml.Serialization;
 using NodaMoney.Tests.Helpers;
 using FluentAssertions.Common;
-using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.CurrencySpec
 {

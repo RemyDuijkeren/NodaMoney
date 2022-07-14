@@ -20,6 +20,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodaMoney.Tests", "tests\No
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{324D342A-2588-4422-AFB1-FA0359EE825D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodaMoney.Benchmarks", "tests\NodaMoney.Benchmarks\NodaMoney.Benchmarks.csproj", "{ED4F3523-DACF-4C96-B667-CFA95356A5AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F816AC01-7479-4E72-A668-2CF9650B5F4E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B47D1275-A1AA-43D3-B0E1-D40EB99253C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +43,20 @@ Global
 		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{324D342A-2588-4422-AFB1-FA0359EE825D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{324D342A-2588-4422-AFB1-FA0359EE825D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4F3523-DACF-4C96-B667-CFA95356A5AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED4F3523-DACF-4C96-B667-CFA95356A5AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED4F3523-DACF-4C96-B667-CFA95356A5AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4F3523-DACF-4C96-B667-CFA95356A5AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {67B5C6E9-63D4-4510-9C95-AAA5BBFF8E11}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{58F0FE5E-E139-4ABF-B9A5-969DBBE69F52} = {F816AC01-7479-4E72-A668-2CF9650B5F4E}
+		{ED4F3523-DACF-4C96-B667-CFA95356A5AB} = {B47D1275-A1AA-43D3-B0E1-D40EB99253C2}
+		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7} = {B47D1275-A1AA-43D3-B0E1-D40EB99253C2}
 	EndGlobalSection
 EndGlobal
