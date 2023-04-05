@@ -8,6 +8,24 @@ namespace NodaMoney
         // : IConvertible
 #endif
     {
+
+
+        private static T IsAllowed<T>(T other)
+        {
+            if(IsImplicitConversionDisabled)
+            {
+                if(other is not Money)
+                {
+                    throw new ArgumentException("Implicit conversion is disabled via static parameter `IsImplicitConversionDisabled`.");
+                }
+            }
+
+            return other;
+        }
+
+        /// <summary>Disallow implicit conversion at runtime </summary>
+        public static bool IsImplicitConversionDisabled = false;
+
         /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
@@ -26,30 +44,30 @@ namespace NodaMoney
         /// <summary>Performs an implicit conversion from <see cref="long"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator Money(long money) => new Money(money);
+        public static implicit operator Money(long money) => new Money(IsAllowed(money));
 
         /// <summary>Performs an implicit conversion from <see cref="ulong"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
         [CLSCompliant(false)]
-        public static implicit operator Money(ulong money) => new Money(money);
+        public static implicit operator Money(ulong money) => new Money(IsAllowed(money));
 
         /// <summary>Performs an implicit conversion from <see cref="byte"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator Money(byte money) => new Money(money);
+        public static implicit operator Money(byte money) => new Money(IsAllowed(money));
 
         /// <summary>Performs an implicit conversion from <see cref="ushort"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
         [CLSCompliant(false)]
-        public static implicit operator Money(ushort money) => new Money(money);
+        public static implicit operator Money(ushort money) => new Money(IsAllowed(money));
 
         /// <summary>Performs an implicit conversion from <see cref="uint"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
         [CLSCompliant(false)]
-        public static implicit operator Money(uint money) => new Money(money);
+        public static implicit operator Money(uint money) => new Money(IsAllowed(money));
 
         /// <summary>Performs an implicit conversion from <see cref="double"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
@@ -59,7 +77,7 @@ namespace NodaMoney
         /// <summary>Performs an implicit conversion from <see cref="decimal"/> to <see cref="Money"/>.</summary>
         /// <param name="money">The money.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator Money(decimal money) => new Money(money);
+        public static implicit operator Money(decimal money) => new Money(IsAllowed(money));
 
         /// <summary>Converts the value of this instance to an <see cref="float"/>.</summary>
         /// <param name="money">A <see cref="Money"/> value.</param>
