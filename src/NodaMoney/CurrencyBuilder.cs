@@ -110,7 +110,7 @@ namespace NodaMoney
         public Currency Register()
         {
             Currency currency = Build();
-            if (!Currency.Registry.TryAdd(Code, Namespace, currency))
+            if (!Currency.Registry.TryAdd(Namespace, currency))
                 throw new InvalidOperationException("The custom currency is already registered.");
 
             return currency;

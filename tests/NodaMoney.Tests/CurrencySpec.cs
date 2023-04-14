@@ -10,6 +10,7 @@ using System.Xml.Serialization;
 using System.Xml.Linq;
 using System.Threading.Tasks;
 using System.Net;
+using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.CurrencySpec
 {
@@ -91,7 +92,7 @@ namespace NodaMoney.Tests.CurrencySpec
             }
         }
     }
-    
+
     public class GivenIWantCurrencyFromIsoCode
     {
         [Fact]
@@ -176,7 +177,7 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenUsingCultureInfo_ThenCreatingShouldSucceed()
         {
-            var currency = Currency.FromCulture(CultureInfo.CreateSpecificCulture("nl-NL"));
+            var currency = Currency.FromCulture(CultureInfo.CreateSpecificCulture(CultureNames.NetherlandsDutch));
 
             currency.Should().NotBeNull();
             currency.Symbol.Should().Be("€");
@@ -203,7 +204,7 @@ namespace NodaMoney.Tests.CurrencySpec
         [Fact]
         public void WhenUsingCultureName_ThenCreatingShouldSucceed()
         {
-            var currency = Currency.FromRegion("nl-NL");
+            var currency = Currency.FromRegion(CultureNames.NetherlandsDutch);
 
             currency.Should().NotBeNull();
             currency.Symbol.Should().Be("€");
@@ -374,7 +375,7 @@ namespace NodaMoney.Tests.CurrencySpec
         }
     }
 
-    public class GivenIWantToSerializeCurrencyWitXmlSerializer
+    public class GivenIWantToSerializeCurrencyWithXmlSerializer
     {
         private Currency yen = Currency.FromCode("JPY");
 

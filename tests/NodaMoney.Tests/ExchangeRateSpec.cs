@@ -224,13 +224,13 @@ namespace NodaMoney.Tests.ExchangeRateSpec
     {
         ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()
         {
             fx.ToString().Should().Be("EUR/USD 1.2524");
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
         {
             fx.ToString().Should().Be("EUR/USD 1,2524");
@@ -239,7 +239,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
 
     public class GivenIWantToParseACurrencyPair
     {
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenCurrencyPairInUsCulture_ThenParsingShouldSucceed()
         {
             var fx1 = ExchangeRate.Parse("EUR/USD 1.2591");
@@ -255,7 +255,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx2.Value.Should().Be(1.2591M);
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceed()
         {
             var fx1 = ExchangeRate.Parse("EUR/USD 1,2591");
@@ -279,7 +279,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             action.Should().Throw<FormatException>();
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenCurrencyPairHasSameCurrencies_ThenThrowException()
         {
             Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
@@ -306,7 +306,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
 
     public class GivenIWantToTryParseACurrencyPair
     {
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenCurrencyPairInUsCulture_ThenParsingShouldSucceed()
         {
             ExchangeRate fx1;
@@ -326,7 +326,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx2.Value.Should().Be(1.2591M);
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceed()
         {
             ExchangeRate fx1;
@@ -358,7 +358,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec
             fx.Value.Should().Be(0M);
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenCurrencyPairHasSameCurrencies_ThenParsingFails()
         {
             ExchangeRate fx;

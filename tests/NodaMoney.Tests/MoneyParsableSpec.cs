@@ -1,6 +1,5 @@
-using System;
+ï»¿using System;
 using System.Globalization;
-using System.Threading;
 
 using FluentAssertions;
 using Xunit;
@@ -10,92 +9,112 @@ namespace NodaMoney.Tests.MoneyParsableSpec
 {
     public class GivenIWantToParseImplicitCurrency
     {
-        [Fact, UseCulture("nl-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumDutch)]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("€ 765,43");
+            const string Value = "â‚¬ -98.765,43";
+            var money = Money.Parse(Value);
 
-            euro.Should().Be(new Money(765.43m, "EUR"));
+            money.Should().Be(new Money(-98765.43m, "EUR"));
         }
 
-        [Fact, UseCulture("fr-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumFrench)]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("765,43 €");
+            const string Value = "-98.765,43 â‚¬";
+            var money = Money.Parse(Value);
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingNumberWithoutCurrency_ThenThisUseCurrencyOfCurrentCulture()
         {
-            var euro = Money.Parse("765,43");
+            const string Value = "-98.765,43";
+            var money = Money.Parse(Value);
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("ja-JP")]
+        [Fact, UseCulture(CultureNames.JapanJapanese)]
         public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
         {
-            var yen = Money.Parse("¥ 765");
+            const string Value = "Â¥ -98,765";
+            var money = Money.Parse(Value);
 
-            yen.Should().Be(new Money(765m, "JPY"));
+            money.Should().Be(new Money(-98765m, "JPY"));
         }
 
-        [Fact, UseCulture("zh-CN")]
+        [Fact, UseCulture(CultureNames.ChinaMainlandChinese)]
         public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
         {
-            var yuan = Money.Parse("¥ 765");
+            const string Value = "Â¥ -98,765";
+            var money = Money.Parse(Value);
 
-            yuan.Should().Be(new Money(765m, "CNY"));
+            money.Should().Be(new Money(-98765m, "CNY"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingYenYuanInNetherlands_ThenThisShouldFail()
         {
-            // ¥ symbol is used for Japanese yen and Chinese yuan
-            Action action = () => Money.Parse("¥ 765");
+            // Â¥ symbol is used for Japanese money and Chinese money
+            const string Value = "Â¥ -98,765";
+            Action action = () => Money.Parse(Value);
 
-            action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
+            action.Should().Throw<FormatException>().WithMessage("*Specify currency or culture explicitly*");
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenParsingDollarSymbolInUSA_ThenThisShouldReturnUSDollar()
         {
-            var dollar = Money.Parse("$765.43");
+            const string Value = "$-98,765.43";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("es-AR")]
+        [Fact, UseCulture(CultureNames.ArgentinaSpanish)]
         public void WhenParsingDollarSymbolInArgentina_ThenThisShouldReturnArgentinePeso()
         {
-            var peso = Money.Parse("$765,43");
+            const string Value = "$-98.765,43";
+            var money = Money.Parse(Value);
 
-            peso.Should().Be(new Money(765.43m, "ARS"));
+            money.Should().Be(new Money(-98765.43m, "ARS"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingDollarSymbolInNetherlands_ThenThisShouldFail()
         {
             // $ symbol is used for multiple currencies
-            Action action = () => Money.Parse("$ 765,43");
+            const string Value = "$ -98.765,43";
+            Action action = () => Money.Parse(Value);
 
-            action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
+            action.Should().Throw<FormatException>().WithMessage("*Specify currency or culture explicitly*");
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenParsingEuroSymbolInUSA_ThenThisShouldReturnUSDollar()
         {
-            var euro = Money.Parse("€765.43");
+            const string Value = "â‚¬-98,765.43";
+            var money = Money.Parse(Value);
 
-            euro.Should().Be(new Money(765.43m, "EUR"));
+            money.Should().Be(new Money(-98765.43m, "EUR"));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenParsingChfSymbolInSwitzerlandGermanSpeaking_ThenThisShouldReturnSwissFranc()
+        {
+            const string Value = "-98â€™765.23 CHF";
+            var money = Money.Parse(Value);
+
+            money.Should().Be(new Money(-98765.23m, "CHF"));
         }
 
         [Fact]
         public void WhenValueIsNull_ThenThowExeception()
         {
-            Action action = () => Money.Parse(null);
+            const string Value = null;
+            Action action = () => Money.Parse(Value);
 
             action.Should().Throw<ArgumentNullException>();
         }
@@ -103,373 +122,470 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact]
         public void WhenValueIsEmpty_ThenThowExeception()
         {
-            Action action = () => Money.Parse("");
+            const string Value = "";
+            Action action = () => Money.Parse(Value);
 
             action.Should().Throw<ArgumentNullException>();
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenCurrencyIsUnknown_ThenThowExeception()
         {
-            Action action = () => Money.Parse("XYZ 765,43");
+            const string Value = "XYZ -98.765,43";
+            Action action = () => Money.Parse(Value);
 
-            action.Should().Throw<FormatException>().WithMessage("*unknown currency*");
+            action.Should().Throw<FormatException>().WithMessage("*must be a known currency*");
         }
     }
 
     public class GivenIWantToParseExplicitCurrency
     {
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
         {
-            var yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
+            const string Value = "Â¥ -98.765";
+            var money = Money.Parse(Value, Currency.FromCode("JPY"));
 
-            yen.Should().Be(new Money(765, "JPY"));
+            money.Should().Be(new Money(-98765, "JPY"));
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
         {
-            var peso = Money.Parse("$765.43", Currency.FromCode("ARS"));
+            const string Value = "$-98,765.43";
+            var money = Money.Parse(Value, Currency.FromCode("ARS"));
 
-            peso.Should().Be(new Money(765.43m, "ARS"));
+            money.Should().Be(new Money(-98765.43m, "ARS"));
         }
 
-        [Fact, UseCulture("es-AR")]
+        [Fact, UseCulture(CultureNames.ArgentinaSpanish)]
         public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
         {
-            var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+            const string Value = "$-98.765,43";
+            var money = Money.Parse(Value, Currency.FromCode("USD"));
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
         {
             // $ symbol is used for multiple currencies
-            var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+            const string Value = "$-98.765,43";
+            var money = Money.Parse(Value, Currency.FromCode("USD"));
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("nl-BE")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
+        public void WhenParsingSwissFrancInNetherlands_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF-98.765,43";
+            var money = Money.Parse(Value, Currency.FromCode("CHF"));
+
+            money.Should().Be(new Money(-98765.43m, "CHF"));
+        }
+
+        [Fact, UseCulture(CultureNames.BelgiumDutch)]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
+            const string Value = "â‚¬ -98.765,43";
+            var money = Money.Parse(Value, Currency.FromCode("EUR"));
 
-            euro.Should().Be(new Money(765.43m, "EUR"));
+            money.Should().Be(new Money(-98765.43m, "EUR"));
         }
 
-        [Fact, UseCulture("fr-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumFrench)]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
+            const string Value = "-98.765,43 â‚¬";
+            var money = Money.Parse(Value, Currency.FromCode("EUR"));
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("765,43", Currency.FromCode("USD"));
+            const string Value = "-98.765,43";
+            var money = Money.Parse(Value, Currency.FromCode("USD"));
 
-            euro.Should().Be(new Money(765.43, "USD"));
+            money.Should().Be(new Money(-98765.43, "USD"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldFail()
         {
-            Action action = () => Money.Parse("€ 765,43", Currency.FromCode("USD"));
+            const string Value = "â‚¬ -98.765,43";
+            Action action = () => Money.Parse(Value, Currency.FromCode("USD"));
 
             action.Should().Throw<FormatException>(); //.WithMessage("Input string was not in a correct format.");                
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsNull_ThenThowExeception()
         {
-            Action action = () => Money.Parse(null, Currency.FromCode("EUR"));
+            const string Value = null;
+            Action action = () => Money.Parse(Value, Currency.FromCode("EUR"));
 
             action.Should().Throw<ArgumentNullException>();
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsEmpty_ThenThowExeception()
         {
-            Action action = () => Money.Parse("", Currency.FromCode("EUR"));
+            const string Value = "";
+            Action action = () => Money.Parse(Value, Currency.FromCode("EUR"));
 
             action.Should().Throw<ArgumentNullException>();
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsNullWithOverrideMethod_ThenThowExeception()
         {
-            Action action = () => Money.Parse(null, NumberStyles.Currency, null, Currency.FromCode("EUR"));
+            const string Value = null;
+            Action action = () => Money.Parse(Value, NumberStyles.Currency, null, Currency.FromCode("EUR"));
 
             action.Should().Throw<ArgumentNullException>();
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsEmptyWithOverrideMethod_ThenThowExeception()
         {
-            Action action = () => Money.Parse("", NumberStyles.Currency, null, Currency.FromCode("EUR"));
+            const string Value = "";
+            Action action = () => Money.Parse(Value, NumberStyles.Currency, null, Currency.FromCode("EUR"));
 
             action.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenParsingSwissFrancInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF-98â€™765.43";
+            var money = Money.Parse(Value, Currency.FromCode("CHF"));
+
+            money.Should().Be(new Money(-98765.43m, "CHF"));
         }
     }
 
     public class GivenIWantToParseNegativeMoney
     {
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenMinusSignBeforeDollarSign_ThenThisShouldSucceed()
         {
-            string value = "-$765.43";
-            var dollar = Money.Parse(value);
+            const string Value = "-$98,765.43";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "USD"));
+            money.Should().Be(new Money(-98765.43, "USD"));
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenMinusSignAfterDollarSign_ThenThisShouldSucceed()
         {
-            string value = "$-765.43";
-            var dollar = Money.Parse(value);
+            const string Value = "$-98,765.43";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "USD"));
+            money.Should().Be(new Money(-98765.43, "USD"));
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenDollarsWithParentheses_ThenThisShouldSucceed()
         {
-            string value = "($765.43)";
-            var dollar = Money.Parse(value);
+            const string Value = "($98,765.43)";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "USD"));
+            money.Should().Be(new Money(-98765.43, "USD"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenMinusSignBeforeEuroSign_ThenThisShouldSucceed()
         {
-            string value = "-€ 765,43";
-            var dollar = Money.Parse(value);
+            const string Value = "-â‚¬ 98.765,43";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenMinusSignAfterEuroSign_ThenThisShouldSucceed()
         {
-            string value = "€ -765,43";
-            var dollar = Money.Parse(value);
+            const string Value = "â‚¬ -98.765,43";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenEurosWithParentheses_ThenThisShouldSucceed()
         {
-            string value = "(€ 765,43)";
-            var dollar = Money.Parse(value);
+            const string Value = "(â‚¬ 98.765,43)";
+            var money = Money.Parse(Value);
 
-            dollar.Should().Be(new Money(-765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenMinusSignBeforeChfSign_ThenThisShouldSucceed()
+        {
+            const string Value = "-CHF 98â€™765.43";
+            var money = Money.Parse(Value);
+
+            money.Should().Be(new Money(-98765.43, "CHF"));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenMinusSignAfterCHFSign_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF -98â€™765.43";
+            var money = Money.Parse(Value);
+
+            money.Should().Be(new Money(-98765.43, "CHF"));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenChfWithParentheses_ThenThisShouldSucceed()
+        {
+            const string Value = "(CHF 98â€™765.43)";
+            var money = Money.Parse(Value);
+
+            money.Should().Be(new Money(-98765.43, "CHF"));
         }
     }
 
     public class GivenIWantToParseMoneyWithMoreDecimalPossibleForCurrency
     {
-        [Fact, UseCulture("ja-JP")]
+        [Fact, UseCulture(CultureNames.JapanJapanese)]
         public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedDown()
         {
-            var yen = Money.Parse("¥ 765.4");
+            const string Value = "Â¥ 98,765.4";
+            var money = Money.Parse(Value);
 
-            yen.Should().Be(new Money(765m, "JPY"));
+            money.Should().Be(new Money(98765m, "JPY"));
         }
 
-        [Fact, UseCulture("ja-JP")]
+        [Fact, UseCulture(CultureNames.JapanJapanese)]
         public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedUp()
         {
-            var yen = Money.Parse("¥ 765.5");
+            const string Value = "Â¥ 98,765.5";
+            var money = Money.Parse(Value);
 
-            yen.Should().Be(new Money(766m, "JPY"));
+            money.Should().Be(new Money(98766m, "JPY"));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenParsingSwissFranc_ThenThisShouldBeRoundedUp()
+        {
+            const string Value = "CHF 98â€™765.475";
+            var money = Money.Parse(Value);
+
+            money.Should().Be(new Money(98765.48m, "CHF"));
         }
     }
 
     public class GivenIWantToTryParseImplicitCurrency
     {
-        [Fact, UseCulture("nl-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumDutch)]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            Money euro;
-            Money.TryParse("€ 765,43", out euro).Should().BeTrue();
+            const string Value = "â‚¬ -98.765,43";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43m, "EUR"));
+            money.Should().Be(new Money(-98765.43m, "EUR"));
         }
 
-        [Fact, UseCulture("fr-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumFrench)]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            Money euro;
-            Money.TryParse("765,43 €", out euro).Should().BeTrue();
+            const string Value = "-98.765,43 â‚¬";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingNumberWithoutCurrency_ThenThisUseCurrencyOfCurrentCulture()
         {
-            Money euro;
-            Money.TryParse("765,43", out euro).Should().BeTrue();
+            const string Value = "-98.765,43";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("ja-JP")]
+        [Fact, UseCulture(CultureNames.JapanJapanese)]
         public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
         {
-            Money yen;
-            Money.TryParse("¥ 765", out yen).Should().BeTrue();
+            const string Value = "Â¥ -98,765";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            yen.Should().Be(new Money(765m, "JPY"));
+            money.Should().Be(new Money(-98765m, "JPY"));
         }
 
-        [Fact, UseCulture("zh-CN")]
+        [Fact, UseCulture(CultureNames.ChinaMainlandChinese)]
         public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
         {
-            Money yuan;
-            Money.TryParse("¥ 765", out yuan).Should().BeTrue();
+            const string Value = "Â¥ -98,765";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            yuan.Should().Be(new Money(765m, "CNY"));
+            money.Should().Be(new Money(-98765m, "CNY"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingYenYuanInNetherlands_ThenThisShouldReturnFalse()
         {
-            // ¥ symbol is used for Japanese yen and Chinese yuan
-            Money money;
-            Money.TryParse("¥ 765", out money).Should().BeFalse();
+            // Â¥ symbol is used for Japanese money and Chinese money
+            const string Value = "Â¥ -98,765";
+            Money.TryParse(Value, out Money money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenParsingDollarSymbolInUSA_ThenThisShouldReturnUSDollar()
         {
-            Money dollar;
-            Money.TryParse("$765.43", out dollar).Should().BeTrue();
+            const string Value = "$-98,765.43";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("es-AR")]
+        [Fact, UseCulture(CultureNames.ArgentinaSpanish)]
         public void WhenParsingDollarSymbolInArgentina_ThenThisShouldReturnArgentinePeso()
         {
-            Money peso;
-            Money.TryParse("$765,43", out peso).Should().BeTrue();
+            const string Value = "$-98.765,43";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
 
-            peso.Should().Be(new Money(765.43m, "ARS"));
+            money.Should().Be(new Money(-98765.43m, "ARS"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingDollarSymbolInNetherlands_ThenThisShouldReturnFalse()
         {
             // $ symbol is used for multiple currencies
-            Money money;
-            Money.TryParse("$ 765,43", out money).Should().BeFalse();
+            const string Value = "$ -98.765,43";
+            Money.TryParse(Value, out Money money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsNull_ThenReturnFalse()
         {
-            Money money;
-            Money.TryParse(null, out money).Should().BeFalse();
+            const string Value = null;
+            Money.TryParse(Value, out Money money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenValueIsEmpty_ThenReturnFalse()
         {
-            Money money;
-            Money.TryParse("", out money).Should().BeFalse();
+            const string Value = "";
+            Money.TryParse(Value, out Money money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF -98â€™765.43";
+            Money.TryParse(Value, out Money money).Should().BeTrue();
+
+            money.Should().Be(new Money(-98765.43m, "CHF"));
         }
     }
 
     public class GivenIWantToTryParseExplicitCurrency
     {
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
         {
-            Money yen;
-            Money.TryParse("¥ 765", Currency.FromCode("JPY"), out yen).Should().BeTrue();
+            const string Value = "Â¥ -98.765";
+            Money.TryParse(Value, Currency.FromCode("JPY"), out Money money).Should().BeTrue();
 
-            yen.Should().Be(new Money(765, "JPY"));
+            money.Should().Be(new Money(-98765m, "JPY"));
         }
 
-        [Fact, UseCulture("en-US")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
+        public void WhenParsingSwissFrancInNetherlands_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF -98.765";
+            Money.TryParse(Value, Currency.FromCode("CHF"), out Money money).Should().BeTrue();
+
+            money.Should().Be(new Money(-98765m, "CHF"));
+        }
+
+        [Fact, UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
         {
-            Money peso;
-            Money.TryParse("$765.43", Currency.FromCode("ARS"), out peso).Should().BeTrue();
+            const string Value = "$-98,765.43";
+            Money.TryParse(Value, Currency.FromCode("ARS"), out Money money).Should().BeTrue();
 
-            peso.Should().Be(new Money(765.43m, "ARS"));
+            money.Should().Be(new Money(-98765.43m, "ARS"));
         }
 
-        [Fact, UseCulture("es-AR")]
+        [Fact, UseCulture(CultureNames.ArgentinaSpanish)]
         public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
         {
-            Money dollar;
-            Money.TryParse("$765,43", Currency.FromCode("USD"), out dollar).Should().BeTrue();
+            const string Value = "$-98.765,43";
+            Money.TryParse(Value, Currency.FromCode("USD"), out Money money).Should().BeTrue();
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
         {
             // $ symbol is used for multiple currencies
-            Money dollar;
-            Money.TryParse("$765,43", Currency.FromCode("USD"), out dollar).Should().BeTrue();
+            const string Value = "$-98.765,43";
+            Money.TryParse(Value, Currency.FromCode("USD"), out Money money).Should().BeTrue();
 
-            dollar.Should().Be(new Money(765.43m, "USD"));
+            money.Should().Be(new Money(-98765.43m, "USD"));
         }
 
-        [Fact, UseCulture("nl-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumDutch)]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            Money euro;
-            Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro).Should().BeTrue();
+            const string Value = "â‚¬ -98.765,43";
+            Money.TryParse(Value, Currency.FromCode("EUR"), out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43m, "EUR"));
+            money.Should().Be(new Money(-98765.43m, "EUR"));
         }
 
-        [Fact, UseCulture("fr-BE")]
+        [Fact, UseCulture(CultureNames.BelgiumFrench)]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            Money euro;
-            Money.TryParse("765,43 €", Currency.FromCode("EUR"), out euro).Should().BeTrue();
+            const string Value = "-98.765,43 â‚¬";
+            Money.TryParse(Value, Currency.FromCode("EUR"), out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43, "EUR"));
+            money.Should().Be(new Money(-98765.43, "EUR"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
         {
-            Money euro;
-            Money.TryParse("765,43", Currency.FromCode("USD"), out euro).Should().BeTrue();
+            const string Value = "-98.765,43";
+            Money.TryParse(Value, Currency.FromCode("USD"), out Money money).Should().BeTrue();
 
-            euro.Should().Be(new Money(765.43, "USD"));
+            money.Should().Be(new Money(-98765.43, "USD"));
         }
 
-        [Fact, UseCulture("nl-NL")]
+        [Fact, UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldReturnFalse()
         {
-            Money money;
-            Money.TryParse("€ 765,43", Currency.FromCode("USD"), out money).Should().BeFalse();
+            const string Value = "â‚¬ -98.765,43";
+            Money.TryParse(Value, Currency.FromCode("USD"), out Money money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
+        }
+
+        [Fact, UseCulture(CultureNames.SwitzerlandGerman)]
+        public void WhenParsingSwissFrancInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
+        {
+            const string Value = "CHF -98â€™765";
+            Money.TryParse(Value, Currency.FromCode("CHF"), out Money money).Should().BeTrue();
+
+            money.Should().Be(new Money(-98765m, "CHF"));
         }
     }
 }

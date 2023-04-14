@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace NodaMoney
@@ -20,8 +21,20 @@ namespace NodaMoney
         /// <summary>Used for indication that the number of decimal digits doesn't matter, for example for gold or silver.</summary>
         internal const double NotApplicable = -1;
 
-        private static readonly ConcurrentDictionary<string, Currency> Currencies = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
-        private static readonly ConcurrentDictionary<string, byte> Namespaces = new ConcurrentDictionary<string, byte>(new Dictionary<string, byte> { ["ISO-4217"] = default, ["ISO-4217-HISTORIC"] = default });
+        private readonly object _syncRoot = new object();
+        private readonly ConcurrentDictionary<string, Currency> _currenciesByCode;
+        private readonly HashSet<string> _namespaces;
+        private ILookup<string, Currency> _currenciesBySymbol;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CurrencyRegistry"/> class.
+        /// </summary>
+        public CurrencyRegistry()
+        {
+            _currenciesByCode = new ConcurrentDictionary<string, Currency>(InitializeIsoCurrencies());
+            _namespaces = new HashSet<string>(_currenciesByCode.Values.Select(currency => currency.Namespace).Distinct());
+            RecreateCurrenciesBySymbol();
+        }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
@@ -33,18 +46,18 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
 
-            var found = new List<Currency>();
-            foreach (var ns in Namespaces.Keys)
+            currency = default;
+            bool success = false;
+            foreach (var @namespace in _namespaces)
             {
-                // don't use string.Format(), string concat much faster in this case!
-                if (Currencies.TryGetValue(ns + "::" + code, out Currency c))
+                if (_currenciesByCode.TryGetValue(GetKey(@namespace, code), out currency))
                 {
-                    found.Add(c);
+                    success = true;
+                    break; // out of foreach loop
                 }
             }
 
-            currency = found.FirstOrDefault(); // TODO: If more than one, sort by prio.
-            return !currency.Equals(default);
+            return success;
         }
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
@@ -60,27 +73,31 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            return Currencies.TryGetValue(@namespace + "::" + code, out currency); // don't use string.Format(), string concat much faster in this case!
+            return _currenciesByCode.TryGetValue(GetKey(@namespace, code), out currency);
         }
 
-#pragma warning disable CA1822 // Member TryAdd does not access instance data and can be marked as static.
         /// <summary>Attempts to add the <see cref="Currency"/> of the given code and namespace.</summary>
-        /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
         /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if the <see cref="Currency"/> with the specified code is added; otherwise, <b>false</b>.</returns>
-        /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
-        public bool TryAdd(string code, string @namespace, Currency currency)
+        /// <exception cref="System.ArgumentNullException">The value of 'namespace' cannot be null or empty.</exception>
+        public bool TryAdd(string @namespace, Currency currency)
         {
-            if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentNullException(nameof(code));
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            Namespaces[@namespace] = default;
-            return Currencies.TryAdd(@namespace + "::" + code, currency);
+            bool success;
+            lock (_syncRoot)
+            {
+                if (success = _currenciesByCode.TryAdd(GetKey(@namespace, currency.Code), currency))
+                {
+                    _namespaces.Add(@namespace);
+                    RecreateCurrenciesBySymbol();
+                }
+            }
+
+            return success;
         }
-#pragma warning restore CA1822 // Member TryAdd does not access instance data and can be marked as static.
 
         /// <summary>Attempts to remove the <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
@@ -95,16 +112,40 @@ namespace NodaMoney
             if (string.IsNullOrWhiteSpace(@namespace))
                 throw new ArgumentNullException(nameof(@namespace));
 
-            // Namespaces[@namespace] = null; // TODO: Count currencies in namespace and when zero, remove namespace
-            return Currencies.TryRemove(@namespace + "::" + code, out currency);
+            bool success;
+            lock (_syncRoot)
+            {
+                if (success = _currenciesByCode.TryRemove(GetKey(@namespace, code), out currency))
+                {
+                    if (!_currenciesByCode.Values.Any(currency => currency.Namespace == @namespace))
+                    {
+                        _ = _namespaces.Remove(@namespace);
+                    }
+
+                    RecreateCurrenciesBySymbol();
+                }
+            }
+
+            return success;
         }
 
-        /// <summary>Get all registered currencies.</summary>
+        /// <summary>Gets all registered currencies.</summary>
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
-        public IEnumerable<Currency> GetAllCurrencies()
+        public IEnumerable<Currency> GetAllCurrencies() => _currenciesByCode.Values.AsEnumerable();
+
+        /// <summary>Gets all registered currencies with a given symbol.</summary>
+        /// <param name="symbol">A currency symbol, like € or $.</param>
+        /// <returns>Returns all registered <see cref="Currency"/> instances with the given <paramref name="symbol"/>.</returns>
+        /// <exception cref="System.ArgumentNullException">The value of 'symbol' cannot be null or empty.</exception>
+        public IEnumerable<Currency> GetCurrencies(string symbol)
         {
-            return Currencies.Values.AsEnumerable();
+            if (string.IsNullOrWhiteSpace(symbol))
+                throw new ArgumentNullException(nameof(symbol));
+
+            return _currenciesBySymbol[symbol];
         }
+
+        private static string GetKey(string @namespace, string code) => @namespace + "::" + code;
 
         private static IDictionary<string, Currency> InitializeIsoCurrencies()
         {
@@ -142,7 +183,7 @@ namespace NodaMoney
                 ["ISO-4217::CAD"] = new Currency("CAD", "124", 2, "Canadian dollar", "$"),
                 ["ISO-4217::CDF"] = new Currency("CDF", "976", 2, "Congolese franc", "FC"),
                 ["ISO-4217::CHE"] = new Currency("CHE", "947", 2, "WIR Euro (complementary currency)", "CHE"),
-                ["ISO-4217::CHF"] = new Currency("CHF", "756", 2, "Swiss franc", "fr."), // or CHF
+                ["ISO-4217::CHF"] = new Currency("CHF", "756", 2, "Swiss franc", "CHF"), // not "fr.", not "SFr"
                 ["ISO-4217::CHW"] = new Currency("CHW", "948", 2, "WIR Franc (complementary currency)", "CHW"),
                 ["ISO-4217::CLF"] = new Currency("CLF", "990", 4, "Unidad de Fomento (funds code)", "CLF"),
                 ["ISO-4217::CLP"] = new Currency("CLP", "152", 0, "Chilean peso", "$"),
@@ -420,6 +461,12 @@ namespace NodaMoney
                 ["ISO-4217-HISTORIC::BGJ"] = new Currency("BGJ", "100", NotApplicable, "Lev A / 52", Currency.GenericCurrencySign, "ISO-4217-HISTORIC", new DateTime(2017, 9, 22)), // BULGARIA
                 ["ISO-4217-HISTORIC::ARY"] = new Currency("ARY", "032", NotApplicable, "Peso", Currency.GenericCurrencySign, "ISO-4217-HISTORIC", new DateTime(2017, 9, 22)), // ARGENTINA
             };
+        }
+
+        private void RecreateCurrenciesBySymbol()
+        {
+            _currenciesBySymbol = _currenciesByCode.Values
+                .ToLookup(keySelector: currency => currency.Symbol);
         }
     }
 }

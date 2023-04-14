@@ -252,6 +252,12 @@ namespace NodaMoney
         /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
         public static IEnumerable<Currency> GetAllCurrencies() => Registry.GetAllCurrencies();
 
+        /// <summary>Gets all registered currencies with a given symbol.</summary>
+        /// <param name="symbol">A currency symbol, like € or $.</param>
+        /// <returns>Returns all registered <see cref="Currency"/> instances with the given <paramref name="symbol"/>.</returns>
+        /// <exception cref="System.ArgumentNullException">The value of 'symbol' cannot be null or empty.</exception>
+        public static IEnumerable<Currency> GetCurrencies(string symbol) => Registry.GetCurrencies(symbol);
+
         /// <summary>Returns a value indicating whether two specified instances of <see cref="Currency"/> represent the same value.</summary>
         /// <param name="left">The first <see cref="Currency"/> object.</param>
         /// <param name="right">The second <see cref="Currency"/> object.</param>

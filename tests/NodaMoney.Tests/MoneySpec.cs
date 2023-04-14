@@ -15,29 +15,29 @@ namespace NodaMoney.Tests.MoneySpec
         private readonly decimal _decimalValue = 1234.567m;
 
         [Fact]
-        [UseCulture("en-US")]
+        [UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenCurrentCultureIsUS_ThenCreatingShouldSucceed()
         {            
             var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be(CultureNames.UnitedStatesEnglish);
             money.Currency.Should().Be(Currency.FromCode("USD"));
             money.Amount.Should().Be(1234.57m);
         }
 
         [Fact]
-        [UseCulture("nl-NL")]
+        [UseCulture(CultureNames.NetherlandsDutch)]
         public void WhenCurrentCultureIsNL_ThenCreatingShouldSucceed()
         {
             var money = new Money(_decimalValue);
 
-            Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+            Thread.CurrentThread.CurrentCulture.Name.Should().Be(CultureNames.NetherlandsDutch);
             money.Currency.Should().Be(Currency.FromCode("EUR"));
             money.Amount.Should().Be(1234.57m);
         }
 
         [Fact]
-        [UseCulture("ja-JP")]
+        [UseCulture(CultureNames.JapanJapanese)]
         public void WhenCurrentCultureIsJP_ThenCreatingShouldSucceed()
         {
             var money = new Money(_decimalValue);
@@ -48,7 +48,7 @@ namespace NodaMoney.Tests.MoneySpec
         }
 
         [Fact]
-        [UseCulture(null)]
+        [UseCulture(CultureNames.Invariant)]
         public void WhenCurrentCultureIsInvariant_ThenThisShouldThrowException()
         {
             Action action = () => { var money = new Money(_decimalValue); };

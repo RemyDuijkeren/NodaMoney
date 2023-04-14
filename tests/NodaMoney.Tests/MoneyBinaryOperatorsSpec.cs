@@ -75,7 +75,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        [UseCulture("en-us")]
+        [UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenUsingAddtionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
@@ -90,7 +90,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        [UseCulture("en-us")]
+        [UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenUsingAdditionMethodWithDecimal_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
         {
             var money1 = new Money(value1, "EUR");
@@ -102,7 +102,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        [UseCulture("en-us")]
+        [UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenUsingSubstractionOperatorWithDecimal_ThenMoneyShouldBeAdded(decimal expected, decimal value2, decimal value1)
         {
             var money1 = new Money(value1, "EUR");
@@ -117,7 +117,7 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        [UseCulture("en-us")]
+        [UseCulture(CultureNames.UnitedStatesEnglish)]
         public void WhenUsingSubstractionMethodWithDecimal_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
         {
             var money1 = new Money(value1, "EUR");

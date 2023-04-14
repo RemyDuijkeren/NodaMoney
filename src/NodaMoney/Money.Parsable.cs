@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -129,37 +127,44 @@ namespace NodaMoney
             return false;
         }
 
-        private static Currency ExtractCurrencyFromString(string value)
+        private static Currency ExtractCurrencyFromString(string moneyValue)
         {
+            // It is not sufficient to check for
+            //    !char.IsDigit(character) &&
+            //    !char.IsWhiteSpace(character) &&
+            //    !char.IsPunctuation(character) &&
+            //    !char.IsSeparator(character);
+            // because if fails for a number of currency symbols containing '.' or '/'.
+            // Of particular interest is a trailing '.' in the currency symbol
+            // which must not be treated as part of the amount.
             // TODO: How to handle alternative symbols, like US$
-            string currencyAsString = new string(value.Cast<char>().Where(IsNotNumericCharacter()).ToArray());
-
-            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Symbol == currencyAsString
-                || Currency.CurrentCurrency.Code == currencyAsString)
+            string symbol = CurrencySymbolParser.Parse(moneyValue);
+            Currency currency;
+            if (symbol.Length == 0 ||
+                string.Equals(symbol, Currency.CurrentCurrency.Symbol, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(symbol, Currency.CurrentCurrency.Code, StringComparison.OrdinalIgnoreCase))
             {
-                return Currency.CurrentCurrency;
+                currency = Currency.CurrentCurrency;
+            }
+            else
+            {
+                var currencies = Currency.GetCurrencies(symbol).ToArray();
+                if (currencies.Length == 0)
+                {
+                    if (!Currency.Registry.TryGet(code: symbol, out currency))
+                        throw new FormatException($@"""{symbol}"" must be a known currency symbol or code.");
+                }
+                else if (currencies.Length > 1)
+                {
+                    throw new FormatException($@"Currency symbol ""{symbol}"" matches with {currencies.Length} known currencies! Specify currency or culture explicitly.");
+                }
+                else
+                {
+                    currency = currencies[0];
+                }
             }
 
-            List<Currency> match =
-                Currency.GetAllCurrencies().Where(c => c.Symbol == currencyAsString || c.Code == currencyAsString).ToList();
-
-            if (match.Count == 0)
-            {
-                throw new FormatException($"{currencyAsString} is an unknown currency sign or code!");
-            }
-
-            if (match.Count > 1)
-            {
-                throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
-            }
-
-            return match[0];
-        }
-
-        private static Func<char, bool> IsNotNumericCharacter()
-        {
-            return character => !char.IsDigit(character) && !char.IsWhiteSpace(character) && character != '.' && character != ','
-                && character != '(' && character != ')' && character != '+' && character != '-';
+            return currency;
         }
     }
 }
