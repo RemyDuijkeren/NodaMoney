@@ -22,7 +22,7 @@ namespace NodaMoney.Tests.Iso4127Spec
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             using var client = new WebClient();
-            client.DownloadFile(new Uri("https://www.currency-iso.org/dam/downloads/lists/list_one.xml"), fileName);
+            client.DownloadFile(new Uri("https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml"), fileName);
 
             var document = XDocument.Load(fileName);
 
