@@ -28,6 +28,9 @@ namespace NodaMoney
         private static Currency[] currencies;
         private static string[] namespaces = { "ISO-4217", "ISO-4217-HISTORIC" };
 
+        // TODO: tryout CurrencyUnit
+        static readonly Dictionary<CurrencyUnit, Currency> LookupCurrencies;
+
         private static object changeLock = new object();
 
         //private static Currency[][] CurrenciesJagged = new Currency[2][];
@@ -43,6 +46,14 @@ namespace NodaMoney
             foreach (var c in currencies)
             {
                 Index[c.GetHashCode()] = i++;
+            }
+            
+            // TODO: tryout CurrencyUnit
+            LookupCurrencies = new Dictionary<CurrencyUnit, Currency>(currencies.Length);
+            foreach (var ci in currencies)
+            {
+                var cu = new CurrencyUnit(ci.Code);
+                LookupCurrencies[cu] = ci;
             }
 
             // var xa = Currencies.AsMemory();
@@ -64,7 +75,6 @@ namespace NodaMoney
 
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
-        /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
         public static ref Currency Get(string code)
@@ -93,7 +103,6 @@ namespace NodaMoney
         /// <summary>Tries the get <see cref="Currency"/> of the given code and namespace.</summary>
         /// <param name="code">A currency code, like EUR or USD.</param>
         /// <param name="namespace">A namespace, like ISO-4217.</param>
-        /// <param name="currency">When this method returns, contains the <see cref="Currency"/> that has the specified code and namespace, or the default value of the type if the operation failed.</param>
         /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="Currency"/> with the specified code; otherwise, <b>false</b>.</returns>
         /// <exception cref="System.ArgumentNullException">The value of 'code' or 'namespace' cannot be null or empty.</exception>
         public static ref Currency Get(string code, string @namespace)

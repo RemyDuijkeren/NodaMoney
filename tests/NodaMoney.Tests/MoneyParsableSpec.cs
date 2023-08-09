@@ -12,7 +12,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-BE")]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("€ 765,43");
+            var euro = Money.Parse("â‚¬ 765,43");
 
             euro.Should().Be(new Money(765.43m, "EUR"));
         }
@@ -20,7 +20,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("fr-BE")]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("765,43 €");
+            var euro = Money.Parse("765,43 â‚¬");
 
             euro.Should().Be(new Money(765.43, "EUR"));
         }
@@ -36,7 +36,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("ja-JP")]
         public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
         {
-            var yen = Money.Parse("¥ 765");
+            var yen = Money.Parse("Â¥ 765");
 
             yen.Should().Be(new Money(765m, "JPY"));
         }
@@ -44,7 +44,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("zh-CN")]
         public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
         {
-            var yuan = Money.Parse("¥ 765");
+            var yuan = Money.Parse("Â¥ 765");
 
             yuan.Should().Be(new Money(765m, "CNY"));
         }
@@ -52,8 +52,8 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenParsingYenYuanInNetherlands_ThenThisShouldFail()
         {
-            // ¥ symbol is used for Japanese yen and Chinese yuan
-            Action action = () => Money.Parse("¥ 765");
+            // Â¥ symbol is used for Japanese yen and Chinese yuan
+            Action action = () => Money.Parse("Â¥ 765");
 
             action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
         }
@@ -86,7 +86,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("en-US")]
         public void WhenParsingEuroSymbolInUSA_ThenThisShouldReturnUSDollar()
         {
-            var euro = Money.Parse("€765.43");
+            var euro = Money.Parse("â‚¬765.43");
 
             euro.Should().Be(new Money(765.43m, "EUR"));
         }
@@ -122,7 +122,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
         {
-            var yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
+            var yen = Money.Parse("Â¥ 765", Currency.FromCode("JPY"));
 
             yen.Should().Be(new Money(765, "JPY"));
         }
@@ -155,7 +155,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-BE")]
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
+            var euro = Money.Parse("â‚¬ 765,43", Currency.FromCode("EUR"));
 
             euro.Should().Be(new Money(765.43m, "EUR"));
         }
@@ -163,7 +163,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("fr-BE")]
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
-            var euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
+            var euro = Money.Parse("765,43 â‚¬", Currency.FromCode("EUR"));
 
             euro.Should().Be(new Money(765.43, "EUR"));
         }
@@ -179,7 +179,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldFail()
         {
-            Action action = () => Money.Parse("€ 765,43", Currency.FromCode("USD"));
+            Action action = () => Money.Parse("â‚¬ 765,43", Currency.FromCode("USD"));
 
             action.Should().Throw<FormatException>(); //.WithMessage("Input string was not in a correct format.");                
         }
@@ -250,7 +250,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenMinusSignBeforeEuroSign_ThenThisShouldSucceed()
         {
-            string value = "-€ 765,43";
+            string value = "-â‚¬ 765,43";
             var dollar = Money.Parse(value);
 
             dollar.Should().Be(new Money(-765.43, "EUR"));
@@ -259,7 +259,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenMinusSignAfterEuroSign_ThenThisShouldSucceed()
         {
-            string value = "€ -765,43";
+            string value = "â‚¬ -765,43";
             var dollar = Money.Parse(value);
 
             dollar.Should().Be(new Money(-765.43, "EUR"));
@@ -268,7 +268,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenEurosWithParentheses_ThenThisShouldSucceed()
         {
-            string value = "(€ 765,43)";
+            string value = "(â‚¬ 765,43)";
             var dollar = Money.Parse(value);
 
             dollar.Should().Be(new Money(-765.43, "EUR"));
@@ -281,7 +281,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("ja-JP")]
         public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedDown()
         {
-            var yen = Money.Parse("¥ 765.4");
+            var yen = Money.Parse("Â¥ 765.4");
 
             yen.Should().Be(new Money(765m, "JPY"));
         }
@@ -289,7 +289,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("ja-JP")]
         public void WhenParsingJapaneseYen_ThenThisShouldBeRoundedUp()
         {
-            var yen = Money.Parse("¥ 765.5");
+            var yen = Money.Parse("Â¥ 765.5");
 
             yen.Should().Be(new Money(766m, "JPY"));
         }
@@ -302,7 +302,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
             Money euro;
-            Money.TryParse("€ 765,43", out euro).Should().BeTrue();
+            Money.TryParse("â‚¬ 765,43", out euro).Should().BeTrue();
 
             euro.Should().Be(new Money(765.43m, "EUR"));
         }
@@ -311,7 +311,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
             Money euro;
-            Money.TryParse("765,43 €", out euro).Should().BeTrue();
+            Money.TryParse("765,43 â‚¬", out euro).Should().BeTrue();
 
             euro.Should().Be(new Money(765.43, "EUR"));
         }
@@ -329,7 +329,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenParsingYenYuanSymbolInJapan_ThenThisShouldReturnJapaneseYen()
         {
             Money yen;
-            Money.TryParse("¥ 765", out yen).Should().BeTrue();
+            Money.TryParse("Â¥ 765", out yen).Should().BeTrue();
 
             yen.Should().Be(new Money(765m, "JPY"));
         }
@@ -338,7 +338,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenParsingYenYuanSymbolInChina_ThenThisShouldReturnChineseYuan()
         {
             Money yuan;
-            Money.TryParse("¥ 765", out yuan).Should().BeTrue();
+            Money.TryParse("Â¥ 765", out yuan).Should().BeTrue();
 
             yuan.Should().Be(new Money(765m, "CNY"));
         }
@@ -346,9 +346,9 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         [Fact, UseCulture("nl-NL")]
         public void WhenParsingYenYuanInNetherlands_ThenThisShouldReturnFalse()
         {
-            // ¥ symbol is used for Japanese yen and Chinese yuan
+            // Â¥ symbol is used for Japanese yen and Chinese yuan
             Money money;
-            Money.TryParse("¥ 765", out money).Should().BeFalse();
+            Money.TryParse("Â¥ 765", out money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
         }
@@ -407,7 +407,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
         {
             Money yen;
-            Money.TryParse("¥ 765", Currency.FromCode("JPY"), out yen).Should().BeTrue();
+            Money.TryParse("Â¥ 765", Currency.FromCode("JPY"), out yen).Should().BeTrue();
 
             yen.Should().Be(new Money(765, "JPY"));
         }
@@ -444,7 +444,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
         {
             Money euro;
-            Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro).Should().BeTrue();
+            Money.TryParse("â‚¬ 765,43", Currency.FromCode("EUR"), out euro).Should().BeTrue();
 
             euro.Should().Be(new Money(765.43m, "EUR"));
         }
@@ -453,7 +453,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
         {
             Money euro;
-            Money.TryParse("765,43 €", Currency.FromCode("EUR"), out euro).Should().BeTrue();
+            Money.TryParse("765,43 â‚¬", Currency.FromCode("EUR"), out euro).Should().BeTrue();
 
             euro.Should().Be(new Money(765.43, "EUR"));
         }
@@ -471,7 +471,7 @@ namespace NodaMoney.Tests.MoneyParsableSpec
         public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldReturnFalse()
         {
             Money money;
-            Money.TryParse("€ 765,43", Currency.FromCode("USD"), out money).Should().BeFalse();
+            Money.TryParse("â‚¬ 765,43", Currency.FromCode("USD"), out money).Should().BeFalse();
 
             money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
         }

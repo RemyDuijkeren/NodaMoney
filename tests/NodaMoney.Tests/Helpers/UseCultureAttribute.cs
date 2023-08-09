@@ -56,7 +56,7 @@ namespace NodaMoney.Tests.Helpers
 
             CultureInfo.CurrentCulture.ClearCachedData();
             CultureInfo.CurrentUICulture.ClearCachedData();
-
+            
             // Change the default culture of any new threads created by the application domain.
             // These properties are only available as of .NET 4.5.
             // CultureInfo.DefaultThreadCurrentCulture = Culture;
@@ -74,6 +74,9 @@ namespace NodaMoney.Tests.Helpers
 
             CultureInfo.CurrentCulture.ClearCachedData();
             CultureInfo.CurrentUICulture.ClearCachedData();
+            
+            // CultureInfo.DefaultThreadCurrentCulture = _originalCulture;
+            // CultureInfo.DefaultThreadCurrentUICulture = _originalUiCulture;
         }
     }
 }

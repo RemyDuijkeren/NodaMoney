@@ -63,7 +63,7 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
             var clone = JsonConvert.DeserializeObject<Currency>(json);
 
             clone.Should().Be(money.Currency);
-        }
+        } 
 
         [Theory]
         [MemberData(nameof(TestData))]

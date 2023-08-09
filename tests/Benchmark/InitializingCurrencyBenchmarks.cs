@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
+using NodaMoney;
 
-namespace NodaMoney.Benchmarks;
+namespace Benchmark;
 
 [MemoryDiagnoser]
 public class InitializingCurrencyBenchmarks

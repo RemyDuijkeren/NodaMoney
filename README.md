@@ -10,7 +10,9 @@ Packages on this feed are alpha and beta and, while they've passed all our tests
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
-[![Build Status](https://dev.azure.com/dynamichands/GitHub/_apis/build/status/DynamicHands.NodaMoney?branchName=master)](https://dev.azure.com/dynamichands/GitHub/_build/latest?definitionId=9&branchName=master)
+![CI](https://github.com/AutomateValue/NodaMoney/actions/workflows/continuous.yml/badge.svg)
+[![NuGet](https://img.shields.io/nuget/dt/NServiceBus.Extensions.Diagnostics.ApplicationInsights.svg)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/vpre/NServiceBus.Extensions.Diagnostics.ApplicationInsights.svg)](https://www.nuget.org/packages/NodaMoney)
 [![Coverage Status](https://coveralls.io/repos/github/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/github/remyvd/NodaMoney?branch=master)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.

@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
+using NodaMoney;
 
-namespace NodaMoney.Benchmarks;
+namespace Benchmark;
 
 [MemoryDiagnoser]
 public class AddingCustomCurrencyBenchmarks
@@ -31,19 +32,19 @@ public class AddingCustomCurrencyBenchmarks
         return _builder.Build();
     }
 
-    // [Benchmark]
+    //[Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
     public Currency Register()
     {
         return _builder.Register();
     }
 
-    // [Benchmark]
+    //[Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
     public Currency Unregister()
     {
         return CurrencyBuilder.Unregister("USD", "ISO-4217");
     }
 
-    // [Benchmark]
+    // [Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
     public Currency Replace()
     {
         Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");

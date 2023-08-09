@@ -96,7 +96,6 @@ namespace NodaMoney
             get
             {
                 var currentRegion = RegionInfo.CurrentRegion;
-
                 return ref currentRegion.Name == "IV" ? ref FromCode("XXX") : ref FromRegion(currentRegion);
             }
         }
@@ -391,7 +390,7 @@ namespace NodaMoney
         /// <summary>Check a value indication whether currency is valid on a given date.</summary>
         /// <param name="date">The date on which the Currency should be valid.</param>
         /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
-        public bool IsValidOn(in DateTime date)
+        public bool IsValidOn(DateTime date)
         {
             return
                 (!ValidFrom.HasValue || ValidFrom <= date) &&
