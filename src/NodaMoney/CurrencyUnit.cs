@@ -10,7 +10,7 @@ public readonly record struct CurrencyUnit
     // readonly byte _code1;
     // readonly byte _code2;
     readonly ushort _code;
-    readonly byte _namespace;
+    //readonly byte _namespace;
 
     /// <summary>Initializes a new instance of the <see cref="CurrencyUnit"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
@@ -42,9 +42,10 @@ public readonly record struct CurrencyUnit
         //_code1 = (byte)_code;
         //_code2 = (byte)(_code >> 8);
 
+        // TODO: store namespace
         // ushort for storing code (2bytes) = 15bits needed, 1bit left => use 1bit to mark if ISO? ISO=0, 1=other?
         // byte for storing namespace (4bits=15 or 3bits=7) and minor unit (4bits=15 or 5bit=31)? or use CurrencyInfo to retrieve?
-        _namespace = @namespace;
+        //_namespace = @namespace;
     }
 
     /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>

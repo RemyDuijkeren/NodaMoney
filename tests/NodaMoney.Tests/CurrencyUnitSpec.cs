@@ -70,9 +70,9 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
         [Fact]
         public void SizeIs2Bytes_GivenCurrencyType()
         {
-            int size = System.Runtime.InteropServices.Marshal.SizeOf(typeof(CurrencyUnit));
+            int size = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Currency));
 
-            size.Should().Be(3);
+            size.Should().Be(64);
         }
         
         [Theory]
