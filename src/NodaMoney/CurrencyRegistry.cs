@@ -49,12 +49,12 @@ namespace NodaMoney
             }
             
             // TODO: tryout CurrencyUnit
-            LookupCurrencies = new Dictionary<CurrencyUnit, Currency>(currencies.Length);
-            foreach (var ci in currencies)
-            {
-                var cu = new CurrencyUnit(ci.Code);
-                LookupCurrencies[cu] = ci;
-            }
+            // LookupCurrencies = new Dictionary<CurrencyUnit, Currency>(currencies.Length);
+            // foreach (var ci in currencies)
+            // {
+            //     var cu = new CurrencyUnit(ci.Code);
+            //     LookupCurrencies[cu] = ci;
+            // }
 
             // var xa = Currencies.AsMemory();
             // TODO: Use ReadOnlySpan<T> or ReadOnlyMemory<T>  to split up namespaces? 0..999 ISO4127, 1000..9999 ISO4127-HISTORIC

@@ -62,4 +62,23 @@ public class HighLoadBenchmarks
 
         return money;
     }
+    
+    [Benchmark]
+    public MoneyUnit[] CreatingOneMillionMoneyUnit()
+    {
+        int max = 1_000_000;
+        MoneyUnit[] money = new MoneyUnit[max];
+
+        for (int i = 0; i < max; i++)
+        {
+            if (i % 3 == 0)
+                money[i] = new MoneyUnit(10M, "EUR");
+            else if (i % 2 == 0)
+                money[i] = new MoneyUnit(10M, "USD");
+            else
+                money[i] = new MoneyUnit(10M, "JPY");
+        }
+
+        return money;
+    }
 }
