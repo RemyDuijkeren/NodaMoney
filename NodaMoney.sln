@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodaMoney.Tests", "tests\No
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{324D342A-2588-4422-AFB1-FA0359EE825D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "tests\Benchmark\Benchmark.csproj", "{E0C44A78-CEA4-4BA8-A5C3-139D9079345C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{CC01DEB3-F862-49A1-9EB5-50A4E52B82E7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{324D342A-2588-4422-AFB1-FA0359EE825D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{324D342A-2588-4422-AFB1-FA0359EE825D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0C44A78-CEA4-4BA8-A5C3-139D9079345C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0C44A78-CEA4-4BA8-A5C3-139D9079345C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0C44A78-CEA4-4BA8-A5C3-139D9079345C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0C44A78-CEA4-4BA8-A5C3-139D9079345C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
