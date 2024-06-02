@@ -20,7 +20,7 @@ namespace NodaMoney
     [Serializable]
     [DebuggerDisplay("{Code}")]
     [TypeConverter(typeof(CurrencyTypeConverter))]
-    public readonly struct Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
+    public class Currency : IEquatable<Currency>, IXmlSerializable, ISerializable
     {
         /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
         /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
@@ -65,7 +65,7 @@ namespace NodaMoney
         /// <exception cref="System.ArgumentNullException">code or number or englishName or symbol is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 28, or -1 if not applicable.</exception>
         internal Currency(string code, short number, byte minorUnitAsPowerOfTen, string englishName, string symbol, byte @namespace = 0, DateTime? validTo = null, DateTime? validFrom = null)
-            : this()
+            //: this()
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
