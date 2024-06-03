@@ -156,14 +156,13 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |----------------------------|---------:|---------:|---------:|-----------:|----------:|
 | CreatingOneMillionCurrency | 482.6 ms |  9.57 ms | 26.68 ms | 75000.0000 |    679 MB |
 | CreatingOneMillionMoney    | 516.8 ms | 10.33 ms | 28.46 ms | 75000.0000 |    694 MB |
-#### after
-| Method                            |      Mean |    Error |   StdDev |      Gen 0 |    Gen 1 |    Gen 2 | Allocated |
-|-----------------------------------|----------:|---------:|---------:|-----------:|---------:|---------:|----------:|
-| CreatingOneMillionCurrencyUnits   |  21.52 ms | 0.427 ms | 1.032 ms |  8093.7500 | 468.7500 | 468.7500 |     63 MB |
-| CreatingOneMillionCurrency        |  50.61 ms | 1.009 ms | 1.767 ms |   272.7273 | 272.7273 | 272.7273 |     61 MB |
-| CreatingOneMillionMoney           | 157.97 ms | 3.056 ms | 4.284 ms |          - |        - |        - |     76 MB |
-| CreatingOneMillionMoneyUnit       | 219.60 ms | 3.809 ms | 4.386 ms | 24666.6667 |        - |        - |    221 MB |
-| CreatingOneMillionMoneyUnit-Class | 208.17 ms | 2.949 ms | 2.302 ms | 24666.6667 |        - |        - |    221 MB |
+#### after (.net8)
+| Method                          | Mean       | Error     | StdDev    | Gen0       | Gen1     | Gen2     | Allocated |
+|-------------------------------- |-----------:|----------:|----------:|-----------:|---------:|---------:|----------:|
+| CreatingOneMillionCurrencyUnits |   2.352 ms | 0.0387 ms | 0.0380 ms |   996.0938 | 996.0938 | 996.0938 |   3.82 MB |
+| CreatingOneMillionCurrency      |  23.872 ms | 0.4008 ms | 0.3749 ms |   968.7500 | 968.7500 | 968.7500 |  61.04 MB |
+| CreatingOneMillionMoney         | 128.971 ms | 1.6607 ms | 1.4722 ms |   750.0000 | 750.0000 | 750.0000 |  76.29 MB |
+| CreatingOneMillionMoneyUnit     | 165.396 ms | 3.2704 ms | 4.0164 ms | 13666.6667 | 333.3333 | 333.3333 | 122.07 MB |
 ### after Currency as class
 | Method                          |      Mean |    Error |   StdDev |     Gen 0 |    Gen 1 |    Gen 2 | Allocated |
 |---------------------------------|----------:|---------:|---------:|----------:|---------:|---------:|----------:|
@@ -179,3 +178,9 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | CreateCurrencyUnit                 | 78.61 ns | 1.586 ns | 3.239 ns |  1.00 | 0.0172 |     144 B |
 | CreateCurrencyUnitNoLinq           | 17.47 ns | 0.329 ns | 0.503 ns |  0.22 | 0.0076 |      64 B |
 | CreateCurrencyUnitNoLinqAndPattern | 18.35 ns | 0.396 ns | 0.683 ns |  0.23 | 0.0076 |      64 B |
+#### after (.net8)
+| Method                             |     Mean |    Error |   StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
+|------------------------------------|---------:|---------:|---------:|------:|-------:|----------:|------------:|
+| CreateCurrencyUnit                 | 41.25 ns | 0.844 ns | 1.853 ns |  1.00 | 0.0172 |     144 B |        1.00 |
+| CreateCurrencyUnitNoLinq           | 10.68 ns | 0.240 ns | 0.580 ns |  0.26 | 0.0076 |      64 B |        0.44 |
+| CreateCurrencyUnitNoLinqAndPattern | 10.82 ns | 0.243 ns | 0.450 ns |  0.26 | 0.0076 |      64 B |        0.44 |

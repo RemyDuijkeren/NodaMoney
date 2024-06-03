@@ -15,11 +15,11 @@ public class HighLoadBenchmarks
         for (int i = 0; i < max; i++)
         {
             if (i % 3 == 0)
-                currencies[i] = new CurrencyUnit("EUR");
+                currencies[i] = new CurrencyUnit("EUR", MinorUnit.Two);
             else if (i % 2 == 0)
-                currencies[i] = new CurrencyUnit("USD");
+                currencies[i] = new CurrencyUnit("USD", MinorUnit.Two);
             else
-                currencies[i] = new CurrencyUnit("JPY");
+                currencies[i] = new CurrencyUnit("JPY", MinorUnit.Zero);
         }
 
         return currencies;

@@ -1,53 +1,85 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NodaMoney;
+
+public enum CurrencyList : byte
+{
+    Iso4217 = 0,
+    Iso4217Historic = 1,
+    Other = 2
+}
+
+public enum MinorUnit : byte
+{
+    Zero = 0,
+    One = 1,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+    Nine = 9,
+    Ten = 10,
+    Eleven = 11,
+    Twelve = 12,
+    Thirteen = 13,
+    Z07Byte = 14,
+    NotApplicable = 15,
+}
 
 /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Currency</remarks>
 public readonly record struct CurrencyUnit
 {
-    // readonly byte _code1;
-    // readonly byte _code2;
+    const string NoCurrencyCode = "XXX";
     readonly ushort _code;
-    //readonly byte _namespace;
+    readonly byte _listAndMinorUnit;
+    public static readonly CurrencyUnit NoCurrency = new CurrencyUnit(NoCurrencyCode, MinorUnit.NotApplicable);
 
     /// <summary>Initializes a new instance of the <see cref="CurrencyUnit"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
     /// <param name="flag"></param>
-    public CurrencyUnit(string code, byte @namespace = 0, bool flag = false)
+    public CurrencyUnit(string code, MinorUnit minorUnit, CurrencyList currencyList = 0)
     {
         if (code == null) throw new ArgumentNullException(nameof(code));
-        
-        var chars = code.ToCharArray();
-        if (chars.Length != 3) throw new ArgumentException("Currency code must be three characters long", nameof(code));
+        if (code.Length != 3) throw new ArgumentException("Currency code must be three characters long", nameof(code));
+
+        if (code == NoCurrencyCode)
+        {
+            _code = 0; // 25368 = 'XXX' (No Currency) => set to 0 (default)
+            _listAndMinorUnit = 0; // No MinorUnit for 'XXX'
+            return;
+        }
         
         // don't use LINQ here, it's faster to check the individual characters
-        var bytes = new byte[3];
-        for (var i = 0; i < chars.Length; i++)
+        _code = 0;
+        for (var i = 0; i < code.Length; i++)
         {
-            var c = chars[i];
+            var c = code[i];
             if (c is < 'A' or > 'Z') throw new ArgumentException("Currency code should only exist out of capital letters", nameof(code));
-            bytes[i] = (byte)(c - 'A' + 1); // A-Z (65-90 in ASCII) => 1-26 (fits in 5 bits)
+            
+            // A-Z (65-90 in ASCII) => 1-26 (fits in 5 bits). We use 0 for 'XXX' (No Currency)
+            // store in ushort (2 bytes) by shifting 5 bits to the left for each byte
+            _code = (ushort)(_code << 5 | (c - 'A' + 1));
         }
 
-        // store in ushort (2 bytes) by shifting 5 bits to the left for each byte
-        _code = (ushort)(bytes[0] << 10 | bytes[1] << 5 | bytes[2]);
-
-        // ushort = 2bytes, only 15bits needed for code, 1bit left => use last bit to indicate flag for ...? IsIso4217?
-        if (flag) _code |= 1 << 15; // set last bit to 1
-
-        if (_code == 25368) _code = 0; // 25368 = 'XXX' (No Currency) => set to 0 (default)
+        // ushort = 2bytes, only 15bits needed for code, 1bit left => use last bit to indicate flag for ...?
+        // IsIso4217? Or MinorUnit is known?
+        //if (flag) _code |= 1 << 15; // set last bit to 1
         
-        //_code1 = (byte)_code;
-        //_code2 = (byte)(_code >> 8);
-
-        // TODO: store namespace
-        // ushort for storing code (2bytes) = 15bits needed, 1bit left => use 1bit to mark if ISO? ISO=0, 1=other?
-        // byte for storing namespace (4bits=15 or 3bits=7) and minor unit (4bits=15 or 5bit=31)? or use CurrencyInfo to retrieve?
-        //_namespace = @namespace;
+        // store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)
+        if ((byte)currencyList > 3)
+            throw new ArgumentOutOfRangeException(nameof(currencyList), "Currency list must be between 0 and 3");
+        
+        if ((byte)minorUnit > 15) 
+            throw new ArgumentOutOfRangeException(nameof(minorUnit), "Minor unit must be between 0 and 15");
+        
+        _listAndMinorUnit = (byte)((byte)minorUnit << 2 | (byte)currencyList);
     }
 
     /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>
@@ -55,15 +87,15 @@ public readonly record struct CurrencyUnit
     {
         get
         {
-            if (_code == 0) return "XXX";
-            //if (_code1 == 0 && _code2 == 0) return "XXX";
-
-            // var _code = _code1 | _code2 << 8;
+            if (_code == 0) return NoCurrencyCode;
             
             // shifting back into separate bytes with clearing the left 3 bits using '& 0b_0001_1111' (= '& 0x1F')
-            var bytes = new[] { (byte)(_code >> 10 & 0x1F), (byte)(_code >> 5 & 0x1F), (byte)(_code & 0x1F) };
-            
-            return new string(bytes.Select(b => (char)(b + 'A' - 1)).ToArray()); // 1-26 => A-Z (65-90 in ASCII)
+            var sb = new StringBuilder(3);
+            sb.Append((char)((_code >> 10 & 0x1F) + 'A' - 1)); // 1-26 => A-Z (65-90 in ASCII)
+            sb.Append((char)((_code >> 5 & 0x1F) + 'A' - 1));
+            sb.Append((char)((_code & 0x1F) + 'A' - 1));
+
+            return sb.ToString();
         }
     }
     
@@ -74,6 +106,8 @@ public readonly record struct CurrencyUnit
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct MoneyUnit : IEquatable<MoneyUnit>
     {
+        readonly long _amount;
+
         /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
         /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
         /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
@@ -83,7 +117,7 @@ public readonly record struct CurrencyUnit
         /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
         /// result from consistently rounding a midpoint value in a single direction.</remarks>
         public MoneyUnit(decimal amount, string code)
-            : this(amount, new CurrencyUnit(code))
+            : this(amount, new CurrencyUnit(code,0))
         {
         }
 
@@ -107,7 +141,7 @@ public readonly record struct CurrencyUnit
         /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
         /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
         public MoneyUnit(decimal amount, string code, MidpointRounding rounding)
-            : this(amount, new CurrencyUnit(code), rounding)
+            : this(amount, new CurrencyUnit(code, 0), rounding)
         {
         }
         
@@ -115,11 +149,13 @@ public readonly record struct CurrencyUnit
             : this()
         {
             Currency = currency;
-            Amount = Round(amount, currency, rounding);
+            
+            decimal rounded = Round(amount, currency, rounding);
+            _amount = (long)(rounded * (decimal)Math.Pow(10, 2));
         }
 
         /// <summary>Gets the amount of money.</summary>
-        public decimal Amount { get; }
+        public decimal Amount => _amount / (decimal)Math.Pow(10, 2);
 
         /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
         public CurrencyUnit Currency { get; } 

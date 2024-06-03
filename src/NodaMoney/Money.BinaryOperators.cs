@@ -71,7 +71,7 @@
         /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
         public static Money Add(in Money money1, in Money money2)
         {
-            AssertIsSameCurrency(money1, money2);
+            VerifySameCurrency(money1, money2);
             return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
         }
 
@@ -87,7 +87,7 @@
         /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
         public static Money Subtract(in Money money1, in Money money2)
         {
-            AssertIsSameCurrency(money1, money2);
+            VerifySameCurrency(money1, money2);
             return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
         }
 
@@ -117,7 +117,7 @@
         /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
         public static decimal Divide(in Money money1, in Money money2)
         {
-            AssertIsSameCurrency(money1, money2);
+            VerifySameCurrency(money1, money2);
             return decimal.Divide(money1.Amount, money2.Amount);
         }
     }

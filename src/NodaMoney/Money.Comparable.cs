@@ -119,7 +119,7 @@ namespace NodaMoney
         /// </returns>
         public int CompareTo(Money other)
         {
-            AssertIsSameCurrency(this, other);
+            VerifySameCurrency(this, other);
             return Amount.CompareTo(other.Amount);
         }
     }

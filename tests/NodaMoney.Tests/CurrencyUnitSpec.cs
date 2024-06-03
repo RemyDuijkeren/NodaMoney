@@ -1,17 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
-using System.Xml.Serialization;
-using NodaMoney.Tests.Helpers;
-using FluentAssertions.Common;
 
 namespace NodaMoney.Tests.CurrencyUnitSpec
 {
-    public class CreateCurrency
+    public class CreateCurrencyUnit
     {
         [Theory]
         [InlineData("EUR")]
@@ -19,7 +13,7 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
         [InlineData("USD")]
         public void CurrencyIsCreated_GivenCodeIsThreeCapitalLetters(string code)
         {
-            var currency = new CurrencyUnit(code);
+            var currency = new CurrencyUnit(code, 0);
 
             currency.Code.Should().Be(code);
             //currency.Flag.Should().BeFalse();
@@ -33,7 +27,7 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
         [InlineData("EU1")]
         public void ThrowArgumentException_GivenCodeIsNotThreeCapitalLetters(string code)
         {
-            Action act = () => new CurrencyUnit(code);
+            Action act = () => new CurrencyUnit(code, 0);
             
             act.Should().Throw<ArgumentException>();
         }
@@ -41,7 +35,7 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
         [Fact]
         public void ThrowArgumentNullException_GivenCodeIsNull()
         {
-            Action act = () => new CurrencyUnit(null);
+            Action act = () => new CurrencyUnit(null, 0);
             
             act.Should().Throw<ArgumentException>();
         }
@@ -50,7 +44,7 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
         public void CurrencyIsXXX_GivenDefaultCurrency()
         {
             // Arrange / Act
-            var noCurrency = new CurrencyUnit("XXX");
+            var noCurrency = new CurrencyUnit("XXX", 0);
             CurrencyUnit defaultCurrency = default;
 
             // Assert
@@ -58,8 +52,8 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
             noCurrency.Should().Be(default(CurrencyUnit));
 
             // Assert with XUnit methods, because https://stackoverflow.com/questions/61556309/fluent-assertions-be-vs-equals
-            Assert.Equal(noCurrency, default);
-            Assert.Equal((object)noCurrency, default(CurrencyUnit));
+            Assert.Equal(default, noCurrency);
+            Assert.Equal(default(CurrencyUnit), (object)noCurrency);
             Assert.True(noCurrency == default);
             Assert.True(noCurrency == default(CurrencyUnit));
             Assert.True(noCurrency.Equals(default));
