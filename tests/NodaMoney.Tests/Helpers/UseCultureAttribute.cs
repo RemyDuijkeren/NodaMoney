@@ -53,14 +53,14 @@ namespace NodaMoney.Tests.Helpers
 
             Thread.CurrentThread.CurrentCulture = Culture;
             Thread.CurrentThread.CurrentUICulture = UICulture;
-
-            CultureInfo.CurrentCulture.ClearCachedData();
-            CultureInfo.CurrentUICulture.ClearCachedData();
-            
+                        
             // Change the default culture of any new threads created by the application domain.
             // These properties are only available as of .NET 4.5.
             // CultureInfo.DefaultThreadCurrentCulture = Culture;
             // CultureInfo.DefaultThreadCurrentUICulture = UICulture;
+
+            CultureInfo.CurrentCulture.ClearCachedData();
+            CultureInfo.CurrentUICulture.ClearCachedData();
         }
 
         /// <summary>Restores the original <see cref="CultureInfo.CurrentCulture" /> and
@@ -71,12 +71,12 @@ namespace NodaMoney.Tests.Helpers
         {
             Thread.CurrentThread.CurrentCulture = _originalCulture;
             Thread.CurrentThread.CurrentUICulture = _originalUiCulture;
-
-            CultureInfo.CurrentCulture.ClearCachedData();
-            CultureInfo.CurrentUICulture.ClearCachedData();
             
             // CultureInfo.DefaultThreadCurrentCulture = _originalCulture;
             // CultureInfo.DefaultThreadCurrentUICulture = _originalUiCulture;
+            
+            CultureInfo.CurrentCulture.ClearCachedData();
+            CultureInfo.CurrentUICulture.ClearCachedData();
         }
     }
 }

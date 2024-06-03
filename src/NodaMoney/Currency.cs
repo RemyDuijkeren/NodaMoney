@@ -95,8 +95,20 @@ namespace NodaMoney
         {
             get
             {
+#if NET5_0_OR_GREATER
+                // In >.NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
+                // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
+                var currentCulture = CultureInfo.CurrentCulture;
+                if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
+                {
+                    return ref FromCode("XXX");
+                }
+
+                return ref FromCulture(currentCulture);
+#else
                 var currentRegion = RegionInfo.CurrentRegion;
                 return ref currentRegion.Name == "IV" ? ref FromCode("XXX") : ref FromRegion(currentRegion);
+#endif                
             }
         }
 
@@ -313,8 +325,8 @@ namespace NodaMoney
         {
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
-            if (culture.IsNeutralCulture)
-                throw new ArgumentException("Culture {0} is a neutral culture, from which no region information can be extracted!", culture.Name);
+            if (Equals(culture, CultureInfo.InvariantCulture))
+                throw new ArgumentException("Culture {0} is a invariant culture, from which no region information can be extracted!", culture.Name);
 
             return ref FromRegion(culture.Name);
         }
