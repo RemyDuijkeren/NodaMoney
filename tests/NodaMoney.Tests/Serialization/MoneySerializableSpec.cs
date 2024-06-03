@@ -11,7 +11,111 @@ using System.Collections.Generic;
 
 namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
 {
-    public class GivenIWantToDeserializeMoneyWithJsonNetSerializer
+    public class GivenIWantToDeserializeMoneyWithSystemTextJsonSerializer
+    {
+        [Theory]
+        [ClassData(typeof(ValidJsonTestData))]
+        public void WhenDeserializing_ThenThisShouldSucceed(string json, Money expected)
+        {
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Money>(json);
+
+            clone.Should().Be(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(InvalidJsonTestData))]
+        public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
+        {
+            Action action = () => System.Text.Json.JsonSerializer.Deserialize<Money>(json);
+
+            action.Should().Throw<SerializationException>().WithMessage("Member '*");
+        }
+
+        [Theory]
+        [ClassData(typeof(NestedJsonTestData))]
+        public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json, Order expected)
+        {
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Order>(json);
+
+            clone.Should().BeEquivalentTo(expected);
+            clone.Discount.Should().BeNull();
+        }
+    }
+    
+    // TODO: Write convertors, see https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-8-0
+    public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
+    {
+        public static IEnumerable<object[]> TestData => new[]
+        {
+                new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
+                new object[] { new Money(765.4321m, Currency.FromCode("EUR")) },
+                new object[] { new Money(765.4321m, Currency.FromCode("USD")) }, 
+                new object[] { new Money(765.4321m, Currency.FromCode("BHD")) },
+                new object[] { default(Money) },
+                new object[] { default(Money?) }
+        };
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money)
+        {
+            string json = System.Text.Json.JsonSerializer.Serialize(money.Currency);
+            Console.WriteLine(json);
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Currency>(json);
+
+            clone.Should().Be(money.Currency);
+        } 
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void WhenSerializingMoney_ThenThisShouldSucceed(Money money)
+        {
+            string json = System.Text.Json.JsonSerializer.Serialize(money);
+            // Console.WriteLine(json);
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Money>(json);
+            
+            clone.Should().Be(money);
+        }
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void WhenSerializingArticleWithPrice_ThenThisShouldSucceed(Money money)
+        {
+            var order = new Order
+            {
+                Id = 123,
+                Name = "Foo",
+                Price = money
+            };
+
+            string json = System.Text.Json.JsonSerializer.Serialize(order);
+            // Console.WriteLine(json);
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Order>(json);
+
+            clone.Should().BeEquivalentTo(order);
+        }
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void WhenSerializingArticleWithPriceAndDiscount_ThenThisShouldSucceed(Money money)
+        {
+            var order = new Order
+            {
+                Id = 123,
+                Name = "Foo",
+                Price = money,
+                Discount = money
+            };
+
+            string json = System.Text.Json.JsonSerializer.Serialize(order);
+            // Console.WriteLine(json);
+            var clone = System.Text.Json.JsonSerializer.Deserialize<Order>(json);
+
+            clone.Should().BeEquivalentTo(order);
+        }
+    }
+    
+    public class GivenIWantToDeserializeMoneyWithNewtonsoftJsonSerializer
     {
         [Theory]
         [ClassData(typeof(ValidJsonTestData))]
@@ -42,7 +146,7 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
         }
     }
 
-    public class GivenIWantToSerializeMoneyWithJsonNetSerializer
+    public class GivenIWantToSerializeMoneyWithNewtonsoftJsonSerializer
     {
         public static IEnumerable<object[]> TestData => new[]
         {
@@ -59,7 +163,7 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
         public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money)
         {
             string json = JsonConvert.SerializeObject(money.Currency);
-            // Console.WriteLine(json);
+            //Console.WriteLine(json);
             var clone = JsonConvert.DeserializeObject<Currency>(json);
 
             clone.Should().Be(money.Currency);

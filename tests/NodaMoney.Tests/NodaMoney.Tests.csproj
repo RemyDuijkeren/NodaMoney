@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net48;net6.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;net48;</TargetFrameworks>
     <AssemblyName>NodaMoney.Tests</AssemblyName>
     <PackageId>NodaMoney.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RavenDB.TestDriver" Version="5.3.103" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit.analyzers" Version="0.10.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
