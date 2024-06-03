@@ -226,19 +226,31 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
         private Money yen = new Money(765m, Currency.FromCode("JPY"));
         private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
 
+#if NET8_0_OR_GREATER
+        [Fact(Skip = "Not supported in .NET 8.0 or greater. See https://aka.ms/binaryformatter")]
+#else
         [Fact]
+#endif
         public void WhenSerializingYen_ThenThisShouldSucceed()
         {
             yen.Should().Be(Clone<Money>(yen));
         }
 
+#if NET8_0_OR_GREATER
+        [Fact(Skip = "Not supported in .NET 8.0 or greater. See https://aka.ms/binaryformatter")]
+#else
         [Fact]
+#endif
         public void WhenSerializingEuro_ThenThisShouldSucceed()
         {
             euro.Should().Be(Clone<Money>(euro));
         }
 
+#if NET8_0_OR_GREATER
+        [Fact(Skip = "Not supported in .NET 8.0 or greater. See https://aka.ms/binaryformatter")]
+#else
         [Fact]
+#endif
         public void WhenSerializingArticle_ThenThisShouldSucceed()
         {
             var article = new Order
@@ -251,6 +263,7 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
             article.Price.Should().Be(Clone<Order>(article).Price);
         }
 
+        [Obsolete("Obsolete")]
         public static Stream Serialize(object source)
         {
             IFormatter formatter = new BinaryFormatter();
@@ -259,6 +272,7 @@ namespace NodaMoney.Tests.Serialization.MoneySerializableSpec
             return stream;
         }
 
+        [Obsolete("Obsolete")]
         public static T Deserialize<T>(Stream stream)
         {
             IFormatter formatter = new BinaryFormatter();
