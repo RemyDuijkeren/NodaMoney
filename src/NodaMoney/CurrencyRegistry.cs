@@ -242,7 +242,6 @@ namespace NodaMoney
                 ["ISO-4217::SEK"] = new Currency("SEK", "752", 2, "Swedish krona/kronor", "kr"),
                 ["ISO-4217::SGD"] = new Currency("SGD", "702", 2, "Singapore dollar", "S$"), // or $
                 ["ISO-4217::SHP"] = new Currency("SHP", "654", 2, "Saint Helena pound", "£"),
-                ["ISO-4217::SLL"] = new Currency("SLL", "694", 0, "Sierra Leonean leone", "Le"),
                 ["ISO-4217::SOS"] = new Currency("SOS", "706", 2, "Somali shilling", "S"), // or Sh.So.
                 ["ISO-4217::SRD"] = new Currency("SRD", "968", 2, "Surinamese dollar", "$"),
                 ["ISO-4217::SSP"] = new Currency("SSP", "728", 2, "South Sudanese pound", "£"), // not sure about symbol...
@@ -299,7 +298,7 @@ namespace NodaMoney
                 ["ISO-4217::SLE"] = new Currency("SLE", "925", 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
 
                 // Historic ISO-4217 currencies (list three)
-                ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", "694", 2, "Sierra Leonean leone", "Le", "ISO-4217-HISTORIC", validTo: new DateTime(2022, 6, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
+                ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", "694", 2, "Sierra Leonean leone", "Le", "ISO-4217-HISTORIC", validTo: new DateTime(2022, 09, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
                 ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
                 ["ISO-4217-HISTORIC::ESA"] = new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
