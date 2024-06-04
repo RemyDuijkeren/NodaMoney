@@ -1,16 +1,21 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
 
-/// <summary>Represents a fast money value with a currency unit.</summary>
+/// <summary>Represents a fast money value with a currency unit. Scaled integer</summary>
 /// <remarks>Size from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 of the minor unit (like cents)</remarks>
+/// <remarks>https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type
+/// Currency variables are stored as 64-bit (8-byte) numbers in an integer format, scaled by 10,000 to give a fixed-point number with 15 digits to the left of the decimal point and 4 digits to the right.
+/// This representation provides a range of -922,337,203,685,477.5808 to 922,337,203,685,477.5807.
+/// The type-declaration character for Currency is the at (@) sign.
+/// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
+/// </remarks>
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct FastMoney : IEquatable<FastMoney>
 {
-    readonly long _amount;
+    readonly long _amount; 
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
