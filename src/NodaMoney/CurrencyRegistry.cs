@@ -47,7 +47,7 @@ namespace NodaMoney
             {
                 Index[c.GetHashCode()] = i++;
             }
-            
+
             // TODO: tryout CurrencyUnit
             // LookupCurrencies = new Dictionary<CurrencyUnit, Currency>(currencies.Length);
             // foreach (var ci in currencies)
@@ -81,7 +81,7 @@ namespace NodaMoney
         {
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
-            
+
             // Using JaggedArray
             //if (IsoKeyLookup.TryGetValue(code.GetHashCode(), out short number))
             //{
@@ -771,6 +771,7 @@ namespace NodaMoney
                 new Currency("STD", 678, 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
                 new Currency("UYW", 927, 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
                 new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
+                new Currency("SLE", 925, 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
                 new Currency("ANG", 532, 2, "Netherlands Antillean guilder", "ƒ", validTo: new DateTime(2025, 03, 31)), // Amendment 176, replaced by XCG/532
                 // new Currency("XCG", 532, 2, "Caribbean Guilder", "ƒ", validFrom: new DateTime(2025, 03, 31)), // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
