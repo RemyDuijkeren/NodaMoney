@@ -174,7 +174,6 @@ namespace NodaMoney
                 ["ISO-4217::GYD"] = new Currency("GYD", "328", 2, "Guyanese dollar", "$"), // or G$
                 ["ISO-4217::HKD"] = new Currency("HKD", "344", 2, "Hong Kong dollar", "HK$"), // or $
                 ["ISO-4217::HNL"] = new Currency("HNL", "340", 2, "Honduran lempira", "L"),
-                ["ISO-4217::HRK"] = new Currency("HRK", "191", 2, "Croatian kuna", "kn"),
                 ["ISO-4217::HTG"] = new Currency("HTG", "332", 2, "Haitian gourde", "G"),
                 ["ISO-4217::HUF"] = new Currency("HUF", "348", 2, "Hungarian forint", "Ft"),
                 ["ISO-4217::IDR"] = new Currency("IDR", "360", 2, "Indonesian rupiah", "Rp"),
@@ -298,6 +297,7 @@ namespace NodaMoney
                 ["ISO-4217::SLE"] = new Currency("SLE", "925", 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
 
                 // Historic ISO-4217 currencies (list three)
+                ["ISO-4217-HISTORIC::HRK"] = new Currency("HRK", "191", 2, "Croatian kuna", "kn", "ISO-4217-HISTORIC", validTo: new DateTime(2022, 12, 31)), // replaced by EUR/978
                 ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", "694", 2, "Sierra Leonean leone", "Le", "ISO-4217-HISTORIC", validTo: new DateTime(2022, 09, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
                 ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
