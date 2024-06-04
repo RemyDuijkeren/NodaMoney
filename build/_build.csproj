@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="6.1.2" />
+    <PackageReference Include="Nuke.Common" Version="8.0.0" />
     <PackageDownload Include="ReportGenerator" Version="[5.1.9]" />
     <PackageDownload Include="coveralls.net" Version="[4.0.0]" />
   </ItemGroup>
