@@ -276,7 +276,6 @@ namespace NodaMoney
                 ["ISO-4217::AFN"] = new Currency("AFN", 971, 2, "Afghan afghani", "؋"),
                 ["ISO-4217::ALL"] = new Currency("ALL", 008, 2, "Albanian lek", "L"),
                 ["ISO-4217::AMD"] = new Currency("AMD", 051, 2, "Armenian dram", "֏"),
-                ["ISO-4217::ANG"] = new Currency("ANG", 532, 2, "Netherlands Antillean guilder", "ƒ"),
                 ["ISO-4217::AOA"] = new Currency("AOA", 973, 2, "Angolan kwanza", "Kz"),
                 ["ISO-4217::ARS"] = new Currency("ARS", 032, 2, "Argentine peso", "$"),
                 ["ISO-4217::AUD"] = new Currency("AUD", 036, 2, "Australian dollar", "$"),
@@ -454,6 +453,8 @@ namespace NodaMoney
                 // 1 October 2021 for any internal needs during the redenomination process, but is not replacing VES as the official currency code (Amendment 170)
                 ["ISO-4217::VED"] = new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
                 ["ISO-4217::SLE"] = new Currency("SLE", 925, 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
+                ["ISO-4217::ANG"] = new Currency("ANG", 532, 2, "Netherlands Antillean guilder", "ƒ", validTo: new DateTime(2025, 03, 31)), // Amendment 176, replaced by XCG/532
+                //["ISO-4217::XCG"] = new Currency("XCG", 532, 2, "Caribbean Guilder", "ƒ", validFrom: new DateTime(2025, 03, 31)), // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
                 // Historic ISO-4217 currencies (list three)
                 ["ISO-4217-HISTORIC::HRK"] = new Currency("HRK", 191, 2, "Croatian kuna", "kn", Iso4217Historic, validTo: new DateTime(2022, 12, 31)), // replaced by EUR/978
@@ -596,7 +597,6 @@ namespace NodaMoney
                 new Currency("AFN", 971, 2, "Afghan afghani", "؋"),
                 new Currency("ALL", 008, 2, "Albanian lek", "L"),
                 new Currency("AMD", 051, 2, "Armenian dram", "֏"),
-                new Currency("ANG", 532, 2, "Netherlands Antillean guilder", "ƒ"),
                 new Currency("AOA", 973, 2, "Angolan kwanza", "Kz"),
                 new Currency("ARS", 032, 2, "Argentine peso", "$"),
                 new Currency("AUD", 036, 2, "Australian dollar", "$"),
@@ -771,6 +771,8 @@ namespace NodaMoney
                 new Currency("STD", 678, 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
                 new Currency("UYW", 927, 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
                 new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
+                new Currency("ANG", 532, 2, "Netherlands Antillean guilder", "ƒ", validTo: new DateTime(2025, 03, 31)), // Amendment 176, replaced by XCG/532
+                // new Currency("XCG", 532, 2, "Caribbean Guilder", "ƒ", validFrom: new DateTime(2025, 03, 31)), // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
                 // Historic ISO-4217 currencies (list three)
                 new Currency("HRK", 191, 2, "Croatian kuna", "kn", Iso4217Historic, validTo: new DateTime(2022, 12, 31)),
