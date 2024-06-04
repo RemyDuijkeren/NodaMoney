@@ -15,7 +15,7 @@ namespace NodaMoney;
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct FastMoney : IEquatable<FastMoney>
 {
-    readonly long _amount; 
+    readonly long _amount;
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -53,12 +53,12 @@ public readonly struct FastMoney : IEquatable<FastMoney>
         : this(amount, new CurrencyUnit(code, 0), rounding)
     {
     }
-        
+
     public FastMoney(decimal amount, CurrencyUnit currency, MidpointRounding rounding)
         : this()
     {
         Currency = currency;
-            
+
         decimal rounded = Round(amount, currency, rounding);
         _amount = (long)(rounded * (decimal)Math.Pow(10, 2));
     }

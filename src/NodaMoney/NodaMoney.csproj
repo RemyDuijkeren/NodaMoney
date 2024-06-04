@@ -51,16 +51,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
- 
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-  </ItemGroup>
 
   <ItemGroup>
     <!-- Add InternalsVisibleTo to src projects to enable testing internal methods https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm -->
     <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CustomDictionary.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CodeAnalysisDictionary>True</CodeAnalysisDictionary>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
