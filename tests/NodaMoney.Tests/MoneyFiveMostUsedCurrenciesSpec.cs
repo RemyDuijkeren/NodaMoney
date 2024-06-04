@@ -2,13 +2,13 @@ using System;
 using FluentAssertions;
 using Xunit;
 
-namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
+namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec;
+
+public class GivenIWantEuros
 {
-    public class GivenIWantEuros
+    [Fact]
+    public void WhenDecimal_ThenCreatingShouldSucceed()
     {
-        [Fact]
-        public void WhenDecimal_ThenCreatingShouldSucceed()
-        {
             // from decimal (other integral types are implicitly converted to decimal)
             var euros = Money.Euro(10.00m);
 
@@ -16,9 +16,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             euros.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             // from decimal (other integral types are implicitly converted to decimal)
             var euros1 = Money.Euro(10.005m);
             var euros2 = Money.Euro(10.005m, MidpointRounding.AwayFromZero);
@@ -28,9 +28,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             euros1.Amount.Should().NotBe(euros2.Amount);
         }
 
-        [Fact]
-        public void WhenDouble_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDouble_ThenCreatingShouldSucceed()
+    {
             // from double (float is implicitly converted to double)
             var euros = Money.Euro(10.00);
 
@@ -38,9 +38,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             euros.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             // from double (float is implicitly converted to double)
             var euros1 = Money.Euro(10.005);
             var euros2 = Money.Euro(10.005, MidpointRounding.AwayFromZero);
@@ -50,9 +50,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             euros1.Amount.Should().NotBe(euros2.Amount);
         }
 
-        [Fact]
-        public void WhenLong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenLong_ThenCreatingShouldSucceed()
+    {
             // from long (byte, short and int are implicitly converted to long)
             var euros = Money.Euro(10L);
 
@@ -60,21 +60,21 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             euros.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenULong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenULong_ThenCreatingShouldSucceed()
+    {
             var euros = Money.Euro(10UL);
 
             euros.Currency.Should().Be(Currency.FromCode("EUR"));
             euros.Amount.Should().Be(10.00m);
         }
-    }
+}
 
-    public class GivenIWantDollars
+public class GivenIWantDollars
+{
+    [Fact]
+    public void WhenDecimal_ThenCreatingShouldSucceed()
     {
-        [Fact]
-        public void WhenDecimal_ThenCreatingShouldSucceed()
-        {
             //from decimal (other integral types are implicitly converted to decimal)
             var dollars = Money.USDollar(10.00m);
 
@@ -82,9 +82,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             dollars.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             // from decimal (other integral types are implicitly converted to decimal)
             var dollars1 = Money.USDollar(10.005m);
             var dollars2 = Money.USDollar(10.005m, MidpointRounding.AwayFromZero);
@@ -94,9 +94,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             dollars1.Amount.Should().NotBe(dollars2.Amount);
         }
 
-        [Fact]
-        public void WhenDouble_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDouble_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var dollars = Money.USDollar(10.00);
 
@@ -104,9 +104,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             dollars.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var dollars1 = Money.USDollar(10.005);
             var dollars2 = Money.USDollar(10.005, MidpointRounding.AwayFromZero);
@@ -116,9 +116,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             dollars1.Amount.Should().NotBe(dollars2.Amount);
         }
 
-        [Fact]
-        public void WhenLong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenLong_ThenCreatingShouldSucceed()
+    {
             //from long (byte, short and int are implicitly converted to long)
             var dollars = Money.USDollar(10L);
 
@@ -126,22 +126,22 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             dollars.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenULong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenULong_ThenCreatingShouldSucceed()
+    {
             //from long (byte, short and int are implicitly converted to long)
             var dollars = Money.USDollar(10UL);
 
             dollars.Currency.Should().Be(Currency.FromCode("USD"));
             dollars.Amount.Should().Be(10.00m);
         }
-    }
+}
 
-    public class GivenIWantYens
+public class GivenIWantYens
+{
+    [Fact]
+    public void WhenDecimal_ThenCreatingShouldSucceed()
     {
-        [Fact]
-        public void WhenDecimal_ThenCreatingShouldSucceed()
-        {
             //from decimal (other integral types are implicitly converted to decimal)
             var yens = Money.Yen(10.00m);
 
@@ -150,9 +150,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             yens.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from decimal (other integral types are implicitly converted to decimal)
             var yen1 = Money.Yen(10.5m);
             var yen2 = Money.Yen(10.5m, MidpointRounding.AwayFromZero);
@@ -162,9 +162,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             yen1.Amount.Should().NotBe(yen2.Amount);
         }
 
-        [Fact]
-        public void WhenDouble_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDouble_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var yens = Money.Yen(10.00);
 
@@ -173,9 +173,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             yens.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var yen1 = Money.Yen(10.5);
             var yen2 = Money.Yen(10.5, MidpointRounding.AwayFromZero);
@@ -185,9 +185,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             yen1.Amount.Should().NotBe(yen2.Amount);
         }
 
-        [Fact]
-        public void WhenLong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenLong_ThenCreatingShouldSucceed()
+    {
             //from long (byte, short and int are implicitly converted to long)
             var yens = Money.Yen(10L);
 
@@ -196,22 +196,22 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             yens.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenULong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenULong_ThenCreatingShouldSucceed()
+    {
             var yens = Money.Yen(10UL);
 
             yens.Should().NotBeNull();
             yens.Currency.Should().Be(Currency.FromCode("JPY"));
             yens.Amount.Should().Be(10.00m);
         }
-    }
+}
 
-    public class GivenIWantPonds
+public class GivenIWantPonds
+{
+    [Fact]
+    public void WhenDecimal_ThenCreatingShouldSucceed()
     {
-        [Fact]
-        public void WhenDecimal_ThenCreatingShouldSucceed()
-        {
             //from decimal (other integral types are implicitly converted to decimal)
             var pounds = Money.PoundSterling(10.00m);
 
@@ -220,9 +220,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from decimal (other integral types are implicitly converted to decimal)
             var pounds1 = Money.PoundSterling(10.005m);
             var pounds2 = Money.PoundSterling(10.005m, MidpointRounding.AwayFromZero);
@@ -232,9 +232,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds1.Amount.Should().NotBe(pounds2.Amount);
         }
 
-        [Fact]
-        public void WhenDouble_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDouble_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var pounds = Money.PoundSterling(10.00);
 
@@ -243,9 +243,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var pounds1 = Money.PoundSterling(10.005);
             var pounds2 = Money.PoundSterling(10.005, MidpointRounding.AwayFromZero);
@@ -255,9 +255,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds1.Amount.Should().NotBe(pounds2.Amount);
         }
 
-        [Fact]
-        public void WhenLong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenLong_ThenCreatingShouldSucceed()
+    {
             //from long (byte, short and int are implicitly converted to long)
             var pounds = Money.PoundSterling(10L);
 
@@ -266,22 +266,22 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenULong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenULong_ThenCreatingShouldSucceed()
+    {
             var pounds = Money.PoundSterling(10UL);
 
             pounds.Should().NotBeNull();
             pounds.Currency.Should().Be(Currency.FromCode("GBP"));
             pounds.Amount.Should().Be(10.00m);
         }
-    }
+}
 
-    public class GivenIWantYuan
+public class GivenIWantYuan
+{
+    [Fact]
+    public void WhenDecimal_ThenCreatingShouldSucceed()
     {
-        [Fact]
-        public void WhenDecimal_ThenCreatingShouldSucceed()
-        {
             //from decimal (other integral types are implicitly converted to decimal)
             var pounds = Money.Yuan(10.00m);
 
@@ -290,9 +290,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDecimalAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from decimal (other integral types are implicitly converted to decimal)
             var pounds1 = Money.Yuan(10.005m);
             var pounds2 = Money.Yuan(10.005m, MidpointRounding.AwayFromZero);
@@ -302,9 +302,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds1.Amount.Should().NotBe(pounds2.Amount);
         }
 
-        [Fact]
-        public void WhenDouble_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDouble_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var pounds = Money.Yuan(10.00);
 
@@ -313,9 +313,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
+    {
             //from double (float is implicitly converted to double)
             var pounds1 = Money.Yuan(10.005);
             var pounds2 = Money.Yuan(10.005, MidpointRounding.AwayFromZero);
@@ -325,9 +325,9 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds1.Amount.Should().NotBe(pounds2.Amount);
         }
 
-        [Fact]
-        public void WhenLong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenLong_ThenCreatingShouldSucceed()
+    {
             //from long (byte, short and int are implicitly converted to long)
             var pounds = Money.Yuan(10L);
 
@@ -336,14 +336,13 @@ namespace NodaMoney.Tests.MoneyFiveMostUsedCurrenciesSpec
             pounds.Amount.Should().Be(10.00m);
         }
 
-        [Fact]
-        public void WhenULong_ThenCreatingShouldSucceed()
-        {
+    [Fact]
+    public void WhenULong_ThenCreatingShouldSucceed()
+    {
             var pounds = Money.Yuan(10UL);
 
             pounds.Should().NotBeNull();
             pounds.Currency.Should().Be(Currency.FromCode("CNY"));
             pounds.Amount.Should().Be(10.00m);
         }
-    }
 }

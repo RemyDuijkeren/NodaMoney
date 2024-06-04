@@ -7,15 +7,15 @@ using System.Net;
 using Xunit;
 using FluentAssertions;
 
-namespace NodaMoney.Tests.Iso4127Spec
-{
-    public class Iso4127ListFixture
-    {
-        public Iso4127Currency[] currencies { get; private set; }
-        public DateTime PublishDate { get; private set; }
+namespace NodaMoney.Tests.Iso4127Spec;
 
-        public Iso4127ListFixture()
-        {
+public class Iso4127ListFixture
+{
+    public Iso4127Currency[] currencies { get; private set; }
+    public DateTime PublishDate { get; private set; }
+
+    public Iso4127ListFixture()
+    {
             var fileName = "iso4127.xml";
 
             ServicePointManager.Expect100Continue = true;
@@ -41,29 +41,29 @@ namespace NodaMoney.Tests.Iso4127Spec
 
             PublishDate = DateTime.Parse(document.Element("ISO_4217").Attribute("Pblshd").Value);
         }
-    }
+}
 
-    public class Iso4127Currency
+public class Iso4127Currency
+{
+    public string CountryName { get; set; }
+    public string CurrencyName { get; set; }
+    public string Currency { get; set; }
+    public string CurrencyNumber { get; set; }
+    public string CurrencyMinorUnits { get; set; }
+}
+
+public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127ListFixture>
+{
+    private Iso4127ListFixture _iso4127List;
+
+    public GivenIWantToCompareNodaMoneyWithIso4127(Iso4127ListFixture fixture)
     {
-        public string CountryName { get; set; }
-        public string CurrencyName { get; set; }
-        public string Currency { get; set; }
-        public string CurrencyNumber { get; set; }
-        public string CurrencyMinorUnits { get; set; }
-    }
-
-    public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127ListFixture>
-    {
-        private Iso4127ListFixture _iso4127List;
-
-        public GivenIWantToCompareNodaMoneyWithIso4127(Iso4127ListFixture fixture)
-        {
             _iso4127List = fixture;
         }
 
-        [Fact]
-        public void WhenCurrenciesInIso4127List_ThenShouldAlsoExistInNodaMoney()
-        {
+    [Fact]
+    public void WhenCurrenciesInIso4127List_ThenShouldAlsoExistInNodaMoney()
+    {
             var missingCurrencies = _iso4127List.currencies
                                         .Where(a => !Currency.GetAllCurrencies().Any(c => c.Code == a.Currency))
                                         .ToList();
@@ -71,9 +71,9 @@ namespace NodaMoney.Tests.Iso4127Spec
             missingCurrencies.Should().HaveCount(0, $"expected defined currencies to contain {string.Join(", ", missingCurrencies.Select(a => a.Currency + " " + a.CurrencyName))}");
         }
 
-        [Fact]
-        public void WhenCurrenciesInRegistryAndCurrent_ThenTheyShouldAlsoBeDefinedInTheIsoList()
-        {
+    [Fact]
+    public void WhenCurrenciesInRegistryAndCurrent_ThenTheyShouldAlsoBeDefinedInTheIsoList()
+    {
             var notDefinedCurrencies =
                 Currency.GetAllCurrencies()
                 .Where(c => c.IsValidOn(_iso4127List.PublishDate))
@@ -84,9 +84,9 @@ namespace NodaMoney.Tests.Iso4127Spec
             notDefinedCurrencies.Should().HaveCount(0, $"did not expect currencies to contain {string.Join(", ", notDefinedCurrencies.Select(a => a.Code))}");
         }
 
-        [Fact(Skip="Names contains countries at the moment")]
-        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameEnglishName()
-        {
+    [Fact(Skip="Names contains countries at the moment")]
+    public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameEnglishName()
+    {
             var differences = new List<string>();
 
             foreach (var nodaCurrency in Currency.GetAllCurrencies())
@@ -105,9 +105,9 @@ namespace NodaMoney.Tests.Iso4127Spec
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
         }
 
-        [Fact]
-        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumber()
-        {
+    [Fact]
+    public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumber()
+    {
             var differences = new List<string>();
 
             foreach (var nodaCurrency in Currency.GetAllCurrencies())
@@ -126,9 +126,9 @@ namespace NodaMoney.Tests.Iso4127Spec
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
         }
 
-        [Fact]
-        public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumberOfMinorDigits()
-        {
+    [Fact]
+    public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameNumberOfMinorDigits()
+    {
             var differences = new List<string>();
 
             foreach (var nodaCurrency in Currency.GetAllCurrencies())
@@ -151,5 +151,4 @@ namespace NodaMoney.Tests.Iso4127Spec
 
             differences.Should().HaveCount(0, string.Join(Environment.NewLine, differences));
         }
-    }
 }

@@ -3,40 +3,40 @@ using FluentAssertions;
 using Raven.TestDriver;
 using Xunit;
 
-namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
+namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec;
+
+public class GivenIWantToStoreInRavenDb : RavenTestDriver
 {
-    public class GivenIWantToStoreInRavenDb : RavenTestDriver
+    [Fact] //(Skip = "Microsoft.NETCore.App 2.1.10 not installed on build server")]
+    public void WhenMoneyAsRoot_ThenThisMustWork()
     {
-        [Fact] //(Skip = "Microsoft.NETCore.App 2.1.10 not installed on build server")]
-        public void WhenMoneyAsRoot_ThenThisMustWork()
+        Money euros = new Money(123.56, "EUR");
+
+        using (var store = GetDocumentStore())
         {
-            Money euros = new Money(123.56, "EUR");
-
-            using (var store = GetDocumentStore())
+            // Store in RavenDb
+            using (var session = store.OpenSession())
             {
-                // Store in RavenDb
-                using (var session = store.OpenSession())
-                {
-                    session.Store(euros);
-                    session.SaveChanges();
-                }
+                session.Store(euros);
+                session.SaveChanges();
+            }
 
-                WaitForIndexing(store);
-                // WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
+            WaitForIndexing(store);
+            // WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
 
-                // Read from RavenDb
-                using (var session = store.OpenSession())
-                {
-                    var result = session.Query<Money>().FirstOrDefault();
+            // Read from RavenDb
+            using (var session = store.OpenSession())
+            {
+                var result = session.Query<Money>().FirstOrDefault();
 
-                    result.Should().Be(euros);
-                }
+                result.Should().Be(euros);
             }
         }
+    }
 
-        [Fact] //(Skip = "Microsoft.NETCore.App 2.1.10 not installed on build server")]
-        public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
-        {
+    [Fact] //(Skip = "Microsoft.NETCore.App 2.1.10 not installed on build server")]
+    public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
+    {
             SampleData sample = new SampleData { Name = "Test", Price = new Money(123.56, "EUR"), BaseCurrency = Currency.FromCode("USD") };
 
             using (var store = GetDocumentStore())
@@ -61,14 +61,13 @@ namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec
                 }
             }
         }
-    }
+}
 
-    public class SampleData
-    {
-        public string Name { get; set; }
+public class SampleData
+{
+    public string Name { get; set; }
 
-        public Money Price { get; set; }
+    public Money Price { get; set; }
 
-        public Currency BaseCurrency { get; set; }
-    }
+    public Currency BaseCurrency { get; set; }
 }

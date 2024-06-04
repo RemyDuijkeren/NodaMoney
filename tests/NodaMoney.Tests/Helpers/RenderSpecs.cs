@@ -5,19 +5,19 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace NodaMoney.Tests.Helpers
+namespace NodaMoney.Tests.Helpers;
+
+public class RenderSpecs
 {
-    public class RenderSpecs
+    // [Fact]
+    public void Rendering()
     {
-        // [Fact]
-        public void Rendering()
-        {
             Render("", Console.Out);
         }
 
-        // [Fact]
-        public void RenderAllSpecs()
-        {
+    // [Fact]
+    public void RenderAllSpecs()
+    {
             using (var stream = File.Open(@"Specs.txt", FileMode.Create))
             using (var writer = new StreamWriter(stream))
             {
@@ -25,8 +25,8 @@ namespace NodaMoney.Tests.Helpers
             }
         }
 
-        private void Render(string withinNamespace, TextWriter output)
-        {
+    private void Render(string withinNamespace, TextWriter output)
+    {
             var specs = (from type in this.GetType().Assembly.GetTypes()
                          where type.Namespace != null &&
                                type.Namespace.StartsWith(withinNamespace) //&&
@@ -66,13 +66,13 @@ namespace NodaMoney.Tests.Helpers
             }
         }
 
-        private static string ToPhrase(string pascalCasedPhrase)
-        {
+    private static string ToPhrase(string pascalCasedPhrase)
+    {
             return ToPhrase(pascalCasedPhrase, true);
         }
 
-        private static string ToPhrase(string pascalCasedPhrase, bool toLower)
-        {
+    private static string ToPhrase(string pascalCasedPhrase, bool toLower)
+    {
             var builder = new StringBuilder();
             builder.Append(pascalCasedPhrase.First());
 
@@ -95,5 +95,4 @@ namespace NodaMoney.Tests.Helpers
 
             return phrase;
         }
-    }
 }

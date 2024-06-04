@@ -3,46 +3,46 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 
-namespace NodaMoney.Tests.CurrencyUnitSpec
+namespace NodaMoney.Tests.CurrencyUnitSpec;
+
+public class CreateCurrencyUnit
 {
-    public class CreateCurrencyUnit
+    [Theory]
+    [InlineData("EUR")]
+    [InlineData("MYR")]
+    [InlineData("USD")]
+    public void CurrencyIsCreated_GivenCodeIsThreeCapitalLetters(string code)
     {
-        [Theory]
-        [InlineData("EUR")]
-        [InlineData("MYR")]
-        [InlineData("USD")]
-        public void CurrencyIsCreated_GivenCodeIsThreeCapitalLetters(string code)
-        {
             var currency = new CurrencyUnit(code, 0);
 
             currency.Code.Should().Be(code);
             //currency.Flag.Should().BeFalse();
         }
         
-        [Theory]
-        [InlineData("E")]
-        [InlineData("EU")]
-        [InlineData("EURO")]
-        [InlineData("eur")]
-        [InlineData("EU1")]
-        public void ThrowArgumentException_GivenCodeIsNotThreeCapitalLetters(string code)
-        {
+    [Theory]
+    [InlineData("E")]
+    [InlineData("EU")]
+    [InlineData("EURO")]
+    [InlineData("eur")]
+    [InlineData("EU1")]
+    public void ThrowArgumentException_GivenCodeIsNotThreeCapitalLetters(string code)
+    {
             Action act = () => new CurrencyUnit(code, 0);
             
             act.Should().Throw<ArgumentException>();
         }
         
-        [Fact]
-        public void ThrowArgumentNullException_GivenCodeIsNull()
-        {
+    [Fact]
+    public void ThrowArgumentNullException_GivenCodeIsNull()
+    {
             Action act = () => new CurrencyUnit(null, 0);
             
             act.Should().Throw<ArgumentException>();
         }
         
-        [Fact]
-        public void CurrencyIsXXX_GivenDefaultCurrency()
-        {
+    [Fact]
+    public void CurrencyIsXXX_GivenDefaultCurrency()
+    {
             // Arrange / Act
             var noCurrency = new CurrencyUnit("XXX", 0);
             CurrencyUnit defaultCurrency = default;
@@ -61,23 +61,23 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
             Assert.True(object.Equals(noCurrency, default(CurrencyUnit)));
         }
         
-        [Fact]
-        public void SizeIs2Bytes_GivenCurrencyType()
-        {
+    [Fact]
+    public void SizeIs2Bytes_GivenCurrencyType()
+    {
             int size = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Currency));
 
             size.Should().Be(64);
         }
         
-        [Theory]
-        [InlineData("EUR")]
-        [InlineData("MYR")]
-        [InlineData("USD")]
-        [InlineData("XXX")]
-        [InlineData("AAA")]
-        [InlineData("ZZZ")]
-        public void WhenTryToFitCodeIn2Bytes_ThenItShouldBePossible(string currencyCode)
-        {
+    [Theory]
+    [InlineData("EUR")]
+    [InlineData("MYR")]
+    [InlineData("USD")]
+    [InlineData("XXX")]
+    [InlineData("AAA")]
+    [InlineData("ZZZ")]
+    public void WhenTryToFitCodeIn2Bytes_ThenItShouldBePossible(string currencyCode)
+    {
             bool isIso4217 = true;
             
             // EUR = 69, 85, 82 => 5, 21, 18
@@ -105,5 +105,4 @@ namespace NodaMoney.Tests.CurrencyUnitSpec
             // ushort for storing code (2bytes) = 15bits needed, 1bit left => use 1bit to mark if ISO? ISO=0, 1=other?
             // byte for storing namespace (4bits=15 or 3bits=7) and minor unit (4bits=15 or 5bit=31)? or use CurrencyInfo to retrieve?
         }
-    }
 }
