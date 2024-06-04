@@ -18,6 +18,3 @@ _ReSharper*/
 # JetBrains Rider IDE
 .idea/
 riderModule.iml
-
-# NUKE
-.nuke
