@@ -1,15 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyTitle>NodaMoney</AssemblyTitle>
-    <AssemblyName>NodaMoney</AssemblyName>
-    <Description>NodaMoney provides a library that treats Money as a first class citizen and handles all the ugly bits like currencies and formatting.</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageId>NodaMoney</PackageId>
-    <PackageTags>Noda;Money;Currency;ExchangeRate</PackageTags>
     <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="PackageProperties">
+    <PackageId>NodaMoney</PackageId>
+    <Description>NodaMoney provides a library that treats Money as a first class citizen and handles all the ugly bits like currencies and formatting.</Description>
+    <Copyright>Copyright (c) Remy van Duijkeren 2024</Copyright>
+    <Authors>Remy van Duijkeren (@RemyDuijkeren)</Authors>
+    <PackageProjectUrl>https://github.com/RemyDuijkeren/NodaMoney</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>logo_nodamoney.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/RemyDuijkeren/NodaMoney.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Noda Money Currency ExchangeRate</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLinkProperties">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(Deterministic)'=='true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
  
   <ItemGroup>
@@ -36,6 +56,16 @@
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Add InternalsVisibleTo to src projects to enable testing internal methods https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm -->
+    <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_nodamoney.png" Pack="true" PackagePath="\" Visible="false"/>
+    <None Include="../../README.md" Pack="true" PackagePath="\" Visible="false"/>
   </ItemGroup>
   
 </Project>

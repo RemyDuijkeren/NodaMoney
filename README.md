@@ -11,9 +11,8 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
 ![CI](https://github.com/AutomateValue/NodaMoney/actions/workflows/continuous.yml/badge.svg)
-[![NuGet](https://img.shields.io/nuget/dt/NServiceBus.Extensions.Diagnostics.ApplicationInsights.svg)](https://www.nuget.org/packages/NodaMoney)
-[![NuGet](https://img.shields.io/nuget/vpre/NServiceBus.Extensions.Diagnostics.ApplicationInsights.svg)](https://www.nuget.org/packages/NodaMoney)
-[![Coverage Status](https://coveralls.io/repos/github/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/github/remyvd/NodaMoney?branch=master)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
@@ -23,7 +22,7 @@ NodaMoney provides a library that treats Money as a first class citizen in .NET 
 and formatting.
 
 We have the [decimal type](http://msdn.microsoft.com/en-us/library/364x0z75.aspx) in .NET to store an amount of money, which can
-be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units, 
+be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units,
 formatting, etc. The .NET Framework has the System.Globalization namespace that helps with formatting of money in different cultures and regions,
 but it only captures some info about currencies, but not everything.
 
@@ -32,7 +31,7 @@ conversion, etc. that motivates to have a Money type that contains all the domai
 his book [Patterns of Enterprise Application Architecture](http://martinfowler.com/eaaCatalog/money.html)
 
 NodaMoney represents the .NET counterpart of java library [JodaMoney](http://www.joda.org/joda-money/), like NodaTime is the .NET
-counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and 
+counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and
 obvious. This is because the requirements for these algorithms vary widely between domains. This library is intended to act as the
 base layer, providing classes that should be in the .NET Framework. It complies with the currencies in [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).
 
@@ -62,10 +61,10 @@ var money = Money.Yen(6);
 var money = new Money(6.54m);
 Money money = 6.54m;
 Money money = 6;
-Money money = (Money)6.54; // need explict cast from double data type  
+Money money = (Money)6.54; // need explict cast from double data type
 
 // auto-rounding to the minor unit will take place with MidpointRounding.ToEven
-// also known as banker's rounding 
+// also known as banker's rounding
 var euro = new Money(765.425m, "EUR"); // EUR 765.42
 var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
 

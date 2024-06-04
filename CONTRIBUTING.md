@@ -24,7 +24,3 @@ can be accepted quickly.
 * Push your changes to your fork of the repository.
 * Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to the NodaMoney repository.
 * If needed we will give feedback about the pull request or accept it right away.
-
-Build status: [![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-
-<a href="https://zenhub.io"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png" height="18px"></a>
