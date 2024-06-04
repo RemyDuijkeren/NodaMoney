@@ -457,7 +457,7 @@ namespace NodaMoney
                 ["ISO-4217::SLE"] = new Currency("SLE", 925, 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
 
                 // Historic ISO-4217 currencies (list three)
-                ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", 694, 2, "Sierra Leonean leone", "Le", Iso4217Historic, validTo: new DateTime(2022, 6, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
+                ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", 694, 2, "Sierra Leonean leone", "Le", Iso4217Historic, validTo: new DateTime(2022, 9, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
                 ["ISO-4217-HISTORIC::BYR"] = new Currency("BYR", 974, 0, "Belarusian ruble", "Br", Iso4217Historic, validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
                 ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", 937, 2, "Venezuelan bolívar", "Bs.", Iso4217Historic, new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", 478, Z07Byte, "Mauritanian ouguiya", "UM", Iso4217Historic, new DateTime(2018, 1, 1)), // replaced by MRU
@@ -721,7 +721,6 @@ namespace NodaMoney
                 new Currency("SEK", 752, 2, "Swedish krona/kronor", "kr"),
                 new Currency("SGD", 702, 2, "Singapore dollar", "S$"), // or $
                 new Currency("SHP", 654, 2, "Saint Helena pound", "£"),
-                new Currency("SLL", 694, 2, "Sierra Leonean leone", "Le"),
                 new Currency("SOS", 706, 2, "Somali shilling", "S"), // or Sh.So.
                 new Currency("SRD", 968, 2, "Surinamese dollar", "$"),
                 new Currency("SSP", 728, 2, "South Sudanese pound", "£"), // not sure about symbol...
@@ -775,6 +774,7 @@ namespace NodaMoney
                 new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
 
                 // Historic ISO-4217 currencies (list three)
+                new Currency("SLL", 694, 2, "Sierra Leonean leone", "Le", Iso4217Historic, validTo: new DateTime(2022, 9, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
                 new Currency("BYR", 974, 0, "Belarusian ruble", "Br", Iso4217Historic, validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
                 new Currency("VEF", 937, 2, "Venezuelan bolívar", "Bs.", Iso4217Historic, new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 new Currency("MRO", 478, Z07Byte, "Mauritanian ouguiya", "UM", Iso4217Historic, new DateTime(2018, 1, 1)), // replaced by MRU
