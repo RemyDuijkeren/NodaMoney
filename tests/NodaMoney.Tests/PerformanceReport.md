@@ -13,10 +13,10 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |----------|---------:|--------:|---------:|-------:|----------:|
 | FromCode | 443.7 ns | 8.90 ns | 14.87 ns | 0.0753 |     632 B |
 #### after
-| Method        |     Mean |    Error |   StdDev | Allocated |
-|---------------|---------:|---------:|---------:|----------:|
-| FromCode      | 24.65 ns | 0.518 ns | 0.691 ns |         - |
-| FromCodeBeRef | 25.99 ns | 0.739 ns | 2.178 ns |         - |
+| Method        | Mean     | Error    | StdDev   | Allocated |
+|-------------- |---------:|---------:|---------:|----------:|
+| FromCode      | 19.38 ns | 0.285 ns | 0.253 ns |         - |
+| FromCodeBeRef | 17.16 ns | 0.353 ns | 0.362 ns |         - |
 ### after as class
 | Method        |     Mean |    Error |   StdDev | Gen 0 | Gen 1 | Gen 2 | Allocated |
 |---------------|---------:|---------:|---------:|------:|------:|------:|----------:|
@@ -35,15 +35,15 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ImplicitCurrencyByCasting           | 113.58 ns |  1.579 ns |  1.477 ns | 113.67 ns |  0.23 |    0.00 | 0.0057 |      48 B |
 | Deconstruct                         |  34.86 ns |  0.348 ns |  0.309 ns |  34.80 ns |  0.07 |    0.00 |      - |         - |
 #### after
-| Method                              |      Mean |    Error |   StdDev | Ratio | RatioSD | Allocated |
-|-------------------------------------|----------:|---------:|---------:|------:|--------:|----------:|
-| ExplicitCurrencyAsString            | 168.15 ns | 3.298 ns | 3.085 ns |  1.00 |    0.00 |         - |
-| ExplicitCurrencyAsStringAndRounding | 171.95 ns | 1.516 ns | 1.344 ns |  1.02 |    0.02 |         - |
-| ExplicitCurrencyFromCode            | 169.63 ns | 2.755 ns | 2.577 ns |  1.01 |    0.02 |         - |
-| HelperMethod                        | 168.99 ns | 1.655 ns | 1.382 ns |  1.00 |    0.02 |         - |
-| ImplicitCurrencyByConstructor       | 177.03 ns | 1.910 ns | 1.595 ns |  1.05 |    0.02 |         - |
-| ImplicitCurrencyByCasting           | 183.81 ns | 1.642 ns | 1.456 ns |  1.09 |    0.02 |         - |
-| Deconstruct                         |  19.46 ns | 0.390 ns | 0.383 ns |  0.12 |    0.00 |         - |
+| Method                              | Mean      | Error    | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|------------------------------------ |----------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
+| ExplicitCurrencyAsString            | 142.29 ns | 1.862 ns | 1.742 ns |  1.00 |    0.00 |      - |         - |          NA |
+| ExplicitCurrencyAsStringAndRounding | 158.65 ns | 3.182 ns | 5.047 ns |  1.14 |    0.03 |      - |         - |          NA |
+| ExplicitCurrencyFromCode            | 145.45 ns | 1.175 ns | 1.042 ns |  1.02 |    0.01 |      - |         - |          NA |
+| HelperMethod                        | 141.67 ns | 1.071 ns | 1.002 ns |  1.00 |    0.02 |      - |         - |          NA |
+| ImplicitCurrencyByConstructor       | 202.08 ns | 2.831 ns | 2.648 ns |  1.42 |    0.02 | 0.0076 |      64 B |          NA |
+| ImplicitCurrencyByCasting           | 198.08 ns | 3.056 ns | 2.858 ns |  1.39 |    0.03 | 0.0076 |      64 B |          NA |
+| Deconstruct                         |  17.95 ns | 0.243 ns | 0.203 ns |  0.13 |    0.00 |      - |         - |          NA |
 ### after as class
 | Method                              |        Mean |     Error |     StdDev |      Median | Ratio | RatioSD | Gen 0 | Gen 1 | Gen 2 | Allocated |
 |-------------------------------------|------------:|----------:|-----------:|------------:|------:|--------:|------:|------:|------:|----------:|
