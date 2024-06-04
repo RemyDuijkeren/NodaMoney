@@ -296,8 +296,10 @@ namespace NodaMoney
                 // The Bolívar Soberano (VES) is redenominated by removing six zeros from the denominations. A new currency code VED/926 representing the new valuation (1,000,000 times old VES/928) is introduced on
                 // 1 October 2021 for any internal needs during the redenomination process, but is not replacing VES as the official currency code (Amendment 170)
                 ["ISO-4217::VED"] = new Currency("VED", "926", 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
+                ["ISO-4217::SLE"] = new Currency("SLE", "925", 2, "Sierra Leonean leone", "Le", validFrom: new DateTime(2021, 04, 01)), // replaces SLL/694
 
                 // Historic ISO-4217 currencies (list three)
+                ["ISO-4217-HISTORIC::SLL"] = new Currency("SLL", "694", 2, "Sierra Leonean leone", "Le", "ISO-4217-HISTORIC", validTo: new DateTime(2022, 6, 30)), // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
                 ["ISO-4217-HISTORIC::VEF"] = new Currency("VEF", "937", 2, "Venezuelan bolívar", "Bs.", "ISO-4217-HISTORIC", new DateTime(2018, 8, 20)), // replaced by VEF, The conversion rate is 1000 (old) Bolívar to 1 (new) Bolívar Soberano (1000:1). The expiration date of the current bolívar will be defined later and communicated by the Central Bank of Venezuela in due time.
                 ["ISO-4217-HISTORIC::MRO"] = new Currency("MRO", "478", Z07, "Mauritanian ouguiya", "UM", "ISO-4217-HISTORIC", new DateTime(2018, 1, 1)), // replaced by MRU
                 ["ISO-4217-HISTORIC::ESA"] = new Currency("ESA", "996", NotApplicable, "Spanish peseta (account A)", "Pta", "ISO-4217-HISTORIC", new DateTime(2002, 3, 1)), // replaced by ESP (EUR)
