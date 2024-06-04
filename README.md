@@ -10,7 +10,7 @@ Packages on this feed are alpha and beta and, while they've passed all our tests
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
-![CI](https://github.com/AutomateValue/NodaMoney/actions/workflows/continuous.yml/badge.svg)
+![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)
 [![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
 [![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
 
@@ -191,7 +191,7 @@ var builder = new CurrencyBuilder("BTC", "virtual")
 				{
 					EnglishName = "Bitcoin",
 					Symbol = "฿",
-                    ISONumber = "123", // iso number
+          ISONumber = "123", // iso number
 					DecimalDigits = 8
 				};
 
