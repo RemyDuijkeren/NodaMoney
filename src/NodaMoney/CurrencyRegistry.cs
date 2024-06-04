@@ -424,7 +424,7 @@ namespace NodaMoney
                 ["ISO-4217::UYI"] = new Currency("UYI", 940, 0, "Uruguay Peso en Unidades Indexadas (UI) (funds code)", Currency.GenericCurrencySign), // List two
                 ["ISO-4217::UYU"] = new Currency("UYU", 858, 2, "Uruguayan peso", "$"), // or $U
                 ["ISO-4217::UZS"] = new Currency("UZS", 860, 2, "Uzbekistan som", "лв"), // or сўм ?
-                ["ISO-4217::VES"] = new Currency("VES", 928, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2018, 8, 20)), // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug.
+                ["ISO-4217::VES"] = new Currency("VES", 928, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2018, 8, 20)), // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug. // Will be replaced by VED/926
                 ["ISO-4217::VND"] = new Currency("VND", 704, 0, "Vietnamese dong", "₫"),
                 ["ISO-4217::VUV"] = new Currency("VUV", 548, 0, "Vanuatu vatu", "VT"),
                 ["ISO-4217::WST"] = new Currency("WST", 882, 2, "Samoan tala", "WS$"), // sometimes SAT, ST or T
@@ -451,7 +451,10 @@ namespace NodaMoney
                 ["ISO-4217::ZWL"] = new Currency("ZWL", 932, 2, "Zimbabwean dollar", "$"),
                 ["ISO-4217::STN"] = new Currency("STN", 930, 2, "Dobra", "Db", validFrom: new DateTime(2018, 1, 1)), // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
                 ["ISO-4217::STD"] = new Currency("STD", 678, 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
-                ["ISO-4217::UYW"] = new Currency("UYW", 927, 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
+                ["ISO-4217::UYW"] = new Currency("UYW", 927, 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)),
+                // The Bolívar Soberano (VES) is redenominated by removing six zeros from the denominations. A new currency code VED/926 representing the new valuation (1,000,000 times old VES/928) is introduced on
+                // 1 October 2021 for any internal needs during the redenomination process, but is not replacing VES as the official currency code (Amendment 170)
+                ["ISO-4217::VED"] = new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
 
                 // Historic ISO-4217 currencies (list three)
                 ["ISO-4217-HISTORIC::BYR"] = new Currency("BYR", 974, 0, "Belarusian ruble", "Br", Iso4217Historic, validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
@@ -768,6 +771,7 @@ namespace NodaMoney
                 new Currency("STN", 930, 2, "Dobra", "Db", validFrom: new DateTime(2018, 1, 1)), // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
                 new Currency("STD", 678, 2, "Dobra", "Db", validTo: new DateTime(2018, 1, 1)), // To be replaced Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164),  inflation has rendered the cêntimo obsolete
                 new Currency("UYW", 927, 4, "Unidad Previsional", "Db", validFrom: new DateTime(2018, 8, 29)), // The Central Bank of Uruguay is applying for new Fund currency code (Amendment 169)
+                new Currency("VED", 926, 2, "Venezuelan Bolívar Soberano", "Bs.", validFrom: new DateTime(2021, 10, 01)),
 
                 // Historic ISO-4217 currencies (list three)
                 new Currency("BYR", 974, 0, "Belarusian ruble", "Br", Iso4217Historic, validTo: new DateTime(2016, 12, 31), validFrom: new DateTime(2000, 01, 01)),
