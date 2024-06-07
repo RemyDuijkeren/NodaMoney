@@ -128,7 +128,7 @@ public class GivenIWantMoneyAsString
     public void WhenNumberOfDecimalsIsNotApplicable_ThenToStringShouldNotFail()
     {
             var xdr = new Money(765.4321m, Currency.FromCode("XDR"));
-            
+
             Action action = () => xdr.ToString();
 
             action.Should().NotThrow<Exception>();
@@ -261,7 +261,7 @@ public class GivenIWantMoneyAsStringWithCurrencyCode
             _dollar.ToString("I").Should().Be("USD 765,43");
             _dinar.ToString("I").Should().Be("BHD 765,432");
         }
-        
+
     [Fact]
     [UseCulture("fr-FR")]
     public void WhenCurrentCultureFR_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
@@ -328,7 +328,7 @@ public class GivenIWantMoneyAsStringWithCurrencyCode
             _dinar.ToString("I4").Should().Be("BHD 765.4320");
         }
 }
-    
+
 [Collection(nameof(NoParallelization))]
 public class GivenIWantMoneyAsStringWithEnglishCurrencyName
 {

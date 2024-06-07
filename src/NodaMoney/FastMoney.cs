@@ -1,8 +1,9 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
+
+// Good spec document https://cs-syd.eu/posts/2022-08-22-how-to-deal-with-money-in-software
 
 /// <summary>Represents a fast money value with a currency unit. Scaled integer</summary>
 /// <remarks>Size from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 of the minor unit (like cents)</remarks>
@@ -26,7 +27,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public FastMoney(decimal amount, string code)
-        : this(amount, new CurrencyUnit(code,0))
+        : this(amount, new CurrencyUnit(code))
     {
     }
 
@@ -50,7 +51,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
     public FastMoney(decimal amount, string code, MidpointRounding rounding)
-        : this(amount, new CurrencyUnit(code, 0), rounding)
+        : this(amount, new CurrencyUnit(code), rounding)
     {
     }
 

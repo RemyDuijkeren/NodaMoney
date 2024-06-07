@@ -15,16 +15,16 @@ public class HighLoadBenchmarks
         for (int i = 0; i < max; i++)
         {
             if (i % 3 == 0)
-                currencies[i] = new CurrencyUnit("EUR", MinorUnit.Two);
+                currencies[i] = new CurrencyUnit("EUR");
             else if (i % 2 == 0)
-                currencies[i] = new CurrencyUnit("USD", MinorUnit.Two);
+                currencies[i] = new CurrencyUnit("USD");
             else
-                currencies[i] = new CurrencyUnit("JPY", MinorUnit.Zero);
+                currencies[i] = new CurrencyUnit("JPY");
         }
 
         return currencies;
     }
-    
+
     [Benchmark]
     public Currency[] CreatingOneMillionCurrency()
     {
@@ -62,7 +62,7 @@ public class HighLoadBenchmarks
 
         return money;
     }
-    
+
     [Benchmark]
     public FastMoney[] CreatingOneMillionMoneyUnit()
     {

@@ -1,6 +1,11 @@
 namespace NodaMoney;
 
-// store minor unit in 4 bits (0-15). // Power of 10, Math.Log10(2);
+/// <summary>
+/// The MinorUnit enum represents the minor unit as the power oo ten of a currency. The minor unit specifies the number of decimal places used
+/// when representing fractional amounts of a currency. Each value of the MinorUnit enum corresponds to a specific number
+/// of decimal places, ranging from 0 to 13.
+/// </summary>
+/// <remarks>store minor unit in 4 bits (0-15). // Power of 10, Math.Log10(2);</remarks>
 public enum MinorUnit : byte
 {
     Zero = 0,

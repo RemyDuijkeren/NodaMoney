@@ -87,7 +87,7 @@ public class GivenIWantToKnowAllCurrencies
     //    }
     //}
 }
-    
+
 public class GivenIWantCurrencyFromIsoCode
 {
     [Fact]
@@ -292,7 +292,7 @@ public class GivenIWantToKnowSmallestPossibleAmountOfCurrency
 
     private Currency _mga = Currency.FromCode("MGA"); // Malagasy ariary
 
-    private Currency _xau = Currency.FromCode("XAU"); // Gold            
+    private Currency _xau = Currency.FromCode("XAU"); // Gold
 
     [Fact]
     public void WhenEuro_ThenShouldBeDividedBy100()
@@ -463,7 +463,7 @@ public class GivenIWantToSerializeCurrencyWithNewtownsoftJson
     public void WhenSerializingCurrency_ThenThisShouldSucceed(string code)
     {
         var currency = Currency.FromCode(code);
-            
+
         string json = JsonConvert.SerializeObject(currency);
         var clone = JsonConvert.DeserializeObject<Currency>(json);
 

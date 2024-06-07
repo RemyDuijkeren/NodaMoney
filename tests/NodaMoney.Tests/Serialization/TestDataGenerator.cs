@@ -29,7 +29,7 @@ public class ValidJsonTestData : TheoryData<string, Money>
         Add("{ currency: \"EUR\", amount: \"234.25\" }", money); // camelCase, Amount as string, Reversed members
 
         // Members no quotation marks, Values single quotes
-        Add("{ Amount: 234.25, Currency: 'EUR' }", money); // PascalCase, Amount as number, 
+        Add("{ Amount: 234.25, Currency: 'EUR' }", money); // PascalCase, Amount as number,
         Add("{ Currency: 'EUR', Amount: 234.25 }", money); // PascalCase, Amount as number, Reversed members
         Add("{ Amount: '234.25', Currency: 'EUR' }", money); // PascalCase, Amount as string
         Add("{ Currency: 'EUR', Amount: '234.25' }", money); // PascalCase, Amount as string, Reversed members
@@ -63,14 +63,14 @@ public class InvalidJsonTestData : TheoryData<string>
         Add("{ \"currency\": \"EUR\" }"); // camelCase, No Amount member
 
         // Members no quotation marks
-        Add("{ Amount: 234.25 }"); // PascalCase, Amount as number, No Currency member 
+        Add("{ Amount: 234.25 }"); // PascalCase, Amount as number, No Currency member
         Add("{ Currency: \"EUR\" }"); // PascalCase, No Amount member
         Add("{ Amount: \"234.25\" }"); // PascalCase, Amount as string, No Currency member
         Add("{ amount: 234.25 }"); // camelCase, Amount as number, No Currency member
         Add("{ currency: \"EUR\" }"); // camelCase, No Amount member
 
         // Members no quotation marks, Values single quotes
-        Add("{ Currency: 'EUR' }"); // PascalCase, No Amount member, 
+        Add("{ Currency: 'EUR' }"); // PascalCase, No Amount member,
         Add("{ Amount: '234.25' }"); // PascalCase, Amount as string, No Currency member
         Add("{ currency: 'EUR' }"); // camelCase, No Amount member
 

@@ -41,7 +41,7 @@ public class GivenIWantToDeserializeMoneyWithSystemTextJsonSerializer
             clone.Discount.Should().BeNull();
         }
 }
-    
+
 // TODO: Write convertors, see https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-8-0
 public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
 {
@@ -49,7 +49,7 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
         {
                 new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
                 new object[] { new Money(765.4321m, Currency.FromCode("EUR")) },
-                new object[] { new Money(765.4321m, Currency.FromCode("USD")) }, 
+                new object[] { new Money(765.4321m, Currency.FromCode("USD")) },
                 new object[] { new Money(765.4321m, Currency.FromCode("BHD")) },
                 new object[] { default(Money) },
                 new object[] { default(Money?) }
@@ -64,7 +64,7 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
             var clone = System.Text.Json.JsonSerializer.Deserialize<Currency>(json);
 
             clone.Should().Be(money.Currency);
-        } 
+        }
 
     [Theory]
     [MemberData(nameof(TestData))]
@@ -73,7 +73,7 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
             string json = System.Text.Json.JsonSerializer.Serialize(money);
             // Console.WriteLine(json);
             var clone = System.Text.Json.JsonSerializer.Deserialize<Money>(json);
-            
+
             clone.Should().Be(money);
         }
 
@@ -114,7 +114,7 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
             clone.Should().BeEquivalentTo(order);
         }
 }
-    
+
 public class GivenIWantToDeserializeMoneyWithNewtonsoftJsonSerializer
 {
     [Theory]
@@ -152,7 +152,7 @@ public class GivenIWantToSerializeMoneyWithNewtonsoftJsonSerializer
         {
                 new object[] { new Money(765.4321m, Currency.FromCode("JPY")) },
                 new object[] { new Money(765.4321m, Currency.FromCode("EUR")) },
-                new object[] { new Money(765.4321m, Currency.FromCode("USD")) }, 
+                new object[] { new Money(765.4321m, Currency.FromCode("USD")) },
                 new object[] { new Money(765.4321m, Currency.FromCode("BHD")) },
                 new object[] { default(Money) },
                 new object[] { default(Money?) }
@@ -167,7 +167,7 @@ public class GivenIWantToSerializeMoneyWithNewtonsoftJsonSerializer
             var clone = JsonConvert.DeserializeObject<Currency>(json);
 
             clone.Should().Be(money.Currency);
-        } 
+        }
 
     [Theory]
     [MemberData(nameof(TestData))]
@@ -176,7 +176,7 @@ public class GivenIWantToSerializeMoneyWithNewtonsoftJsonSerializer
             string json = JsonConvert.SerializeObject(money);
             // Console.WriteLine(json);
             var clone = JsonConvert.DeserializeObject<Money>(json);
-            
+
             clone.Should().Be(money);
         }
 

@@ -15,7 +15,7 @@ public class GivenIWantMoneyImplicit
     [Fact]
     [UseCulture("en-US")]
     public void WhenCurrentCultureIsUS_ThenCurrencyIsDollar()
-    {            
+    {
             var money = new Money(_decimalValue);
 
             money.Currency.Should().Be(Currency.FromCode("USD"));

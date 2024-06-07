@@ -92,7 +92,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
             foreach (var nodaCurrency in Currency.GetAllCurrencies())
             {
                 var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
-                
+
                 if (iso4127Currency == null)
                     continue;
 
@@ -113,7 +113,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
             foreach (var nodaCurrency in Currency.GetAllCurrencies())
             {
                 var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
-                
+
                 if (iso4127Currency == null)
                     continue;
 

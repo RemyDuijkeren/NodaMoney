@@ -430,7 +430,7 @@ public class GivenIWantToCompareExchangeRates
             fx1.GetHashCode().Should().NotBe(fx2.GetHashCode()); //using GetHashCode()
 
         fx1.Equals(fx2).Should().Be(areEqual); //using Equal()
-        ExchangeRate.Equals(fx1, fx2).Should().Be(areEqual); //using static Equals()            
+        ExchangeRate.Equals(fx1, fx2).Should().Be(areEqual); //using static Equals()
         (fx1 == fx2).Should().Be(areEqual); //using Equality operators
         (fx1 != fx2).Should().Be(!areEqual); //using Equality operators
     }

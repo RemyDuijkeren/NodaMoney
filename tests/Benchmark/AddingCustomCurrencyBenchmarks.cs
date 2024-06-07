@@ -53,7 +53,7 @@ public class AddingCustomCurrencyBenchmarks
         builder.LoadDataFromCurrency(oldEuro);
         builder.EnglishName = "New Euro";
         builder.DecimalDigits = 1;
-        
+
         return builder.Register();
     }
 }
