@@ -10,8 +10,8 @@ namespace NodaMoney;
 //
 // var x = CurrencyInfo.CurrentCurrency;
 //
-// IsObsolete, IsDeprecated, IsIso4217
-// IsHistoric, ReplacedBy, Replaces, AlternativeSymbol, Locals (NL, EN), IsIso4217
+// IsObsolete, IsDeprecated
+// ReplacedBy, Replaces, AlternativeSymbol, Locals (NL, EN),
 // Order/Priority/Weight=1,0.8,0.6 = q-factor weighting (value between 0 and 1) = Any value placed in an order of preference expressed using a relative quality value called weight.
 
 // TODO: Should we use internal sealed class CurrencyData to store the data? CultureInfo has a similar structure called
@@ -37,12 +37,17 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
     [ThreadStatic]
     static CurrencyInfo? s_currentThreadCurrency;
 
-    static CurrencyInfo()
-    {
-        s_currentThreadCurrency = NoCurrency;
-    }
+    // static CurrencyInfo()
+    // {
+    //     s_currentThreadCurrency = NoCurrency;
+    // }
 
-    public Currency CurrencyUnit => new(Code);
+    //public Currency CurrencyUnit => new(Code);
+
+    public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
+
+    /// <summary>Get the (ISO-4217) three-character code of the currency.</summary>
+    //public string Code { get; init; } = Code;
 
     public bool IsIso4217 { get; init; } = true;
 
@@ -98,7 +103,7 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
             {
                 MinorUnit.NotApplicable => 0,
                 MinorUnit.OneFifth => Math.Log10(5),
-                _ => MinorUnits,
+                _ => (double)MinorUnit,
             };
         }
     }
@@ -133,21 +138,20 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
     {
         get
         {
-            return NoCurrency;
-// #if NET5_0_OR_GREATER
-//             // In >.NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
-//             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
-//             var currentCulture = CultureInfo.CurrentCulture;
-//             if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
-//             {
-//                 return ref FromCode("XXX");
-//             }
-//
-//             return ref FromCulture(currentCulture);
-// #else
-//             var currentRegion = RegionInfo.CurrentRegion;
-//             return ref currentRegion.Name == "IV" ? ref FromCode("XXX") : ref FromRegion(currentRegion);
-// #endif
+#if NET5_0_OR_GREATER
+            // In >.NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
+            // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
+            var currentCulture = CultureInfo.CurrentCulture;
+            if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
+            {
+                return NoCurrency;
+            }
+
+            return FromCulture(currentCulture);
+#else
+            var currentRegion = RegionInfo.CurrentRegion;
+            return currentRegion.Name == "IV" ? NoCurrency : FromRegion(currentRegion);
+#endif
         }
     }
 
@@ -156,6 +160,7 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
     public static IEnumerable<CurrencyInfo> GetAllCurrencies() => CurrencyRegistry.GetAllCurrencies();
 
     public static CurrencyInfo FromCode(string code) => CurrencyRegistry.Get(code);
+
     public static CurrencyInfo FromCurrencyUnit(Currency currency) => CurrencyRegistry.Get(currency);
 
     /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified <see cref="RegionInfo"/>.</summary>
@@ -204,6 +209,6 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
         if (Equals(culture, CultureInfo.InvariantCulture))
             throw new ArgumentException("Culture {0} is a invariant culture, from which no region information can be extracted!", culture.Name);
 
-        return FromCode(culture.Name);
+        return FromRegion(culture.Name);
     }
 }

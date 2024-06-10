@@ -76,10 +76,10 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     {
             var notDefinedCurrencies =
                 CurrencyInfo.GetAllCurrencies()
-                .Where(c => c.IsActiveOn(_iso4127List.PublishDate))
-                .Where(c => !string.IsNullOrEmpty(c.NumericCode))
-                .Where(c => !_iso4127List.currencies.Any(a => a.Currency == c.Code))
-                .ToList();
+                    .Where(c => c.IsIso4217)
+                    .Where(c => c.IsActiveOn(_iso4127List.PublishDate))
+                    .Where(c => !string.IsNullOrEmpty(c.NumericCode))
+                    .Where(c => !_iso4127List.currencies.Any(a => a.Currency == c.Code)).ToList();
 
             notDefinedCurrencies.Should().HaveCount(0, $"did not expect currencies to contain {string.Join(", ", notDefinedCurrencies.Select(a => a.Code))}");
         }

@@ -137,7 +137,7 @@ public partial struct Money
             if (currencyAsString.Length == 0 || CurrencyInfo.CurrentCurrency.Symbol == currencyAsString
                 || CurrencyInfo.CurrentCurrency.Code == currencyAsString)
             {
-                return CurrencyInfo.CurrentCurrency.CurrencyUnit;
+                return CurrencyInfo.CurrentCurrency;
             }
 
             List<CurrencyInfo> match =
@@ -153,7 +153,7 @@ public partial struct Money
                 throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
             }
 
-            return match[0].CurrencyUnit;
+            return match[0];
         }
 
     private static Func<char, bool> IsNotNumericCharacter()

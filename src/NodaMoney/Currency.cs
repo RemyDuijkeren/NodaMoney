@@ -80,7 +80,7 @@ public readonly record struct Currency
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
-    public static Currency FromCode(string code) => CurrencyInfo.FromCode(code).CurrencyUnit;
+    public static Currency FromCode(string code) => CurrencyInfo.FromCode(code);
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>
     public decimal MinimalAmount => CurrencyInfo.FromCode(Code).MinimalAmount;

@@ -20,7 +20,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public Money(decimal amount)
-        : this(amount, CurrencyInfo.CurrentCurrency.CurrencyUnit)
+        : this(amount, CurrencyInfo.CurrentCurrency)
     {
     }
 
@@ -43,7 +43,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
     public Money(decimal amount, MidpointRounding rounding)
-        : this(amount, CurrencyInfo.CurrentCurrency.CurrencyUnit, rounding)
+        : this(amount, CurrencyInfo.CurrentCurrency, rounding)
     {
     }
 
@@ -200,7 +200,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount, string code)
-        : this((decimal)amount,  CurrencyInfo.FromCode(code).CurrencyUnit)
+        : this((decimal)amount,  Currency.FromCode(code))
     {
     }
 
