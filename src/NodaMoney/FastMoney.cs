@@ -27,7 +27,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public FastMoney(decimal amount, string code)
-        : this(amount, new CurrencyUnit(code))
+        : this(amount, new Currency(code))
     {
     }
 
@@ -39,7 +39,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount, CurrencyUnit currency)
+    public FastMoney(decimal amount, Currency currency)
         : this(amount, currency, MidpointRounding.ToEven)
     {
     }
@@ -51,11 +51,11 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
     public FastMoney(decimal amount, string code, MidpointRounding rounding)
-        : this(amount, new CurrencyUnit(code), rounding)
+        : this(amount, new Currency(code), rounding)
     {
     }
 
-    public FastMoney(decimal amount, CurrencyUnit currency, MidpointRounding rounding)
+    public FastMoney(decimal amount, Currency currency, MidpointRounding rounding)
         : this()
     {
         Currency = currency;
@@ -68,7 +68,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     public decimal Amount => _amount / (decimal)Math.Pow(10, 2);
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-    public CurrencyUnit Currency { get; }
+    public Currency Currency { get; }
 
     /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
@@ -109,13 +109,13 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
-    public void Deconstruct(out decimal amount, out CurrencyUnit currency)
+    public void Deconstruct(out decimal amount, out Currency currency)
     {
         amount = Amount;
         currency = Currency;
     }
 
-    private static decimal Round(in decimal amount, in CurrencyUnit currencyUnit, in MidpointRounding rounding)
+    private static decimal Round(in decimal amount, in Currency currencyUnit, in MidpointRounding rounding)
     {
         // https://stackoverflow.com/questions/43289478/how-can-i-tell-if-a-number-is-a-power-of-10-in-kotlin-or-java
         static bool IsPowerOf10(long n)
@@ -143,8 +143,8 @@ public readonly struct FastMoney : IEquatable<FastMoney>
                    || x == 1000000000;
         }
 
-        Currency currency = NodaMoney.Currency.FromCode(currencyUnit.Code);
-        return IsPowerOfTen(currency.MinorUnit)
+        CurrencyInfo currency = CurrencyRegistry.Get(currencyUnit);
+        return IsPowerOfTen(currency.MinorUnits)
             ? Math.Round(amount, currency.DecimalDigits, rounding)
             : Math.Round(amount / currency.MinimalAmount, 0, rounding) * currency.MinimalAmount;
     }

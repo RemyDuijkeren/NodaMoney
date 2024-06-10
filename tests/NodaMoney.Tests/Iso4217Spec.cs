@@ -65,7 +65,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     public void WhenCurrenciesInIso4127List_ThenShouldAlsoExistInNodaMoney()
     {
             var missingCurrencies = _iso4127List.currencies
-                                        .Where(a => !Currency.GetAllCurrencies().Any(c => c.Code == a.Currency))
+                                        .Where(a => !CurrencyInfo.GetAllCurrencies().Any(c => c.Code == a.Currency))
                                         .ToList();
 
             missingCurrencies.Should().HaveCount(0, $"expected defined currencies to contain {string.Join(", ", missingCurrencies.Select(a => a.Currency + " " + a.CurrencyName))}");
@@ -75,8 +75,8 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     public void WhenCurrenciesInRegistryAndCurrent_ThenTheyShouldAlsoBeDefinedInTheIsoList()
     {
             var notDefinedCurrencies =
-                Currency.GetAllCurrencies()
-                .Where(c => c.IsValidOn(_iso4127List.PublishDate))
+                CurrencyInfo.GetAllCurrencies()
+                .Where(c => c.IsActiveOn(_iso4127List.PublishDate))
                 .Where(c => !string.IsNullOrEmpty(c.NumericCode))
                 .Where(c => !_iso4127List.currencies.Any(a => a.Currency == c.Code))
                 .ToList();
@@ -89,7 +89,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     {
             var differences = new List<string>();
 
-            foreach (var nodaCurrency in Currency.GetAllCurrencies())
+            foreach (var nodaCurrency in CurrencyInfo.GetAllCurrencies())
             {
                 var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
 
@@ -110,7 +110,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     {
             var differences = new List<string>();
 
-            foreach (var nodaCurrency in Currency.GetAllCurrencies())
+            foreach (var nodaCurrency in CurrencyInfo.GetAllCurrencies())
             {
                 var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
 
@@ -131,7 +131,7 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
     {
             var differences = new List<string>();
 
-            foreach (var nodaCurrency in Currency.GetAllCurrencies())
+            foreach (var nodaCurrency in CurrencyInfo.GetAllCurrencies())
             {
                 var iso4127Currency = _iso4127List.currencies.FirstOrDefault(x => x.Currency == nodaCurrency.Code);
 
@@ -140,9 +140,9 @@ public class GivenIWantToCompareNodaMoneyWithIso4127 : IClassFixture<Iso4127List
 
                 if (!string.Equals(nodaCurrency.DecimalDigits.ToString(), iso4127Currency.CurrencyMinorUnits, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (nodaCurrency.MinorUnit == 0 && iso4127Currency.CurrencyMinorUnits == "N.A.")
+                    if (nodaCurrency.MinorUnit == MinorUnit.NotApplicable && iso4127Currency.CurrencyMinorUnits == "N.A.")
                         continue;
-                    if (nodaCurrency.MinorUnit == Math.Log10(5) && iso4127Currency.CurrencyMinorUnits == "2")
+                    if (nodaCurrency.MinorUnit == MinorUnit.OneFifth && iso4127Currency.CurrencyMinorUnits == "2")
                         continue;
 
                     differences.Add($"{nodaCurrency.Code}: expected {iso4127Currency.CurrencyMinorUnits} minor units but found {nodaCurrency.DecimalDigits}");

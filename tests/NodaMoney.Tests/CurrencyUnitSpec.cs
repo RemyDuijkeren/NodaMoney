@@ -5,7 +5,7 @@ using Xunit;
 
 namespace NodaMoney.Tests.CurrencyUnitSpec;
 
-public class CreateCurrencyUnit
+public class CreateCurrencyV2
 {
     [Theory]
     [InlineData("EUR")]
@@ -13,7 +13,7 @@ public class CreateCurrencyUnit
     [InlineData("USD")]
     public void CurrencyIsCreated_GivenCodeIsThreeCapitalLetters(string code)
     {
-            var currency = new CurrencyUnit(code);
+            var currency = new Currency(code);
 
             currency.Code.Should().Be(code);
             currency.IsIso4217.Should().BeTrue();
@@ -27,7 +27,7 @@ public class CreateCurrencyUnit
     [InlineData("EU1")]
     public void ThrowArgumentException_GivenCodeIsNotThreeCapitalLetters(string code)
     {
-            Action act = () => new CurrencyUnit(code);
+            Action act = () => new Currency(code);
 
             act.Should().Throw<ArgumentException>();
         }
@@ -35,7 +35,7 @@ public class CreateCurrencyUnit
     [Fact]
     public void ThrowArgumentNullException_GivenCodeIsNull()
     {
-            Action act = () => new CurrencyUnit(null);
+            Action act = () => new Currency(null);
 
             act.Should().Throw<ArgumentException>();
         }
@@ -44,23 +44,23 @@ public class CreateCurrencyUnit
     public void CurrencyIsXXX_GivenDefaultCurrency()
     {
             // Arrange / Act
-            var noCurrency = new CurrencyUnit("XXX");
-            CurrencyUnit defaultCurrency = default;
+            var noCurrency = new Currency("XXX");
+            Currency defaultCurrency = default;
 
             // Assert
             noCurrency.Should().NotBeNull();
-            noCurrency.Should().Be(default(CurrencyUnit));
+            noCurrency.Should().Be(default(Currency));
 
             // Assert with XUnit methods, because https://stackoverflow.com/questions/61556309/fluent-assertions-be-vs-equals
             Assert.Equal(default, noCurrency);
-            Assert.Equal(default(CurrencyUnit), (object)noCurrency);
+            Assert.Equal(default(Currency), (object)noCurrency);
             Assert.True(noCurrency == default);
-            Assert.True(noCurrency == default(CurrencyUnit));
+            Assert.True(noCurrency == default(Currency));
             Assert.True(noCurrency.Equals(default));
-            Assert.True(noCurrency.Equals((object)default(CurrencyUnit)));
-            Assert.True(object.Equals(noCurrency, default(CurrencyUnit)));
+            Assert.True(noCurrency.Equals((object)default(Currency)));
+            Assert.True(object.Equals(noCurrency, default(Currency)));
             Assert.Equal(defaultCurrency, noCurrency);
-            Assert.Equal(CurrencyUnit.NoCurrency, noCurrency);
+            Assert.Equal(Currency.NoCurrency, noCurrency);
         }
 
     [Fact]

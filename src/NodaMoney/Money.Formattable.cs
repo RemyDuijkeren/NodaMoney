@@ -58,8 +58,10 @@ public partial struct Money : IFormattable
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
-            numberFormatInfo.CurrencyDecimalDigits = currency.DecimalDigits == CurrencyRegistry.NotApplicable ? 0 : (int)currency.DecimalDigits;
-            numberFormatInfo.CurrencySymbol = currency.Symbol;
+            CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
+
+            numberFormatInfo.CurrencyDecimalDigits = currencyInfo.DecimalDigits;
+            numberFormatInfo.CurrencySymbol = currencyInfo.Symbol;
 
             if (useCode)
             {
@@ -133,6 +135,8 @@ public partial struct Money : IFormattable
             format = "C";
         }
 
+        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(Currency);
+
         if (format.StartsWith("F", StringComparison.Ordinal))
         {
 #if NETSTANDARD2_0
@@ -142,10 +146,10 @@ public partial struct Money : IFormattable
 #endif
             if (format.Length == 1)
             {
-                format += Currency.DecimalDigits;
+                format += currencyInfo.DecimalDigits;
             }
 
-            return $"{Amount.ToString(format, provider)} {Currency.EnglishName}";
+            return $"{Amount.ToString(format, provider)} {currencyInfo.EnglishName}";
         }
 
         return Amount.ToString(format ?? "C", provider);

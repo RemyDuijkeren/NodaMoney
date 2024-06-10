@@ -54,7 +54,8 @@ public class CurrencyTypeConverter : TypeConverter
                 }
                 else
                 {
-                    return new Currency(v[0], v[1]);
+                    throw new NotImplementedException();
+                    //return new Currency(v[0], v[1]);
                 }
             }
 
@@ -74,13 +75,14 @@ public class CurrencyTypeConverter : TypeConverter
             if (destinationType == typeof(string))
             {
                 Currency c = (Currency)value;
-                if (c.Namespace == "ISO-4217")
+                if (c.IsIso4217) // "ISO-4217"
                 {
                     return c.Code;
                 }
                 else
                 {
-                    return $"{c.Code};{c.Namespace}";
+                    throw new NotImplementedException();
+                    //return $"{c.Code};{c.Namespace}";
                 }
             }
 

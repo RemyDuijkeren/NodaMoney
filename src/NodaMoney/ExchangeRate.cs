@@ -42,7 +42,7 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// <param name="quoteCode">The code of the quote currency.</param>
     /// <param name="rate">The rate of the exchange.</param>
     public ExchangeRate(string baseCode, string quoteCode, decimal rate)
-        : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate)
+        : this(CurrencyInfo.FromCode(baseCode).CurrencyUnit, CurrencyInfo.FromCode(quoteCode).CurrencyUnit, rate)
     {
         }
 
@@ -52,7 +52,7 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// <param name="rate">The rate of the exchange.</param>
     /// <param name="numberOfDecimals">The number of decimals to round the exchange rate to.</param>
     public ExchangeRate(string baseCode, string quoteCode, double rate, int numberOfDecimals = 6)
-        : this(Currency.FromCode(baseCode), Currency.FromCode(quoteCode), rate, numberOfDecimals)
+        : this(CurrencyInfo.FromCode(baseCode).CurrencyUnit, CurrencyInfo.FromCode(quoteCode).CurrencyUnit, rate, numberOfDecimals)
     {
         }
 
@@ -114,12 +114,12 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
                     throw new ArgumentNullException(nameof(rate));
 
                 rate = rate.Trim();
-                var baseCurrency = Currency.FromCode(rate.Substring(0, 3));
+                var baseCurrency = CurrencyInfo.FromCode(rate.Substring(0, 3));
                 int index = rate.Substring(3, 1) == "/" ? 4 : 3;
-                var quoteCurrency = Currency.FromCode(rate.Substring(index, 3));
+                var quoteCurrency = CurrencyInfo.FromCode(rate.Substring(index, 3));
                 var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
 
-                result = new ExchangeRate(baseCurrency, quoteCurrency, value);
+                result = new ExchangeRate(baseCurrency.CurrencyUnit, quoteCurrency.CurrencyUnit, value);
                 return true;
             }
             catch (Exception ex)

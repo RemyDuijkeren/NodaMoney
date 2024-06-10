@@ -131,17 +131,17 @@ public partial struct Money
 
     private static Currency ExtractCurrencyFromString(string value)
     {
-            // TODO: How to handle alternative symbols, like US$
+            // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
             string currencyAsString = new string(value.Cast<char>().Where(IsNotNumericCharacter()).ToArray());
 
-            if (currencyAsString.Length == 0 || Currency.CurrentCurrency.Symbol == currencyAsString
-                || Currency.CurrentCurrency.Code == currencyAsString)
+            if (currencyAsString.Length == 0 || CurrencyInfo.CurrentCurrency.Symbol == currencyAsString
+                || CurrencyInfo.CurrentCurrency.Code == currencyAsString)
             {
-                return Currency.CurrentCurrency;
+                return CurrencyInfo.CurrentCurrency.CurrencyUnit;
             }
 
-            List<Currency> match =
-                Currency.GetAllCurrencies().Where(c => c.Symbol == currencyAsString || c.Code == currencyAsString).ToList();
+            List<CurrencyInfo> match =
+                CurrencyInfo.GetAllCurrencies().Where(c => c.Symbol == currencyAsString || c.Code == currencyAsString).ToList();
 
             if (match.Count == 0)
             {
@@ -153,7 +153,7 @@ public partial struct Money
                 throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
             }
 
-            return match[0];
+            return match[0].CurrencyUnit;
         }
 
     private static Func<char, bool> IsNotNumericCharacter()
