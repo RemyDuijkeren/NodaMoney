@@ -70,12 +70,12 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
     [MemberData(nameof(TestData))]
     public void WhenSerializingMoney_ThenThisShouldSucceed(Money money)
     {
-            string json = System.Text.Json.JsonSerializer.Serialize(money);
-            // Console.WriteLine(json);
-            var clone = System.Text.Json.JsonSerializer.Deserialize<Money>(json);
+        string json = System.Text.Json.JsonSerializer.Serialize(money);
+        // Console.WriteLine(json);
+        var clone = System.Text.Json.JsonSerializer.Deserialize<Money>(json);
 
-            clone.Should().Be(money);
-        }
+        clone.Should().Be(money);
+    }
 
     [Theory]
     [MemberData(nameof(TestData))]
@@ -273,22 +273,29 @@ public class GivenIWantToSerializeMoneyWithDataContractSerializer
         }
 }
 
-public class GivenIWantToSerializeMoneyWitXmlSerializer
+public class GivenIWantToSerializeMoneyWithXmlSerializer
 {
     private Money yen = new Money(765m, Currency.FromCode("JPY"));
     private Money euro = new Money(765.43m, Currency.FromCode("EUR"));
+    private Money bitcoin = new Money(765.43m, Currency.FromCode("BTC"));
 
     [Fact]
     public void WhenSerializingYen_ThenThisShouldSucceed()
     {
-            yen.Should().Be(Clone<Money>(yen));
-        }
+        yen.Should().Be(Clone<Money>(yen));
+    }
 
     [Fact]
     public void WhenSerializingEuro_ThenThisShouldSucceed()
     {
-            euro.Should().Be(Clone<Money>(euro));
-        }
+        euro.Should().Be(Clone<Money>(euro));
+    }
+
+    [Fact]
+    public void WhenSerializingBitcoin_ThenThisShouldSucceed()
+    {
+        bitcoin.Should().Be(Clone<Money>(bitcoin));
+    }
 
     [Fact]
     public void WhenSerializingArticle_ThenThisShouldSucceed()
@@ -318,11 +325,20 @@ public class GivenIWantToSerializeMoneyWitXmlSerializer
             return (T)xmlSerializer.Deserialize(stream);
         }
 
+    public static string StreamToString(Stream stream)
+    {
+        stream.Position = 0;
+        using (var reader = new StreamReader(stream))
+        {
+            return reader.ReadToEnd();
+        }
+    }
+
     private static T Clone<T>(object source)
     {
-            // Console.WriteLine(Serialize(source).ToString());
-            return Deserialize<T>(Serialize(source));
-        }
+        Console.WriteLine(StreamToString(Serialize(source)));
+        return Deserialize<T>(Serialize(source));
+    }
 }
 
 public class GivenIWantToSerializeMoneyWithBinaryFormatter

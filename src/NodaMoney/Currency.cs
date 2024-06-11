@@ -4,14 +4,14 @@ namespace NodaMoney;
 
 /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Currency</remarks>
-public readonly record struct Currency
+public readonly partial record struct Currency
 {
     const string NoCurrencyCode = "XXX";
 
-    // ushort = 2bytes, only 15bits needed for code, 1bit left => use last bit to indicate flag for ...?
+    // ushort = 2bytes, only 15bits needed for code, 1bit left => use last bit to indicate flag for isIso4217?
     readonly ushort _code;
 
-    // store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3) : 4+2=6 bits (2bits left for 4 distinct values)
+    // store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
     //readonly byte _listAndMinorUnit;
 
     public static readonly Currency NoCurrency = new (NoCurrencyCode);

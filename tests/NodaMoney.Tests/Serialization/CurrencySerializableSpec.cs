@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Xml.Serialization;
 using FluentAssertions;
@@ -9,14 +10,14 @@ namespace NodaMoney.Tests.Serialization;
 public class GivenIWantToSerializeCurrencyWithXmlSerializer
 {
     private Currency yen = Currency.FromCode("JPY");
-
     private Currency euro = Currency.FromCode("EUR");
+    private Currency bitcoin = Currency.FromCode("BTC");
 
     [Fact]
     public void WhenSerializingYen_ThenThisShouldSucceed()
     {
         //Console.WriteLine(StreamToString(Serialize(yen)));
-        StreamToString(Serialize(yen));
+        var xml = StreamToString(Serialize(yen));
 
         yen.Should().Be(Clone<Currency>(yen));
     }
@@ -25,9 +26,18 @@ public class GivenIWantToSerializeCurrencyWithXmlSerializer
     public void WhenSerializingEuro_ThenThisShouldSucceed()
     {
         //Console.WriteLine(StreamToString(Serialize(euro)));
-        StreamToString(Serialize(euro));
+        var xml = StreamToString(Serialize(euro));
 
         euro.Should().Be(Clone<Currency>(euro));
+    }
+
+    [Fact]
+    public void WhenSerializingBitcoin_ThenThisShouldSucceed()
+    {
+        //Console.WriteLine(StreamToString(Serialize(euro)));
+        var xml = StreamToString(Serialize(bitcoin));
+
+        bitcoin.Should().Be(Clone<Currency>(bitcoin));
     }
 
     public static Stream Serialize(object source)
@@ -66,12 +76,31 @@ public class GivenIWantToSerializeCurrencyWithNewtownsoftJson
     [InlineData("EUR")]
     [InlineData("JPY")]
     [InlineData("CZK")]
+    [InlineData("BTC")]
     public void WhenSerializingCurrency_ThenThisShouldSucceed(string code)
     {
         var currency = Currency.FromCode(code);
 
         string json = JsonConvert.SerializeObject(currency);
         var clone = JsonConvert.DeserializeObject<Currency>(json);
+
+        clone.Should().Be(currency);
+    }
+}
+
+public class GivenIWantToSerializeCurrencyWithSystemTextJsonSerializer
+{
+    [Theory]
+    [InlineData("EUR")]
+    [InlineData("JPY")]
+    [InlineData("CZK")]
+    [InlineData("BTC")]
+    public void WhenSerializingCurrency_ThenThisShouldSucceed(string code)
+    {
+        var currency = Currency.FromCode(code);
+
+        string json = System.Text.Json.JsonSerializer.Serialize(currency);
+        var clone = System.Text.Json.JsonSerializer.Deserialize<Currency>(json);
 
         clone.Should().Be(currency);
     }

@@ -1,16 +1,18 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 [Serializable]
+//[TypeConverter(typeof(MoneyTypeConverter))]
+[JsonConverter(typeof(MoneyJsonConverter))]
 public partial struct Money : IXmlSerializable, ISerializable
 {
 #pragma warning disable CA1801 // Parameter context of method.ctor is never used.

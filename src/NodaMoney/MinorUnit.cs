@@ -29,4 +29,8 @@ public enum MinorUnit : byte
     /// written out, a single significant digit is used. E.g. 1.2 UM.
     /// </summary>
     OneFifth = 15, // Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
+
+    // TODO: 0-13 is enough for ISO-4217 and most crypto, but Ethereum (ETH) has 18 decimal places (wei)
+    // If now fits in 4bits, but if we need more, we can use 5 bits (0-31) or 6 bits (0-63) for minor unit
+
 }

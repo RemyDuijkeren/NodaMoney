@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
-using System.Text;
 
 namespace NodaMoney;
 
@@ -47,15 +44,14 @@ public class CurrencyTypeConverter : TypeConverter
     {
             if (value is string valueAsString)
             {
-                string[] v = valueAsString.Split(new[] { ';' });
-                if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]))
+                string[] v = valueAsString.Split([';']);
+                if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
                 {
                     return new Currency(v[0]);
                 }
-                else
+                else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
                 {
-                    throw new NotImplementedException();
-                    //return new Currency(v[0], v[1]);
+                    return new Currency(v[0]) { IsIso4217 = false };
                 }
             }
 
@@ -75,15 +71,13 @@ public class CurrencyTypeConverter : TypeConverter
             if (destinationType == typeof(string))
             {
                 Currency c = (Currency)value;
-                //if (c.IsIso4217) // "ISO-4217"
-                if (true)
+                if (c.IsIso4217) // "ISO-4217"
                 {
                     return c.Code;
                 }
                 else
                 {
-                    throw new NotImplementedException();
-                    //return $"{c.Code};{c.Namespace}";
+                    return $"{c.Code};CUSTOM";
                 }
             }
 
