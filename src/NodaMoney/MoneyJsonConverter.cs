@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,13 +14,17 @@ public class MoneyJsonConverter : JsonConverter<Money>
         }
 
         decimal amount = 0;
-        string currencyCode = null;
+        Currency currency = Currency.NoCurrency;
+        bool hasAmount = false, hasCurrency = false;
 
         while (reader.Read())
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                return new Money(amount, Currency.FromCode(currencyCode));
+                if (!hasAmount) throw new JsonException("Missing property 'Amount'!");
+                if (!hasCurrency) throw new JsonException("Missing property 'Currency'!");
+
+                return new Money(amount, currency);
             }
 
             if (reader.TokenType == JsonTokenType.PropertyName)
@@ -29,10 +34,35 @@ public class MoneyJsonConverter : JsonConverter<Money>
                 switch (propertyName)
                 {
                     case "Amount":
-                        amount = reader.GetDecimal();
+                    case "amount":
+                        if (reader.TokenType == JsonTokenType.Number)
+                        {
+                            amount = reader.GetDecimal();
+                        }
+                        else
+                        {
+                            if (!decimal.TryParse(reader.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+                            {
+                                throw new JsonException("Can't parse property 'Amount' to a number!");
+                            }
+                        }
+                        hasAmount = true;
                         break;
                     case "Currency":
-                        currencyCode = reader.GetString();
+                    case "currency":
+                        var valueAsString = reader.GetString();
+                        if (valueAsString == null) break;
+
+                        string[] v = valueAsString.Split([';']);
+                        if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
+                        {
+                            currency = new Currency(v[0]);
+                        }
+                        else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
+                        {
+                            currency = new Currency(v[0]) { IsIso4217 = false };
+                        }
+                        hasCurrency = true;
                         break;
                 }
             }
@@ -44,8 +74,8 @@ public class MoneyJsonConverter : JsonConverter<Money>
     public override void Write(Utf8JsonWriter writer, Money value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WriteNumber("Amount", value.Amount);
-        writer.WriteString("Currency", value.Currency.Code);
+        writer.WriteNumber(options.PropertyNamingPolicy?.ConvertName("Amount") ?? "Amount", value.Amount);
+        writer.WriteString(options.PropertyNamingPolicy?.ConvertName("Currency") ?? "Currency", value.Currency.Code);
         writer.WriteEndObject();
     }
 }

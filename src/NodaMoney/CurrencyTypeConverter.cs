@@ -71,14 +71,7 @@ public class CurrencyTypeConverter : TypeConverter
             if (destinationType == typeof(string))
             {
                 Currency c = (Currency)value;
-                if (c.IsIso4217) // "ISO-4217"
-                {
-                    return c.Code;
-                }
-                else
-                {
-                    return $"{c.Code};CUSTOM";
-                }
+                return c.IsIso4217 ? c.Code : $"{c.Code};CUSTOM";
             }
 
             return base.ConvertTo(context, culture, value, destinationType);

@@ -11,7 +11,7 @@ namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 [Serializable]
-//[TypeConverter(typeof(MoneyTypeConverter))]
+[TypeConverter(typeof(MoneyTypeConverter))]
 [JsonConverter(typeof(MoneyJsonConverter))]
 public partial struct Money : IXmlSerializable, ISerializable
 {

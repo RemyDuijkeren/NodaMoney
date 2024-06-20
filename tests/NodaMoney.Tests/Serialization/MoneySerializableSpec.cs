@@ -8,6 +8,7 @@ using Xunit;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace NodaMoney.Tests.Serialization.MoneySerializableSpec;
 
@@ -26,23 +27,24 @@ public class GivenIWantToDeserializeMoneyWithSystemTextJsonSerializer
     [ClassData(typeof(InvalidJsonTestData))]
     public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
     {
-            Action action = () => System.Text.Json.JsonSerializer.Deserialize<Money>(json);
+        Action action = () => System.Text.Json.JsonSerializer.Deserialize<Money>(json);
 
-            action.Should().Throw<SerializationException>().WithMessage("Member '*");
-        }
+        action.Should().Throw<System.Text.Json.JsonException>().WithMessage("*property*");
+    }
 
     [Theory]
     [ClassData(typeof(NestedJsonTestData))]
     public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json, Order expected)
     {
-            var clone = System.Text.Json.JsonSerializer.Deserialize<Order>(json);
+        JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
 
-            clone.Should().BeEquivalentTo(expected);
-            clone.Discount.Should().BeNull();
-        }
+        var clone = System.Text.Json.JsonSerializer.Deserialize<Order>(json, options);
+
+        clone.Should().BeEquivalentTo(expected);
+        clone.Discount.Should().BeNull();
+    }
 }
 
-// TODO: Write convertors, see https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-8-0
 public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
 {
     public static IEnumerable<object[]> TestData => new[]
@@ -60,7 +62,7 @@ public class GivenIWantToSerializeMoneyWithSystemTextJsonSerializer
     public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money)
     {
             string json = System.Text.Json.JsonSerializer.Serialize(money.Currency);
-            Console.WriteLine(json);
+            //Console.WriteLine(json);
             var clone = System.Text.Json.JsonSerializer.Deserialize<Currency>(json);
 
             clone.Should().Be(money.Currency);
