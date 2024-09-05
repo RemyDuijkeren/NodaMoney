@@ -5,6 +5,7 @@ using System.Text;
 namespace NodaMoney;
 
 /// <summary>Provides a way of converting the type <see cref="string"/> to and from the type <see cref="Money"/>.</summary>
+/// <remarks>Used by <see cref="Newtonsoft.Json."/> to do the serialization.</remarks>
 public class MoneyTypeConverter : TypeConverter
 {
     /// <inheritdoc/>
@@ -16,7 +17,7 @@ public class MoneyTypeConverter : TypeConverter
         destinationType == typeof(Money) || base.CanConvertTo(context, destinationType);
 
     /// <inheritdoc/>
-    public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
+    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object? value)
     {
         if (value is string valueAsString)
         {

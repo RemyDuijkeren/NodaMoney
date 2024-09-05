@@ -25,7 +25,10 @@ static class CurrencyRegistry
             s_lookupCurrenciesByCode[ci.Code] = ci;
         }
 
-        // TODO: Parallel foreach? ReadOnlySpan<T>
+        // TODO: Use FrozenDictionary in .NET 8?
+        //FrozenDictionary<Currency, CurrencyInfo> frozenDictionary = s_lookupCurrencies.ToFrozenDictionary();
+
+        // TODO: Parallel foreach? ReadOnlySpan<T>.
         // var xa = Currencies.AsMemory();
         // TODO: Use ReadOnlySpan<T> or ReadOnlyMemory<T>  to split up namespaces? 0..999 ISO4127, 1000..9999 ISO4127-HISTORIC
         // To much useless gaps, but for first 0..999 performance boost, because of no key lookup?

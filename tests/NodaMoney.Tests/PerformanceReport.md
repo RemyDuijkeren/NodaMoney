@@ -39,8 +39,8 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ImplicitCurrencyByCasting           | 113.58 ns |  1.579 ns |  1.477 ns | 113.67 ns |  0.23 |    0.00 | 0.0057 |      48 B |
 | Deconstruct                         |  34.86 ns |  0.348 ns |  0.309 ns |  34.80 ns |  0.07 |    0.00 |      - |         - |
 #### after
-| Method                              | Mean      | Error    | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-|------------------------------------ |----------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
+| Method                              |      Mean |    Error |   StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|-------------------------------------|----------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
 | ExplicitCurrencyAsString            | 142.29 ns | 1.862 ns | 1.742 ns |  1.00 |    0.00 |      - |         - |          NA |
 | ExplicitCurrencyAsStringAndRounding | 158.65 ns | 3.182 ns | 5.047 ns |  1.14 |    0.03 |      - |         - |          NA |
 | ExplicitCurrencyFromCode            | 145.45 ns | 1.175 ns | 1.042 ns |  1.02 |    0.01 |      - |         - |          NA |
@@ -49,8 +49,8 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ImplicitCurrencyByCasting           | 198.08 ns | 3.056 ns | 2.858 ns |  1.39 |    0.03 | 0.0076 |      64 B |          NA |
 | Deconstruct                         |  17.95 ns | 0.243 ns | 0.203 ns |  0.13 |    0.00 |      - |         - |          NA |
 
-| Method                              | Mean        | Error     | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-|------------------------------------ |------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+| Method                              |        Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|-------------------------------------|------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
 | ExplicitCurrencyAsString            | 336.4189 ns | 1.4724 ns | 1.3053 ns | 1.000 |    0.00 | 0.0143 |     120 B |        1.00 |
 | ExplicitCurrencyAsStringAndRounding | 342.7107 ns | 3.5120 ns | 2.9327 ns | 1.019 |    0.01 | 0.0143 |     120 B |        1.00 |
 | ExplicitCurrencyFromCode            | 335.5134 ns | 2.1293 ns | 1.9918 ns | 0.998 |    0.01 | 0.0143 |     120 B |        1.00 |

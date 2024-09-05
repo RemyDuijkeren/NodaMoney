@@ -1,6 +1,5 @@
-﻿Test are structured in a BDD way (Spec), see http://blogs.clariusconsulting.net/kzu/writing-meaningful-self-documenting-behavior-oriented-tests/
+﻿Test are structured in a BDD way (Spec). Here’s the way we write tests:
 
-Here’s the way we write tests:
 ```C#
 namespace NodaMoney.Tests.JoinSpec
 {
@@ -43,7 +42,7 @@ Key benefits of this approach:
   not tell the difference on who wrote which tests.
 - It triggers good practices about test complexity almost automatically: because context + tests have to make sense as an
   english phrase, sometimes you realize that a given test is testing too much (the test method becomes TOOOO long to write).
-- It’s trivial to write code that uses reflection to render this as a document 
+- It’s trivial to write code that uses reflection to render this as a document
 
 We use this as a guideline. There’s no requirement that we have a context class. Sometimes, it’s just not worth it because
 you’re testing a very small unit. In this case, the *Spec becomes the class, such as below. This is typically more the

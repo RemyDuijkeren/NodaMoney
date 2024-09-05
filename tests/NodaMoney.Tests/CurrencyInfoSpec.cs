@@ -4,7 +4,7 @@ using FluentAssertions;
 using NodaMoney.Tests.Helpers;
 using Xunit;
 
-namespace NodaMoney.Tests;
+namespace NodaMoney.Tests.CurrencyInfoSpec;
 
 public class GivenIWantToKnowAllCurrencies
 {

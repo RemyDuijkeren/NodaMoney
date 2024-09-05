@@ -112,6 +112,8 @@ public partial struct Money : IFormattable
         Justification = "Invalid overload; known bug in code analysis, see https://github.com/dotnet/roslyn-analyzers/issues/1552")]
     private string ConvertToString(string format, IFormatProvider formatProvider)
     {
+        // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
+
         // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
 
         // TODO: Hacked solution, solve with better implementation

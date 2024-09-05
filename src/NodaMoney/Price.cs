@@ -15,8 +15,8 @@ namespace NodaMoney;
 // The example you give is a special type of price, an hourrate: money/hour or money/TimeSpan. This could be
 // new Price<TimeSpan>(0.0034m, "EUR") or a type Hourrate that extends from Price.
 //
-// Hourrate could also have businessrules about rounding.You could do for example:
-// TimeSpan * Hourrate = (Total) Amount
+// Hour rate could also have business rules about rounding.You could do for example:
+// TimeSpan * HourRate = (Total) Amount
 //
 // Do you see other places, besides price, where you need more precision?
 // public readonly struct Price<T>(decimal ratio, Currency currency, T unit)
