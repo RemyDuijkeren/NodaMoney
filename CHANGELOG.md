@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ISO 4217 Amendment Number 176 ANG/532 XCG/532
 - System.Text.Json serialization support
 - Added CurrencyInfo to provide information about a currency
-- Support for .NET 6.0 and .NET 8.0 (next to already supported .NET Standard 2.0)
+- Support for .NET 6.0, .NET 8.0 and .NET 9.0 (next to already supported .NET Standard 2.0)
 -
 - Currency.NumericCode is a three-digit code number of the currency
 - Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
