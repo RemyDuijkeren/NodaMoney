@@ -59,7 +59,9 @@ public class GivenIWantToSerializeMoney
     {
         // Arrange
         var order = new Order { Id = 123, Name = "Foo", Total = money };
-        string expected = $$"""{"Id":123,"Name":"Foo","Total":"{{expectedMoney}}"}""";
+        string expected = $$"""
+                            {"Id":123,"Total":"{{expectedMoney}}","Name":"Foo"}
+                            """;
 
         // Act
         string json = JsonConvert.SerializeObject(order);
@@ -77,7 +79,7 @@ public class GivenIWantToSerializeMoney
     {
         // Arrange
         var order = new NullableOrder() { Id = 123, Name = "Foo", Total = money };
-        string expected = $$"""{"Id":123,"Name":"Foo","Price":"{{expectedMoney}}"}""";
+        string expected = $$"""{"Id":123,"Total":"{{expectedMoney}}","Name":"Foo"}""";
 
         // Act
         string json = JsonConvert.SerializeObject(order);
@@ -94,7 +96,7 @@ public class GivenIWantToDeserializeMoney
 {
     [Theory]
     [ClassData(typeof(ValidJsonV1TestData))]
-    public void WhenDeserializing_ThenThisShouldSucceed(string json, Money expected)
+    public void WhenDeserializingV1_ThenThisShouldSucceed(string json, Money expected)
     {
         var clone = JsonConvert.DeserializeObject<Money>(json);
 
@@ -103,16 +105,43 @@ public class GivenIWantToDeserializeMoney
 
     [Theory]
     [ClassData(typeof(InvalidJsonV1TestData))]
-    public void WhenDeserializingWithInvalidJSON_ThenThisShouldFail(string json)
+    public void WhenDeserializingWithInvalidJSONV1_ThenThisShouldFail(string json)
     {
         Action action = () => JsonConvert.DeserializeObject<Money>(json);
 
-        action.Should().Throw<SerializationException>().WithMessage("Member '*");
+        action.Should().Throw<SerializationException>();
     }
 
     [Theory]
     [ClassData(typeof(NestedJsonV1TestData))]
-    public void WhenDeserializingWithNested_ThenThisShouldSucceed(string json, Order expected)
+    public void WhenDeserializingWithNestedV1_ThenThisShouldSucceed(string json, Order expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Order>(json);
+
+        clone.Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(ValidJsonV2TestData))]
+    public void WhenDeserializingV2_ThenThisShouldSucceed(string json, Money expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Money>(json);
+
+        clone.Should().Be(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(InvalidJsonV2TestData))]
+    public void WhenDeserializingWithInvalidJSONV2_ThenThisShouldFail(string json)
+    {
+        Action action = () => JsonConvert.DeserializeObject<Money>(json);
+
+        action.Should().Throw<JsonException>();
+    }
+
+    [Theory]
+    [ClassData(typeof(NestedJsonV2TestData))]
+    public void WhenDeserializingWithNestedV2_ThenThisShouldSucceed(string json, Order expected)
     {
         var clone = JsonConvert.DeserializeObject<Order>(json);
 

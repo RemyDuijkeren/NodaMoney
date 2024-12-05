@@ -169,7 +169,7 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
             {
                 return Value.GetHashCode() + (397 * BaseCurrency.GetHashCode()) + (397 * QuoteCurrency.GetHashCode());
             }
-        }
+    }
 
     /// <summary>Indicates whether this instance and a specified <see cref="ExchangeRate"/> are equal.</summary>
     /// <param name="other">Another object to compare to.</param>

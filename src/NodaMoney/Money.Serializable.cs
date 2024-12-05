@@ -11,8 +11,9 @@ namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 [Serializable]
-//[TypeConverter(typeof(MoneyTypeConverter))]
-[JsonConverter(typeof(MoneyJsonConverter))]
+[TypeConverter(typeof(MoneyTypeConverter))] // Used by Newtonsoft.Json JSON String to do the serialization.
+[JsonConverter(typeof(MoneyJsonConverter))] // Used by System.Text.Json to do the serialization.
+//[JsonConverter(typeof(NullableMoneyJsonConverter))]
 // IXmlSerializable used for XML serialization (ReadXml, WriteXml, GetSchema),
 // ISerializable for binary serialization (GetObjectData, ctor(SerializationInfo, StreamingContext))
 public partial struct Money : IXmlSerializable, ISerializable

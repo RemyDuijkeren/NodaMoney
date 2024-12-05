@@ -7,20 +7,26 @@ namespace NodaMoney;
 /// <inheritdoc />
 public class MoneyJsonConverter : JsonConverter<Money>
 {
+    //public override bool HandleNull => false;
+
     /// <inheritdoc />
     public override Money Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
-            //return (Money)null;
+            throw new JsonException("Unexpected null value for Money.");
+            return default;
+            //return null;
         }
 
-        // new serialization format (v2): "EUR 234.25"
+        // new serialization format (v2): "EUR 234.25" (or "234.25 EUR")
+        // TODO: serialize non-ISO-4217 currencies with same code as ISO-4217 currencies, like "XXX;NON-ISO 234.25" or something else
         if (reader.TokenType == JsonTokenType.String)
         {
-            string value = reader.GetString();
+            string? value = reader.GetString();
             if (string.IsNullOrWhiteSpace(value))
             {
+                throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
                 //return (Money)null;
             }
             else
@@ -29,16 +35,35 @@ public class MoneyJsonConverter : JsonConverter<Money>
                 int spaceIndex = valueAsSpan.IndexOf(' ');
                 if (spaceIndex == -1)
                 {
-                    throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount'.");
+                    throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
                 }
 
                 ReadOnlySpan<char> currencySpan = valueAsSpan.Slice(0, spaceIndex);
                 ReadOnlySpan<char> amountSpan = valueAsSpan.Slice(spaceIndex + 1);
 
-                Currency currency1 = new Currency(currencySpan.ToString());
-                decimal amount1 = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+                try
+                {
+                    Currency currency1 = new Currency(currencySpan.ToString());
+                    decimal amount1 = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 
-                return new Money(amount1, currency1);
+                    return new Money(amount1, currency1);
+                }
+                catch (Exception ex) when (ex is FormatException or ArgumentException)
+                {
+                    try
+                    {
+                        // try reverse 234.25 EUR
+                        Currency currency1 = new Currency(amountSpan.ToString());
+                        decimal amount1 = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                        return new Money(amount1, currency1);
+                    }
+                    catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException)
+                    {
+                        // throw with original exception!
+                        throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
+                    }
+                }
             }
         }
 
@@ -109,14 +134,12 @@ public class MoneyJsonConverter : JsonConverter<Money>
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, Money money, JsonSerializerOptions options)
     {
+        if (money == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
         writer.WriteStringValue($"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}");
-        // if (money == null)
-        // {
-        //     writer.WriteNullValue();
-        // }
-        // else
-        // {
-        //     writer.WriteStringValue($"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}");
-        // }
     }
 }

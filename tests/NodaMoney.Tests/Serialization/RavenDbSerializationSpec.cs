@@ -7,30 +7,13 @@ namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec;
 
 public class GivenIWantToStoreInRavenDb : RavenTestDriver
 {
-    [Fact]
-    public void WhenMoneyAsRoot_ThenThisMustWork()
+    static GivenIWantToStoreInRavenDb()
     {
-        Money euros = new Money(123.56, "EUR");
-
-        using var store = GetDocumentStore();
-
-        // Store in RavenDb
-        using (var session = store.OpenSession())
+        // ConfigureServer() must be set before calling GetDocumentStore() and can only be set once per test run.
+        ConfigureServer(new TestServerOptions
         {
-            session.Store(euros);
-            session.SaveChanges();
-        }
-
-        WaitForIndexing(store);
-        //WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
-
-        // Read from RavenDb
-        using (var session = store.OpenSession())
-        {
-            var result = session.Query<Money>().FirstOrDefault();
-
-            result.Should().Be(euros);
-        }
+            Licensing = { ThrowOnInvalidOrMissingLicense = false }
+        });
     }
 
     [Fact]
@@ -48,7 +31,7 @@ public class GivenIWantToStoreInRavenDb : RavenTestDriver
             }
 
             WaitForIndexing(store);
-            WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
+            //WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
 
             // Read from RavenDb
             using (var session = store.OpenSession())

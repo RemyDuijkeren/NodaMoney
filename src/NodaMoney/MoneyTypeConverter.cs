@@ -1,45 +1,67 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace NodaMoney;
 
 /// <summary>Provides a way of converting the type <see cref="string"/> to and from the type <see cref="Money"/>.</summary>
-/// <remarks>Used by <see cref="Newtonsoft.Json."/> to do the serialization.</remarks>
+/// <remarks>Used by <see cref="Newtonsoft.Json"/> for JSON Strings to do the serialization.</remarks>
 public class MoneyTypeConverter : TypeConverter
 {
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-        sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        sourceType == typeof(string) || sourceType == typeof(Money) || base.CanConvertFrom(context, sourceType);
 
     /// <inheritdoc/>
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
-        destinationType == typeof(Money) || base.CanConvertTo(context, destinationType);
+        destinationType == typeof(Money) || destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
     /// <inheritdoc/>
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object? value)
     {
-        if (value is string valueAsString)
+        // Newtonsoft.Json will call this method when it is a JSON String, like "EUR 234.25",
+        // but if it is a JSON Object it tries to check if it can convert JObject (in Newtonsoft.Json).
+
+        if (value is not string jsonString)
+            return base.ConvertFrom(context, culture, value);
+
+        var valueAsSpan = jsonString.AsSpan();
+        var spaceIndex = valueAsSpan.IndexOf(' ');
+        if (spaceIndex == -1)
         {
-            // Use Span<T> to slice the string without creating a new array
-            var valueAsSpan = valueAsString.AsSpan();
-            var separatorIndex = valueAsSpan.IndexOf(' ');
-            if (separatorIndex == -1)
-            {
-                throw new FormatException("Invalid format. Expected format is 'amount currency' but didn't find a space.");
-            }
-
-            var amountPart = valueAsSpan.Slice(0, separatorIndex);
-            var currencyPart = valueAsSpan.Slice(separatorIndex + 1);
-
-            var amount = decimal.Parse(amountPart.ToString(), culture);
-            var currency = new Currency(currencyPart.ToString());
-
-            return new Money(amount, currency);
-
-            // string[] v = valueAsString.Split([' ']);
-            // return new Money(decimal.Parse(v[0], culture), v[1]);
+            throw new FormatException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25', but didn't find a space.");
         }
+
+        ReadOnlySpan<char> currencySpan = valueAsSpan.Slice(0, spaceIndex);
+        ReadOnlySpan<char> amountSpan = valueAsSpan.Slice(spaceIndex + 1);
+
+        try
+        {
+            Currency currency1 = new Currency(currencySpan.ToString());
+            decimal amount1 = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+            return new Money(amount1, currency1);
+        }
+        catch (Exception ex) when (ex is FormatException or ArgumentException)
+        {
+            try
+            {
+                // try reverse: 234.25 EUR
+                Currency currency1 = new Currency(amountSpan.ToString());
+                decimal amount1 = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                return new Money(amount1, currency1);
+            }
+            catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException)
+            {
+                // throw with original exception!
+                throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
+            }
+        }
+
+        // old serialization format (v1): { "Amount": 234.25, "Currency": "EUR" }
+        // use the build in converter for this.
 
         return base.ConvertFrom(context, culture, value);
     }
@@ -50,9 +72,9 @@ public class MoneyTypeConverter : TypeConverter
         if (destinationType == typeof(string) && value is Money money)
         {
             var result = new StringBuilder();
-            result.Append(money.Amount.ToString(culture));
-            result.Append(' ');
             result.Append(money.Currency.Code.ToString(culture));
+            result.Append(' ');
+            result.Append(money.Amount.ToString(culture));
 
             return result.ToString();
         }
