@@ -16,5 +16,14 @@ _ReSharper*/
 *.DotSettings.user
 
 # JetBrains Rider IDE
-.idea/
 riderModule.iml
+.idea/workspace.xml
+.idea/modules.xml
+.idea/usage.statistics.xml
+.idea/vcs.xml
+!.idea/misc.xml
+!.idea/libraries/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/dictionaries/
+!.idea/runConfigurations/
