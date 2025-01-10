@@ -152,17 +152,24 @@ public class GivenIWantToDeserializeMoney
 public class GivenIWantToSerializeCurrency
 {
     [Theory]
-    [InlineData("EUR")]
     [InlineData("JPY")]
-    [InlineData("CZK")]
+    [InlineData("EUR")]
+    [InlineData("USD")]
+    [InlineData("BHD")]
     [InlineData("BTC")]
+    [InlineData("XXX")]
     public void WhenSerializingCurrency_ThenThisShouldSucceed(string code)
     {
+        // Arrange
         var currency = Currency.FromCode(code);
 
+        // Act
         string json = JsonConvert.SerializeObject(currency);
-        var clone = JsonConvert.DeserializeObject<Currency>(json);
 
+        // Assert
+        json.Should().Be($"\"{code}\"");
+
+        var clone = JsonConvert.DeserializeObject<Currency>(json);
         clone.Should().Be(currency);
     }
 }

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace NodaMoney;
 
 /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
@@ -7,20 +5,47 @@ namespace NodaMoney;
 public readonly partial record struct Currency
 {
     const string NoCurrencyCode = "XXX";
+    const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
 
-    // ushort = 2bytes, only 15bits needed for code, 1bit left => use last bit to indicate flag for isIso4217?
-    readonly ushort _code;
+    // ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.
+    readonly ushort _encodedValue;
 
     // store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
     //readonly byte _listAndMinorUnit;
 
-    public static readonly Currency NoCurrency = new (NoCurrencyCode);
+    public static readonly Currency NoCurrency = new();
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
-    public Currency(string code)
+    /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
+    public Currency(string code) : this(code.AsSpan()) { }
+
+    /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
+    /// <param name="code">The (ISO-4217) three-character code of the currency</param>
+    /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
+    public Currency(ReadOnlySpan<char> code)
     {
-        Code = code;
+        // Special handling for no currency. Use 0 for 'XXX' (No Currency)
+        if (code.Length == 3 && code[0] == 'X' && code[1] == 'X' && code[2] == 'X')
+        {
+            _encodedValue = 0;
+            return;
+        }
+
+        if (code.IsEmpty) throw new ArgumentNullException(nameof(code));
+        if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+
+        // A-Z (65-90 in ASCII), move to 1-26 so that it fits in 5 bits.
+        // Store in ushort (2 bytes) by shifting 5 bits to the left for each byte.
+        _encodedValue = 0;
+        foreach (var c in code)
+        {
+            if (c is < 'A' or > 'Z')
+                throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+
+            _encodedValue = (ushort)(_encodedValue << 5 | (c - 'A' + 1));
+        }
+
         IsIso4217 = true;
     }
 
@@ -29,36 +54,21 @@ public readonly partial record struct Currency
     {
         get
         {
-            if (_code == 0) return NoCurrencyCode;
+            if (_encodedValue is 0 or 25368) // 25368; // Precomputed value of "XXX"
+                return NoCurrencyCode;
 
-            // shifting back into separate bytes with clearing the left 3 bits using '& 0b_0001_1111' (= '& 0x1F')
-            var sb = new StringBuilder(3);
-            sb.Append((char)((_code >> 10 & 0x1F) + 'A' - 1)); // 1-26 => A-Z (65-90 in ASCII)
-            sb.Append((char)((_code >> 5 & 0x1F) + 'A' - 1));
-            sb.Append((char)((_code & 0x1F) + 'A' - 1));
+            // Decode the stored ushort value into a 3-character string by shifting back into
+            // separate bytes with clearing the left 3 bits using '& 0b_0001_1111' (= '& 0x1F')
+            Span<char> result = stackalloc char[3];
+            result[0] = (char)((_encodedValue >> 10 & 0x1F) + 'A' - 1); // 1-26 => A-Z (65-90 in ASCII)
+            result[1] = (char)((_encodedValue >> 5 & 0x1F) + 'A' - 1);
+            result[2] = (char)((_encodedValue & 0x1F) + 'A' - 1);
 
-            return sb.ToString();
-        }
-        init
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (value.Length != 3) throw new ArgumentException("Currency code must be three characters long", nameof(value));
-
-            if (value == NoCurrencyCode)
-            {
-                _code = 0; // 25368 = 'XXX' (No Currency) => set to 0 (default)
-                return;
-            }
-
-            _code = 0;
-            foreach (var c in value)
-            {
-                if (c is < 'A' or > 'Z') throw new ArgumentException("Currency code should only exist out of capital letters", nameof(value));
-
-                // A-Z (65-90 in ASCII) => 1-26 (fits in 5 bits). We use 0 for 'XXX' (No Currency)
-                // store in ushort (2 bytes) by shifting 5 bits to the left for each byte
-                _code = (ushort)(_code << 5 | (c - 'A' + 1));
-            }
+#if NET5_0_OR_GREATER
+            return new string(result);
+#else
+            return new string(result.ToArray());
+#endif
         }
     }
 
@@ -67,11 +77,11 @@ public readonly partial record struct Currency
     {
         get
         {
-            return (_code & 1 << 15) != 1; // get last bit
+            return (_encodedValue & 1 << 15) != 1; // get last bit
         }
         init
         {
-            if (!value) _code |= 1 << 15; // set last bit to 1 if not ISO-4217 (so default is 0=true!)
+            if (!value) _encodedValue |= 1 << 15; // set last bit to 1 if not ISO-4217 (so default is 0=true!)
         }
     }
 

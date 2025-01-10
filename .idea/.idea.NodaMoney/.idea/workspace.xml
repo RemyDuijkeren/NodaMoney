@@ -10,11 +10,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyJsonConverter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyUnitSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyUnitSpec.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" afterDir="false" />
     </list>
@@ -64,65 +67,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/2aade6beb02ea367fd97c4070a4198802fe61c03/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.Private.CoreLib/src/System/Globalization/CultureData.Nls.cs" root0="SKIP_HIGHLIGHTING" />
@@ -163,6 +107,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/da617ecc825044c18a153119eb21e0af11e00/31/326c59ee/02000002pdb1High.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/da617ecc825044c18a153119eb21e0af11e00/31/326c59ee/02000002pdb1Low.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/da617ecc825044c18a153119eb21e0af11e00/a8/8fd62ec6/02000007pdb6Low.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/ec8d7bc3dd7c44938085cb477d891b9c14600/ee/0b710317/02000002pdb1High.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fe8602d2f4704b1a85a19a1e576072f31b200/05/6668032f/02000004pdb3High.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fe8602d2f4704b1a85a19a1e576072f31b200/05/6668032f/02000004pdb3Low.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04b6cdc90bd44757a6ebcefa3b9b9f9379e8b0/1a/ad4e6cef/XmlSerializer.cs" root0="SKIP_HIGHLIGHTING" />
@@ -206,8 +151,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ec3597c9edc99f6853d4fa6227763878c145105b8aa5edeb8d2780e476c8b3/JsonTypeReflector.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ef2e936858cc9ca2f1f8f5c5153b01cf910f782b2d68a6ca1a6f3ddd8cabaaa/ConvertUtils.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f87c606e5c2575e0616d874899f4ba88669535e34e14f28f059cc2f7550cf/TypeConverter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/Money.Serializable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/Currency.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -261,7 +205,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.spelling&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -377,7 +321,8 @@
       <workItem from="1735198245406" duration="12723000" />
       <workItem from="1735442122583" duration="5099000" />
       <workItem from="1736474729416" duration="11055000" />
-      <workItem from="1736490399975" duration="1001000" />
+      <workItem from="1736490399975" duration="3523000" />
+      <workItem from="1736494100462" duration="2835000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -706,48 +651,56 @@
       <option name="project" value="LOCAL" />
       <updated>1736479002090</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="Add IntelliJ IDEA project configuration files&#10;&#10;This commit introduces various .idea configuration files for the NodaMoney project. These files include settings for encoding, Git integration, workspace setup, and project-specific configurations to support development within IntelliJ-based IDEs.">
+      <option name="closed" value="true" />
+      <created>1736491750291</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1736491750291</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="UnitTestsCoverage.Settings">
-    <option name="coveragePercentColumnWidth" value="121" />
+    <option name="coveragePercentColumnWidth" value="113" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="248" />
+    <option name="symbolColumnWidth" value="231" />
     <coverage-tree-state>
       <expand>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="src 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="src 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="src 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="NodaMoney 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="src 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="NodaMoney 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="src 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="NodaMoney 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(2.0.0.0, net9.0) 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="src 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="NodaMoney 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(2.0.0.0, net9.0) 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="src 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="NodaMoney 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(2.0.0.0, net9.0) 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="NodaMoney 66% 386/1149" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="src 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="NodaMoney 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(2.0.0.0, net9.0) 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="NodaMoney 67% 375/1152" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
       </expand>
       <select />
@@ -1001,42 +954,29 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs</url>
-          <line>177</line>
+          <line>164</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\Serialization\SystemTextJsonSerializationSpec.cs" containingFunctionPresentation="Method 'WhenSerializingCurrency_ThenThisShouldSucceed'">
             <startOffsets>
-              <option value="5739" />
+              <option value="5337" />
             </startOffsets>
             <endOffsets>
-              <option value="5788" />
+              <option value="5386" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/src/NodaMoney/Currency.cs</url>
-          <line>30</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\Currency.cs" containingFunctionPresentation="Constructor 'Currency'">
+          <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs</url>
+          <line>166</line>
+          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\Serialization\NewtonsoftJsonSerializer.cs" containingFunctionPresentation="Method 'WhenSerializingCurrency_ThenThisShouldSucceed'">
             <startOffsets>
-              <option value="1496" />
+              <option value="5070" />
             </startOffsets>
             <endOffsets>
-              <option value="1571" />
+              <option value="5122" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="79" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/src/NodaMoney/Currency.cs</url>
-          <line>22</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\Currency.cs" containingFunctionPresentation="Constructor 'Currency'">
-            <startOffsets>
-              <option value="1083" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1084" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="80" />
+          <option name="timeStamp" value="81" />
         </line-breakpoint>
         <breakpoint type="DotNet Exception Breakpoints">
           <properties exception="System.InvalidOperationException" isInternal="false" displayValue="InvalidOperationException" namespaceName="System">

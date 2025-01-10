@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -8,7 +9,10 @@ using System.Xml.Serialization;
 namespace NodaMoney;
 
 [Serializable]
-[TypeConverter(typeof(CurrencyTypeConverter))]
+[TypeConverter(typeof(CurrencyTypeConverter))]  // Used by Newtonsoft.Json to do the serialization.
+[JsonConverter(typeof(CurrencyJsonConverter))] // Used by System.Text.Json to do the serialization.
+// IXmlSerializable used for XML serialization (ReadXml, WriteXml, GetSchema),
+// ISerializable for binary serialization (GetObjectData, ctor(SerializationInfo, StreamingContext))
 public readonly partial record struct Currency : IXmlSerializable, ISerializable
 {
     /// <inheritdoc cref="IXmlSerializable.GetSchema"/>

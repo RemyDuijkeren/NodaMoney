@@ -1,145 +1,164 @@
+using System.Buffers;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace NodaMoney;
 
-/// <inheritdoc />
+/// <summary>Converts a Money type to or from JSON.</summary>
+/// <remarks>Used by System.Text.Json to do the (de)serialization.</remarks>
+#pragma warning disable CA1704
 public class MoneyJsonConverter : JsonConverter<Money>
+#pragma warning restore CA1704
 {
-    //public override bool HandleNull => false;
+    const string InvalidFormatMessage = "Invalid format for Money. Expected format is '<Currency> <Amount>', like 'EUR 234.25'.";
 
     /// <inheritdoc />
-    public override Money Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override bool CanConvert(Type typeToConvert) =>
+        typeToConvert == typeof(Money) || typeToConvert == typeof(Money?);
+
+    /// <inheritdoc />
+    public override Money Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+        reader.TokenType switch
+        {
+            JsonTokenType.Null when typeToConvert == typeof(Money) => throw new JsonException(
+                "Null value encountered for 'Money' during JSON deserialization. This value is not allowed. Use Money? instead or make sure the JSON value is not null."),
+            JsonTokenType.Null => default, // Will return null for Money?
+            JsonTokenType.String => ParseMoneyFromString(ref reader),
+            JsonTokenType.StartObject => ParseMoneyFromJsonObject(ref reader),
+            _ => throw new JsonException(InvalidFormatMessage)
+        };
+
+    /// <inheritdoc />
+    public override void Write(Utf8JsonWriter writer, Money money, JsonSerializerOptions options) =>
+        writer.WriteStringValue($"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}");
+
+    /// <summary>Parses a JSON string representation of monetary value into a <see cref="Money"/> object.</summary>
+    /// <param name="reader">An instance of <see cref="Utf8JsonReader"/> providing the JSON string to parse.</param>
+    /// <returns>A <see cref="Money"/> object representing the parsed currency and amount.</returns>
+    /// <exception cref="JsonException">Thrown when the JSON string is null, empty, or in an invalid format not adhering to 'Currency Amount'.</exception>
+    /// <remarks>This is the new serialization format from v2 and up, like: "EUR 234.25" (or "234.25 EUR")</remarks>
+    static Money ParseMoneyFromString(ref Utf8JsonReader reader)
     {
-        if (reader.TokenType == JsonTokenType.Null)
+        // TODO: serialize non-ISO-4217 currencies with same code as ISO-4217 currencies, like "XXX;NON-ISO 234.25" or something else?
+
+        // Get the JSON value as UTF-8 bytes and then decode to a ReadOnlySpan<char>, avoiding intermediate string allocations.
+        ReadOnlySpan<byte> valueBytes = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
+#if NET5_0_OR_GREATER
+        ReadOnlySpan<char> valueChars = System.Text.Encoding.UTF8.GetString(valueBytes).AsSpan();
+#else
+        ReadOnlySpan<char> valueChars = System.Text.Encoding.UTF8.GetString(valueBytes.ToArray()).AsSpan();
+#endif
+        if (valueChars.IsWhiteSpace())
+            throw new JsonException(InvalidFormatMessage);
+
+        // Expecting '<Currency> <Amount>', like 'EUR 234.25', so search for space.
+        int spaceIndex = valueChars.IndexOf(' ');
+        if (spaceIndex == -1)
+            throw new JsonException(InvalidFormatMessage);
+
+        // Split the string into currency and amount, like 'EUR' and '234.25'
+        ReadOnlySpan<char> currencySpan = valueChars.Slice(0, spaceIndex);
+        ReadOnlySpan<char> amountSpan = valueChars.Slice(spaceIndex + 1);
+
+        try
         {
-            throw new JsonException("Unexpected null value for Money.");
-            return default;
-            //return null;
+            Currency currency = new(currencySpan);
+            decimal amount = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+            return new Money(amount, currency);
         }
-
-        // new serialization format (v2): "EUR 234.25" (or "234.25 EUR")
-        // TODO: serialize non-ISO-4217 currencies with same code as ISO-4217 currencies, like "XXX;NON-ISO 234.25" or something else
-        if (reader.TokenType == JsonTokenType.String)
+        catch (Exception ex) when (ex is FormatException or ArgumentException)
         {
-            string? value = reader.GetString();
-            if (string.IsNullOrWhiteSpace(value))
+            // Retry using reverse format, like '234.25 EUR'
+            try
             {
-                throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
-                //return (Money)null;
+                Currency currency = new(amountSpan);
+                decimal amount = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                return new Money(amount, currency);
             }
-            else
+            catch (Exception reverseException) when (reverseException is FormatException or ArgumentException)
             {
-                ReadOnlySpan<char> valueAsSpan = value.AsSpan();
-                int spaceIndex = valueAsSpan.IndexOf(' ');
-                if (spaceIndex == -1)
-                {
-                    throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
-                }
-
-                ReadOnlySpan<char> currencySpan = valueAsSpan.Slice(0, spaceIndex);
-                ReadOnlySpan<char> amountSpan = valueAsSpan.Slice(spaceIndex + 1);
-
-                try
-                {
-                    Currency currency1 = new Currency(currencySpan.ToString());
-                    decimal amount1 = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
-
-                    return new Money(amount1, currency1);
-                }
-                catch (Exception ex) when (ex is FormatException or ArgumentException)
-                {
-                    try
-                    {
-                        // try reverse 234.25 EUR
-                        Currency currency1 = new Currency(amountSpan.ToString());
-                        decimal amount1 = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
-
-                        return new Money(amount1, currency1);
-                    }
-                    catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException)
-                    {
-                        // throw with original exception!
-                        throw new JsonException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
-                    }
-                }
+                // Throw with original exception because using reverse format also failed!
+                throw new JsonException(InvalidFormatMessage, ex);
             }
         }
+    }
 
-        // old serialization format (v1): { "Amount": 234.25, "Currency": "EUR" }
-        if (reader.TokenType != JsonTokenType.StartObject)
-        {
-            throw new JsonException();
-        }
-
+    /// <summary>Parses a JSON object and converts it into a <see cref="Money"/> instance.</summary>
+    /// <param name="reader">The <see cref="Utf8JsonReader"/> used to parse the JSON object.</param>
+    /// <returns>A <see cref="Money"/> instance created from the JSON object.</returns>
+    /// <exception cref="JsonException">Thrown if the JSON is invalid, or if required properties such as 'Amount' or 'Currency' are missing.</exception>
+    /// <remarks>This is the old serialization format used in v1, like: { "Amount": 234.25, "Currency": "EUR" }.</remarks>
+#pragma warning disable CA1704
+    static Money ParseMoneyFromJsonObject(ref Utf8JsonReader reader)
+#pragma warning restore CA1704
+    {
         decimal amount = 0;
         Currency currency = Currency.NoCurrency;
         bool hasAmount = false, hasCurrency = false;
 
         while (reader.Read())
         {
-            if (reader.TokenType == JsonTokenType.EndObject)
+            switch (reader.TokenType)
             {
-                if (!hasAmount) throw new JsonException("Missing property 'Amount'!");
-                if (!hasCurrency) throw new JsonException("Missing property 'Currency'!");
-
-                return new Money(amount, currency);
-            }
-
-            if (reader.TokenType == JsonTokenType.PropertyName)
-            {
-                string propertyName = reader.GetString();
-                reader.Read();
-                switch (propertyName)
+                case JsonTokenType.EndObject when !hasAmount:
+                    throw new JsonException("Missing property 'Amount'!");
+                case JsonTokenType.EndObject when !hasCurrency:
+                    throw new JsonException("Missing property 'Currency'!");
+                case JsonTokenType.EndObject:
+                    return new Money(amount, currency);
+                case JsonTokenType.PropertyName:
                 {
-                    case "Amount":
-                    case "amount":
-                        if (reader.TokenType == JsonTokenType.Number)
-                        {
-                            amount = reader.GetDecimal();
-                        }
-                        else
-                        {
-                            if (!decimal.TryParse(reader.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+                    string? propertyName = reader.GetString();
+                    reader.Read();
+                    switch (propertyName)
+                    {
+                        case "Amount":
+                        case "amount":
+                            if (reader.TokenType == JsonTokenType.Number)
                             {
-                                throw new JsonException("Can't parse property 'Amount' to a number!");
+                                amount = reader.GetDecimal();
                             }
-                        }
-                        hasAmount = true;
-                        break;
-                    case "Currency":
-                    case "currency":
-                        var valueAsString = reader.GetString();
-                        if (valueAsString == null) break;
+                            else
+                            {
+                                if (!decimal.TryParse(reader.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+                                {
+                                    throw new JsonException("Can't parse property 'Amount' to a number!");
+                                }
+                            }
 
-                        string[] v = valueAsString.Split([';']);
-                        if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
-                        {
-                            currency = new Currency(v[0]);
-                        }
-                        else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
-                        {
-                            currency = new Currency(v[0]) { IsIso4217 = false };
-                        }
-                        hasCurrency = true;
-                        break;
+                            hasAmount = true;
+                            break;
+                        case "Currency":
+                        case "currency":
+                            var valueAsString = reader.GetString();
+                            if (valueAsString == null) break;
+
+                            string[] v = valueAsString.Split([';']);
+                            if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
+                            {
+                                currency = new Currency(v[0]);
+                            }
+                            else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
+                            {
+                                currency = new Currency(v[0]) { IsIso4217 = false };
+                            }
+
+                            hasCurrency = true;
+                            break;
+                        default:
+                            throw new JsonException($"Invalid property '{propertyName}' in JSON object!");
+                    }
+
+                    break;
                 }
+                default:
+                    throw new JsonException("Invalid JSON format for 'Money'.");
             }
         }
 
-        throw new JsonException();
-    }
-
-    /// <inheritdoc />
-    public override void Write(Utf8JsonWriter writer, Money money, JsonSerializerOptions options)
-    {
-        if (money == null)
-        {
-            writer.WriteNullValue();
-            return;
-        }
-
-        writer.WriteStringValue($"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}");
+        throw new JsonException("Invalid JSON format for 'Money'. Expected a JSON object (e.g., { \"Amount\": 234.25, \"Currency\": \"EUR\" }).");
     }
 }

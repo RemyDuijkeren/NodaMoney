@@ -21,23 +21,6 @@ public class GivenIWantToSerializeMoney
 
     [Theory]
     [MemberData(nameof(TestData))]
-    public void WhenSerializingCurrency_ThenThisShouldSucceed(Money money, string expectedCurrency, string expectedMoney)
-    {
-        // Arrange
-
-        // Act
-        string json = JsonSerializer.Serialize(money.Currency);
-
-        // Assert
-        json.Should().Be($"\"{expectedCurrency}\"");
-
-        //var clone = System.Text.Json.JsonSerializer.Deserialize<Currency>(json);
-
-        //clone.Should().Be(money.Currency);
-    }
-
-    [Theory]
-    [MemberData(nameof(TestData))]
     public void WhenOnlyMoney_ThenThisShouldSucceed(Money money, string expectedCurrency, string expectedMoney)
     {
         string json = JsonSerializer.Serialize(money);
@@ -80,7 +63,7 @@ public class GivenIWantToSerializeMoney
         // Assert
         json.Should().Be(expected);
 
-        var clone = JsonSerializer.Deserialize<Order>(json);
+        var clone = JsonSerializer.Deserialize<NullableOrder>(json);
         clone.Should().BeEquivalentTo(order);
         clone.Total.Should().Be(money);
     }
@@ -99,7 +82,7 @@ public class GivenIWantToSerializeMoney
         // Assert
         json.Should().Be(expected);
 
-        var clone = JsonSerializer.Deserialize<Order>(json);
+        var clone = JsonSerializer.Deserialize<NullableOrder>(json);
         clone.Should().BeEquivalentTo(order);
         clone.Total.Should().BeNull();
     }
@@ -167,17 +150,24 @@ public class GivenIWantToDeserializeMoney
 public class GivenIWantToSerializeCurrency
 {
     [Theory]
-    [InlineData("EUR")]
     [InlineData("JPY")]
-    [InlineData("CZK")]
+    [InlineData("EUR")]
+    [InlineData("USD")]
+    [InlineData("BHD")]
     [InlineData("BTC")]
+    [InlineData("XXX")]
     public void WhenSerializingCurrency_ThenThisShouldSucceed(string code)
     {
+        // Arrange
         var currency = Currency.FromCode(code);
 
+        // Act
         string json = JsonSerializer.Serialize(currency);
-        var clone = JsonSerializer.Deserialize<Currency>(json);
 
+        // Assert
+        json.Should().Be($"\"{code}\"");
+
+        var clone = JsonSerializer.Deserialize<Currency>(json);
         clone.Should().Be(currency);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using FluentAssertions;
 using Xunit;
 
@@ -13,10 +12,10 @@ public class CreateCurrencyV2
     [InlineData("USD")]
     public void CurrencyIsCreated_GivenCodeIsThreeCapitalLetters(string code)
     {
-            var currency = new Currency(code);
+        var currency = new Currency(code);
 
-            currency.Code.Should().Be(code);
-            //currency.IsIso4217.Should().BeTrue();
+        currency.Code.Should().Be(code);
+        //currency.IsIso4217.Should().BeTrue();
     }
 
     [Theory]
@@ -27,17 +26,17 @@ public class CreateCurrencyV2
     [InlineData("EU1")]
     public void ThrowArgumentException_GivenCodeIsNotThreeCapitalLetters(string code)
     {
-            Action act = () => new Currency(code);
+        Action act = () => new Currency(code);
 
-            act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentException>().WithMessage("Currency code should only exist out of three capital letters*");
     }
 
     [Fact]
     public void ThrowArgumentNullException_GivenCodeIsNull()
     {
-            Action act = () => new Currency(null);
+        Action act = () => new Currency((string)null);
 
-            act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentException>().WithMessage("Value cannot be null*");
     }
 
     [Fact]
