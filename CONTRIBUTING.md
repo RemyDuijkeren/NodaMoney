@@ -10,8 +10,6 @@ can be accepted quickly.
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * Fork the repository on GitHub (we use the [fork & pull model](https://help.github.com/articles/using-pull-requests))
 * We use as branching strategy the [GitHub Flow Workflow](https://guides.github.com/introduction/flow/).
-* Optionally you could install [ZenHub](https://www.zenhub.io/), a Chrome extension. This will add a task dashboard, file uploads
-  and +1 (likes) to GitHub.
 
 ## Making Changes
 * If possible, create an issue for big improvements or features, so that people can discuss.

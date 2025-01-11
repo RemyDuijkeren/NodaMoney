@@ -9,17 +9,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes.">
+    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments.">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Price.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Price.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyInfoBuilderSpec.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Benchmark/InitializingCurrencyBenchmarks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Benchmark/InitializingCurrencyBenchmarks.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Benchmark/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Benchmark/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +62,28 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
@@ -163,7 +180,12 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ef2e936858cc9ca2f1f8f5c5153b01cf910f782b2d68a6ca1a6f3ddd8cabaaa/ConvertUtils.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f87c606e5c2575e0616d874899f4ba88669535e34e14f28f059cc2f7550cf/TypeConverter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyJsonConverter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -217,7 +239,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "RiderCSharpLiveTemplatesSettingsId",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -334,7 +356,7 @@
       <workItem from="1735442122583" duration="5099000" />
       <workItem from="1736474729416" duration="11055000" />
       <workItem from="1736490399975" duration="3523000" />
-      <workItem from="1736494100462" duration="27096000" />
+      <workItem from="1736494100462" duration="33940000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -687,7 +709,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736500895237</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Refactor CurrencyBuilder to CurrencyInfoBuilder&#10;&#10;Renamed CurrencyBuilder to CurrencyInfoBuilder to better align with the updated API structure and conventions. Updated all references, namespaces, methods, and test cases accordingly to reflect this change. Additionally, removed obsolete namespaces and refined validation logic for currency codes.">
+      <option name="closed" value="true" />
+      <created>1736586162098</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1736586162098</updated>
+    </task>
+    <task id="LOCAL-00046" summary="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments.">
+      <option name="closed" value="true" />
+      <created>1736588436278</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1736588436278</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -747,8 +785,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Update NuGet packages" />
-    <MESSAGE value="Refactor currency unit initializer and add minor unit definitions&#10;&#10;Modifications to the NodaMoney/CurrencyUnit.cs and FastMoney.cs files include a significant refactor of the CurrencyUnit initializer. This update simplifies the initializer and adds explicit properties for CurrencyCode, MinorUnit, and CurrencyList. Additionally, minor unit definition was expanded, including" />
     <MESSAGE value=" one-fifth. In the FastMoney.cs file, the FastMoney struct was annotated with more descriptive comments to aid in understanding its usage." />
     <MESSAGE value="Add new solution folders&#10;&#10;Three new folders - 'workflows', 'src', and 'tests' have been added to the NodaMoney solution. The nested relations between these projects have been defined in the GlobalSection of the solution file." />
     <MESSAGE value="Improve performance metrics in Testing Report&#10;&#10;Modified the PerformanceReport.md file under NodaMoney.Tests" />
@@ -772,7 +808,9 @@
     <MESSAGE value="Enhance JSON Serialization and Deserialization&#10;&#10;Updated serialization for `Money` type to support advanced formats, including reversed currency/amount strings. Improved error handling with concise messages for invalid formats. Expanded test coverage for varied JSON serialization scenarios, ensuring robustness with both valid and invalid test cases." />
     <MESSAGE value="Add IntelliJ IDEA project configuration files&#10;&#10;This commit introduces various .idea configuration files for the NodaMoney project. These files include settings for encoding, Git integration, workspace setup, and project-specific configurations to support development within IntelliJ-based IDEs." />
     <MESSAGE value="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes." />
+    <MESSAGE value="Refactor CurrencyBuilder to CurrencyInfoBuilder&#10;&#10;Renamed CurrencyBuilder to CurrencyInfoBuilder to better align with the updated API structure and conventions. Updated all references, namespaces, methods, and test cases accordingly to reflect this change. Additionally, removed obsolete namespaces and refined validation logic for currency codes." />
+    <MESSAGE value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
+    <option name="LAST_COMMIT_MESSAGE" value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
   </component>
   <component name="WfRunsListSearchHistory">{
   &quot;history&quot;: [
@@ -1011,10 +1049,10 @@
           <line>251</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\CurrencyBuilderSpec.cs" containingFunctionPresentation="Method 'WhenReplacingEuroWithCustom_ThenThisShouldSucceed'">
             <startOffsets>
-              <option value="7227" />
+              <option value="7277" />
             </startOffsets>
             <endOffsets>
-              <option value="7276" />
+              <option value="7326" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="89" />

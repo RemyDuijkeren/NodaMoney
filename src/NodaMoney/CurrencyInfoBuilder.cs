@@ -107,7 +107,7 @@ public class CurrencyInfoBuilder
 
     /// <summary>Builds the current <see cref="CurrencyInfoBuilder"/> object as a custom currency.</summary>
     /// <returns>A <see cref="CurrencyInfo"/> instance that is build.</returns>
-    //// <exception cref="InvalidOperationException">The current CurrencyBuilder object has a property that must be set before the currency can be registered.</exception>
+    /// <exception cref="InvalidOperationException">The current CurrencyBuilder object has a property that must be set before the currency can be registered.</exception>
     public CurrencyInfo Build()
     {
         // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
@@ -158,8 +158,8 @@ public class CurrencyInfoBuilder
     }
 
     /// <summary>Sets the properties of the current <see cref="CurrencyInfoBuilder"/> object with the corresponding properties of
-    /// the specified <see cref="Currency"/> object, except for the code and namespace.</summary>
-    /// <param name="currency">The object whose properties will be used.</param>
+    /// the specified <see cref="CurrencyInfo"/> object, except for the code and namespace.</summary>
+    /// <param name="currencyInfo">The object whose properties will be used.</param>
     public void LoadDataFromCurrencyInfo(CurrencyInfo currencyInfo)
     {
         if (currencyInfo == null)
