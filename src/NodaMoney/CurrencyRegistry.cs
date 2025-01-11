@@ -292,18 +292,19 @@ static class CurrencyRegistry
             new ("YER", 886, MinorUnit.Two, "Yemeni rial", "﷼"), // or ر.ي.‏‏ ?
             new ("ZAR", 710, MinorUnit.Two, "South African rand", "R"),
             new ("ZMW", 967, MinorUnit.Two, "Zambian kwacha", "ZK"), // or ZMW
-            new ("ZWL", 932, MinorUnit.Two, "Zimbabwean dollar", "$"),
             new ("STN", 930, MinorUnit.Two, "Dobra", "Db") { IntroducedOn = new DateTime(2018, 1, 1) }, // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
             new ("UYW", 927, MinorUnit.Four, "Unidad Previsional", "Db") { IntroducedOn = new DateTime(2018, 8, 29) },
             new ("VES", 928, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2018, 8, 20) }, // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug. // Replaced by VED/926 but stays active for now
             new ("VED", 926, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2021, 10, 01) }, // replaces VES/928 (Amendment 170)
             new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2021, 04, 01) }, // replaces SLL/694
             new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaced by XCG/532
+            new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "$") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
 
             // Still Active (list one), will move to Historic (list three) in the future
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
             // Historic ISO-4217 currencies (list three)
+            new ("ZWL", 932, MinorUnit.Two, "Zimbabwean dollar", "$") { ExpiredOn = new DateTime(2024, 08, 31) }, // Amendment 177, replaces ZWG/924,
             new ("HRK", 191, MinorUnit.Two, "Croatian kuna", "kn") { ExpiredOn = new DateTime(2022, 12, 31) }, // replaced by EUR/978
             new ("SLL", 694, MinorUnit.Two, "Sierra Leonean leone", "Le") { ExpiredOn = new DateTime(2022, 9, 30) }, // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
             new ("BYR", 974, MinorUnit.Zero, "Belarusian ruble", "Br") { ExpiredOn = new DateTime(2016, 12, 31), IntroducedOn = new DateTime(2000, 01, 01) },
