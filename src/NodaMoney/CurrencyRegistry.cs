@@ -62,12 +62,13 @@ static class CurrencyRegistry
     {
         lock (s_changeLock)
         {
-            if (!s_lookupCurrencies.ContainsKey(currency))
+            if (s_lookupCurrencies.ContainsKey(currency))
             {
                 return false;
             }
 
             s_lookupCurrencies[currency] = currency;
+            s_lookupCurrenciesByCode[currency.Code] = currency;
 
             Array.Resize(ref s_currencies, s_currencies.Length + 1);
             int index = s_currencies.Length - 1;
@@ -89,6 +90,8 @@ static class CurrencyRegistry
             {
                 return false;
             }
+
+            s_lookupCurrenciesByCode.Remove(currency.Code);
 
             int index = Array.IndexOf(s_currencies, currency);
             if (index == -1)

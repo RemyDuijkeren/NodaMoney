@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ISO 4217 Amendment Number 174 HRK/191
 - ISO 4217 Amendment Number 176 ANG/532 XCG/532
 - System.Text.Json serialization support
-- Added CurrencyInfo to provide information about a currency
+- Added CurrencyInfo to provide information about a currency. It implicitly cast to Currency.
 - Support for .NET 6.0, .NET 8.0 and .NET 9.0 (next to already supported .NET Standard 2.0)
 -
 - Currency.NumericCode is a three-digit code number of the currency
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - XML Serialization format is change from `<Money Amount="765.43" Currency="USD" />` to `<Money Currency="USD">765.43</Money>`.
   This is a breaking change for XML serialization, but deserialization of the old format is supported for migration purposes.
 - Currency is now a 2byte struct and only contains basic information. Use CurrencyInfo to retrieve more info for a Currency.
-- CurrencyBuilder is obsolete. This class is replaced by CurrencyInfo and will be removed in a future version.
+- CurrencyBuilder is renamed to CurrencyInfoBuilder and returns CurrencyInfo instead of Currency.
 -
 - Performance improvement on:
   - init of currency (14x) and money (7x)

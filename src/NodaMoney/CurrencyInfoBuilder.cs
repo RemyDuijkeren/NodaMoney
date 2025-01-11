@@ -3,25 +3,30 @@
 namespace NodaMoney;
 
 /// <summary>Defines a custom currency that is new or based on another currency.</summary>
-[Obsolete("This class is replaced by CurrencyInfo and will be removed in a future version.")]
-public class CurrencyBuilder
+public class CurrencyInfoBuilder
 {
+    const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
     private byte _decimalDigits;
     private short _number;
 
-    /// <summary>Initializes a new instance of the <see cref="CurrencyBuilder"/> class.</summary>
+    /// <summary>Initializes a new instance of the <see cref="CurrencyInfoBuilder"/> class.</summary>
     /// <param name="code">The code of the currency, normally the three-character ISO 4217 currency code.</param>
-    /// <param name="namespace">The namespace for the currency.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="code"/> or <paramref name="namespace"/> is <see langword="null" /> or empty.</exception>
-    public CurrencyBuilder(string code, string @namespace)
+    /// <exception cref="ArgumentNullException"><paramref name="code"/> is <see langword="null" /> or empty.</exception>
+    public CurrencyInfoBuilder(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new ArgumentNullException(nameof(code));
-        if (string.IsNullOrWhiteSpace(@namespace))
-            throw new ArgumentNullException(nameof(@namespace));
+
+        if (code.Length != 3)
+            throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+
+        // check that code exist out of only out of three capital letters
+        foreach (var c in code)
+            if (c is < 'A' or > 'Z')
+                throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
 
         Code = code;
-        Namespace = @namespace;
+        IsIso4217 = false;
     }
 
     /// <summary>Gets or sets the english name of the currency.</summary>
@@ -60,58 +65,50 @@ public class CurrencyBuilder
         }
     }
 
-    /// <summary>Gets the namespace of the currency.</summary>
-    public string Namespace { get; }
-
     /// <summary>Gets the code of the currency, normally a three-character ISO 4217 currency code.</summary>
     public string Code { get; }
 
     /// <summary>Gets or sets the date when the currency is valid from.</summary>
-    /// <value>The from date when the currency is valid.</value>
+    /// <value>The date from which the currency is valid.</value>
     public DateTime? ValidFrom { get; set; }
 
     /// <summary>Gets or sets the date when the currency is valid to.</summary>
-    /// <value>The to date when the currency is valid.</value>
+    /// <value>The date until the currency is valid.</value>
     public DateTime? ValidTo { get; set; }
 
-    bool IsIso4217 => Namespace == "ISO-4217";
+    public bool IsIso4217 { get; set; }
 
-    /// <summary>Reconstitutes a <see cref="CurrencyBuilder"/> object from a specified XML file that contains a
+    /// <summary>Reconstitutes a <see cref="CurrencyInfoBuilder"/> object from a specified XML file that contains a
     /// representation of the object.</summary>
-    /// <param name="xmlFileName">A file name that contains the XML representation of a <see cref="CurrencyBuilder"/> object.</param>
+    /// <param name="xmlFileName">A file name that contains the XML representation of a <see cref="CurrencyInfoBuilder"/> object.</param>
     /// <returns>A new object that is equivalent to the information stored in the <i>xmlFileName</i> parameter.</returns>
-    public static CurrencyBuilder CreateFromLdml(string xmlFileName)
+    public static CurrencyInfoBuilder CreateFromLdml(string xmlFileName)
     {
         throw new NotImplementedException();
     }
 
     /// <summary>Unregisters the specified currency code from the current AppDomain and returns it.</summary>
     /// <param name="code">The name of the currency to unregister.</param>
-    /// <param name="namespace">The namespace of the currency to unregister from.</param>
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentException">code specifies a currency that is not found in the given namespace.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="code" /> or <paramref name="namespace" /> is <see langword="null" /> or empty.</exception>
-    public static Currency Unregister(string code, string @namespace)
+    /// <exception cref="ArgumentNullException"><paramref name="code" /> is <see langword="null" /> or empty.</exception>
+    public static CurrencyInfo Unregister(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new ArgumentNullException(nameof(code));
-        if (string.IsNullOrWhiteSpace(@namespace))
-            throw new ArgumentNullException(nameof(@namespace));
 
         // TODO: fix for other namespaces
         var currencyInfo = CurrencyInfo.FromCode(code);
         if (CurrencyRegistry.TryRemove(currencyInfo))
             return currencyInfo;
 
-        throw new InvalidCurrencyException($"code {code} specifies a currency that is not found in the namespace {@namespace}!");
+        throw new InvalidCurrencyException($"Can't unregister the currency {code} because it is not registered!");
     }
 
-    /// <summary>Builds the current <see cref="CurrencyBuilder"/> object as a custom currency.</summary>
-    /// <returns>A <see cref="Currency"/> instance that is build.</returns>
+    /// <summary>Builds the current <see cref="CurrencyInfoBuilder"/> object as a custom currency.</summary>
+    /// <returns>A <see cref="CurrencyInfo"/> instance that is build.</returns>
     //// <exception cref="InvalidOperationException">The current CurrencyBuilder object has a property that must be set before the currency can be registered.</exception>
-    public Currency Build() => BuildCurrencyInfo();
-
-    CurrencyInfo BuildCurrencyInfo()
+    public CurrencyInfo Build()
     {
         // throw new InvalidOperationException("The current CurrencyBuilder object has a property that must be set before the currency can be registered.");
         if (string.IsNullOrWhiteSpace(Symbol))
@@ -126,26 +123,26 @@ public class CurrencyBuilder
         };
     }
 
-    /// <summary>Registers the current <see cref="CurrencyBuilder"/> object as a custom currency for the current AppDomain.</summary>
-    /// <returns>A <see cref="Currency"/> instance that is build and registered.</returns>
+    /// <summary>Registers the current <see cref="CurrencyInfoBuilder"/> object as a custom currency for the current AppDomain.</summary>
+    /// <returns>A <see cref="CurrencyInfo"/> instance that is build and registered.</returns>
     /// <exception cref="InvalidOperationException">
     ///     <para>The custom currency is already registered -or-.</para>
     ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
     /// </exception>
-    public Currency Register()
+    public CurrencyInfo Register()
     {
-        CurrencyInfo currency = BuildCurrencyInfo();
-        if (!CurrencyRegistry.TryAdd(currency))
-            throw new InvalidCurrencyException($"The currency {Code} is already registered in {Namespace}.");
+        CurrencyInfo currency = Build();
+        if (CurrencyRegistry.TryAdd(currency) == false)
+            throw new InvalidCurrencyException($"The currency {Code} is already registered.");
 
         return currency;
     }
 
-    /// <summary>Writes an XML representation of the current <see cref="CurrencyBuilder"/> object to the specified file.</summary>
+    /// <summary>Writes an XML representation of the current <see cref="CurrencyInfoBuilder"/> object to the specified file.</summary>
     /// <param name="fileName">The name of a file to contain the XML representation of this custom currency.</param>
     /// <remarks>
     ///     <para>
-    ///     The Save method writes the current <see cref="CurrencyBuilder"/> object to the file specified by the
+    ///     The Save method writes the current <see cref="CurrencyInfoBuilder"/> object to the file specified by the
     ///     filename parameter in an XML format called Locale Data Markup Language (LDML) version 1.1.
     ///     The <see cref="CreateFromLdml"/> method performs the reverse operation of the Save method.
     ///     </para>
@@ -160,13 +157,15 @@ public class CurrencyBuilder
         throw new NotImplementedException();
     }
 
-    /// <summary>Sets the properties of the current <see cref="CurrencyBuilder"/> object with the corresponding properties of
+    /// <summary>Sets the properties of the current <see cref="CurrencyInfoBuilder"/> object with the corresponding properties of
     /// the specified <see cref="Currency"/> object, except for the code and namespace.</summary>
     /// <param name="currency">The object whose properties will be used.</param>
-    public void LoadDataFromCurrency(Currency currency)
+    public void LoadDataFromCurrencyInfo(CurrencyInfo currencyInfo)
     {
-        var currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
+        if (currencyInfo == null)
+            throw new ArgumentNullException(nameof(currencyInfo));
 
+        IsIso4217 = currencyInfo.IsIso4217;
         EnglishName = currencyInfo.EnglishName;
         Symbol = currencyInfo.Symbol;
         NumericCode = currencyInfo.NumericCode;

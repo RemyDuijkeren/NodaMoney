@@ -187,28 +187,27 @@ Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 
 ```C#
 // Build custom currency
-var builder = new CurrencyBuilder("BTC", "virtual")
-				{
-					EnglishName = "Bitcoin",
-					Symbol = "฿",
-          ISONumber = "123", // iso number
-					DecimalDigits = 8
-				};
+var builder = new CurrencyInfoBuilder("BTC", "virtual")
+{
+    EnglishName = "Bitcoin",
+    Symbol = "฿",
+    ISONumber = "123", // iso number
+    DecimalDigits = 8
+};
 
 // Build, but will not register it
-var bitcoin = builder.Build();
-Money bitcoins = new Money(1.2, bitcoin);
+CurrencyInfo bitcoin = builder.Build();
 
 // Build and register it for the life-time of the app domain in the namespace 'virtual'
-var bitcoin = builder.Register();
+CurrencyInfo bitcoin = builder.Register();
 Money bitcoins = new Money(1.2, "BTC"); // works if no overlap with other namespaces
 Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
 
 // Replace ISO 4217 currency for the life-time of the app domain
-Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+CurrencyInfo oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
 
 var builder = new CurrencyBuilder("EUR", "ISO-4217");
-builder.LoadDataFromCurrency(oldEuro);
+builder.LoadDataFromCurrencyInfo(oldEuro);
 builder.EnglishName = "New Euro";
 builder.DecimalDigits = 1;
 builder.Register();

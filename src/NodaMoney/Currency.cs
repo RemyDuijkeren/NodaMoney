@@ -90,6 +90,7 @@ public readonly partial record struct Currency
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
+    [Obsolete("Use CurrencyInfo.FromCode(). This will be removed in a future version.")]
     public static Currency FromCode(string code) => CurrencyInfo.FromCode(code);
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>

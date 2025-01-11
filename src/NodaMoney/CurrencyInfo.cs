@@ -21,13 +21,26 @@ namespace NodaMoney;
 /// <remarks>See http://en.wikipedia.org/wiki/Currency and
 /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
 /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
-/// <param name="Code">The (ISO-4217) three-character code of the currency.</param>
-/// <param name="Number">The (ISO-4217) number of the currency.</param>
-/// <param name="MinorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
-/// <param name="EnglishName">The english name of the currency</param>
-/// <param name="Symbol">The currency symbol.</param>
-public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName, string Symbol = CurrencyInfo.GenericCurrencySign)
+public record CurrencyInfo
 {
+    /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
+    /// <remarks>See http://en.wikipedia.org/wiki/Currency and
+    /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
+    /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
+    /// <param name="Code">The (ISO-4217) three-character code of the currency.</param>
+    /// <param name="Number">The (ISO-4217) number of the currency.</param>
+    /// <param name="MinorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
+    /// <param name="EnglishName">The english name of the currency</param>
+    /// <param name="Symbol">The currency symbol.</param>
+    public CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName = "", string Symbol = CurrencyInfo.GenericCurrencySign)
+    {
+        this.Code = Code ?? throw new ArgumentNullException(nameof(Code));
+        this.Number = Number;
+        this.MinorUnit = MinorUnit;
+        this.EnglishName = EnglishName ?? string.Empty;
+        this.Symbol = Symbol ?? CurrencyInfo.GenericCurrencySign;
+    }
+
     /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
     /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
     public const string GenericCurrencySign = "¤";
@@ -125,6 +138,21 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
     public bool IsHistoric => !IsActiveOn(DateTime.Today);
 
+    /// <summary>The (ISO-4217) three-character code of the currency.</summary>
+    public string Code { get; init; }
+
+    /// <summary>The (ISO-4217) number of the currency.</summary>
+    public short Number { get; init; }
+
+    /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
+    public MinorUnit MinorUnit { get; init; }
+
+    /// <summary>The english name of the currency</summary>
+    public string EnglishName { get; init; }
+
+    /// <summary>The currency symbol.</summary>
+    public string Symbol { get; init; }
+
     /// <summary>Check a value indication whether currency is valid on a given date.</summary>
     /// <param name="date">The date on which the Currency should be valid.</param>
     /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
@@ -210,5 +238,14 @@ public record CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, strin
             throw new ArgumentException("Culture {0} is a invariant culture, from which no region information can be extracted!", culture.Name);
 
         return FromRegion(culture.Name);
+    }
+
+    public void Deconstruct(out string Code, out short Number, out MinorUnit MinorUnit, out string EnglishName, out string Symbol)
+    {
+        Code = this.Code;
+        Number = this.Number;
+        MinorUnit = this.MinorUnit;
+        EnglishName = this.EnglishName;
+        Symbol = this.Symbol;
     }
 }

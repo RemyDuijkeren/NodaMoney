@@ -19,6 +19,7 @@ namespace NodaMoney;
 // TimeSpan * HourRate = (Total) Amount
 //
 // Do you see other places, besides price, where you need more precision?
+
 // public readonly struct Price<T>(decimal ratio, Currency currency, T unit)
 // {
 //

@@ -9,16 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyJsonConverter.cs" afterDir="false" />
+    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes.">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyUnitSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyUnitSpec.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/SystemTextJsonSerializationSpec.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Price.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Price.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyInfoBuilderSpec.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/TestDataGenerator.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,6 +67,16 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/2aade6beb02ea367fd97c4070a4198802fe61c03/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.Private.CoreLib/src/System/Globalization/CultureData.Nls.cs" root0="SKIP_HIGHLIGHTING" />
@@ -119,6 +129,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9e4992465ee24dc8915fd9be20badb7d281d48/fd/9e5d7fe1/XmlSerializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b85ed9f5a5284383a05e477c89d981e9b58a0/0f/115d911f/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/bd3068231d8f4a95b6ef38501afa339f7600/76/fd97b78d/RavenTestDriver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c73b3c6c598640c592fd3c6fa226c286e90908/03/ddf4fad7/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d3a451850004403293b134b9fe18ce3fc8f920/8d/81aa449b/MidpointRounding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/11cf6f79db6e5db84b6eb86a6205d9e2182d0c7b49573aa721e393b604e12d4/JsonSerializerOptions.Caching.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/148eef9a8f9b7aec8a5ea243577e3a03165d1ce2f7aa3884f92d0c575ac8f/JsonPropertyInfoOfT.cs" root0="FORCE_HIGHLIGHTING" />
@@ -151,7 +162,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ec3597c9edc99f6853d4fa6227763878c145105b8aa5edeb8d2780e476c8b3/JsonTypeReflector.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ef2e936858cc9ca2f1f8f5c5153b01cf910f782b2d68a6ca1a6f3ddd8cabaaa/ConvertUtils.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f87c606e5c2575e0616d874899f4ba88669535e34e14f28f059cc2f7550cf/TypeConverter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/Currency.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyJsonConverter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -174,41 +186,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.DemoApp.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Project.NodaMoney.Benchmarks.executor&quot;: &quot;Debug&quot;,
-    &quot;0a0c67e4-91ce-49e5-95b1-f972244cba81.executor&quot;: &quot;Debug&quot;,
-    &quot;13377603-e4c7-4af7-ae8f-d5e34e4fcfb6.executor&quot;: &quot;Debug&quot;,
-    &quot;159e8c50-149f-43ba-93b7-dc15d3d7790d.executor&quot;: &quot;Debug&quot;,
-    &quot;26108f5d-bf67-440e-b3a2-e13091cd9fc0.executor&quot;: &quot;Debug&quot;,
-    &quot;26f1e98b-6f8b-4dfd-a36a-96f15ffccc56.executor&quot;: &quot;Debug&quot;,
-    &quot;2c55018a-7dbf-4612-afa3-fcd82d26a80f.executor&quot;: &quot;Debug&quot;,
-    &quot;4e73271a-703e-4601-8f0d-6466dc14ff75.executor&quot;: &quot;Debug&quot;,
-    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
-    &quot;6bcea2ba-4041-4f22-a4df-761d0be02cfb.executor&quot;: &quot;Debug&quot;,
-    &quot;9a977f55-bd07-4e26-b340-7427b148a8db.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;a42d9efc-f75e-48d0-834f-b8bf4f650d90.executor&quot;: &quot;Debug&quot;,
-    &quot;aa60e5ec-66f3-420c-a14b-2cc8e4ec3a48.executor&quot;: &quot;Debug&quot;,
-    &quot;b1daa9b6-1368-4685-bc58-d26be93287ff.executor&quot;: &quot;Debug&quot;,
-    &quot;baa795c8-4a2e-4f2b-aa58-f131f4f44a12.executor&quot;: &quot;Debug&quot;,
-    &quot;cefccab6-bac1-43b8-989b-b602fcb3d2ae.executor&quot;: &quot;Debug&quot;,
-    &quot;e3cf03cf-70ca-4a33-8e0f-762887b9e1d3.executor&quot;: &quot;Debug&quot;,
-    &quot;e8e73480-a796-4a32-9c89-6b8103e3bb18.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/improve-performance&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.DemoApp.executor": "Run",
+    ".NET Project.NodaMoney.Benchmarks.executor": "Run",
+    "0a0c67e4-91ce-49e5-95b1-f972244cba81.executor": "Debug",
+    "13377603-e4c7-4af7-ae8f-d5e34e4fcfb6.executor": "Debug",
+    "159e8c50-149f-43ba-93b7-dc15d3d7790d.executor": "Debug",
+    "26108f5d-bf67-440e-b3a2-e13091cd9fc0.executor": "Debug",
+    "26f1e98b-6f8b-4dfd-a36a-96f15ffccc56.executor": "Debug",
+    "2c55018a-7dbf-4612-afa3-fcd82d26a80f.executor": "Debug",
+    "4e73271a-703e-4601-8f0d-6466dc14ff75.executor": "Debug",
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "6bcea2ba-4041-4f22-a4df-761d0be02cfb.executor": "Debug",
+    "9a977f55-bd07-4e26-b340-7427b148a8db.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "a42d9efc-f75e-48d0-834f-b8bf4f650d90.executor": "Debug",
+    "aa60e5ec-66f3-420c-a14b-2cc8e4ec3a48.executor": "Debug",
+    "b1daa9b6-1368-4685-bc58-d26be93287ff.executor": "Debug",
+    "baa795c8-4a2e-4f2b-aa58-f131f4f44a12.executor": "Debug",
+    "cefccab6-bac1-43b8-989b-b602fcb3d2ae.executor": "Debug",
+    "e3cf03cf-70ca-4a33-8e0f-762887b9e1d3.executor": "Debug",
+    "e8e73480-a796-4a32-9c89-6b8103e3bb18.executor": "Debug",
+    "git-widget-placeholder": "feature/improve-performance",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "RiderCSharpLiveTemplatesSettingsId",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Project.NodaMoney.Benchmarks">
     <configuration name="DemoApp" type="DotNetProject" factoryName=".NET Project" temporary="true">
       <option name="EXE_PATH" value="" />
@@ -322,7 +334,7 @@
       <workItem from="1735442122583" duration="5099000" />
       <workItem from="1736474729416" duration="11055000" />
       <workItem from="1736490399975" duration="3523000" />
-      <workItem from="1736494100462" duration="2835000" />
+      <workItem from="1736494100462" duration="27096000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -659,7 +671,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736491750291</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes.">
+      <option name="closed" value="true" />
+      <created>1736499749494</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1736499749494</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes.">
+      <option name="closed" value="true" />
+      <created>1736500895237</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1736500895237</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -719,7 +747,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="ISO 4217 AMENDMENT NUMBER 176 ANG/532 XCG/532" />
     <MESSAGE value="Update NuGet packages" />
     <MESSAGE value="Refactor currency unit initializer and add minor unit definitions&#10;&#10;Modifications to the NodaMoney/CurrencyUnit.cs and FastMoney.cs files include a significant refactor of the CurrencyUnit initializer. This update simplifies the initializer and adds explicit properties for CurrencyCode, MinorUnit, and CurrencyList. Additionally, minor unit definition was expanded, including" />
     <MESSAGE value=" one-fifth. In the FastMoney.cs file, the FastMoney struct was annotated with more descriptive comments to aid in understanding its usage." />
@@ -744,7 +771,8 @@
     <MESSAGE value="Remove branch specification from CI workflow&#10;&#10;The CI workflow now triggers on all branches instead of just 'master' and 'main'. This change allows for more flexibility and ensures that all branches are verified, regardless of their name. Paths under 'docs/**' still do not trigger the workflow." />
     <MESSAGE value="Enhance JSON Serialization and Deserialization&#10;&#10;Updated serialization for `Money` type to support advanced formats, including reversed currency/amount strings. Improved error handling with concise messages for invalid formats. Expanded test coverage for varied JSON serialization scenarios, ensuring robustness with both valid and invalid test cases." />
     <MESSAGE value="Add IntelliJ IDEA project configuration files&#10;&#10;This commit introduces various .idea configuration files for the NodaMoney project. These files include settings for encoding, Git integration, workspace setup, and project-specific configurations to support development within IntelliJ-based IDEs." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add IntelliJ IDEA project configuration files&#10;&#10;This commit introduces various .idea configuration files for the NodaMoney project. These files include settings for encoding, Git integration, workspace setup, and project-specific configurations to support development within IntelliJ-based IDEs." />
+    <MESSAGE value="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes." />
   </component>
   <component name="WfRunsListSearchHistory">{
   &quot;history&quot;: [
@@ -967,16 +995,29 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs</url>
-          <line>166</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\Serialization\NewtonsoftJsonSerializer.cs" containingFunctionPresentation="Method 'WhenSerializingCurrency_ThenThisShouldSucceed'">
+          <line>100</line>
+          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\Serialization\NewtonsoftJsonSerializer.cs" containingFunctionPresentation="Method 'WhenDeserializingV1_ThenThisShouldSucceed'">
             <startOffsets>
-              <option value="5070" />
+              <option value="3200" />
             </startOffsets>
             <endOffsets>
-              <option value="5122" />
+              <option value="3255" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="81" />
+          <option name="timeStamp" value="82" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyInfoBuilderSpec.cs</url>
+          <line>251</line>
+          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\CurrencyBuilderSpec.cs" containingFunctionPresentation="Method 'WhenReplacingEuroWithCustom_ThenThisShouldSucceed'">
+            <startOffsets>
+              <option value="7227" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7276" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="89" />
         </line-breakpoint>
         <breakpoint type="DotNet Exception Breakpoints">
           <properties exception="System.InvalidOperationException" isInternal="false" displayValue="InvalidOperationException" namespaceName="System">
