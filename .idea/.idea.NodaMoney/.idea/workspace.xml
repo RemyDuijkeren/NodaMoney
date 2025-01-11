@@ -9,12 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments.">
+    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`.">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyInfoBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Benchmark/InitializingCurrencyBenchmarks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Benchmark/InitializingCurrencyBenchmarks.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Benchmark/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Benchmark/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +59,21 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
@@ -152,9 +164,11 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/148eef9a8f9b7aec8a5ea243577e3a03165d1ce2f7aa3884f92d0c575ac8f/JsonPropertyInfoOfT.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1c35e24bed73d11e6b193e6b5c424d7a5b59a38954494bec5046c1a736/JsonSerializer.Helpers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/27c4858128168eda568c1334d70d5241efb9461e2a3209258a04deee5d9c367/JsonSerializer.Read.String.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2854ce6d56c18d0d837d3a3ef9c4f2c7c77691fa3528c8394986ac7ce7719/StackFrameIterator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/29ea32a76b2a6b8eb246f247df6a6a86d887384b4c31db2a35effccdd86c24/JsonSerializerInternalReader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3e9931b6565e331af77c831f229910f0f28072c93d72fc3cd589fa9125a16f/DefaultJsonTypeInfoResolver.Converters.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4749449091693e15599d23732b7b8bfa0601c96a9d218a7c73f382d304a8bf/DefaultContractResolver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4eae6449caa21e90c2ff2d63846343457a0e4192fb25892da80d78feb4774f/JsonSerializer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/52475eac9522e19212764c21eccb7f66be3dca73eec64be1fae3d1b713f6d/ObjectDefaultConverter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5cde391207de75962d7bacb899ca2bd3985c86911b152d185b58999a422bf0/Type.CoreCLR.cs" root0="FORCE_HIGHLIGHTING" />
@@ -167,6 +181,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/735c872467dcdac2e1673f1174a7f9d42a71c82ecd12b53e1a174c3ca4435f3/DefaultJsonTypeInfoResolver.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7e9f4b29222e2d9f97ee02774e8c385e49ade1b5b467cb8545696c05d90/JsonConverterAttribute.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8d7a996932951dc929c6c3855f98f0c58cae8ac5b0d0bbf223f97c6388b3b61f/ConcurrentDictionary.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/982b7aa07be88fd96f55c1e9bf6ec5d9ac1fd3a01d9a3344dabc943a4c72/ValidationUtils.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a6b1457cbcf17db31a383ba49ef9bcc786cf3ef77146d997eee499b27a46d/Object.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a7e99f3da3fc9d80c1949ce87d548d992a745092d1c720f44952dbbd144437f/JsonConverterOfT.ReadCore.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ae8fc899aa89b3ba09399aa2b32bd8ffa8e8a6661b66b976ddff28d2455c/JsonConverterOfT.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bd1d5c50194fea68ff3559c160230b0ab50f5acf4ce3061bffd6d62958e2182/ExceptionDispatchInfo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -178,10 +194,14 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e2e3d26278e439d44964729238a685ad58d3189abf8fb84cdfe34b893a290a2/JsonSerializerInternalWriter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ec3597c9edc99f6853d4fa6227763878c145105b8aa5edeb8d2780e476c8b3/JsonTypeReflector.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ef2e936858cc9ca2f1f8f5c5153b01cf910f782b2d68a6ca1a6f3ddd8cabaaa/ConvertUtils.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f3981d658666ec9cc1e6958fe22f8614bfe02ccb6625b056c3ece3729c9262/JsonConvert.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f87c606e5c2575e0616d874899f4ba88669535e34e14f28f059cc2f7550cf/TypeConverter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyInfoBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyJsonConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/Benchmark/InitializingCurrencyBenchmarks.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
@@ -356,7 +376,7 @@
       <workItem from="1735442122583" duration="5099000" />
       <workItem from="1736474729416" duration="11055000" />
       <workItem from="1736490399975" duration="3523000" />
-      <workItem from="1736494100462" duration="33940000" />
+      <workItem from="1736494100462" duration="38347000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -725,7 +745,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736588436278</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`.">
+      <option name="closed" value="true" />
+      <created>1736600230414</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1736600230414</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -785,7 +813,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value=" one-fifth. In the FastMoney.cs file, the FastMoney struct was annotated with more descriptive comments to aid in understanding its usage." />
     <MESSAGE value="Add new solution folders&#10;&#10;Three new folders - 'workflows', 'src', and 'tests' have been added to the NodaMoney solution. The nested relations between these projects have been defined in the GlobalSection of the solution file." />
     <MESSAGE value="Improve performance metrics in Testing Report&#10;&#10;Modified the PerformanceReport.md file under NodaMoney.Tests" />
     <MESSAGE value=". These updates are especially noticeable in operations relating to &quot;FromCode&quot;, &quot;ExplicitCurrencyAsString&quot;, and &quot;Deconstruct&quot; methods." />
@@ -810,7 +837,8 @@
     <MESSAGE value="Add JSON converters and improve serialization for Currency/Money&#10;&#10;Introduce `CurrencyJsonConverter` and enhance `MoneyJsonConverter` to handle serialization/deserialization for both Newtonsoft.Json and System.Text.Json. Updated unit tests and refactored `Currency` struct to optimize internal storage and validation of ISO-4217 codes." />
     <MESSAGE value="Refactor CurrencyBuilder to CurrencyInfoBuilder&#10;&#10;Renamed CurrencyBuilder to CurrencyInfoBuilder to better align with the updated API structure and conventions. Updated all references, namespaces, methods, and test cases accordingly to reflect this change. Additionally, removed obsolete namespaces and refined validation logic for currency codes." />
     <MESSAGE value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
-    <option name="LAST_COMMIT_MESSAGE" value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
+    <MESSAGE value="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`." />
   </component>
   <component name="WfRunsListSearchHistory">{
   &quot;history&quot;: [
@@ -981,29 +1009,16 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs</url>
-          <line>71</line>
+          <line>77</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\MoneyTypeConverter.cs" containingFunctionPresentation="Method 'ConvertTo'">
             <startOffsets>
-              <option value="3180" />
+              <option value="3539" />
             </startOffsets>
             <endOffsets>
-              <option value="3242" />
+              <option value="3601" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs</url>
-          <line>25</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\MoneyTypeConverter.cs" containingFunctionPresentation="Method 'ConvertFrom'">
-            <startOffsets>
-              <option value="1229" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1264" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ae8fc899aa89b3ba09399aa2b32bd8ffa8e8a6661b66b976ddff28d2455c/JsonConverterOfT.cs</url>
@@ -1032,19 +1047,6 @@
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/Serialization/NewtonsoftJsonSerializer.cs</url>
-          <line>100</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\Serialization\NewtonsoftJsonSerializer.cs" containingFunctionPresentation="Method 'WhenDeserializingV1_ThenThisShouldSucceed'">
-            <startOffsets>
-              <option value="3200" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3255" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="82" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/tests/NodaMoney.Tests/CurrencyInfoBuilderSpec.cs</url>
           <line>251</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\CurrencyBuilderSpec.cs" containingFunctionPresentation="Method 'WhenReplacingEuroWithCustom_ThenThisShouldSucceed'">
@@ -1056,6 +1058,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="89" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs</url>
+          <line>25</line>
+          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\MoneyTypeConverter.cs" containingFunctionPresentation="Method 'ConvertFrom'">
+            <startOffsets>
+              <option value="1231" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1256" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="91" />
         </line-breakpoint>
         <breakpoint type="DotNet Exception Breakpoints">
           <properties exception="System.InvalidOperationException" isInternal="false" displayValue="InvalidOperationException" namespaceName="System">
