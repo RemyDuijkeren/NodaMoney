@@ -9,20 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="">
+    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="Remove `CurrencyV1` and restructure `CurrencyTypeConverter`.&#10;&#10;`CurrencyV1` was completely removed as part of refactoring efforts. The `CurrencyTypeConverter` was relocated to a new `Serialization` namespace for improved organization and alignment with project structure. Additionally, performance reports were updated to reflect benchmark changes after these alterations.">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/CurrencyJsonConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/CurrencyTypeConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyV1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyV1.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.BinaryOperators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.BinaryOperators.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.UnaryOperators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.UnaryOperators.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/MoneyJsonConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/MoneyTypeConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,61 +58,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/2aade6beb02ea367fd97c4070a4198802fe61c03/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/TypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.Private.CoreLib/src/System/Globalization/CultureData.Nls.cs" root0="SKIP_HIGHLIGHTING" />
@@ -215,18 +148,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ef2e936858cc9ca2f1f8f5c5153b01cf910f782b2d68a6ca1a6f3ddd8cabaaa/ConvertUtils.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f3981d658666ec9cc1e6958fe22f8614bfe02ccb6625b056c3ece3729c9262/JsonConvert.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f87c606e5c2575e0616d874899f4ba88669535e34e14f28f059cc2f7550cf/TypeConverter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyInfoBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyJsonConverter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/Benchmark/InitializingCurrencyBenchmarks.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/Currency.Serializable.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -286,28 +208,10 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Project.NodaMoney.Benchmarks">
-    <configuration name="DemoApp" type="DotNetProject" factoryName=".NET Project" temporary="true">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/src/DemoApp/DemoApp.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
     <configuration name="NodaMoney.Benchmarks" type="DotNetProject" factoryName=".NET Project" temporary="true">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/tests/Benchmark/bin/Debug/net9.0/Benchmark.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/Benchmark/bin/Debug/net9.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
@@ -317,51 +221,17 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
+      <option name="PROJECT_TFM" value="net9.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
-    <configuration name="_build" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/build/_build.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Compile" type="NukeBuildTarget" factoryName="NUKE" temporary="true">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="Compile" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/build/_build.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
+    <list>
+      <item itemvalue=".NET Project.NodaMoney.Benchmarks" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue=".NET Project.NodaMoney.Benchmarks" />
-        <item itemvalue=".NET Project.DemoApp" />
       </list>
     </recent_temporary>
   </component>
@@ -399,7 +269,7 @@
       <workItem from="1736474729416" duration="11055000" />
       <workItem from="1736490399975" duration="3523000" />
       <workItem from="1736494100462" duration="45785000" />
-      <workItem from="1736647510488" duration="1532000" />
+      <workItem from="1736647510488" duration="2009000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -784,7 +654,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736604621366</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Remove `CurrencyV1` and restructure `CurrencyTypeConverter`.&#10;&#10;`CurrencyV1` was completely removed as part of refactoring efforts. The `CurrencyTypeConverter` was relocated to a new `Serialization` namespace for improved organization and alignment with project structure. Additionally, performance reports were updated to reflect benchmark changes after these alterations.">
+      <option name="closed" value="true" />
+      <created>1736650277501</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1736650277501</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -844,7 +722,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Improve performance metrics in Testing Report&#10;&#10;Modified the PerformanceReport.md file under NodaMoney.Tests" />
     <MESSAGE value=". These updates are especially noticeable in operations relating to &quot;FromCode&quot;, &quot;ExplicitCurrencyAsString&quot;, and &quot;Deconstruct&quot; methods." />
     <MESSAGE value="Update project files and code formating &#10;&#10;Several changes have been made to improve the structure and readability of the project files and the source code. The LICENSE.txt file has been renamed to LICENSE, modifications in .gitignore and .editorconfig files have been made to better suit project requirements, and adjustments in README.md and CONTRIBUTING.md files have been made for clarity and consistency." />
     <MESSAGE value="Update project files and code formating&#10;&#10;Several changes have been made to improve the structure and readability of the project files and the source code. The LICENSE.txt file has been renamed to LICENSE, modifications in .gitignore and .editorconfig files have been made to better suit project requirements, and adjustments in README.md and CONTRIBUTING.md files have been made for clarity and consistency." />
@@ -869,7 +746,8 @@
     <MESSAGE value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
     <MESSAGE value="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`." />
     <MESSAGE value="Refactor MoneyTypeConverter and skip failing tests&#10;&#10;Refactor exception handling in `MoneyTypeConverter.ConvertFrom` for improved clarity and stricter type validation. Mark failing deserialization tests in `NewtonsoftJsonSerializer` as skipped for follow-up debugging and fixing." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor MoneyTypeConverter and skip failing tests&#10;&#10;Refactor exception handling in `MoneyTypeConverter.ConvertFrom` for improved clarity and stricter type validation. Mark failing deserialization tests in `NewtonsoftJsonSerializer` as skipped for follow-up debugging and fixing." />
+    <MESSAGE value="Remove `CurrencyV1` and restructure `CurrencyTypeConverter`.&#10;&#10;`CurrencyV1` was completely removed as part of refactoring efforts. The `CurrencyTypeConverter` was relocated to a new `Serialization` namespace for improved organization and alignment with project structure. Additionally, performance reports were updated to reflect benchmark changes after these alterations." />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove `CurrencyV1` and restructure `CurrencyTypeConverter`.&#10;&#10;`CurrencyV1` was completely removed as part of refactoring efforts. The `CurrencyTypeConverter` was relocated to a new `Serialization` namespace for improved organization and alignment with project structure. Additionally, performance reports were updated to reflect benchmark changes after these alterations." />
   </component>
   <component name="WfRunsListSearchHistory">{
   &quot;history&quot;: [
