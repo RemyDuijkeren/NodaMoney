@@ -12,7 +12,7 @@ public class GivenIWantToAddAndSubtractMoney
     {
         new object[] { 101m, 99m, 200m }, // whole numbers
         new object[] { 100m, 0.01m, 100.01m }, // fractions
-        new object[] { 100.999m, 0.9m, 101.899m }, // overflow 
+        new object[] { 100.999m, 0.9m, 101.899m }, // overflow
         new object[] { 100.5m, 0.9m, 101.4m }, // overflow
         new object[] { 100.999m, -0.9m, 100.099m }, // negative
         new object[] { -100.999m, -0.9m, -101.899m } // negative
@@ -124,7 +124,7 @@ public class GivenIWantToAddAndSubtractMoneyWithDecimal
     {
         new object[] { 101m, 99m, 200m }, // whole numbers
         new object[] { 100m, 0.01m, 100.01m }, // fractions
-        new object[] { 100.999m, 0.9m, 101.899m }, // overflow 
+        new object[] { 100.999m, 0.9m, 101.899m }, // overflow
         new object[] { 100.5m, 0.9m, 101.4m }, // overflow
         new object[] { 100.999m, -0.9m, 100.099m }, // negative
         new object[] { -100.999m, -0.9m, -101.899m } // negative
@@ -199,12 +199,12 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataDecimal))]
     public void WhenUsingMultiplyOperatorWithDecimal_ThenMoneyShouldBeMultiplied(decimal value, decimal multiplier, decimal expected)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result1 = money * multiplier;
         var result2 = multiplier * money;
-                
-        result1.Should().Be(new Money(expected));            
+
+        result1.Should().Be(new Money(expected));
         result1.Should().NotBeSameAs(money);
         result2.Should().Be(new Money(expected));
         result2.Should().NotBeSameAs(money);
@@ -213,7 +213,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataDecimal))]
     public void WhenUsingMultiplyMethodWithDecimal_ThenMoneyShouldBeMultiplied(decimal value, decimal multiplier, decimal expected)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = Money.Multiply(money, multiplier);
 
@@ -224,7 +224,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataDecimal))]
     public void WhenUsingDivisionOperatorWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = money / divider;
 
@@ -235,7 +235,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataDecimal))]
     public void WhenUsingDivisionMethodWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = Money.Divide(money, divider);
 
@@ -255,7 +255,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataInteger))]
     public void WhenUsingMultiplyOperatorWithInteger_ThenMoneyShouldBeMultiplied(decimal value, int multiplier, decimal expected)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result1 = money * multiplier;
         var result2 = multiplier * money;
@@ -269,7 +269,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataInteger))]
     public void WhenUsingMultiplyMethodWithInteger_ThenMoneyShouldBeMultiplied(decimal value, int multiplier, decimal expected)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = Money.Multiply(money, multiplier);
 
@@ -280,7 +280,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataInteger))]
     public void WhenUsingDivisionOperatorWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = money / divider;
 
@@ -291,7 +291,7 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataInteger))]
     public void WhenUsingDivisionMethodWithInteger_ThenMoneyShouldBeDivided(decimal expected, int divider, decimal value)
     {
-        var money = new Money(value);
+        var money = new Money(value, "EUR");
 
         var result = Money.Divide(money, divider);
 
@@ -302,14 +302,15 @@ public class GivenIWantToMultiplyAndDivideMoney
     public static IEnumerable<object[]> TestDataMoney => new[]
     {
         new object[] { 150m, 15m, 10m },
-        new object[] { 100.12m, 3m, 100.12m/3m },
+        new object[] { 100.12m, 3m, decimal.Divide(100.12m, 3m) },
+        new object[] { 100m, 3m, decimal.Divide(100m, 3m) },
     };
 
     [Theory, MemberData(nameof(TestDataMoney))]
     public void WhenUsingDivisionOperatorWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
     {
-        var money1 = new Money(value1);
-        var money2 = new Money(value2);
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR");
 
         var result = money1 / money2;
 
@@ -319,8 +320,8 @@ public class GivenIWantToMultiplyAndDivideMoney
     [Theory, MemberData(nameof(TestDataMoney))]
     public void WhenUsingDivisionMethodWithMoney_ThenResultShouldBeRatio(decimal value1, decimal value2, decimal expected)
     {
-        var money1 = new Money(value1);
-        var money2 = new Money(value2);
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR");
 
         var result = Money.Divide(money1, money2);
 
