@@ -7,9 +7,16 @@ namespace Benchmark;
 public class InitializingCurrencyBenchmarks
 {
     [Benchmark]
-    public Currency FromCode()
+    public Currency CurrencyFromCode()
     {
         Currency currency = Currency.FromCode("EUR");
+        return currency;
+    }
+
+    [Benchmark]
+    public CurrencyInfo CurrencyInfoFromCode()
+    {
+        CurrencyInfo currency = CurrencyInfo.FromCode("EUR");
         return currency;
     }
 

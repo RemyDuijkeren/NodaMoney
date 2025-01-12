@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dictionary>
+    <Words>
+        <Unrecognized>
+            <Word>cb</Word>
+        </Unrecognized>
+        <Recognized>
+            <Word>Noda</Word>
+            <Word>iraimbilanja</Word>
+            <Word>cinquième</Word>
+            <Word>ariary</Word>
+            <Word>Ldml</Word>
+        </Recognized>
+        <Deprecated>
+            <Term PreferredAlternate="EnterpriseServices">ComPlus</Term>
+        </Deprecated>
+    </Words>
+    <Acronyms>
+        <CasingExceptions>
+            <Acronym>USDollar</Acronym>
+            <Acronym>ISO</Acronym>
+            <Acronym>Json</Acronym>
+        </CasingExceptions>
+    </Acronyms>
+</Dictionary>

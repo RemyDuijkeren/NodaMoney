@@ -1,49 +1,49 @@
 ﻿using System;
 using System.Globalization;
 
-namespace NodaMoney
-{
-    /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
-    public partial struct Money : IFormattable
-    {
-        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation.</summary>
-        /// <returns>A string that represents this <see cref="Money"/> instance.</returns>
-        /// <remarks>
-        /// Converting will use the <see cref="NumberFormatInfo"/> object for the current culture if this has the same
-        /// ISOCurrencySymbol, otherwise the <see cref="NumberFormatInfo"/> from the <see cref="Currency"/> will be used.
-        /// </remarks>
-        public override string ToString() => ConvertToString(null, null);
+namespace NodaMoney;
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
-        /// using the specified format.</summary>
-        /// <param name="format">A numeric format string.</param>
-        /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format.</returns>
-        public string ToString(string format)
-        {
+/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
+public partial struct Money : IFormattable
+{
+    /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation.</summary>
+    /// <returns>A string that represents this <see cref="Money"/> instance.</returns>
+    /// <remarks>
+    /// Converting will use the <see cref="NumberFormatInfo"/> object for the current culture if this has the same
+    /// ISOCurrencySymbol, otherwise the <see cref="NumberFormatInfo"/> from the <see cref="Currency"/> will be used.
+    /// </remarks>
+    public override string ToString() => ConvertToString(null, null);
+
+    /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
+    /// using the specified format.</summary>
+    /// <param name="format">A numeric format string.</param>
+    /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format.</returns>
+    public string ToString(string format)
+    {
             return ConvertToString(format, null);
         }
 
-        /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation using the
-        /// specified culture-specific format information.</summary>
-        /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
-        /// <returns>The string representation of this <see cref="Money"/> instance as specified by formatProvider.</returns>
-        public string ToString(IFormatProvider formatProvider)
-        {
+    /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation using the
+    /// specified culture-specific format information.</summary>
+    /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
+    /// <returns>The string representation of this <see cref="Money"/> instance as specified by formatProvider.</returns>
+    public string ToString(IFormatProvider formatProvider)
+    {
             return ConvertToString(null, formatProvider);
         }
 
-        /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
-        /// using the specified format and culture-specific format information.</summary>
-        /// <param name="format">A numeric format string.</param>
-        /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
-        /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format and formatProvider.</returns>
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
+    /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
+    /// using the specified format and culture-specific format information.</summary>
+    /// <param name="format">A numeric format string.</param>
+    /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
+    /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format and formatProvider.</returns>
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
             return ConvertToString(format, formatProvider);
         }
 
-        private static IFormatProvider GetFormatProvider(Currency currency, IFormatProvider formatProvider, bool useCode = false)
-        {
+    private static IFormatProvider GetFormatProvider(Currency currency, IFormatProvider formatProvider, bool useCode = false)
+    {
             CultureInfo cc = CultureInfo.CurrentCulture;
 
             // var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
@@ -58,8 +58,10 @@ namespace NodaMoney
                     numberFormatInfo = (NumberFormatInfo)nfi.Clone();
             }
 
-            numberFormatInfo.CurrencyDecimalDigits = currency.DecimalDigits == CurrencyRegistry.NotApplicable ? 0 : (int)currency.DecimalDigits;
-            numberFormatInfo.CurrencySymbol = currency.Symbol;
+            CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
+
+            numberFormatInfo.CurrencyDecimalDigits = currencyInfo.DecimalDigits;
+            numberFormatInfo.CurrencySymbol = currencyInfo.Symbol;
 
             if (useCode)
             {
@@ -104,51 +106,54 @@ namespace NodaMoney
             return numberFormatInfo;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Globalization",
-            "CA1307:Specify StringComparison",
-            Justification = "Invalid overload; known bug in code analysis, see https://github.com/dotnet/roslyn-analyzers/issues/1552")]
-        private string ConvertToString(string format, IFormatProvider formatProvider)
-        {
-            // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Globalization",
+        "CA1307:Specify StringComparison",
+        Justification = "Invalid overload; known bug in code analysis, see https://github.com/dotnet/roslyn-analyzers/issues/1552")]
+    private string ConvertToString(string format, IFormatProvider formatProvider)
+    {
+        // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
 
-            // TODO: Hacked solution, solve with better implementation
-            IFormatProvider provider;
-            if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
-            {
-#if NETFRAMEWORK || NETSTANDARD2_0
+        // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
+
+        // TODO: Hacked solution, solve with better implementation
+        IFormatProvider provider;
+        if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
+        {
+#if NETSTANDARD2_0
                 format = format.Replace("I", "C");
 #else
-                format = format.Replace("I", "C", StringComparison.Ordinal);
+            format = format.Replace("I", "C", StringComparison.Ordinal);
 #endif
-                provider = GetFormatProvider(Currency, formatProvider, true);
-            }
-            else
-            {
-                provider = GetFormatProvider(Currency, formatProvider);
-            }
+            provider = GetFormatProvider(Currency, formatProvider, true);
+        }
+        else
+        {
+            provider = GetFormatProvider(Currency, formatProvider);
+        }
 
-            if (format == null || format == "G")
-            {
-                format = "C";
-            }
+        if (format == null || format == "G")
+        {
+            format = "C";
+        }
 
-            if (format.StartsWith("F", StringComparison.Ordinal))
-            {
-#if NETFRAMEWORK || NETSTANDARD2_0
+        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(Currency);
+
+        if (format.StartsWith("F", StringComparison.Ordinal))
+        {
+#if NETSTANDARD2_0
                 format = format.Replace("F", "N");
 #else
-                format = format.Replace("F", "N", StringComparison.Ordinal);
+            format = format.Replace("F", "N", StringComparison.Ordinal);
 #endif
-                if (format.Length == 1)
-                {
-                    format += Currency.DecimalDigits;
-                }
-
-                return $"{Amount.ToString(format, provider)} {Currency.EnglishName}";
+            if (format.Length == 1)
+            {
+                format += currencyInfo.DecimalDigits;
             }
 
-            return Amount.ToString(format ?? "C", provider);
+            return $"{Amount.ToString(format, provider)} {currencyInfo.EnglishName}";
         }
+
+        return Amount.ToString(format ?? "C", provider);
     }
 }

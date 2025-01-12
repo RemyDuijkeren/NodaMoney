@@ -10,8 +10,9 @@ Packages on this feed are alpha and beta and, while they've passed all our tests
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-[![Coverage Status](https://coveralls.io/repos/github/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/github/remyvd/NodaMoney?branch=master)
+![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
@@ -21,7 +22,7 @@ NodaMoney provides a library that treats Money as a first class citizen in .NET 
 and formatting.
 
 We have the [decimal type](http://msdn.microsoft.com/en-us/library/364x0z75.aspx) in .NET to store an amount of money, which can
-be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units, 
+be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units,
 formatting, etc. The .NET Framework has the System.Globalization namespace that helps with formatting of money in different cultures and regions,
 but it only captures some info about currencies, but not everything.
 
@@ -30,18 +31,20 @@ conversion, etc. that motivates to have a Money type that contains all the domai
 his book [Patterns of Enterprise Application Architecture](http://martinfowler.com/eaaCatalog/money.html)
 
 NodaMoney represents the .NET counterpart of java library [JodaMoney](http://www.joda.org/joda-money/), like NodaTime is the .NET
-counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and 
+counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and
 obvious. This is because the requirements for these algorithms vary widely between domains. This library is intended to act as the
 base layer, providing classes that should be in the .NET Framework. It complies with the currencies in [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).
 
 Usage
 -----
 At the moment there are four classes:
-- Currency: An immutable structure that represents a currency. It can give all ISO 4217 and custom currencies.
+- Currency: A small immutable structure that represents a currency unit.
+- CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
+and custom currencies.
 - Money: An immutable structure that represents money in a specified currency.
-- ExchangeRate: A stucture that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
+- ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
-- CurrencyBuilder: Defines a custom currency that is new or based on another currency.
+- CurrencyInfoBuilder: Defines a custom currency that is new or based on another currency.
 
 **Initalizing money**
 
@@ -60,10 +63,10 @@ var money = Money.Yen(6);
 var money = new Money(6.54m);
 Money money = 6.54m;
 Money money = 6;
-Money money = (Money)6.54; // need explict cast from double data type  
+Money money = (Money)6.54; // need explict cast from double data type
 
 // auto-rounding to the minor unit will take place with MidpointRounding.ToEven
-// also known as banker's rounding 
+// also known as banker's rounding
 var euro = new Money(765.425m, "EUR"); // EUR 765.42
 var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
 
@@ -186,28 +189,27 @@ Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 
 ```C#
 // Build custom currency
-var builder = new CurrencyBuilder("BTC", "virtual")
-				{
-					EnglishName = "Bitcoin",
-					Symbol = "฿",
-                    ISONumber = "123", // iso number
-					DecimalDigits = 8
-				};
+var builder = new CurrencyInfoBuilder("BTC", "virtual")
+{
+    EnglishName = "Bitcoin",
+    Symbol = "฿",
+    ISONumber = "123", // iso number
+    DecimalDigits = 8
+};
 
 // Build, but will not register it
-var bitcoin = builder.Build();
-Money bitcoins = new Money(1.2, bitcoin);
+CurrencyInfo bitcoin = builder.Build();
 
 // Build and register it for the life-time of the app domain in the namespace 'virtual'
-var bitcoin = builder.Register();
+CurrencyInfo bitcoin = builder.Register();
 Money bitcoins = new Money(1.2, "BTC"); // works if no overlap with other namespaces
 Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
 
 // Replace ISO 4217 currency for the life-time of the app domain
-Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+CurrencyInfo oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
 
 var builder = new CurrencyBuilder("EUR", "ISO-4217");
-builder.LoadDataFromCurrency(oldEuro);
+builder.LoadDataFromCurrencyInfo(oldEuro);
 builder.EnglishName = "New Euro";
 builder.DecimalDigits = 1;
 builder.Register();

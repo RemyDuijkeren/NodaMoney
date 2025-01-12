@@ -1,0 +1,60 @@
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      packages: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: 🛠️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: 💾 Restore dependencies
+        run: dotnet restore
+
+      - name: ⚙️ Build
+        run: dotnet build -c Release --no-restore
+
+      - name: 🚦 Test
+        run: dotnet test -c Release -l trx --results-directory ./artifacts/ --no-build
+
+      - name: 📋 Test reporter
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: unittests
+          path: ./artifacts/*.trx
+          reporter: dotnet-trx
+
+      - name: 📦 Pack
+        run: dotnet pack -c Release -o ./artifacts/ --no-build
+
+      - name: 🚀 Push to NuGet
+        run: dotnet nuget push **/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+
+      - name: 🚀 Push to GitHub
+        run: |
+          dotnet nuget add source --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
