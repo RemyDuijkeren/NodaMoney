@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace NodaMoney;
+namespace NodaMoney.Serialization;
 
 /// <summary>Converts a Money type to or from JSON.</summary>
 /// <remarks>Used by System.Text.Json to do the (de)serialization.</remarks>

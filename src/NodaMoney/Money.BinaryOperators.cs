@@ -117,7 +117,7 @@ public partial struct Money
     /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
     public static decimal Divide(in Money money1, in Money money2)
     {
-            VerifySameCurrency(money1, money2);
-            return decimal.Divide(money1.Amount, money2.Amount);
-        }
+        VerifySameCurrency(money1, money2);
+        return decimal.Divide(money1.Amount, money2.Amount);
+    }
 }

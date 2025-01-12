@@ -9,9 +9,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`.">
+    <list default="true" id="447f8c3b-fe07-444a-b0ab-18268c175cd6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NodaMoney/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Currency.Serializable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/CurrencyJsonConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/CurrencyTypeConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/CurrencyV1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/CurrencyV1.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.BinaryOperators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.BinaryOperators.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.Serializable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.UnaryOperators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.UnaryOperators.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/Money.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Money.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyJsonConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/MoneyJsonConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodaMoney/Serialization/MoneyTypeConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" beforeDir="false" afterPath="$PROJECT_DIR$/tests/NodaMoney.Tests/PerformanceReport.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +70,14 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
@@ -201,6 +220,8 @@
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/CurrencyRegistry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/src/NodaMoney/MoneyTypeConverter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/Benchmark/InitializingCurrencyBenchmarks.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/CurrencyBuilderSpec.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/Code/RemyDuijkeren/NodaMoney/tests/NodaMoney.Tests/Iso4217Spec.cs" root0="SKIP_HIGHLIGHTING" />
@@ -228,41 +249,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.DemoApp.executor": "Run",
-    ".NET Project.NodaMoney.Benchmarks.executor": "Run",
-    "0a0c67e4-91ce-49e5-95b1-f972244cba81.executor": "Debug",
-    "13377603-e4c7-4af7-ae8f-d5e34e4fcfb6.executor": "Debug",
-    "159e8c50-149f-43ba-93b7-dc15d3d7790d.executor": "Debug",
-    "26108f5d-bf67-440e-b3a2-e13091cd9fc0.executor": "Debug",
-    "26f1e98b-6f8b-4dfd-a36a-96f15ffccc56.executor": "Debug",
-    "2c55018a-7dbf-4612-afa3-fcd82d26a80f.executor": "Debug",
-    "4e73271a-703e-4601-8f0d-6466dc14ff75.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "6bcea2ba-4041-4f22-a4df-761d0be02cfb.executor": "Debug",
-    "9a977f55-bd07-4e26-b340-7427b148a8db.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "a42d9efc-f75e-48d0-834f-b8bf4f650d90.executor": "Debug",
-    "aa60e5ec-66f3-420c-a14b-2cc8e4ec3a48.executor": "Debug",
-    "b1daa9b6-1368-4685-bc58-d26be93287ff.executor": "Debug",
-    "baa795c8-4a2e-4f2b-aa58-f131f4f44a12.executor": "Debug",
-    "cefccab6-bac1-43b8-989b-b602fcb3d2ae.executor": "Debug",
-    "e3cf03cf-70ca-4a33-8e0f-762887b9e1d3.executor": "Debug",
-    "e8e73480-a796-4a32-9c89-6b8103e3bb18.executor": "Debug",
-    "git-widget-placeholder": "feature/improve-performance",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Project.DemoApp.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Project.NodaMoney.Benchmarks.executor&quot;: &quot;Debug&quot;,
+    &quot;0a0c67e4-91ce-49e5-95b1-f972244cba81.executor&quot;: &quot;Debug&quot;,
+    &quot;13377603-e4c7-4af7-ae8f-d5e34e4fcfb6.executor&quot;: &quot;Debug&quot;,
+    &quot;159e8c50-149f-43ba-93b7-dc15d3d7790d.executor&quot;: &quot;Debug&quot;,
+    &quot;26108f5d-bf67-440e-b3a2-e13091cd9fc0.executor&quot;: &quot;Debug&quot;,
+    &quot;26f1e98b-6f8b-4dfd-a36a-96f15ffccc56.executor&quot;: &quot;Debug&quot;,
+    &quot;2c55018a-7dbf-4612-afa3-fcd82d26a80f.executor&quot;: &quot;Debug&quot;,
+    &quot;4e73271a-703e-4601-8f0d-6466dc14ff75.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;6bcea2ba-4041-4f22-a4df-761d0be02cfb.executor&quot;: &quot;Debug&quot;,
+    &quot;9a977f55-bd07-4e26-b340-7427b148a8db.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;a42d9efc-f75e-48d0-834f-b8bf4f650d90.executor&quot;: &quot;Debug&quot;,
+    &quot;aa60e5ec-66f3-420c-a14b-2cc8e4ec3a48.executor&quot;: &quot;Debug&quot;,
+    &quot;b1daa9b6-1368-4685-bc58-d26be93287ff.executor&quot;: &quot;Debug&quot;,
+    &quot;baa795c8-4a2e-4f2b-aa58-f131f4f44a12.executor&quot;: &quot;Debug&quot;,
+    &quot;cefccab6-bac1-43b8-989b-b602fcb3d2ae.executor&quot;: &quot;Debug&quot;,
+    &quot;e3cf03cf-70ca-4a33-8e0f-762887b9e1d3.executor&quot;: &quot;Debug&quot;,
+    &quot;e8e73480-a796-4a32-9c89-6b8103e3bb18.executor&quot;: &quot;Debug&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/improve-performance&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.NodaMoney.Benchmarks">
     <configuration name="DemoApp" type="DotNetProject" factoryName=".NET Project" temporary="true">
       <option name="EXE_PATH" value="" />
@@ -376,7 +398,8 @@
       <workItem from="1735442122583" duration="5099000" />
       <workItem from="1736474729416" duration="11055000" />
       <workItem from="1736490399975" duration="3523000" />
-      <workItem from="1736494100462" duration="38347000" />
+      <workItem from="1736494100462" duration="45785000" />
+      <workItem from="1736647510488" duration="1532000" />
     </task>
     <task id="LOCAL-00001" summary="Update Build and moved Benchmarks to seperate project">
       <created>1657797900022</created>
@@ -753,7 +776,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736600230414</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Refactor MoneyTypeConverter and skip failing tests&#10;&#10;Refactor exception handling in `MoneyTypeConverter.ConvertFrom` for improved clarity and stricter type validation. Mark failing deserialization tests in `NewtonsoftJsonSerializer` as skipped for follow-up debugging and fixing.">
+      <option name="closed" value="true" />
+      <created>1736604621366</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1736604621366</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,7 +844,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Add new solution folders&#10;&#10;Three new folders - 'workflows', 'src', and 'tests' have been added to the NodaMoney solution. The nested relations between these projects have been defined in the GlobalSection of the solution file." />
     <MESSAGE value="Improve performance metrics in Testing Report&#10;&#10;Modified the PerformanceReport.md file under NodaMoney.Tests" />
     <MESSAGE value=". These updates are especially noticeable in operations relating to &quot;FromCode&quot;, &quot;ExplicitCurrencyAsString&quot;, and &quot;Deconstruct&quot; methods." />
     <MESSAGE value="Update project files and code formating &#10;&#10;Several changes have been made to improve the structure and readability of the project files and the source code. The LICENSE.txt file has been renamed to LICENSE, modifications in .gitignore and .editorconfig files have been made to better suit project requirements, and adjustments in README.md and CONTRIBUTING.md files have been made for clarity and consistency." />
@@ -838,7 +868,8 @@
     <MESSAGE value="Refactor CurrencyBuilder to CurrencyInfoBuilder&#10;&#10;Renamed CurrencyBuilder to CurrencyInfoBuilder to better align with the updated API structure and conventions. Updated all references, namespaces, methods, and test cases accordingly to reflect this change. Additionally, removed obsolete namespaces and refined validation logic for currency codes." />
     <MESSAGE value="ISO 4217 AMENDMENT NUMBER 177 ZWL/932 ZWG/924&#10;&#10;Introduce the Zimbabwe Gold (ZWG) currency effective June 25, 2024, replacing the Zimbabwean dollar (ZWL). Mark the Zimbabwean dollar as expired as of August 31, 2024, to reflect the latest changes in ISO 4217 amendments." />
     <MESSAGE value="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor benchmarks and improve currency initialization.&#10;&#10;Renamed benchmark methods for clarity and added a new benchmark for `CurrencyInfo`. Updated documentation with refined performance metrics and adjusted code comments for accuracy. Removed outdated references in `CONTRIBUTING.md`." />
+    <MESSAGE value="Refactor MoneyTypeConverter and skip failing tests&#10;&#10;Refactor exception handling in `MoneyTypeConverter.ConvertFrom` for improved clarity and stricter type validation. Mark failing deserialization tests in `NewtonsoftJsonSerializer` as skipped for follow-up debugging and fixing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor MoneyTypeConverter and skip failing tests&#10;&#10;Refactor exception handling in `MoneyTypeConverter.ConvertFrom` for improved clarity and stricter type validation. Mark failing deserialization tests in `NewtonsoftJsonSerializer` as skipped for follow-up debugging and fixing." />
   </component>
   <component name="WfRunsListSearchHistory">{
   &quot;history&quot;: [
@@ -1008,14 +1039,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs</url>
-          <line>77</line>
+          <url>file://$PROJECT_DIR$/src/NodaMoney/Serialization/MoneyTypeConverter.cs</url>
+          <line>70</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\MoneyTypeConverter.cs" containingFunctionPresentation="Method 'ConvertTo'">
             <startOffsets>
-              <option value="3539" />
+              <option value="3197" />
             </startOffsets>
             <endOffsets>
-              <option value="3601" />
+              <option value="3259" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="24" />
@@ -1051,26 +1082,13 @@
           <line>251</line>
           <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\tests\NodaMoney.Tests\CurrencyBuilderSpec.cs" containingFunctionPresentation="Method 'WhenReplacingEuroWithCustom_ThenThisShouldSucceed'">
             <startOffsets>
-              <option value="7277" />
+              <option value="7665" />
             </startOffsets>
             <endOffsets>
-              <option value="7326" />
+              <option value="7722" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="89" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/src/NodaMoney/MoneyTypeConverter.cs</url>
-          <line>25</line>
-          <properties documentPath="E:\Code\RemyDuijkeren\NodaMoney\src\NodaMoney\MoneyTypeConverter.cs" containingFunctionPresentation="Method 'ConvertFrom'">
-            <startOffsets>
-              <option value="1231" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1256" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="91" />
         </line-breakpoint>
         <breakpoint type="DotNet Exception Breakpoints">
           <properties exception="System.InvalidOperationException" isInternal="false" displayValue="InvalidOperationException" namespaceName="System">

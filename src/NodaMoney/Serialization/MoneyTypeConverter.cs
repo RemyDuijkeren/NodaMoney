@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace NodaMoney;
+namespace NodaMoney.Serialization;
 
 /// <summary>Provides a way of converting the type <see cref="string"/> to and from the type <see cref="Money"/>.</summary>
 /// <remarks>Used by <see cref="Newtonsoft.Json"/> for JSON Strings to do the serialization.</remarks>
@@ -11,26 +11,19 @@ public class MoneyTypeConverter : TypeConverter
 {
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-        sourceType == typeof(string) || sourceType == typeof(Money) || base.CanConvertFrom(context, sourceType);
+        sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
     /// <inheritdoc/>
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
-        destinationType == typeof(Money) || destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
+        destinationType == typeof(Money) || base.CanConvertTo(context, destinationType);
 
     /// <inheritdoc/>
     public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
     {
         // Newtonsoft.Json will call this method when it is a JSON String, like "EUR 234.25",
         // but if it is a JSON Object it tries to check if it can convert JObject (in Newtonsoft.Json).
-
-        if (value is Money money)
-            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
-
         if (value is not string jsonString)
-            throw new NotSupportedException($"Cannot convert from '{value?.GetType().FullName}' to Money. Supported format is 'string'.");
-
-        // if (value is not string jsonString)
-        //     return base.ConvertFrom(context, culture, value);
+            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
 
         var valueAsSpan = jsonString.AsSpan();
         var spaceIndex = valueAsSpan.IndexOf(' ');

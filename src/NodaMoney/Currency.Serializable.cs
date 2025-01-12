@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using NodaMoney.Serialization;
 
 namespace NodaMoney;
 

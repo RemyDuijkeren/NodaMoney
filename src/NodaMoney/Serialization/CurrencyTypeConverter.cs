@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace NodaMoney;
+namespace NodaMoney.Serialization;
 
 /// <summary>Provides a way of converting the type <see cref="string"/> to and from the type <see cref="Currency"/>.</summary>
 public class CurrencyTypeConverter : TypeConverter

@@ -38,11 +38,13 @@ base layer, providing classes that should be in the .NET Framework. It complies 
 Usage
 -----
 At the moment there are four classes:
-- Currency: An immutable structure that represents a currency. It can give all ISO 4217 and custom currencies.
+- Currency: A small immutable structure that represents a currency unit.
+- CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
+and custom currencies.
 - Money: An immutable structure that represents money in a specified currency.
-- ExchangeRate: A stucture that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
+- ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
-- CurrencyBuilder: Defines a custom currency that is new or based on another currency.
+- CurrencyInfoBuilder: Defines a custom currency that is new or based on another currency.
 
 **Initalizing money**
 
