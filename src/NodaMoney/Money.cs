@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
@@ -16,7 +15,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
@@ -29,12 +28,12 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public Money(decimal amount, string code)
-        : this(amount, Currency.FromCode(code))
+        : this(amount, CurrencyInfo.FromCode(code))
     {
     }
 
@@ -42,7 +41,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, MidpointRounding rounding)
         : this(amount, CurrencyInfo.CurrentCurrency, rounding)
     {
@@ -52,7 +51,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
@@ -66,9 +65,9 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, string code, MidpointRounding rounding)
-        : this(amount,  Currency.FromCode(code), rounding)
+        : this(amount,  CurrencyInfo.FromCode(code), rounding)
     {
     }
 
@@ -77,7 +76,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="currency">The Currency of the money.</param>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, Currency currency, MidpointRounding rounding)
         : this()
     {
@@ -89,11 +88,11 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
-    /// casted to double).</param>
+    /// cast to double).</param>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -109,12 +108,12 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
     public Money(double amount, string code)
-        : this((decimal)amount,  Currency.FromCode(code))
+        : this((decimal)amount,  CurrencyInfo.FromCode(code))
     {
     }
 
@@ -125,7 +124,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -136,13 +135,13 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
-    /// casted to double).</param>
+    /// cast to double).</param>
     /// <param name="currency">The Currency of the money.</param>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public Money(double amount, Currency currency, MidpointRounding rounding)
         : this((decimal)amount, currency, rounding)
     {
@@ -150,7 +149,7 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     public Money(long amount)
@@ -161,18 +160,18 @@ public readonly partial struct Money : IEquatable<Money>
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     public Money(long amount, string code)
-        : this((decimal)amount,  Currency.FromCode(code))
+        : this((decimal)amount,  CurrencyInfo.FromCode(code))
     {
     }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     public Money(long amount, Currency currency)
@@ -183,7 +182,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="ulong"/>, <see langword="uint"/>, <see langword="ushort"/>
     /// or <see cref="byte"/>.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     [CLSCompliant(false)]
@@ -196,12 +195,12 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="ulong"/>, <see langword="uint"/>, <see langword="ushort"/>
     /// or <see cref="byte"/>.</param>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount, string code)
-        : this((decimal)amount,  Currency.FromCode(code))
+        : this((decimal)amount,  CurrencyInfo.FromCode(code))
     {
     }
 
@@ -209,7 +208,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="ulong"/>, <see langword="uint"/>, <see langword="ushort"/>
     /// or <see cref="byte"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
-    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore you can
+    /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     [CLSCompliant(false)]

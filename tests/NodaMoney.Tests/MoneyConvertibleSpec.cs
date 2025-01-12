@@ -5,7 +5,7 @@ using Xunit;
 
 namespace NodaMoney.Tests.MoneyConvertibleSpec;
 
-public class GivenIWantToConvertMoney
+public class GivenIWantToConvertMoneyToNumericType
 {
     readonly Money _euros = new Money(765.43m, "EUR");
 
@@ -98,14 +98,14 @@ public class GivenIWantToExplicitCastMoneyToNumericType
 [Collection(nameof(NoParallelization))]
 public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurrentCulture
 {
-    private readonly Currency _euro = Currency.FromCode("EUR");
+    private readonly Currency _euro = CurrencyInfo.FromCode("EUR");
 
     [Fact]
     [UseCulture("nl-NL")]
     public void WhenValueIsByte_ThenCreatingShouldSucceed()
     {
             const byte byteValue = 50;
-            Money money = byteValue;
+            Money money = (Money)byteValue;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(50);
@@ -116,7 +116,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
     {
             const sbyte sbyteValue = 75;
-            Money money = sbyteValue;
+            Money money = (Money)sbyteValue;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(75);
@@ -127,7 +127,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsInt16_ThenCreatingShouldSucceed()
     {
             const short int16Value = 100;
-            Money money = int16Value;
+            Money money = (Money)int16Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(100);
@@ -138,7 +138,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsInt32_ThenCreatingShouldSucceed()
     {
             const int int32Value = 200;
-            Money money = int32Value;
+            Money money = (Money)int32Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(200);
@@ -149,7 +149,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsInt64_ThenCreatingShouldSucceed()
     {
             const long int64Value = 300;
-            Money money = int64Value;
+            Money money = (Money)int64Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(300);
@@ -160,7 +160,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsUint16_ThenCreatingShouldSucceed()
     {
             const ushort uInt16Value = 400;
-            Money money = uInt16Value;
+            Money money = (Money)uInt16Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(400);
@@ -171,7 +171,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsUint32_ThenCreatingShouldSucceed()
     {
             const uint uInt32Value = 500;
-            Money money = uInt32Value;
+            Money money = (Money)uInt32Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(500);
@@ -182,7 +182,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     public void WhenValueIsUint64_ThenCreatingShouldSucceed()
     {
             const ulong uInt64Value = 600;
-            Money money = uInt64Value;
+            Money money = (Money)uInt64Value;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(600);
@@ -190,7 +190,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
 
     [Fact]
     [UseCulture("nl-NL")]
-    public void WhenValueIsSingleAndExplicitCast_ThenCreatingShouldSucceed()
+    public void WhenValueIsSingle_ThenCreatingShouldSucceed()
     {
             const float singleValue = 700;
             var money = (Money)singleValue;
@@ -201,7 +201,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
 
     [Fact]
     [UseCulture("nl-NL")]
-    public void WhenValueIsDoubleAndExplicitCast_ThenCreatingShouldSucceed()
+    public void WhenValueIsDoubl_ThenCreatingShouldSucceed()
     {
             var money = (Money)25.00;
 
@@ -213,7 +213,7 @@ public class GivenIWantToCastNumericTypeToMoneyWithImplicitCurrencyFromTheCurren
     [UseCulture("nl-NL")]
     public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
     {
-            Money money = 25.00m;
+            Money money = (Money)25.00m;
 
             money.Currency.Should().Be(_euro);
             money.Amount.Should().Be(25.00m);
