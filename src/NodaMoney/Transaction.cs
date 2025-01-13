@@ -1,6 +1,6 @@
 ﻿namespace NodaMoney;
 
-/// <summary>Represents a general transaction done in a webshop.</summary>
+/// <summary>Represents a general transaction done in a web shop.</summary>
 public class Transaction
 {
     /// <summary>Gets or sets the transaction amount of the transaction in the local currency of the customer.</summary>
