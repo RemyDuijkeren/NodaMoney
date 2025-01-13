@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 <!--    <TargetFrameworks>net9.0;net8.0;net6.0;net48;</TargetFrameworks>-->
-    <TargetFrameworks>net9.0;net8.0;net6.0;</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>NodaMoney.Tests</AssemblyName>
     <PackageId>NodaMoney.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
