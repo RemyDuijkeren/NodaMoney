@@ -2,17 +2,18 @@
 =========
 <img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png"></img>
 You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
-[github releases page](https://github.com/remyvd/NodaMoney/releases).
+[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
 
-If you'd like to work with the bleeding edge, you can use our [custom Nuget feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
+If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
 Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
 
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
 ![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)
-[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
-[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg)](https://www.nuget.org/packages/NodaMoney)
+[![GitHub NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=GitHub%20nuget&logo=github)](https://github.com/RemyDuijkeren/NodaMoney/packages)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
@@ -37,14 +38,14 @@ base layer, providing classes that should be in the .NET Framework. It complies 
 
 Usage
 -----
-At the moment there are four classes:
+The main classes are:
+- Money: An immutable structure that represents money in a specified currency.
 - Currency: A small immutable structure that represents a currency unit.
 - CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
-and custom currencies.
-- Money: An immutable structure that represents money in a specified currency.
+and custom currencies. It auto-converts to Currency.
+- CurrencyInfoBuilder: Defines a custom currency that is new or based on another currency.
 - ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
-- CurrencyInfoBuilder: Defines a custom currency that is new or based on another currency.
 
 **Initalizing money**
 
@@ -61,8 +62,8 @@ var money = Money.Yen(6);
 
 // define money implicit using currency of current culture/region
 var money = new Money(6.54m);
-Money money = 6.54m;
-Money money = 6;
+Money money = (Money)6.54m;
+Money money = (Money)6;
 Money money = (Money)6.54; // need explict cast from double data type
 
 // auto-rounding to the minor unit will take place with MidpointRounding.ToEven
