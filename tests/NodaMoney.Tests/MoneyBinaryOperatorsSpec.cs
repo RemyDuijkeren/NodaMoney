@@ -204,9 +204,9 @@ public class GivenIWantToMultiplyAndDivideMoney
         var result1 = money * multiplier;
         var result2 = multiplier * money;
 
-        result1.Should().Be(new Money(expected));
+        result1.Should().Be(new Money(expected, "EUR"));
         result1.Should().NotBeSameAs(money);
-        result2.Should().Be(new Money(expected));
+        result2.Should().Be(new Money(expected, "EUR"));
         result2.Should().NotBeSameAs(money);
     }
 
@@ -217,7 +217,7 @@ public class GivenIWantToMultiplyAndDivideMoney
 
         var result = Money.Multiply(money, multiplier);
 
-        result.Should().Be(new Money(expected));
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 
@@ -228,18 +228,21 @@ public class GivenIWantToMultiplyAndDivideMoney
 
         var result = money / divider;
 
-        result.Should().Be(new Money(expected));
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 
     [Theory, MemberData(nameof(TestDataDecimal))]
     public void WhenUsingDivisionMethodWithDecimal_ThenMoneyShouldBeDivided(decimal expected, decimal divider, decimal value)
     {
+        // Arrange
         var money = new Money(value, "EUR");
 
+        // Act
         var result = Money.Divide(money, divider);
 
-        result.Should().Be(new Money(expected));
+        // Assert
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 
@@ -260,9 +263,9 @@ public class GivenIWantToMultiplyAndDivideMoney
         var result1 = money * multiplier;
         var result2 = multiplier * money;
 
-        result1.Should().Be(new Money(expected));
+        result1.Should().Be(new Money(expected, "EUR"));
         result1.Should().NotBeSameAs(money);
-        result2.Should().Be(new Money(expected));
+        result2.Should().Be(new Money(expected, "EUR"));
         result2.Should().NotBeSameAs(money);
     }
 
@@ -273,7 +276,7 @@ public class GivenIWantToMultiplyAndDivideMoney
 
         var result = Money.Multiply(money, multiplier);
 
-        result.Should().Be(new Money(expected));
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 
@@ -284,7 +287,7 @@ public class GivenIWantToMultiplyAndDivideMoney
 
         var result = money / divider;
 
-        result.Should().Be(new Money(expected));
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 
@@ -295,7 +298,7 @@ public class GivenIWantToMultiplyAndDivideMoney
 
         var result = Money.Divide(money, divider);
 
-        result.Should().Be(new Money(expected));
+        result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
     }
 

@@ -302,8 +302,8 @@ public class GivenIWantMoneyWithDifferentRounding
     public void WhenOnlyAmount_ThenItShouldRoundUp()
     {
             decimal amount = 0.525m;
-            var defaultRounding = new Money(amount);
-            var differentRounding = new Money(amount, MidpointRounding.AwayFromZero);
+            var defaultRounding = new Money(amount, "EUR");
+            var differentRounding = new Money(amount, "EUR", MidpointRounding.AwayFromZero);
 
             defaultRounding.Amount.Should().Be(0.52m);
             differentRounding.Amount.Should().Be(0.53m);
@@ -338,7 +338,7 @@ public class GivenIWantToCreateMoneyWithDoubleValue
     [InlineData(0.3333333333333333, 0.33)]
     public void WhenValueIsDoubleWithoutCurrency_ThenMoneyShouldBeCorrect(double input, decimal expected)
     {
-            var money = new Money(input);
+            var money = new Money(input, "EUR");
 
             money.Amount.Should().Be(expected);
         }

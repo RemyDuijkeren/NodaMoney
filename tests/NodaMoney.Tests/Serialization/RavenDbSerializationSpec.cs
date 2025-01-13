@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FluentAssertions;
 using Raven.TestDriver;
 using Xunit;
@@ -10,37 +11,40 @@ public class GivenIWantToStoreInRavenDb : RavenTestDriver
     static GivenIWantToStoreInRavenDb()
     {
         // ConfigureServer() must be set before calling GetDocumentStore() and can only be set once per test run.
-        ConfigureServer(new TestServerOptions
-        {
-            Licensing = { ThrowOnInvalidOrMissingLicense = false }
-        });
+        ConfigureServer(new TestServerOptions { Licensing = { ThrowOnInvalidOrMissingLicense = false } });
     }
 
     [Fact]
     public void WhenObjectWithMoneyAttribute_ThenThisMustWork()
     {
-            SampleData sample = new SampleData { Name = "Test", Price = new Money(123.56, "EUR"), BaseCurrency = Currency.FromCode("USD") };
+        // Only run this test for .NET 9.0, because only .NET 9.0 is installed on the build server.
+        if (!AppContext.TargetFrameworkName.Contains(".NETCoreApp,Version=v9.0"))
+        {
+            return; // Skip execution for other frameworks
+        }
 
-            using var store = GetDocumentStore();
+        SampleData sample = new SampleData { Name = "Test", Price = new Money(123.56, "EUR"), BaseCurrency = Currency.FromCode("USD") };
 
-            // Store in RavenDb
-            using (var session = store.OpenSession())
-            {
-                session.Store(sample);
-                session.SaveChanges();
-            }
+        using var store = GetDocumentStore();
 
-            WaitForIndexing(store);
-            //WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
+        // Store in RavenDb
+        using (var session = store.OpenSession())
+        {
+            session.Store(sample);
+            session.SaveChanges();
+        }
 
-            // Read from RavenDb
-            using (var session = store.OpenSession())
-            {
-                var result = session.Query<SampleData>().FirstOrDefault();
+        WaitForIndexing(store);
+        //WaitForUserToContinueTheTest(store); // Sometimes we want to debug the test itself, this redirect us to the studio
 
-                result.Name.Should().Be(sample.Name);
-                result.Price.Should().Be(sample.Price);
-            }
+        // Read from RavenDb
+        using (var session = store.OpenSession())
+        {
+            var result = session.Query<SampleData>().FirstOrDefault();
+
+            result.Name.Should().Be(sample.Name);
+            result.Price.Should().Be(sample.Price);
+        }
     }
 }
 
