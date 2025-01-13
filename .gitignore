@@ -16,5 +16,5 @@ _ReSharper*/
 *.DotSettings.user
 
 # JetBrains Rider IDE
-riderModule.iml
 .idea/
+riderModule.iml
