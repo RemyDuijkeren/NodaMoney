@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace NodaMoney.Serialization;
 
@@ -70,12 +69,7 @@ public class MoneyTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is Money money)
         {
-            var result = new StringBuilder();
-            result.Append(money.Currency.Code.ToString(culture));
-            result.Append(' ');
-            result.Append(money.Amount.ToString(culture));
-
-            return result.ToString();
+            return $"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}";
         }
 
         return base.ConvertTo(context, culture, value, destinationType);

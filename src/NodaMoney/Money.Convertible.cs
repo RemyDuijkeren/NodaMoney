@@ -1,7 +1,10 @@
 ﻿namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
-public partial struct Money : IConvertible
+public partial struct Money
+#if !NETSTANDARD1_3
+    // : IConvertible //Newtonsoft.Json ignores TypeConverter if IConvertible is implemented https://github.com/JamesNK/Newtonsoft.Json/issues/676
+#endif
 {
     /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
     /// <param name="money">The money.</param>
@@ -116,12 +119,8 @@ public partial struct Money : IConvertible
 
 #if !NETSTANDARD1_3
 #pragma warning disable CA1822 // Mark members as static => Needed for implementation of IConvertible
-    /// <summary>
-    /// Returns the <see cref="TypeCode"/> for this instance.
-    /// </summary>
-    /// <returns>
-    /// The enumerated constant that is the <see cref="TypeCode"/> of the class or value type that implements this interface.
-    /// </returns>
+    /// <summary>Returns the <see cref="TypeCode"/> for this instance.</summary>
+    /// <returns>The enumerated constant that is the <see cref="TypeCode"/> of the class or value type that implements this interface.</returns>
     public TypeCode GetTypeCode() => TypeCode.Object;
 #pragma warning restore CA1822 // Mark members as static
 #endif
