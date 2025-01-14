@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace NodaMoney;
+﻿namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money

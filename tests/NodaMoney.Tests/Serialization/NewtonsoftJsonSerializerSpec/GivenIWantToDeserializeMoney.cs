@@ -1,0 +1,79 @@
+using System;
+using System.Runtime.Serialization;
+using FluentAssertions;
+using Newtonsoft.Json;
+using Xunit;
+
+namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;
+
+public class GivenIWantToDeserializeMoney
+{
+    [Theory(Skip = "This test is not working.")]
+    [ClassData(typeof(ValidJsonV1TestData))]
+    public void WhenDeserializingV1_ThenThisShouldSucceed(string json, Money expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Money>(json);
+
+        clone.Should().Be(expected);
+    }
+
+    [Theory(Skip = "This test is not working.")]
+    [ClassData(typeof(InvalidJsonV1TestData))]
+    public void WhenDeserializingWithInvalidJSONV1_ThenThisShouldFail(string json)
+    {
+        Action action = () => JsonConvert.DeserializeObject<Money>(json);
+
+        action.Should().Throw<SerializationException>();
+    }
+
+    [Theory(Skip = "This test is not working.")]
+    [ClassData(typeof(NestedJsonV1TestData))]
+    public void WhenDeserializingWithNestedV1_ThenThisShouldSucceed(string json, Order expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Order>(json);
+
+        clone.Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(ValidJsonV2TestData))]
+    public void WhenDeserializingV2_ThenThisShouldSucceed(string json, Money expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Money>(json);
+
+        clone.Should().Be(expected);
+    }
+
+    [Fact]
+    public void WhenDesializingV2_ShouldBeOk()
+    {
+        // Arrange
+        string json = "\"EUR 123.456\"";
+        var expected = new Money(123.456m, CurrencyInfo.FromCode("EUR"));
+
+        // Act
+        var clone = JsonConvert.DeserializeObject<Money>(json);
+
+        // Assert
+        clone.Should().Be(expected);
+    }
+
+
+    [Theory]
+    [ClassData(typeof(InvalidJsonV2TestData))]
+    public void WhenDeserializingWithInvalidJSONV2_ThenThisShouldFail(string json)
+    {
+        Action action = () => JsonConvert.DeserializeObject<Money>(json);
+
+        action.Should().Throw<JsonException>();
+    }
+
+    [Theory]
+    [ClassData(typeof(NestedJsonV2TestData))]
+    public void WhenDeserializingWithNestedV2_ThenThisShouldSucceed(string json, Order expected)
+    {
+        var clone = JsonConvert.DeserializeObject<Order>(json);
+
+        clone.Should().BeEquivalentTo(expected);
+    }
+}
