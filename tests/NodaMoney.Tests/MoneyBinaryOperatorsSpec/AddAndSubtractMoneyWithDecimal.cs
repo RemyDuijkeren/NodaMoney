@@ -6,21 +6,21 @@ using Xunit;
 namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec;
 
 [Collection(nameof(NoParallelization))]
-public class GivenIWantToAddAndSubtractMoneyWithDecimal
+public class AddAndSubtractMoneyWithDecimal
 {
-    public static IEnumerable<object[]> TestData => new[]
-    {
-        new object[] { 101m, 99m, 200m }, // whole numbers
-        new object[] { 100m, 0.01m, 100.01m }, // fractions
-        new object[] { 100.999m, 0.9m, 101.899m }, // overflow
-        new object[] { 100.5m, 0.9m, 101.4m }, // overflow
-        new object[] { 100.999m, -0.9m, 100.099m }, // negative
-        new object[] { -100.999m, -0.9m, -101.899m } // negative
-    };
+    public static IEnumerable<object[]> TestData =>
+    [
+        [101m, 99m, 200m], // whole numbers
+        [100m, 0.01m, 100.01m], // fractions
+        [100.999m, 0.9m, 101.899m], // overflow
+        [100.5m, 0.9m, 101.4m], // overflow
+        [100.999m, -0.9m, 100.099m], // negative
+        [-100.999m, -0.9m, -101.899m] // negative
+    ];
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void WhenUsingAdditionOperator_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
+    public void MoneyIsAdded_When_AddUsingOperator(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -35,7 +35,7 @@ public class GivenIWantToAddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void WhenUsingAdditionMethod_ThenMoneyShouldBeAdded(decimal value1, decimal value2, decimal expected)
+    public void MoneyIsAdded_When_AddUsingMethod(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -47,7 +47,7 @@ public class GivenIWantToAddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void WhenUsingSubtractionOperator_ThenMoneyShouldBeAdded(decimal expected, decimal value2, decimal value1)
+    public void MoneyIsSubtracted_When_SubtractUsingOperator(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -62,7 +62,7 @@ public class GivenIWantToAddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void WhenUsingSubtractionMethod_ThenMoneyShouldBeSubtracted(decimal expected, decimal value2, decimal value1)
+    public void MoneyIsSubtracted_When_SubtractUsingMethod(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1, "EUR");
 

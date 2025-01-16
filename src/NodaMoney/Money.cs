@@ -67,7 +67,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, string code, MidpointRounding rounding)
-        : this(amount,  CurrencyInfo.FromCode(code), rounding)
+        : this(amount, CurrencyInfo.FromCode(code), rounding)
     {
     }
 
@@ -80,8 +80,8 @@ public readonly partial struct Money : IEquatable<Money>
     public Money(decimal amount, Currency currency, MidpointRounding rounding)
         : this()
     {
-            this.Currency = currency;
-            Amount = Round(amount, currency, rounding);
+        this.Currency = currency;
+        Amount = Round(amount, currency, rounding);
     }
 
     // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
@@ -113,7 +113,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
     public Money(double amount, string code)
-        : this((decimal)amount,  CurrencyInfo.FromCode(code))
+        : this((decimal)amount, CurrencyInfo.FromCode(code))
     {
     }
 
@@ -164,7 +164,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     public Money(long amount, string code)
-        : this((decimal)amount,  CurrencyInfo.FromCode(code))
+        : this((decimal)amount, CurrencyInfo.FromCode(code))
     {
     }
 
@@ -200,7 +200,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <code>Money money = new Money(10, "EUR");</code></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount, string code)
-        : this((decimal)amount,  CurrencyInfo.FromCode(code))
+        : this((decimal)amount, CurrencyInfo.FromCode(code))
     {
     }
 
@@ -251,12 +251,12 @@ public readonly partial struct Money : IEquatable<Money>
     /// <returns>A 32-bit signed integer hash code.</returns>
     public override int GetHashCode()
     {
-            unchecked
-            {
-                int hash = 17;
-                hash = (hash * 23) + Amount.GetHashCode();
-                return (hash * 23) + Currency.GetHashCode();
-            }
+        unchecked
+        {
+            int hash = 17;
+            hash = (hash * 23) + Amount.GetHashCode();
+            return (hash * 23) + Currency.GetHashCode();
+        }
     }
 
     /// <summary>Deconstructs the current instance into its components.</summary>
@@ -277,29 +277,9 @@ public readonly partial struct Money : IEquatable<Money>
             : Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
 
         // https://stackoverflow.com/questions/43289478/how-can-i-tell-if-a-number-is-a-power-of-10-in-kotlin-or-java
-        static bool IsPowerOf10(long n)
+        static bool IsPowerOfTen(double x)
         {
-            while (n > 9 && n % 10 == 0)
-            {
-                n /= 10;
-            }
-
-            return n == 1;
-        }
-
-        // NOT GOOD, IS ONLY FOR INT. EXTEND
-        static bool IsPowerOfTen(in double x)
-        {
-            return x == 1
-                   || x == 10
-                   || x == 100
-                   || x == 1000
-                   || x == 10000
-                   || x == 100000
-                   || x == 1000000
-                   || x == 10000000
-                   || x == 100000000
-                   || x == 1000000000;
+            return x is 1 or 10 or 100 or 1000 or 10000 or 100000 or 1000000 or 10000000 or 100000000 or 1000000000;
         }
     }
 

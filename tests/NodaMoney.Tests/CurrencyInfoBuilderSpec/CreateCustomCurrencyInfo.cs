@@ -6,16 +6,16 @@ using Xunit;
 namespace NodaMoney.Tests.CurrencyInfoBuilderSpec;
 
 [Collection(nameof(NoParallelization))]
-public class GivenIWantToCreateCustomCurrencyInfo
+public class CreateCustomCurrencyInfo
 {
     [Fact]
-    public void WhenRegisterWithDefaults_ThenShouldBeAvailableWithDefaults()
+    public void ReturnDefaultCurrencyInfo_When_BuildWithDefaults()
     {
         // Arrange
         CurrencyInfoBuilder builder = new("BTA");
 
         // Act
-        CurrencyInfo result = builder.Register();
+        CurrencyInfo result = builder.Build();
 
         // Assert
         result.Code.Should().Be("BTA");
@@ -24,21 +24,96 @@ public class GivenIWantToCreateCustomCurrencyInfo
         result.EnglishName.Should().BeEmpty();
         result.NumericCode.Should().Be("000");
         result.DecimalDigits.Should().Be(0);
+    }
 
+    [Fact]
+    public void NotBeRegistered_When_Build()
+    {
+        // Arrange
+        CurrencyInfoBuilder builder = new("BTA");
+        builder.Build();
+
+        // Act
+        Action action = () => Currency.FromCode("BTA");
+
+        // Assert
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("*unknown*currency*");
+    }
+
+    [Fact]
+    public void BeRegistered_When_Register()
+    {
+        // Arrange
+        CurrencyInfoBuilder builder = new("BTA");
+        CurrencyInfo result = builder.Register();
+
+        // Act
         CurrencyInfo ci = CurrencyInfo.FromCode("BTA");
+
+        // Assert
         ci.Should().BeEquivalentTo(result);
         ci.Should().Be(result);
     }
 
     [Fact]
-    public void WhenRegisterInIsoNamespace_ThenShouldBeAvailable()
+    public void NotBeRegistered_When_BuildBitCoin()
+    {
+        // Arrange
+        var builder = new CurrencyInfoBuilder("BTD")
+        {
+            EnglishName = "Bitcoin",
+            Symbol = "฿",
+            NumericCode = "123", // iso number
+            DecimalDigits = 8
+        };
+
+        // Act
+        CurrencyInfo result = builder.Build();
+
+        // Assert
+        result.Symbol.Should().Be("฿");
+        result.EnglishName.Should().Be("Bitcoin");
+        result.NumericCode.Should().Be("123");
+        result.DecimalDigits.Should().Be(8);
+        result.IsIso4217.Should().BeFalse();
+        result.Code.Should().Be("BTD");
+
+        Action action = () => CurrencyInfo.FromCode("BTD");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("*unknown*currency*");
+    }
+
+    [Fact]
+    public void BeRegisteredAsDefaultToNonIso_When_RegisterBitCoin()
+    {
+        // Arrange
+        var builder = new CurrencyInfoBuilder("BTE")
+        {
+            EnglishName = "Bitcoin",
+            Symbol = "฿",
+            NumericCode = "123",
+            DecimalDigits = 8,
+            //IsIso4217 = false, // default should be False
+        };
+
+        // Act
+        CurrencyInfo result = builder.Register();
+
+        // Assert
+        CurrencyInfo bitocin = CurrencyInfo.FromCode("BTE");
+        bitocin.Symbol.Should().Be("฿");
+        bitocin.IsIso4217.Should().BeFalse();
+        bitocin.Should().BeEquivalentTo(result);
+    }
+
+    [Fact]
+    public void BeRegisteredAsIso_When_RegisterBitcoinAsIso()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("BTB")
         {
             EnglishName = "Bitcoin",
             Symbol = "฿",
-            NumericCode = "123", // iso number
+            NumericCode = "123",
             DecimalDigits = 8,
             IsIso4217 = true // in iso namespace
         };
@@ -59,49 +134,18 @@ public class GivenIWantToCreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void WhenRegisterBitCoin_ThenShouldBeAvailableByExplicitNamespace()
+    public void ThrowInvalidCurrencyException_When_RegisterExistingCurrency()
     {
         // Arrange
-        var builder = new CurrencyInfoBuilder("BTE")
-        {
-            EnglishName = "Bitcoin",
-            Symbol = "฿",
-            NumericCode = "123", // iso number
-            DecimalDigits = 8,
-            IsIso4217 = false, // not in iso namespace
-        };
+        var builder = new CurrencyInfoBuilder("EUR");
+        var euro = CurrencyInfo.FromCode("EUR");
+        builder.LoadDataFromCurrencyInfo(euro);
 
         // Act
-        CurrencyInfo result = builder.Register();
+        Action action = () => builder.Register();
 
         // Assert
-        CurrencyInfo bitcoinCI = CurrencyInfo.FromCode("BTE");
-        bitcoinCI.Symbol.Should().Be("฿");
-        bitcoinCI.Should().BeEquivalentTo(result);
-    }
-
-    [Fact]
-    public void WhenBuildBitCoin_ThenItShouldSucceedButNotBeRegistered()
-    {
-        // Arrange
-        var builder = new CurrencyInfoBuilder("BTD")
-        {
-            EnglishName = "Bitcoin",
-            Symbol = "฿",
-            NumericCode = "123", // iso number
-            DecimalDigits = 8,
-            IsIso4217 = false
-        };
-
-        // Act
-        CurrencyInfo result = builder.Build();
-
-        // Assert
-        result.Symbol.Should().Be("฿");
-
-        //Action action = () => Currency.FromCode("BTD", "virtual");
-        Action action = () => Currency.FromCode("BTD");
-        action.Should().Throw<InvalidCurrencyException>();//.WithMessage("BTD is unknown currency code!");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("*is already registered*");
     }
 
     [Fact]
@@ -124,37 +168,35 @@ public class GivenIWantToCreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void WhenRegisterExistingCurrency_ThenThrowException()
+    public void ThrowArgumentNullException_When_CodeIsNull()
     {
-        var builder = new CurrencyInfoBuilder("EUR");
+        // Arrange
 
-        var euro = CurrencyInfo.FromCode("EUR");
-        builder.LoadDataFromCurrencyInfo(euro);
-
-        Action action = () => builder.Register();
-
-        action.Should().Throw<InvalidCurrencyException>().WithMessage("*is already registered*");
-    }
-
-    [Fact]
-    public void WhenCodeIsNull_ThenThrowException()
-    {
+        // Act
         Action action = () => new CurrencyInfoBuilder(null) { IsIso4217 = false };
 
+        // Assert
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void WhenCodeIsEmpty_ThenThrowException()
+    public void ThrowArgumentNullException_When_CodeIsEmpty()
     {
+        // Arrange
+
+        // Act
         Action action = () => new CurrencyInfoBuilder("")  { IsIso4217 = false };
 
+        // Assert
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void WhenSymbolIsEmpty_ThenSymbolMustBeDefaultCurrencySign()
+    public void SymbolMustBeDefaultCurrencySign_When_SymbolIsEmpty()
     {
+        // Arrange
+
+        // Act
         Currency result = new CurrencyInfoBuilder("BTH")
         {
             EnglishName = "Bitcoin",
@@ -163,6 +205,7 @@ public class GivenIWantToCreateCustomCurrencyInfo
             DecimalDigits = 8,
         }.Register();
 
+        // Assert
         Currency bitcoin = Currency.FromCode("BTH");
         bitcoin.Symbol.Should().Be(CurrencyInfo.GenericCurrencySign); // ¤
         bitcoin.Should().BeEquivalentTo(result);
