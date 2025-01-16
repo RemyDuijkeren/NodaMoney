@@ -31,7 +31,7 @@ jobs:
           dotnet-version: |
             6.0.x
             8.0.x
-            9.0.x # All target .NET SDKs for testing
+            9.0.x
           cache: true
           cache-dependency-path: '**/packages.lock.json'
         env:
