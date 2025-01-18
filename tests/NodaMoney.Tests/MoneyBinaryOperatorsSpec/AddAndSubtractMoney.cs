@@ -43,19 +43,19 @@ public class AddAndSubtractMoney
         result.Should().NotBeSameAs(money2);
     }
 
-    // [Fact]
-    // public void ThrowOverflowException_When_AddIsMoreThenMaxValue()
-    // {
-    //     // Arrange
-    //     Money maxValueMoney = new(decimal.MaxValue);
-    //     Money moneyToAdd = new(1);
-    //
-    //     // Act
-    //     Action action = () => Money.Add(maxValueMoney, moneyToAdd);
-    //
-    //     // Assert
-    //     action.Should().Throw<OverflowException>(); // Value was either too large or too small for a Decimal.
-    // }
+    [Fact]
+    public void ThrowOverflowException_When_AddIsMoreThenMaxValue()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MaxValue);
+        Money moneyToAdd = new(1);
+
+        // Act
+        Action action = () => Money.Add(maxValueMoney, moneyToAdd);
+
+        // Assert
+        action.Should().Throw<OverflowException>().WithMessage("Value was either too large or too small for a Money.");
+    }
 
     [Theory, MemberData(nameof(TestData))]
     public void MoneyIsSubtracted_When_SubtractUsingOperator(decimal expected, decimal value2, decimal value1)
@@ -81,6 +81,36 @@ public class AddAndSubtractMoney
         result.Should().Be(new Money(expected));
         result.Should().NotBeSameAs(money1);
         result.Should().NotBeSameAs(money2);
+    }
+
+    [Fact]
+    public void MoneyIsAdded_When_AddWithZeroInDifferentCurrency_UsingOperator()
+    {
+        // Arrange
+        Money money = new(123.45m, "EUR");
+        Money zero = new(0m, "USD");
+
+        // Act
+        Money result = money + zero;
+
+        // Assert
+        result.Should().Be(money);
+        result.Should().NotBeSameAs(zero);
+    }
+
+    [Fact]
+    public void MoneyIsAdded_When_AddWithZeroInDifferentCurrency_UsingMethod()
+    {
+        // Arrange
+        Money money = new(123.45m, "EUR");
+        Money zero = new(0m, "USD");
+
+        // Act
+        Money result = Money.Add(money, zero);
+
+        // Assert
+        result.Should().Be(money);
+        result.Should().NotBeSameAs(zero);
     }
 
     [Theory, MemberData(nameof(TestData))]

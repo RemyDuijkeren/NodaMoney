@@ -76,9 +76,22 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
     public static Money Add(in Money money1, in Money money2)
     {
-            VerifySameCurrency(money1, money2);
+        // If one of the amounts is zero, then no need to check currency and just return input value.
+        if (money1.Amount == 0m)
+            return money2;
+        if (money2.Amount == 0m)
+            return money1;
+
+        VerifySameCurrency(money1, money2);
+        try
+        {
             return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
         }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a Money.", ex);
+        }
+    }
 
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
@@ -92,9 +105,9 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
     public static Money Subtract(in Money money1, in Money money2)
     {
-            VerifySameCurrency(money1, money2);
-            return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
-        }
+        VerifySameCurrency(money1, money2);
+        return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
+    }
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
