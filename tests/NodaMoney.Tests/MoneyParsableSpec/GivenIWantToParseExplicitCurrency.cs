@@ -12,7 +12,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("nl-NL")]
     public void WhenParsingYenInNetherlands_ThenThisShouldSucceed()
     {
-        var yen = Money.Parse("¥ 765", Currency.FromCode("JPY"));
+        var yen = Money.Parse("¥ 765", CurrencyInfo.FromCode("JPY"));
 
         yen.Should().Be(new Money(765, "JPY"));
     }
@@ -20,7 +20,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("en-US")]
     public void WhenParsingArgentinePesoInUSA_ThenThisShouldReturnArgentinePeso()
     {
-        var peso = Money.Parse("$765.43", Currency.FromCode("ARS"));
+        var peso = Money.Parse("$765.43", CurrencyInfo.FromCode("ARS"));
 
         peso.Should().Be(new Money(765.43m, "ARS"));
     }
@@ -28,7 +28,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("es-AR")]
     public void WhenParsingUSDollarSymbolInArgentina_ThenThisShouldReturnUSDollar()
     {
-        var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+        var dollar = Money.Parse("$765,43", CurrencyInfo.FromCode("USD"));
 
         dollar.Should().Be(new Money(765.43m, "USD"));
     }
@@ -37,7 +37,7 @@ public class GivenIWantToParseExplicitCurrency
     public void WhenParsingUSDollarInNetherlands_ThenThisShouldSucceed()
     {
         // $ symbol is used for multiple currencies
-        var dollar = Money.Parse("$765,43", Currency.FromCode("USD"));
+        var dollar = Money.Parse("$765,43", CurrencyInfo.FromCode("USD"));
 
         dollar.Should().Be(new Money(765.43m, "USD"));
     }
@@ -45,7 +45,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("nl-BE")]
     public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
     {
-        var euro = Money.Parse("€ 765,43", Currency.FromCode("EUR"));
+        var euro = Money.Parse("€ 765,43", CurrencyInfo.FromCode("EUR"));
 
         euro.Should().Be(new Money(765.43m, "EUR"));
     }
@@ -53,7 +53,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("fr-BE")]
     public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
     {
-        var euro = Money.Parse("765,43 €", Currency.FromCode("EUR"));
+        var euro = Money.Parse("765,43 €", CurrencyInfo.FromCode("EUR"));
 
         euro.Should().Be(new Money(765.43, "EUR"));
     }
@@ -61,7 +61,7 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("nl-NL")]
     public void WhenParsingNumberWithoutCurrency_ThenThisShouldSucceed()
     {
-        var euro = Money.Parse("765,43", Currency.FromCode("USD"));
+        var euro = Money.Parse("765,43", CurrencyInfo.FromCode("USD"));
 
         euro.Should().Be(new Money(765.43, "USD"));
     }
@@ -69,39 +69,39 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("nl-NL")]
     public void WhenParsingUSDollarWithEuroCurrency_ThenThisShouldFail()
     {
-        Action action = () => Money.Parse("€ 765,43", Currency.FromCode("USD"));
+        Action action = () => Money.Parse("€ 765,43", CurrencyInfo.FromCode("USD"));
 
         action.Should().Throw<FormatException>(); //.WithMessage("Input string was not in a correct format.");
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsNull_ThenThowExeception()
+    public void WhenValueIsNull_ThenThrowException()
     {
-        Action action = () => Money.Parse(null, Currency.FromCode("EUR"));
+        Action action = () => Money.Parse(null, CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsEmpty_ThenThowExeception()
+    public void WhenValueIsEmpty_ThenThrowException()
     {
-        Action action = () => Money.Parse("", Currency.FromCode("EUR"));
+        Action action = () => Money.Parse("", CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsNullWithOverrideMethod_ThenThowExeception()
+    public void WhenValueIsNullWithOverrideMethod_ThenThrowException()
     {
-        Action action = () => Money.Parse(null, NumberStyles.Currency, null, Currency.FromCode("EUR"));
+        Action action = () => Money.Parse(null, NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsEmptyWithOverrideMethod_ThenThowExeception()
+    public void WhenValueIsEmptyWithOverrideMethod_ThenThrowException()
     {
-        Action action = () => Money.Parse("", NumberStyles.Currency, null, Currency.FromCode("EUR"));
+        Action action = () => Money.Parse("", NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }

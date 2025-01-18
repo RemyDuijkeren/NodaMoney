@@ -39,72 +39,72 @@ public partial struct Money : IFormattable
     /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format and formatProvider.</returns>
     public string ToString(string format, IFormatProvider formatProvider)
     {
-            return ConvertToString(format, formatProvider);
-        }
+        return ConvertToString(format, formatProvider);
+    }
 
-    private static IFormatProvider GetFormatProvider(Currency currency, IFormatProvider? formatProvider, bool useCode = false)
+    private static NumberFormatInfo GetFormatProvider(Currency currency, IFormatProvider? formatProvider, bool useCode = false)
     {
-            CultureInfo cc = CultureInfo.CurrentCulture;
+        CultureInfo cc = CultureInfo.CurrentCulture;
 
-            // var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
-            var numberFormatInfo = (NumberFormatInfo)cc.NumberFormat.Clone();
+        // var numberFormatInfo = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+        var numberFormatInfo = (NumberFormatInfo)cc.NumberFormat.Clone();
 
-            if (formatProvider != null)
-            {
-                if (formatProvider is CultureInfo ci)
-                    numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
+        if (formatProvider != null)
+        {
+            if (formatProvider is CultureInfo ci)
+                numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
 
-                if (formatProvider is NumberFormatInfo nfi)
-                    numberFormatInfo = (NumberFormatInfo)nfi.Clone();
-            }
-
-            CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
-
-            numberFormatInfo.CurrencyDecimalDigits = currencyInfo.DecimalDigits;
-            numberFormatInfo.CurrencySymbol = currencyInfo.Symbol;
-
-            if (useCode)
-            {
-                // Replace symbol with the code
-                numberFormatInfo.CurrencySymbol = currency.Code;
-
-                // Add spacing to PositivePattern and NegativePattern
-                if (numberFormatInfo.CurrencyPositivePattern == 0) // $n
-                    numberFormatInfo.CurrencyPositivePattern = 2; // $ n
-                if (numberFormatInfo.CurrencyPositivePattern == 1) // n$
-                    numberFormatInfo.CurrencyPositivePattern = 3; // n $
-
-                switch (numberFormatInfo.CurrencyNegativePattern)
-                {
-                    case 0: // ($n)
-                        numberFormatInfo.CurrencyNegativePattern = 14; // ($ n)
-                        break;
-                    case 1: // -$n
-                        numberFormatInfo.CurrencyNegativePattern = 9; // -$ n
-                        break;
-                    case 2: // $-n
-                        numberFormatInfo.CurrencyNegativePattern = 12; // $ -n
-                        break;
-                    case 3: // $n-
-                        numberFormatInfo.CurrencyNegativePattern = 11; // $ n-
-                        break;
-                    case 4: // (n$)
-                        numberFormatInfo.CurrencyNegativePattern = 15; // (n $)
-                        break;
-                    case 5: // -n$
-                        numberFormatInfo.CurrencyNegativePattern = 8; // -n $
-                        break;
-                    case 6: // n-$
-                        numberFormatInfo.CurrencyNegativePattern = 13; // n- $
-                        break;
-                    case 7: // n$-
-                        numberFormatInfo.CurrencyNegativePattern = 10; // n $-
-                        break;
-                }
-            }
-
-            return numberFormatInfo;
+            if (formatProvider is NumberFormatInfo nfi)
+                numberFormatInfo = (NumberFormatInfo)nfi.Clone();
         }
+
+        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
+
+        numberFormatInfo.CurrencyDecimalDigits = currencyInfo.DecimalDigits;
+        numberFormatInfo.CurrencySymbol = currencyInfo.Symbol;
+
+        if (useCode)
+        {
+            // Replace symbol with the code
+            numberFormatInfo.CurrencySymbol = currency.Code;
+
+            // Add spacing to PositivePattern and NegativePattern
+            if (numberFormatInfo.CurrencyPositivePattern == 0) // $n
+                numberFormatInfo.CurrencyPositivePattern = 2; // $ n
+            if (numberFormatInfo.CurrencyPositivePattern == 1) // n$
+                numberFormatInfo.CurrencyPositivePattern = 3; // n $
+
+            switch (numberFormatInfo.CurrencyNegativePattern)
+            {
+                case 0: // ($n)
+                    numberFormatInfo.CurrencyNegativePattern = 14; // ($ n)
+                    break;
+                case 1: // -$n
+                    numberFormatInfo.CurrencyNegativePattern = 9; // -$ n
+                    break;
+                case 2: // $-n
+                    numberFormatInfo.CurrencyNegativePattern = 12; // $ -n
+                    break;
+                case 3: // $n-
+                    numberFormatInfo.CurrencyNegativePattern = 11; // $ n-
+                    break;
+                case 4: // (n$)
+                    numberFormatInfo.CurrencyNegativePattern = 15; // (n $)
+                    break;
+                case 5: // -n$
+                    numberFormatInfo.CurrencyNegativePattern = 8; // -n $
+                    break;
+                case 6: // n-$
+                    numberFormatInfo.CurrencyNegativePattern = 13; // n- $
+                    break;
+                case 7: // n$-
+                    numberFormatInfo.CurrencyNegativePattern = 10; // n $-
+                    break;
+            }
+        }
+
+        return numberFormatInfo;
+    }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Globalization",
@@ -113,9 +113,7 @@ public partial struct Money : IFormattable
     private string ConvertToString(string format, IFormatProvider formatProvider)
     {
         // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
-
         // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
-
         // TODO: Hacked solution, solve with better implementation
         IFormatProvider provider;
         if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)

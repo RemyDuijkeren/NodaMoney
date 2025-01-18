@@ -83,7 +83,7 @@ public class GivenIWantToParseImplicitCurrency
     }
 
     [Fact, UseCulture("en-US")]
-    public void WhenParsingEuroSymbolInUSA_ThenThisShouldReturnUSDollar()
+    public void WhenParsingEuroSymbolInUSA_ThenThisShouldReturnEuro()
     {
         var euro = Money.Parse("€765.43");
 
@@ -91,7 +91,7 @@ public class GivenIWantToParseImplicitCurrency
     }
 
     [Fact]
-    public void WhenValueIsNull_ThenThowExeception()
+    public void WhenValueIsNull_ThenThrowException()
     {
         Action action = () => Money.Parse(null);
 
@@ -99,7 +99,7 @@ public class GivenIWantToParseImplicitCurrency
     }
 
     [Fact]
-    public void WhenValueIsEmpty_ThenThowExeception()
+    public void WhenValueIsEmpty_ThenThrowException()
     {
         Action action = () => Money.Parse("");
 
@@ -107,7 +107,7 @@ public class GivenIWantToParseImplicitCurrency
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenCurrencyIsUnknown_ThenThowExeception()
+    public void WhenCurrencyIsUnknown_ThenThrowException()
     {
         Action action = () => Money.Parse("XYZ 765,43");
 

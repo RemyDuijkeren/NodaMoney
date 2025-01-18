@@ -15,7 +15,7 @@ public partial struct Money
     /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
     /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
     /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s) => Parse(s, NumberStyles.Currency, provider: null, currency: null);
+    public static Money Parse(string s) => Parse(s, NumberStyles.Currency, provider: null);
 
     /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
     /// <param name="s">The string representation of the number to convert.</param>
@@ -24,36 +24,30 @@ public partial struct Money
     /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
     /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
     /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s, IFormatProvider? provider) => Parse(s, NumberStyles.Currency, provider, currency: null);
-
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The string representation of the number to convert.</param>
-    /// <param name="currency">The currency to use for parsing the string representation.</param>
-    /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-    /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
-    /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
-    /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s, Currency currency) => Parse(s, NumberStyles.Currency, provider: null, currency);
+    public static Money Parse(string s, IFormatProvider? provider) => Parse(s, NumberStyles.Currency, provider);
 
     /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
     /// <param name="s">The string representation of the number to convert.</param>
     /// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of value. A typical value to specify is <see cref="NumberStyles.Currency"/>.</param>
     /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>.</param>
-    /// <param name="currency">The currency to use for parsing the string representation.</param>
     /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
     /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
     /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
     /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s, NumberStyles style, IFormatProvider? provider = null, Currency? currency = null)
+    public static Money Parse(string s, NumberStyles style, IFormatProvider? provider = null)
     {
             if (string.IsNullOrWhiteSpace(s))
                 throw new ArgumentNullException(nameof(s));
 
-            currency ??= ExtractCurrencyFromString(s);
-            provider ??= GetFormatProvider(currency.Value, null);
+            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ExtractCurrencyInfoFromString(s, ci) : ExtractCurrencyInfoFromString(s);
+            if (provider == null)
+            {
+                provider = (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo)); //GetFormatProvider(currency.Value, null);
+            }
 
-            decimal amount = decimal.Parse(s, style, GetFormatProvider(currency.Value, provider));
-            return new Money(amount, currency.Value);
+            decimal amount = decimal.Parse(s, style, provider);
+
+            return new Money(amount, currencyInfo);
         }
 
     /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
@@ -118,7 +112,7 @@ public partial struct Money
         {
             try
             {
-                currency = ExtractCurrencyFromString(s);
+                currency = ExtractCurrencyInfoFromString(s);
             }
             catch (FormatException)
             {
@@ -138,7 +132,7 @@ public partial struct Money
         return false;
     }
 
-    private static Currency ExtractCurrencyFromString(string value)
+    private static CurrencyInfo ExtractCurrencyInfoFromString(string value, CurrencyInfo? currencyInfo = null)
     {
             // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
             string currencyAsString = new string(value.Cast<char>().Where(IsNotNumericCharacter()).ToArray());
@@ -146,7 +140,7 @@ public partial struct Money
             if (currencyAsString.Length == 0 || CurrencyInfo.CurrentCurrency.Symbol == currencyAsString
                 || CurrencyInfo.CurrentCurrency.Code == currencyAsString)
             {
-                return CurrencyInfo.CurrentCurrency;
+                return currencyInfo ?? CurrencyInfo.CurrentCurrency;
             }
 
             List<CurrencyInfo> match =
@@ -159,7 +153,27 @@ public partial struct Money
 
             if (match.Count > 1)
             {
-                throw new FormatException($"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
+                if (currencyInfo == null)
+                {
+                    throw new FormatException(
+                        $"Currency sign {currencyAsString} matches with multiple known currencies! Specify currency or culture explicit.");
+                }
+
+                if (match.Any(c => c == currencyInfo))
+                {
+                    return match.First(c => c == currencyInfo);
+                }
+                else
+                {
+                    throw new FormatException(
+                        $"Currency sign {currencyAsString} matches with multiple known currencies, but none match with specified {currencyInfo.Code} or {currencyInfo.Symbol}!");
+                }
+            }
+
+            if (match.Count == 1 && (currencyInfo is not null && match[0] != currencyInfo))
+            {
+                throw new FormatException(
+                    $"Currency sign {currencyAsString} matches with {match[0].Code} or {match[0].Symbol}, but doesn't match with specified {currencyInfo.Code} or {currencyInfo.Symbol}!");
             }
 
             return match[0];

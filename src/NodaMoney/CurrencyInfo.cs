@@ -21,7 +21,7 @@ namespace NodaMoney;
 /// <remarks>See http://en.wikipedia.org/wiki/Currency and
 /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
 /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
-public record CurrencyInfo
+public record CurrencyInfo : IFormatProvider
 {
     /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency and
@@ -260,5 +260,93 @@ public record CurrencyInfo
         MinorUnit = this.MinorUnit;
         EnglishName = this.EnglishName;
         Symbol = this.Symbol;
+    }
+
+    public static CurrencyInfo GetInstance(IFormatProvider? formatProvider)
+    {
+        if (formatProvider == null)
+            return CurrentCurrency;
+
+        if (formatProvider is CurrencyInfo currencyInfo)
+            return currencyInfo;
+
+        if (formatProvider is CultureInfo)
+            return FromCulture(formatProvider as CultureInfo);
+
+        if (formatProvider is NumberFormatInfo)
+            throw new NotImplementedException();
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public object? GetFormat(Type? formatType)
+    {
+        if (formatType == typeof(CurrencyInfo))
+            return this;
+
+        if (formatType == typeof(NumberFormatInfo))
+        {
+            return this.ToNumberFormatInfo(formatProvider: null);
+        }
+
+        return null;
+    }
+
+    public NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useISOCurrencySymbol = false)
+    {
+        NumberFormatInfo numberFormatInfo = (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone();
+        if (formatProvider != null)
+        {
+            if (formatProvider is CultureInfo ci)
+                numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
+
+            if (formatProvider is NumberFormatInfo nfi)
+                numberFormatInfo = (NumberFormatInfo)nfi.Clone();
+        }
+
+        numberFormatInfo.CurrencyDecimalDigits = this.DecimalDigits;
+        numberFormatInfo.CurrencySymbol = this.Symbol;
+
+        if (!useISOCurrencySymbol) return numberFormatInfo;
+
+        // Replace symbol with the code
+        numberFormatInfo.CurrencySymbol = this.Code;
+
+        // For PositivePattern and NegativePattern add space between code and value
+        if (numberFormatInfo.CurrencyPositivePattern == 0) // $n
+            numberFormatInfo.CurrencyPositivePattern = 2; // $ n
+        if (numberFormatInfo.CurrencyPositivePattern == 1) // n$
+            numberFormatInfo.CurrencyPositivePattern = 3; // n $
+
+        switch (numberFormatInfo.CurrencyNegativePattern)
+        {
+            case 0: // ($n)
+                numberFormatInfo.CurrencyNegativePattern = 14; // ($ n)
+                break;
+            case 1: // -$n
+                numberFormatInfo.CurrencyNegativePattern = 9; // -$ n
+                break;
+            case 2: // $-n
+                numberFormatInfo.CurrencyNegativePattern = 12; // $ -n
+                break;
+            case 3: // $n-
+                numberFormatInfo.CurrencyNegativePattern = 11; // $ n-
+                break;
+            case 4: // (n$)
+                numberFormatInfo.CurrencyNegativePattern = 15; // (n $)
+                break;
+            case 5: // -n$
+                numberFormatInfo.CurrencyNegativePattern = 8; // -n $
+                break;
+            case 6: // n-$
+                numberFormatInfo.CurrencyNegativePattern = 13; // n- $
+                break;
+            case 7: // n$-
+                numberFormatInfo.CurrencyNegativePattern = 10; // n $-
+                break;
+        }
+
+        return numberFormatInfo;
     }
 }
