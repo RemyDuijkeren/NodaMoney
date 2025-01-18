@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
@@ -272,14 +273,20 @@ public readonly partial struct Money : IEquatable<Money>
     {
         var currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
 
-        return IsPowerOfTen(currencyInfo.MinorUnitAsExponentOfBase10)
-            ? Math.Round(amount, currencyInfo.DecimalDigits, rounding)
-            : Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
-
-        // https://stackoverflow.com/questions/43289478/how-can-i-tell-if-a-number-is-a-power-of-10-in-kotlin-or-java
-        static bool IsPowerOfTen(double x)
+        if (currencyInfo.MinorUnitIsDecimalBased)
         {
-            return x is 1 or 10 or 100 or 1000 or 10000 or 100000 or 1000000 or 10000000 or 100000000 or 1000000000;
+            // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
+            // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
+            return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
+        }
+        else
+        {
+            // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
+            // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
+            // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
+            // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
+            // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
+            return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
         }
     }
 
