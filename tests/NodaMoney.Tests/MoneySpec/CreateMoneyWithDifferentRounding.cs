@@ -4,10 +4,10 @@ using Xunit;
 
 namespace NodaMoney.Tests.MoneySpec;
 
-public class GivenIWantMoneyWithDifferentRounding
+public class CreateMoneyWithDifferentRounding
 {
     [Fact]
-    public void WhenOnlyAmount_ThenItShouldRoundUp()
+    public void RoundUp_When_OnlyAmount()
     {
         decimal amount = 0.525m;
         var defaultRounding = new Money(amount, "EUR");
@@ -18,7 +18,7 @@ public class GivenIWantMoneyWithDifferentRounding
     }
 
     [Fact]
-    public void WhenAmountAndCode_ThenItShouldRoundUp()
+    public void RoundUp_When_AmountAndCode()
     {
         decimal amount = 0.525m;
         var defaultRounding = new Money(amount, "EUR");

@@ -9,11 +9,11 @@ public class GivenIWantToSerializeMoney
 {
     public static IEnumerable<object[]> TestData => new[]
     {
-        [new Money(765.4321m, Currency.FromCode("JPY")), "JPY", "JPY 765"],
-        [new Money(765.4321m, Currency.FromCode("EUR")), "EUR", "EUR 765.43"],
-        [new Money(765.4321m, Currency.FromCode("USD")), "USD", "USD 765.43"],
-        [new Money(765.4321m, Currency.FromCode("BHD")), "BHD", "BHD 765.432"],
-        [new Money(765.4321m, Currency.FromCode("BTC")), "BTC", "BTC 765.43210000"],
+        [new Money(765.4321m, CurrencyInfo.FromCode("JPY")), "JPY", "JPY 765"],
+        [new Money(765.4321m, CurrencyInfo.FromCode("EUR")), "EUR", "EUR 765.43"],
+        [new Money(765.4321m, CurrencyInfo.FromCode("USD")), "USD", "USD 765.43"],
+        [new Money(765.4321m, CurrencyInfo.FromCode("BHD")), "BHD", "BHD 765.432"],
+        [new Money(765.43214321m, CurrencyInfo.FromCode("BTC")), "BTC", "BTC 765.43214321"],
         (object[])[default(Money), "XXX", "XXX 0"],
         //new object[] { default(Money?), "\"\"", "\"\"" }
     };

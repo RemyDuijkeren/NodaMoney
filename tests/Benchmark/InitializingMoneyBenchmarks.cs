@@ -6,7 +6,7 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class InitializingMoneyBenchmarks
 {
-    readonly Currency _euro = Currency.FromCode("EUR");
+    readonly Currency _euro = CurrencyInfo.FromCode("EUR");
     readonly Money _money = new Money(10m, "EUR");
 
     [Benchmark(Baseline = true)]
@@ -23,6 +23,12 @@ public class InitializingMoneyBenchmarks
 
     [Benchmark]
     public Money ExplicitCurrencyFromCode()
+    {
+        return new Money(6.54m, Currency.FromCode("EUR"));
+    }
+
+    [Benchmark]
+    public Money ExplicitCurrencyInfoFromCode()
     {
         return new Money(6.54m, CurrencyInfo.FromCode("EUR"));
     }

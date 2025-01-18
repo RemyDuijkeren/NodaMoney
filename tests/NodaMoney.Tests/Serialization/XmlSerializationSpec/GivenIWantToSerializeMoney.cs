@@ -8,11 +8,11 @@ public class GivenIWantToSerializeMoney : XmlSerializationHelper
 {
     public static IEnumerable<object[]> TestData => new[]
     {
-        [new Money(765.4321m, Currency.FromCode("JPY")), """<Money Currency="JPY">765</Money>"""],
-        [new Money(765.4321m, Currency.FromCode("EUR")), """<Money Currency="EUR">765.43</Money>"""],
-        [new Money(765.4321m, Currency.FromCode("USD")), """<Money Currency="USD">765.43</Money>"""],
-        [new Money(765.4321m, Currency.FromCode("BHD")), """<Money Currency="BHD">765.432</Money>"""],
-        [new Money(765.4321m, Currency.FromCode("BTC")), """<Money Currency="BTC">765.43210000</Money>"""],
+        [new Money(765.4321m, CurrencyInfo.FromCode("JPY")), """<Money Currency="JPY">765</Money>"""],
+        [new Money(765.4321m, CurrencyInfo.FromCode("EUR")), """<Money Currency="EUR">765.43</Money>"""],
+        [new Money(765.4321m, CurrencyInfo.FromCode("USD")), """<Money Currency="USD">765.43</Money>"""],
+        [new Money(765.4321m, CurrencyInfo.FromCode("BHD")), """<Money Currency="BHD">765.432</Money>"""],
+        [new Money(765.43214321m, CurrencyInfo.FromCode("BTC")), """<Money Currency="BTC">765.43214321</Money>"""],
         (object[])[default(Money), """<Money Currency="XXX">0</Money>"""]
     };
 

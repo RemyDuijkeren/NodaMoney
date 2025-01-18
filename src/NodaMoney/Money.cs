@@ -290,11 +290,6 @@ public readonly partial struct Money : IEquatable<Money>
         }
     }
 
-    [SuppressMessage(
-        "Microsoft.Globalization",
-        "CA1305:SpecifyIFormatProvider",
-        MessageId = "System.String.Format(System.String,System.Object[])",
-        Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
     private static void VerifySameCurrency(in Money left, in Money right)
     {
         if (left.Currency != right.Currency)

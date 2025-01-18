@@ -47,8 +47,7 @@ public record CurrencyInfo
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
-    [ThreadStatic]
-    static CurrencyInfo? s_currentThreadCurrency;
+    [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
 
     // static CurrencyInfo()
     // {
@@ -120,6 +119,20 @@ public record CurrencyInfo
             };
         }
     }
+
+    /// <summary>Gets a value indicating whether the minor unit of the currency is based on the decimal system.</summary>
+    /// <value><c>true</c> if minor unit is decimal based; otherwise, <c>false</c>.</value>
+    /// <remarks>
+    /// This property evaluates if the minor unit represents decimal-base minor units (e.g., USD, where 1 unit = 100 minor units).
+    /// Certain currencies might use non-decimal-based minor units (e.g., MRU, where 1 unit = 5 minor units).
+    /// </remarks>
+    public bool MinorUnitIsDecimalBased =>
+        MinorUnit switch
+        {
+            MinorUnit.NotApplicable => true,
+            MinorUnit.OneFifth => false,
+            _ => true,
+        };
 
     /// <summary>Gets the number of minor units by which the currency unit can be divided in.</summary>
     /// <para>
