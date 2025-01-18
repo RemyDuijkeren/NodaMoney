@@ -50,69 +50,84 @@ from one currency to another currency.
 **Initalizing money**
 
 ```C#
-// define money with explicit currency
-var euros = new Money(6.54m, Currency.FromCode("EUR"));
-var euros = new Money(6.54m, "EUR");
+// Define money with explicit currency
+Money euros = new Money(6.54m, "EUR");
+Money euros = new (6.54m, "EUR");
+Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
+Money euros = new Money(6.54m, Currency.FromCode("EUR"));
 
-// define money explicit using helper method for most used currencies in the world
-var money = Money.Euro(6.54m);
-var money = Money.USDollar(6.54m);
-var money = Money.PoundSterling(6.54m);
-var money = Money.Yen(6);
+// Define money explicit using helper method for most used currencies in the world
+Money money = Money.Euro(6.54m);
+Money money = Money.USDollar(6.54m);
+Money money = Money.PoundSterling(6.54m);
+Money money = Money.Yen(6);
 
-// define money implicit using currency of current culture/region
-var money = new Money(6.54m);
+// Use current culture/region to auto populate Currency.
+// When culture is 'NL-nl' code below results in Euros.
+Money money = new Money(6.54m);
+Money money = new (6.54m);
 Money money = (Money)6.54m;
 Money money = (Money)6;
-Money money = (Money)6.54; // need explict cast from double data type
+Money money = (Money)6.54;
 
-// auto-rounding to the minor unit will take place with MidpointRounding.ToEven
+// Auto-rounding to the minor unit will take place with MidpointRounding.ToEven
 // also known as banker's rounding
-var euro = new Money(765.425m, "EUR"); // EUR 765.42
-var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
+Money euro = new Money(765.425m, "EUR"); // EUR 765.42
+Money euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
 
-// deconstruct money
-var money = new Money(10m, "EUR");
+// Deconstruct money
+Money money = new Money(10m, "EUR");
 var (amount, currency) = money;
 ```
 
 **Money operations**
 
 ```C#
-var euro10 = Money.Euro(10);
-var euro20 = Money.Euro(20);
-var dollar10 = Money.USDollar(10);
+Money euro10 = Money.Euro(10);
+Money euro20 = Money.Euro(20);
+Money dollar10 = Money.USDollar(10);
+Money zeroDollar = Money.USDollar(0);
 
-// add and substract
-var euro30 = euro10 + euro20;
-var euro10 = euro20 - euro10;
-var m = euro10 + dollar10; // will throw exception!
-euro10 += euro20;
-euro10 -= euro20;
-
-// compare money
+// Compare money
 euro10 == euro20; // false
 euro10 != euro20; // true;
 euro10 == dollar10; // false;
 euro20 > euro10; // true;
-euro10 <= dollar10; // will throw exception!
+euro10 <= dollar10; // throws InvalidCurrencyException!
 
-// decrement and increment by minor unit
-var yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
-var euro = new Money(765.43m, "EUR");
+// Add and substract
+Money euro30 = euro10 + euro20;
+Money euro10 = euro20 - euro10;
+Money m = euro10 + dollar10; // throws InvalidCurrencyException!
+Money euro10 = euro10 + zeroDollar; // doesn't throw when adding zero
+euro20 += euro10; // EUR 30
+euro20 -= euro10; // EUR 10
+
+// Decrement and increment by minor unit
+Money yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
+Money euro = new Money(765.43m, "EUR"); // the smallest unit is 1 cent (1EUR = 100 cent)
 ++yen; // JPY 766
 --yen; // JPY 765
 ++euro; // EUR 765.44
 --euro; // EUR 765.43
+
+// Multiply
+Money m = euro10 * euro20; // doesn't compile!
+Money euro20 = euro10 * 2;
+Money discount = euro10 * 0.15m;
+
+// Divide
+decimal ratio = euro20 / euro10;
+Money euro5 = euro10 / 2;
 ```
 
 **Money formatting**
 
 ```C#
-var yen = new Money(765m, "JPY");
-var euro = new Money(765.43m, "EUR");
-var dollar = new Money(765.43m, "USD");
-var dinar = new Money(765.432m, "BHD");
+Money yen = new Money(765m, "JPY");
+Money euro = new Money(765.43m, "EUR");
+Money dollar = new Money(765.43m, "USD");
+Money dinar = new Money(765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
 yen.ToString();    // "¥765"

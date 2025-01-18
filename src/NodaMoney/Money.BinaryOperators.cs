@@ -5,7 +5,10 @@ namespace NodaMoney;
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
 #if NET7_0_OR_GREATER
-    : IAdditionOperators<Money, Money, Money>, IAdditionOperators<Money, decimal, Money>
+    : IAdditionOperators<Money, Money, Money>, IAdditionOperators<Money, decimal, Money>,
+        ISubtractionOperators<Money, Money, Money>, ISubtractionOperators<Money, decimal, Money>,
+        IMultiplyOperators<Money, decimal, Money>, IDivisionOperators<Money, decimal, Money>,
+        IDivisionOperators<Money, Money, decimal>
 #endif
 {
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
@@ -76,7 +79,7 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
     public static Money Add(in Money money1, in Money money2)
     {
-        // If one of the amounts is zero, then no need to check currency and just return input value.
+        // If one of the amounts is zero, then no need to check currency: Just return input value.
         if (money1.Amount == 0m)
             return money2;
         if (money2.Amount == 0m)
@@ -105,8 +108,21 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
     public static Money Subtract(in Money money1, in Money money2)
     {
+        // If one of the amounts is zero, then no need to check currency: Just return input value.
+        if (money1.Amount == 0m)
+            return money2;
+        if (money2.Amount == 0m)
+            return money1;
+
         VerifySameCurrency(money1, money2);
-        return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
+        try
+        {
+            return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
+        }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a Money.", ex);
+        }
     }
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
@@ -119,7 +135,17 @@ public partial struct Money
     /// <param name="money">The money.</param>
     /// <param name="multiplier">The multiplier.</param>
     /// <returns>The result as <see cref="Money"/> after multiplying.</returns>
-    public static Money Multiply(in Money money, in decimal multiplier) => new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
+    public static Money Multiply(in Money money, in decimal multiplier)
+    {
+        try
+        {
+            return new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
+        }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a Money.", ex);
+        }
+    }
 
     /// <summary>Divides the specified money.</summary>
     /// <param name="money">The money.</param>

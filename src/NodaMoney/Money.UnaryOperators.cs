@@ -1,27 +1,32 @@
-﻿namespace NodaMoney;
+﻿using System.Numerics;
+
+namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
+#if NET7_0_OR_GREATER
+    : IDecrementOperators<Money>, IIncrementOperators<Money>, IUnaryPlusOperators<Money, Money>, IUnaryNegationOperators<Money, Money>
+#endif
 {
     /// <summary>Implements the operator +.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator +(in Money money) => Plus(money);
+    public static Money operator +(Money money) => Plus(money);
 
     /// <summary>Implements the operator -.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator -(in Money money) => Negate(money);
+    public static Money operator -(Money money) => Negate(money);
 
     /// <summary>Implements the operator ++.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator ++(in Money money) => Increment(money);
+    public static Money operator ++(Money money) => Increment(money);
 
     /// <summary>Implements the operator --.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator --(in Money money) => Decrement(money);
+    public static Money operator --(Money money) => Decrement(money);
 
     /// <summary>Pluses the specified money.</summary>
     /// <param name="money">The money.</param>

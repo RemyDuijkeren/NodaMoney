@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
@@ -63,6 +64,58 @@ public class MultiplyAndDivideMoney
         // Assert
         result.Should().Be(new Money(expected, "EUR"));
         result.Should().NotBeSameAs(money);
+    }
+
+    [Fact]
+    public void ThrowOverflowException_When_MultiplyIsMoreThenMaxValue()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MaxValue);
+
+        // Act
+        Action action = () => Money.Multiply(maxValueMoney, 2m);
+
+        // Assert
+        action.Should().Throw<OverflowException>().WithMessage("Value was either too large or too small for a Money.");
+    }
+
+    [Fact]
+    public void ThrowDivideByZeroException_When_DivideIByZero()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MaxValue);
+
+        // Act
+        Action action = () => Money.Divide(maxValueMoney, 0m);
+
+        // Assert
+        action.Should().Throw<DivideByZeroException>();
+    }
+
+    [Fact]
+    public void ThrowOverflowException_When_MultiplyByIntIsMoreThenMaxValue()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MaxValue);
+
+        // Act
+        Action action = () => Money.Multiply(maxValueMoney, 2);
+
+        // Assert
+        action.Should().Throw<OverflowException>().WithMessage("Value was either too large or too small for a Money.");
+    }
+
+    [Fact]
+    public void ThrowDivideByZeroException_When_DivideIByZeroInt()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MaxValue);
+
+        // Act
+        Action action = () => Money.Divide(maxValueMoney, 0);
+
+        // Assert
+        action.Should().Throw<DivideByZeroException>();
     }
 
     public static IEnumerable<object[]> TestDataInteger =>

@@ -57,6 +57,20 @@ public class AddAndSubtractMoney
         action.Should().Throw<OverflowException>().WithMessage("Value was either too large or too small for a Money.");
     }
 
+    [Fact]
+    public void ThrowOverflowException_When_SubtractIsMoreThenMinValue()
+    {
+        // Arrange
+        Money maxValueMoney = new(decimal.MinValue);
+        Money moneyToAdd = new(1);
+
+        // Act
+        Action action = () => Money.Subtract(maxValueMoney, moneyToAdd);
+
+        // Assert
+        action.Should().Throw<OverflowException>().WithMessage("Value was either too large or too small for a Money.");
+    }
+
     [Theory, MemberData(nameof(TestData))]
     public void MoneyIsSubtracted_When_SubtractUsingOperator(decimal expected, decimal value2, decimal value1)
     {
@@ -107,6 +121,36 @@ public class AddAndSubtractMoney
 
         // Act
         Money result = Money.Add(money, zero);
+
+        // Assert
+        result.Should().Be(money);
+        result.Should().NotBeSameAs(zero);
+    }
+
+    [Fact]
+    public void MoneyIsSubtracted_When_SubtractWithZeroInDifferentCurrency_UsingOperator()
+    {
+        // Arrange
+        Money money = new(123.45m, "EUR");
+        Money zero = new(0m, "USD");
+
+        // Act
+        Money result = money - zero;
+
+        // Assert
+        result.Should().Be(money);
+        result.Should().NotBeSameAs(zero);
+    }
+
+    [Fact]
+    public void MoneyIsSubtracted_When_SubstractWithZeroInDifferentCurrency_UsingMethod()
+    {
+        // Arrange
+        Money money = new(123.45m, "EUR");
+        Money zero = new(0m, "USD");
+
+        // Act
+        Money result = Money.Subtract(money, zero);
 
         // Assert
         result.Should().Be(money);

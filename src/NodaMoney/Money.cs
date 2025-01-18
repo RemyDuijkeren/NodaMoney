@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace NodaMoney;
 
@@ -246,7 +244,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// and value.</summary>
     /// <param name="obj">An <see cref="object"/>.</param>
     /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => obj is Money money && this.Equals(money);
+    public override bool Equals(object? obj) => obj is Money money && this.Equals(money);
 
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
@@ -269,7 +267,7 @@ public readonly partial struct Money : IEquatable<Money>
         currency = Currency;
     }
 
-    private static decimal Round(in decimal amount, in Currency currency, in MidpointRounding rounding)
+    private static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding)
     {
         var currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
 
