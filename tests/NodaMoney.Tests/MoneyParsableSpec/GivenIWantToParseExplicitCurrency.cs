@@ -77,32 +77,32 @@ public class GivenIWantToParseExplicitCurrency
     [Fact, UseCulture("nl-NL")]
     public void WhenValueIsNull_ThenThrowException()
     {
-        Action action = () => Money.Parse(null, CurrencyInfo.FromCode("EUR"));
+        Action action = () => Money.Parse((string)null, CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsEmpty_ThenThrowException()
+    public void WhenValueIsEmpty_ThenThrowFormatException()
     {
         Action action = () => Money.Parse("", CurrencyInfo.FromCode("EUR"));
 
-        action.Should().Throw<ArgumentNullException>();
+        action.Should().Throw<FormatException>().WithMessage("*not in a correct format*");
     }
 
     [Fact, UseCulture("nl-NL")]
     public void WhenValueIsNullWithOverrideMethod_ThenThrowException()
     {
-        Action action = () => Money.Parse(null, NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
+        Action action = () => Money.Parse((string)null, NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsEmptyWithOverrideMethod_ThenThrowException()
+    public void WhenValueIsEmptyWithOverrideMethod_ThenThrowFormatException()
     {
         Action action = () => Money.Parse("", NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
 
-        action.Should().Throw<ArgumentNullException>();
+        action.Should().Throw<FormatException>().WithMessage("*not in a correct format*");
     }
 }

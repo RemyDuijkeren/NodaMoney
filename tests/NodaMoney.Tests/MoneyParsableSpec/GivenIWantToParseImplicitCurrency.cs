@@ -99,11 +99,11 @@ public class GivenIWantToParseImplicitCurrency
     }
 
     [Fact]
-    public void WhenValueIsEmpty_ThenThrowException()
+    public void WhenValueIsEmpty_ThenThrowFormatException()
     {
         Action action = () => Money.Parse("");
 
-        action.Should().Throw<ArgumentNullException>();
+        action.Should().Throw<FormatException>().WithMessage("*not in a correct format*");
     }
 
     [Fact, UseCulture("nl-NL")]
