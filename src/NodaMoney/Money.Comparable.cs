@@ -123,7 +123,7 @@ public partial struct Money : IComparable, IComparable<Money>
     /// </returns>
     public int CompareTo(Money other)
     {
-            VerifySameCurrency(this, other);
+            EnsureSameCurrency(this, other);
             return Amount.CompareTo(other.Amount);
         }
 }

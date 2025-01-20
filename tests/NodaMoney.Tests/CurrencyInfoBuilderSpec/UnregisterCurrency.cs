@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.CurrencyInfoBuilderSpec;
 public class UnregisterCurrency
 {
     [Fact]
-    public void NotBeRegistered_When_UnregisterIso()
+    public void WhenUnregisterIso_ShouldNotBeRegistered()
     {
         // Arrange
         CurrencyInfo exists = CurrencyInfo.FromCode("PAB");
@@ -25,7 +25,7 @@ public class UnregisterCurrency
     }
 
     [Fact]
-    public void NotBeRegistered_When_UnregisterNonIso()
+    public void WhenUnregisterNonIso_ShouldNotBeRegistered()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("XYZ")
@@ -50,7 +50,7 @@ public class UnregisterCurrency
     }
 
     [Fact]
-    public void ThrowInvalidCurrencyException_When_CurrencyDoesNotExist()
+    public void WhenCurrencyDoesNotExist_ThrowInvalidCurrencyException()
     {
         // Arrange
 
@@ -62,7 +62,7 @@ public class UnregisterCurrency
     }
 
     [Fact]
-    public void ThrowArgumentNullException_When_CodeIsNull()
+    public void WhenCodeIsNull_ThrowArgumentNullException()
     {
         // Arrange
 
@@ -74,7 +74,7 @@ public class UnregisterCurrency
     }
 
     [Fact]
-    public void ThrowArgumentNullException_When_CodeIsEmpty()
+    public void WhenCodeIsEmpty_ThrowArgumentNullException()
     {
         // Arrange
 

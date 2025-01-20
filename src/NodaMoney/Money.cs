@@ -288,7 +288,7 @@ public readonly partial struct Money : IEquatable<Money>
         }
     }
 
-    private static void VerifySameCurrency(in Money left, in Money right)
+    private static void EnsureSameCurrency(in Money left, in Money right)
     {
         if (left.Currency != right.Currency)
             throw new InvalidCurrencyException(left.Currency, right.Currency);

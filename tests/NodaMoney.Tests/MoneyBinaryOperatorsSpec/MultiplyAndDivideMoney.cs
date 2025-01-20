@@ -17,7 +17,7 @@ public class MultiplyAndDivideMoney
     ];
 
     [Theory, MemberData(nameof(TestDataDecimal))]
-    public void MoneyIsMultiplied_When_MultiplyByDecimal_UsingOperator(decimal value, decimal multiplier, decimal expected)
+    public void WhenMultiplyOperatorByDecimal_ReturnMultipliedMoney(decimal value, decimal multiplier, decimal expected)
     {
         var money = new Money(value, "EUR");
 
@@ -31,7 +31,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataDecimal))]
-    public void MoneyIsMultiplied_When_MultiplyByDecimal_UsingMethod(decimal value, decimal multiplier, decimal expected)
+    public void WhenMultiplyMethodByDecimal_ReturnMultipliedMoney(decimal value, decimal multiplier, decimal expected)
     {
         var money = new Money(value, "EUR");
 
@@ -42,7 +42,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataDecimal))]
-    public void MoneyIsDivided_When_DividedByDecimal_UsingOperator(decimal expected, decimal divider, decimal value)
+    public void WhenDivideOperatorByDecimal_ReturnDividedMoney(decimal expected, decimal divider, decimal value)
     {
         var money = new Money(value, "EUR");
 
@@ -53,7 +53,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataDecimal))]
-    public void MoneyIsDivided_When_DividedByDecimal_UsingMethod(decimal expected, decimal divider, decimal value)
+    public void WhenDivideMethodByDecimal_ReturnDividedMoney(decimal expected, decimal divider, decimal value)
     {
         // Arrange
         var money = new Money(value, "EUR");
@@ -67,7 +67,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Fact]
-    public void ThrowOverflowException_When_MultiplyIsMoreThenMaxValue()
+    public void WhenMultiplyIsMoreThenMaxValue_ThrowOverflowException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -80,7 +80,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Fact]
-    public void ThrowDivideByZeroException_When_DivideIByZero()
+    public void WhenDivideIByZero_ThrowDivideByZeroException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -93,7 +93,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Fact]
-    public void ThrowOverflowException_When_MultiplyByIntIsMoreThenMaxValue()
+    public void WhenMultiplyByIntIsMoreThenMaxValue_ThrowDivideByZeroException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -106,7 +106,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Fact]
-    public void ThrowDivideByZeroException_When_DivideIByZeroInt()
+    public void WhenDivideIByZeroInt_ThrowDivideByZeroException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -128,7 +128,7 @@ public class MultiplyAndDivideMoney
     ];
 
     [Theory, MemberData(nameof(TestDataInteger))]
-    public void MoneyIsMultiplied_When_MultiplyByInt_UsingOperator(decimal value, int multiplier, decimal expected)
+    public void WhenMultiplyOperatorByInt_ReturnMultipliedMoney(decimal value, int multiplier, decimal expected)
     {
         var money = new Money(value, "EUR");
 
@@ -142,7 +142,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataInteger))]
-    public void MoneyIsMultiplied_When_MultiplyByInt_UsingMethod(decimal value, int multiplier, decimal expected)
+    public void WhenMultiplyMethodByInt_ReturnMultipliedMoney(decimal value, int multiplier, decimal expected)
     {
         var money = new Money(value, "EUR");
 
@@ -153,7 +153,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataInteger))]
-    public void MoneyIsDivided_When_DivideByInt_UsingOperator(decimal expected, int divider, decimal value)
+    public void WhenDivideOperatorByInt_ReturnDividedMoney(decimal expected, int divider, decimal value)
     {
         var money = new Money(value, "EUR");
 
@@ -164,7 +164,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataInteger))]
-    public void MoneyIsDivided_When_DivideByInt_UsingMethod(decimal expected, int divider, decimal value)
+    public void WhenDivideMethodByInt_ReturnDividedMoney(decimal expected, int divider, decimal value)
     {
         var money = new Money(value, "EUR");
 
@@ -182,7 +182,7 @@ public class MultiplyAndDivideMoney
     ];
 
     [Theory, MemberData(nameof(TestDataMoney))]
-    public void ReturnDecimalRatio_When_DivideByMoney_UsingOperator(decimal value1, decimal value2, decimal expected)
+    public void WhenDivideOperatorByMoney_ReturnDecimalRatio(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR");
@@ -194,7 +194,7 @@ public class MultiplyAndDivideMoney
     }
 
     [Theory, MemberData(nameof(TestDataMoney))]
-    public void ReturnDecimalRatio_When_DivideByMoney_UsingMethod(decimal value1, decimal value2, decimal expected)
+    public void WhenDivideMethodByMoney_ReturnDecimalRatio(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR");

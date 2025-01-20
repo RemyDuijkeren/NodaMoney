@@ -6,7 +6,7 @@ namespace NodaMoney.Tests.MoneyNumericInterfaces;
 public class NumericOperations
 {
     [Fact]
-    public void ReturnOne_When_MultiplicativeIdentity()
+    public void WhenMultiplicativeIdentity_ReturnOne()
     {
         // Act
         decimal result = Money.MultiplicativeIdentity;
@@ -17,7 +17,7 @@ public class NumericOperations
 
 
     [Fact]
-    public void ReturnStartValue_When_MultipleWithMultiplicativeIdentity()
+    public void WhenMultipleWithMultiplicativeIdentity_ReturnStartValue()
     {
         // Arrange
         Money startValue = new(123, "EUR");
@@ -30,7 +30,7 @@ public class NumericOperations
     }
 
     [Fact]
-    public void ReturnZeroNoCurrencyMoney_When_AdditiveIdentity()
+    public void WhenAdditiveIdentity_ReturnZeroNoCurrencyMoney()
     {
         // Act
         Money result = Money.AdditiveIdentity;
@@ -40,7 +40,7 @@ public class NumericOperations
     }
 
     [Fact]
-    public void ReturnStartValue_When_AddingAdditiveIdentity()
+    public void WhenAddingAdditiveIdentity_ReturnStartValue()
     {
         // Arrange
         Money startValue = new(123, "EUR");

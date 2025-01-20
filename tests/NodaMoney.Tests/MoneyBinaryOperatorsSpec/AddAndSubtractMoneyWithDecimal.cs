@@ -20,7 +20,7 @@ public class AddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void MoneyIsAdded_When_AddUsingOperator(decimal value1, decimal value2, decimal expected)
+    public void WhenAddOperator_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -35,7 +35,7 @@ public class AddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void MoneyIsAdded_When_AddUsingMethod(decimal value1, decimal value2, decimal expected)
+    public void WhenAddMethod_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -47,7 +47,7 @@ public class AddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void MoneyIsSubtracted_When_SubtractUsingOperator(decimal expected, decimal value2, decimal value1)
+    public void WhenSubtractOperator_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1, "EUR");
 
@@ -62,7 +62,7 @@ public class AddAndSubtractMoneyWithDecimal
 
     [Theory, MemberData(nameof(TestData))]
     [UseCulture("en-us")]
-    public void MoneyIsSubtracted_When_SubtractUsingMethod(decimal expected, decimal value2, decimal value1)
+    public void WhenSubtractMethod_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1, "EUR");
 

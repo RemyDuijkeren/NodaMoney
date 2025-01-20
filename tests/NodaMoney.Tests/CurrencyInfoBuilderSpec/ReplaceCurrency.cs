@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.CurrencyInfoBuilderSpec;
 public class ReplaceCurrency
 {
     [Fact]
-    public void MustWork_When_ReplacingCurrencyWithCustom()
+    public void WhenReplacingCurrencyWithCustom_CurrencyIsReplaced()
     {
         // Arrange
         CurrencyInfo removed = CurrencyInfoBuilder.Unregister("PAB"); // Panamanian balboa

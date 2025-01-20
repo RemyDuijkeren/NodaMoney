@@ -9,7 +9,7 @@ namespace NodaMoney.Tests.CurrencyInfoBuilderSpec;
 public class CreateCustomCurrencyInfo
 {
     [Fact]
-    public void ReturnDefaultCurrencyInfo_When_BuildWithDefaults()
+    public void WhenBuildWithDefaults_ReturnDefaultCurrencyInfo()
     {
         // Arrange
         CurrencyInfoBuilder builder = new("BTA");
@@ -27,7 +27,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void NotBeRegistered_When_Build()
+    public void WhenBuild_ShouldNotBeRegistered()
     {
         // Arrange
         CurrencyInfoBuilder builder = new("BTA");
@@ -41,7 +41,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void BeRegistered_When_Register()
+    public void WhenRegister_ShouldBeRegistered()
     {
         // Arrange
         CurrencyInfoBuilder builder = new("BTA");
@@ -56,7 +56,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void NotBeRegistered_When_BuildBitCoin()
+    public void WhenBuildBitCoin_ShouldNotBeRegistered()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("BTD")
@@ -83,7 +83,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void BeRegisteredAsDefaultToNonIso_When_RegisterBitCoin()
+    public void WhenRegisterBitCoin_ShouldBeRegisteredAsDefaultToNonIso()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("BTE")
@@ -106,7 +106,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void BeRegisteredAsIso_When_RegisterBitcoinAsIso()
+    public void WhenRegisterBitcoinAsIso_ShouldBeRegisteredAsIso()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("BTB")
@@ -134,7 +134,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void ThrowInvalidCurrencyException_When_RegisterExistingCurrency()
+    public void WhenRegisterExistingCurrency_ThrowInvalidCurrencyException()
     {
         // Arrange
         var builder = new CurrencyInfoBuilder("EUR");
@@ -149,7 +149,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void WhenFromExistingCurrency_ThenThisShouldSucceed()
+    public void WhenLoadFromExistingCurrency_ThenThisShouldSucceed()
     {
         var builder = new CurrencyInfoBuilder("BTE") { IsIso4217 = false };
 
@@ -168,7 +168,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void ThrowArgumentNullException_When_CodeIsNull()
+    public void WhenCodeIsNull_ThrowArgumentNullException()
     {
         // Arrange
 
@@ -180,7 +180,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void ThrowArgumentNullException_When_CodeIsEmpty()
+    public void WhenCodeIsEmpty_ThrowArgumentNullException()
     {
         // Arrange
 
@@ -192,7 +192,7 @@ public class CreateCustomCurrencyInfo
     }
 
     [Fact]
-    public void SymbolMustBeDefaultCurrencySign_When_SymbolIsEmpty()
+    public void WhenSymbolIsEmpty_SymbolMustBeDefaultCurrencySign()
     {
         // Arrange
 

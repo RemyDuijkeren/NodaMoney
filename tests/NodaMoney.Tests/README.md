@@ -21,7 +21,7 @@ brittle tests.
 
 ### Test naming
 
-We follow the [Given-When_Then](https://www.agilealliance.org/glossary/given-when-then/) style of writing acceptance
+We follow the [Given-When-Then](https://www.agilealliance.org/glossary/given-when-then/) style of writing acceptance
 criteria for tests.
 
 Where generally:
@@ -30,24 +30,24 @@ Where generally:
 
 #### Methods names
 
-Method names should capture the **When** and **Then**, like **When[PreCondition(s)]_Then[ExpectedBehvavior]**, but we flip
-this into **Then[ExpectedBehvavior]_When[PreCondition(s)]**. We then remove the _Then_ prefix, because it's redundant.
+Method names should capture the **When** and **Then**, like **When/With[PreCondition(s)]_Then[ExpectedBehvavior]**.
+We often remove the _Then_ prefix, because it's redundant, or replace it with _Should_ if it makes more sense.
 
 Optionally you can include the method name under test at the beginning at the method name to group the tests (try not to
 because when the method changes, you need to change the tests). The test method name should be a sentence that reads.
 
 This will result in a test methods name like below:.
 
-    (MethodNameUnderTest_)[ExpectedBehavior]_When_[PreCondition(s)]
+    (MethodNameUnderTest_)_(When)[PreCondition(s)]_ReturnsCorrectResult
 
     examples:
-    ThrowException_When_AgeLessThan18
-    ReturnContact_When_ContactIdExists
-    ThrowArgumentException_When_ContactIdIsNullOrWhitespace
-    PublishContactCreatedEvent_When_ContactIsCreated
-    SendCreateContactCommand_When_ContactIsCreated
-    SumTwoNumbers_When_NumbersArePositive
-    SumTwoNumbers // omit the When_ part if there are no preconditions or only one precondition
+    WhenAgeLessThan18_ThrowException
+    WhenContactIdExists_ReturnContact
+    WhenContactIdIsNullOrWhitespace_ThrowArgumentException
+    WhenContactIsCreated_PublishContactCreatedEvent
+    WhenContactIsCreated_SendCreateContactCommand
+    WhenNumbersArePositive_ShouldSumTwoNumbers
+    ShouldSumTwoNumbers // omit the When_ part if there are no preconditions or only one precondition
 
 ### Class names
 Class names have the **Given** part in BDD style, the context, which would result in a class name as **Given[Context]**.
@@ -86,7 +86,7 @@ We follow the Arrange, Act, Assert (AAA) pattern for structuring our tests. This
 
 ```c#
     [Fact]
-    public void ReturnsContact_WhenContactIdExists()
+    public void WhenContactIdExists_ReturnsContact()
     {
         // Arrange
         var contactId = Guid.NewGuid();

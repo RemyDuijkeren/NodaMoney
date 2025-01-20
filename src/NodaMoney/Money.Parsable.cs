@@ -83,7 +83,7 @@ public partial struct Money
     /// <param name="provider">An object that provides culture-specific formatting information, or <c>null</c> to use the current culture.</param>
     /// <returns>The equivalent monetary value represented by the provided text.</returns>
     /// <exception cref="System.FormatException">The input is not a valid UTF-8 encoded text or cannot be parsed as a monetary value.</exception>
-    public static Money Parse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider)
+    static Money IUtf8SpanParsable<Money>.Parse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider)
     {
         // Attempt to decode UTF8 text directly to a char span without intermediate string allocation
         Span<char> charBuffer = stackalloc char[utf8Text.Length]; // Allocate on the stack
@@ -195,7 +195,7 @@ public partial struct Money
     /// <param name="provider">An object that provides culture-specific formatting information.</param>
     /// <param name="result">When this method returns, contains the parsed <see cref="Money"/> value if the conversion succeeded, or the default value if it failed.</param>
     /// <returns><c>true</c> if the text was successfully parsed; otherwise, <c>false</c>.</returns>
-    public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Money result)
+    static bool IUtf8SpanParsable<Money>.TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Money result)
     {
         // Decode UTF-8 encoded bytes to a char span
         Span<char> charBuffer = stackalloc char[utf8Text.Length]; // Allocate stack buffer

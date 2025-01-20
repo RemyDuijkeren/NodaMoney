@@ -36,7 +36,7 @@ public class InvalidCurrencyException : InvalidOperationException
     /// <param name="expected">The expected currency.</param>
     /// <param name="actual">The actual currency.</param>
     public InvalidCurrencyException(Currency expected, Currency actual)
-        : this($"The requested operation expected the currency {expected.Code}, but the actual value was the currency {actual.Code}!")
+        : this($"Currency mismatch: The requested operation expected the currency {expected.Code}, but the actual value was the currency {actual.Code}!")
     {
         }
 

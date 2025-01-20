@@ -18,7 +18,7 @@ public class AddAndSubtractMoney
     ];
 
     [Theory, MemberData(nameof(TestData))]
-    public void MoneyIsAdded_When_AddUsingOperator(decimal value1, decimal value2, decimal expected)
+    public void WhenAddOperator_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1);
         var money2 = new Money(value2);
@@ -31,7 +31,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void MoneyIsAdded_When_AddUsingMethod(decimal value1, decimal value2, decimal expected)
+    public void WhenAddMethod_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1);
         var money2 = new Money(value2);
@@ -44,7 +44,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void ThrowOverflowException_When_AddIsMoreThenMaxValue()
+    public void WhenAddIsMoreThenMaxValue_ThrowOverflowException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -58,7 +58,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void ThrowOverflowException_When_SubtractIsMoreThenMinValue()
+    public void WhenSubtractIsMoreThenMinValue_ThrowOverflowException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MinValue);
@@ -72,7 +72,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void MoneyIsSubtracted_When_SubtractUsingOperator(decimal expected, decimal value2, decimal value1)
+    public void WhenSubtractOperator_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1);
         var money2 = new Money(value2);
@@ -85,7 +85,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void MoneyIsSubtracted_When_SubtractUsingMethod(decimal expected, decimal value2, decimal value1)
+    public void WhenSubtractMethod_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         var money1 = new Money(value1);
         var money2 = new Money(value2);
@@ -98,7 +98,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void MoneyIsAdded_When_AddWithZeroInDifferentCurrency_UsingOperator()
+    public void AddOperator_WhenAddWithZeroInDifferentCurrency_ReturnSumMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -113,7 +113,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void MoneyIsAdded_When_AddWithZeroInDifferentCurrency_UsingMethod()
+    public void AddMethod_WhenAddWithZeroInDifferentCurrency_ReturnSumMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -128,7 +128,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void MoneyIsSubtracted_When_SubtractWithZeroInDifferentCurrency_UsingOperator()
+    public void SubtractOperator_WhenSubtractWithZeroInDifferentCurrency_ReturnSubtractedMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -143,7 +143,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void MoneyIsSubtracted_When_SubstractWithZeroInDifferentCurrency_UsingMethod()
+    public void SubtractMethod_WhenSubstractWithZeroInDifferentCurrency_ReturnSubtractedMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -159,7 +159,7 @@ public class AddAndSubtractMoney
 
     [Theory, MemberData(nameof(TestData))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
-    public void ThrowException_When_AddWithDifferentCurrency_UsingOperator(decimal value1, decimal value2, decimal expected)
+    public void AddOperator_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -170,7 +170,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void ThrowException_When_AddWithDifferentCurrency_UsingMethod(decimal value1, decimal value2, decimal expected)
+    public void AddMethod_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -181,7 +181,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void ThrowException_When_SubtractWithDifferentCurrency_UsingOperator(decimal value1, decimal value2, decimal expected)
+    public void AddOperator_WhenSubtractWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -192,7 +192,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void ThrowException_When_SubtractWithDifferentCurrency_UsingMethod(decimal value1, decimal value2, decimal expected)
+    public void SubtractMethod_WhenSubtractWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
