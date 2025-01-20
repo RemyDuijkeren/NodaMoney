@@ -18,7 +18,7 @@ public class CurrencyJsonConverter : JsonConverter<Currency>
             if (string.IsNullOrWhiteSpace(code))
                 throw new JsonException("Invalid currency code.");
 
-            return Currency.FromCode(code);
+            return CurrencyInfo.FromCode(code);
         }
 
         throw new JsonException("Invalid currency code.");

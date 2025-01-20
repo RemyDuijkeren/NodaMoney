@@ -15,11 +15,11 @@ public class HighLoadBenchmarks
         for (int i = 0; i < max; i++)
         {
             if (i % 3 == 0)
-                currencies[i] = Currency.FromCode("EUR");
+                currencies[i] = CurrencyInfo.FromCode("EUR");
             else if (i % 2 == 0)
-                currencies[i] = Currency.FromCode("USD");
+                currencies[i] = CurrencyInfo.FromCode("USD");
             else
-                currencies[i] = Currency.FromCode("JPY");
+                currencies[i] = CurrencyInfo.FromCode("JPY");
         }
 
         return currencies;

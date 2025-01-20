@@ -37,7 +37,7 @@ public partial struct Money : IFormattable
     /// <param name="format">A numeric format string.</param>
     /// <param name="formatProvider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information.</param>
     /// <returns>The string representation of this <see cref="Money"/> instance as specified by the format and formatProvider.</returns>
-    public string ToString(string format, IFormatProvider formatProvider)
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
         return ConvertToString(format, formatProvider);
     }
@@ -110,7 +110,7 @@ public partial struct Money : IFormattable
         "Globalization",
         "CA1307:Specify StringComparison",
         Justification = "Invalid overload; known bug in code analysis, see https://github.com/dotnet/roslyn-analyzers/issues/1552")]
-    private string ConvertToString(string format, IFormatProvider formatProvider)
+    private string ConvertToString(string? format, IFormatProvider? formatProvider)
     {
         // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
         // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true

@@ -9,7 +9,7 @@ public class InitializingCurrencyBenchmarks
     [Benchmark]
     public Currency CurrencyFromCode()
     {
-        Currency currency = Currency.FromCode("EUR");
+        Currency currency = CurrencyInfo.FromCode("EUR");
         return currency;
     }
 

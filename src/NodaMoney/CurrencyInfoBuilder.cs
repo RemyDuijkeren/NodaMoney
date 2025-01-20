@@ -30,10 +30,10 @@ public class CurrencyInfoBuilder
     }
 
     /// <summary>Gets or sets the english name of the currency.</summary>
-    public string EnglishName { get; set; }
+    public string EnglishName { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the currency sign.</summary>
-    public string Symbol { get; set; }
+    public string Symbol { get; set; } = CurrencyInfo.GenericCurrencySign;
 
     /// <summary>Gets or sets the numeric ISO 4217 currency code.</summary>
     public string NumericCode
