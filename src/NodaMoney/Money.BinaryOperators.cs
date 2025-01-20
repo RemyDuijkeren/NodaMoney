@@ -8,7 +8,7 @@ public partial struct Money
     : IAdditionOperators<Money, Money, Money>, IAdditionOperators<Money, decimal, Money>,
         ISubtractionOperators<Money, Money, Money>, ISubtractionOperators<Money, decimal, Money>,
         IMultiplyOperators<Money, decimal, Money>, IDivisionOperators<Money, decimal, Money>,
-        IDivisionOperators<Money, Money, decimal>
+        IDivisionOperators<Money, Money, decimal>, IModulusOperators<Money, Money, Money>
 #endif
 {
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
@@ -73,6 +73,12 @@ public partial struct Money
     /// <remarks>Division of Money by Money, means the unit is lost, so the result will be a ratio <see cref="decimal"/>.</remarks>
     public static decimal operator /(Money left, Money right) => Divide(left, right);
 
+    /// <summary>Divides two <see cref="Money"/> values togheter to compute their modulus or remainder.</summary>
+    /// <param name="left">The <see cref="Money"/> value which rights divides.</param>
+    /// <param name="right">The <see cref="Money"/> value which divides left.</param>
+    /// <returns>The <see cref="Money"/> modulus or remainder of <see cref="left"/> divide by <see cref="right"/>.</returns>
+    public static Money operator %(Money left, Money right) => Remainder(left, right);
+
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
     /// <param name="money2">The second <see cref="Money"/> object.</param>
@@ -85,7 +91,7 @@ public partial struct Money
         if (money2.Amount == 0m)
             return money1;
 
-        VerifySameCurrency(money1, money2);
+        EnsureSameCurrency(money1, money2);
         try
         {
             return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
@@ -114,7 +120,7 @@ public partial struct Money
         if (money2.Amount == 0m)
             return money1;
 
-        VerifySameCurrency(money1, money2);
+        EnsureSameCurrency(money1, money2);
         try
         {
             return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
@@ -161,7 +167,17 @@ public partial struct Money
     /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
     public static decimal Divide(in Money money1, in Money money2)
     {
-        VerifySameCurrency(money1, money2);
+        EnsureSameCurrency(money1, money2);
         return decimal.Divide(money1.Amount, money2.Amount);
+    }
+
+    /// <summary>Computes the <see cref="Money"/> remainder after dividing two <see cref="Money"/> values.</summary>
+    /// <param name="money1">The <see cref="Money"/> dividend.</param>
+    /// <param name="money2">The <see cref="Money"/> divisor.</param>
+    /// <returns>The <see cref="Money"/> remainder after dividing <see cref="money1"/> by <see cref="money2"/>.</returns>
+    public static Money Remainder(in Money money1, in Money money2)
+    {
+        EnsureSameCurrency(money1, money2);
+        return new Money(decimal.Remainder(money1.Amount, money2.Amount), money1.Currency);
     }
 }

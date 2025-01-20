@@ -270,13 +270,31 @@ public record CurrencyInfo : IFormatProvider
         if (formatProvider is CurrencyInfo currencyInfo)
             return currencyInfo;
 
-        if (formatProvider is CultureInfo)
-            return FromCulture(formatProvider as CultureInfo);
+        if (formatProvider is CultureInfo cultureInfo)
+            return FromCulture(cultureInfo);
 
         if (formatProvider is NumberFormatInfo)
             throw new NotImplementedException();
 
-        return null;
+        return CurrentCurrency;
+
+        // return formatProvider == null ?
+        //     CurrentInfo : // Fast path for a null provider
+        //     GetProviderNonNull(formatProvider);
+        //
+        // static NumberFormatInfo GetProviderNonNull(IFormatProvider provider)
+        // {
+        //     // Fast path for a regular CultureInfo
+        //     if (provider is CultureInfo cultureProvider && !cultureProvider._isInherited)
+        //     {
+        //         return cultureProvider._numInfo ?? cultureProvider.NumberFormat;
+        //     }
+        //
+        //     return
+        //         provider as NumberFormatInfo ?? // Fast path for an NFI
+        //         provider.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo ??
+        //         CurrentInfo;
+        // }
     }
 
     /// <inheritdoc />

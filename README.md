@@ -95,7 +95,7 @@ euro10 == dollar10; // false;
 euro20 > euro10; // true;
 euro10 <= dollar10; // throws InvalidCurrencyException!
 
-// Add and substract
+// Add and Substract
 Money euro30 = euro10 + euro20;
 Money euro10 = euro20 - euro10;
 Money m = euro10 + dollar10; // throws InvalidCurrencyException!
@@ -103,7 +103,11 @@ Money euro10 = euro10 + zeroDollar; // doesn't throw when adding zero
 euro20 += euro10; // EUR 30
 euro20 -= euro10; // EUR 10
 
-// Decrement and increment by minor unit
+// Add and Substract with Implied Currency Context
+Money euro30 = euro10 + 20m; // decimal value is assumed to have the same currency context
+Money euro10 = euro20 - 10m; // decimal value is assumed to have the same currency context
+
+// Decrement and Increment by minor unit
 Money yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
 Money euro = new Money(765.43m, "EUR"); // the smallest unit is 1 cent (1EUR = 100 cent)
 ++yen; // JPY 766
@@ -119,6 +123,15 @@ Money discount = euro10 * 0.15m;
 // Divide
 decimal ratio = euro20 / euro10;
 Money euro5 = euro10 / 2;
+
+// Divide without losing money
+Money total = new Money(101m, "USD");
+IEnumerable<Money> shares = total.SafeDivide(4); // [USD 25, USD 25, USD 25, USD 26]
+
+// Modulus / Remainder
+Money total = new Money(105.50m, "USD");
+Money unitPrice = new Money(20.00m, "USD"); // USD 20 * 5 = USD 100
+Money remainder = total % unitPrice; // USD 5.50
 ```
 
 **Money formatting**
