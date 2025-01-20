@@ -34,7 +34,7 @@ public class CreateCustomCurrencyInfo
         builder.Build();
 
         // Act
-        Action action = () => Currency.FromCode("BTA");
+        Action action = () => CurrencyInfo.FromCode("BTA");
 
         // Assert
         action.Should().Throw<InvalidCurrencyException>().WithMessage("*unknown*currency*");
@@ -44,11 +44,11 @@ public class CreateCustomCurrencyInfo
     public void WhenRegister_ShouldBeRegistered()
     {
         // Arrange
-        CurrencyInfoBuilder builder = new("BTA");
+        CurrencyInfoBuilder builder = new("BTZ");
         CurrencyInfo result = builder.Register();
 
         // Act
-        CurrencyInfo ci = CurrencyInfo.FromCode("BTA");
+        CurrencyInfo ci = CurrencyInfo.FromCode("BTZ");
 
         // Assert
         ci.Should().BeEquivalentTo(result);

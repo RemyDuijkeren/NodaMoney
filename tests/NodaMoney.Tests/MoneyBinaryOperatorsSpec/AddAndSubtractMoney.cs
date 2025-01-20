@@ -166,7 +166,7 @@ public class AddAndSubtractMoney
 
         Action action = () => { var result = money1 + money2; };
 
-        action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
     [Theory, MemberData(nameof(TestData))]
@@ -177,7 +177,7 @@ public class AddAndSubtractMoney
 
         Action action = () => Money.Add(money1, money2);
 
-        action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
     [Theory, MemberData(nameof(TestData))]
@@ -188,7 +188,7 @@ public class AddAndSubtractMoney
 
         Action action = () => { var result = money1 - money2; };
 
-        action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
     [Theory, MemberData(nameof(TestData))]
@@ -199,7 +199,7 @@ public class AddAndSubtractMoney
 
         Action action = () => Money.Subtract(money1, money2);
 
-        action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters
 }

@@ -107,7 +107,7 @@ public class GivenIWantToCompareMoney
     {
             Action action = () => _tenEuro1.CompareTo(_tenDollar);
 
-            action.Should().Throw<InvalidCurrencyException>().WithMessage("The requested operation expected the currency*");
+            action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
         }
 
     [Fact]
