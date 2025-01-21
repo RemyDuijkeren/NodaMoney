@@ -87,4 +87,23 @@ public class GivenIWantToSerializeMoney
         // var clone = JsonConvert.DeserializeObject<Order>(json);
         // clone.Should().BeEquivalentTo(order);
     }
+
+    [Fact]
+    public void WhenNullableOrderWithTotalIsNull_ThenThisShouldSucceed()
+    {
+        // Arrange
+        //var order = new NullableOrder { Id = 123, Name = "Foo", Total = null };
+        var order = new NullableOrder { Id = 123, Name = "Foo" };
+        string expected = $$"""{"Id":123,"Total":null,"Name":"Foo"}""";
+
+        // Act
+        string json = JsonConvert.SerializeObject(order);
+
+        // Assert
+        json.Should().Be(expected);
+
+        // var clone = JsonConvert.DeserializeObject<NullableOrder>(json);
+        // clone.Should().BeEquivalentTo(order);
+        // clone.Total.Should().BeNull();
+    }
 }

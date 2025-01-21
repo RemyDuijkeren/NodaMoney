@@ -47,14 +47,12 @@ public record CurrencyInfo : IFormatProvider
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
-    [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
+    //[ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
 
     // static CurrencyInfo()
     // {
     //     s_currentThreadCurrency = NoCurrency;
     // }
-
-    //public Currency CurrencyUnit => new(Code);
 
     public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
 

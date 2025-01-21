@@ -49,7 +49,7 @@ public partial struct Money : IXmlSerializable, ISerializable
             }
         }
 
-        string currency;
+        string? currency;
         try
         {
             currency = info.GetString("Currency");
@@ -59,7 +59,13 @@ public partial struct Money : IXmlSerializable, ISerializable
             currency = info.GetString("currency");
         }
 
-        Currency = (Currency)TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currency);
+        if (currency is null)
+        {
+            throw new SerializationException("Member 'Currency' was not found or not in a correct string format.");
+        }
+
+        TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(Currency));
+        Currency = (Currency)(typeConverter.ConvertFromString(currency) ?? new SerializationException("Member 'Currency' could not be converted from string to Currency."));
         Amount = Round(amount, Currency, MidpointRounding.ToEven);
     }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
@@ -75,7 +81,7 @@ public partial struct Money : IXmlSerializable, ISerializable
     }
 
     /// <inheritdoc/>
-    public XmlSchema GetSchema() => null;
+    public XmlSchema GetSchema() => null!;
 
     /// <inheritdoc/>
     public void ReadXml(XmlReader reader)

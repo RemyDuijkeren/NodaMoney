@@ -45,7 +45,7 @@ public class GivenIWantToDeserializeMoney
     }
 
     [Fact]
-    public void WhenDesializingV2_ShouldBeOk()
+    public void WhenDesirializingV2_ShouldBeOk()
     {
         // Arrange
         string json = "\"EUR 123.456\"";
@@ -75,5 +75,21 @@ public class GivenIWantToDeserializeMoney
         var clone = JsonConvert.DeserializeObject<Order>(json);
 
         clone.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void WhenNullableOrderWithTotalIsNull_ThenThisShouldSucceed()
+    {
+        // Arrange
+        //var order = new NullableOrder { Id = 123, Name = "Foo", Total = null };
+        var order = new NullableOrder { Id = 123, Name = "Foo" };
+        string json = $$"""{"Id":123,"Total":null,"Name":"Foo"}""";
+
+        // Act
+        var deserialized = JsonConvert.DeserializeObject<NullableOrder>(json);
+
+        // Assert
+        deserialized.Should().BeEquivalentTo(order);
+        deserialized.Total.Should().BeNull();
     }
 }

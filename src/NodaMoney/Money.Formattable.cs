@@ -116,7 +116,7 @@ public partial struct Money : IFormattable
         // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
         // TODO: Hacked solution, solve with better implementation
         IFormatProvider provider;
-        if (!string.IsNullOrWhiteSpace(format) && format.StartsWith("I", StringComparison.Ordinal) && format.Length >= 1 && format.Length <= 2)
+        if (format is not null && format.StartsWith("I", StringComparison.Ordinal) && format.Length is >= 1 and <= 2)
         {
 #if NETSTANDARD2_0
                 format = format.Replace("I", "C");

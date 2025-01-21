@@ -14,15 +14,15 @@ public class MoneyTypeConverter : TypeConverter
 
     /// <inheritdoc/>
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
-        destinationType == typeof(Money) || base.CanConvertTo(context, destinationType);
+        destinationType == typeof(Money) || destinationType == typeof(Money?) || base.CanConvertTo(context, destinationType);
 
     /// <inheritdoc/>
-    public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
+    public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
     {
-        // Newtonsoft.Json will call this method when it is a JSON String, like "EUR 234.25",
-        // but if it is a JSON Object it tries to check if it can convert JObject (in Newtonsoft.Json).
-        if (value is not string jsonString)
-            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
+        // Newtonsoft.Json will only call this method when it is a JSON String, like "EUR 234.25", but if it is
+        // a JSON Object (= "{...}") it will not call this method but tries to convert it internal in Newtonsoft.Json (which fails).
+        if (value is null || value is not string jsonString)
+            return base.ConvertFrom(context, culture, value!);
 
         var valueAsSpan = jsonString.AsSpan();
         var spaceIndex = valueAsSpan.IndexOf(' ');
@@ -57,11 +57,6 @@ public class MoneyTypeConverter : TypeConverter
                 throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
             }
         }
-
-        // old serialization format (v1): { "Amount": 234.25, "Currency": "EUR" }
-        // use the build in converter for this.
-
-        return base.ConvertFrom(context, culture, value);
     }
 
     /// <inheritdoc/>

@@ -10,7 +10,7 @@ public class NestedJsonV2TestData : TheoryData<string, Order>
         {
             Id = 123,
             Name = "Abc",
-            Total = new Money(234.25m, Currency.FromCode("EUR"))
+            Total = new Money(234.25m, CurrencyInfo.FromCode("EUR"))
         };
 
         Add("""{ "Id": 123, "Name": "Abc", "Total": "EUR 234.25" }""", order);

@@ -27,36 +27,35 @@ public class CurrencyTypeConverter : TypeConverter
     /// <param name="culture">The <see cref="CultureInfo" /> to use as the current culture. </param>
     /// <param name="value">The <see cref="object" /> to convert. </param>
     /// <exception cref="NotSupportedException">The conversion cannot be performed. </exception>
-    public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
+    public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
     {
-            if (value is string valueAsString)
+        if (value is not string valueAsString)
+            return base.ConvertFrom(context, culture, value!);
+
+        var valueAsSpan = valueAsString.AsSpan();
+            var separatorIndex = valueAsSpan.IndexOf(';');
+            if (separatorIndex == -1)
             {
-                var valueAsSpan = valueAsString.AsSpan();
-                var separatorIndex = valueAsSpan.IndexOf(';');
-                if (separatorIndex == -1)
-                {
-                    return new Currency(valueAsSpan.ToString());
-                }
-
-                var currencyCode = valueAsSpan.Slice(0, separatorIndex).ToString();
-                var currencyType = valueAsSpan.Slice(separatorIndex + 1).ToString();
-                return string.IsNullOrWhiteSpace(currencyType) || currencyType == "ISO-4217"
-                    ? new Currency(currencyCode)
-                    : new Currency(currencyCode) { IsIso4217 = false };
-
-                // string[] v = valueAsString.Split([';']);
-                // if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
-                // {
-                //     return new Currency(v[0]);
-                // }
-                // else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
-                // {
-                //     return new Currency(v[0]) { IsIso4217 = false };
-                // }
+                return new Currency(valueAsSpan.ToString());
             }
 
-            return base.ConvertFrom(context, culture, value);
-        }
+            var currencyCode = valueAsSpan.Slice(0, separatorIndex).ToString();
+            var currencyType = valueAsSpan.Slice(separatorIndex + 1).ToString();
+            return string.IsNullOrWhiteSpace(currencyType) || currencyType == "ISO-4217"
+                ? new Currency(currencyCode)
+                : new Currency(currencyCode) { IsIso4217 = false };
+
+            // string[] v = valueAsString.Split([';']);
+            // if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
+            // {
+            //     return new Currency(v[0]);
+            // }
+            // else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
+            // {
+            //     return new Currency(v[0]) { IsIso4217 = false };
+            // }
+
+    }
 
     /// <summary>Converts the given value object to the specified type, using the specified context and culture information.</summary>
     /// <returns>An <see cref="object" /> that represents the converted value.</returns>
@@ -66,7 +65,7 @@ public class CurrencyTypeConverter : TypeConverter
     /// <param name="destinationType">The <see cref="Type" /> to convert the <paramref name="value" /> parameter to. </param>
     /// <exception cref="ArgumentNullException">The <paramref name="destinationType" /> parameter is null. </exception>
     /// <exception cref="NotSupportedException">The conversion cannot be performed. </exception>
-    public override object ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
+    public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
     {
             if (destinationType == typeof(string) && value is Currency currency)
             {
