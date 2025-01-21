@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added CurrencyInfo to provide information about a currency and also acts as an IFormatProvider. It implicitly cast
   to Currency.
 - Support for .NET 6.0, .NET 8.0 and .NET 9.0 (next to already supported .NET Standard 2.0)
+- Support for OLE Automation Currency conversion using ToOACurrency() and FromOACurrency()
 -
 - Currency.NumericCode is a three-digit code number of the currency
 - Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
@@ -29,9 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CurrencyBuilder is renamed to CurrencyInfoBuilder and returns CurrencyInfo instead of Currency.
 -
 - Performance improvement on:
-  - init of currency (32x) and money (20x)
-  - parsing money (110x)
-  - smaller footprint and memory allocation (30x smaller)
+  - init of currency (32x faster) and money (20x faster)
+  - parsing money (110x faster)
+  - smaller footprint and memory allocation (30x fewer allocations)
 - Currency.Number is changed from `string` to `short`
 - Currency.DecimalDigits is changed from `decimal` to `int`
 - Currency.MinorUnit changed to total number of minor units of one currency major unit

@@ -234,4 +234,28 @@ public partial struct Money
     /// <returns>An <see cref="object"/> instance of type <paramref name="conversionType"/> whose value is equivalent
     /// to the value of this instance.</returns>
     public object ToType(Type conversionType, IFormatProvider? provider) => Convert.ChangeType(this, conversionType, provider);
+
+    public long ToOACurrency()
+    {
+        // OACurrency, OLE Automation Currency, supports up to 4 decimals max
+        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrencyUnit(Currency);
+        if (currencyInfo.DecimalDigits > 4)
+            throw new InvalidCurrencyException($"The currency '{Currency.Code}' requires more than 4 decimal places, which cannot be represented by OLE Automation Currency.");
+
+        return decimal.ToOACurrency(Amount);
+    }
+
+    public static Money FromOACurrency(long oaCurrencyValue) => FromOACurrency(oaCurrencyValue, CurrencyInfo.CurrentCurrency);
+
+    public static Money FromOACurrency(long oaCurrencyValue, Currency currency) => FromOACurrency(oaCurrencyValue, CurrencyInfo.FromCurrencyUnit(currency));
+
+    public static Money FromOACurrency(long oaCurrencyValue, CurrencyInfo currencyInfo)
+    {
+        // OACurrency, OLE Automation Currency, supports up to 4 decimals max
+        if (currencyInfo.DecimalDigits > 4)
+            throw new InvalidCurrencyException($"The currency '{currencyInfo.Code}' requires more than 4 decimal places, which cannot be represented by OLE Automation Currency.");
+
+        decimal amount = decimal.FromOACurrency(oaCurrencyValue);
+        return new Money(amount, currencyInfo);
+    }
 }

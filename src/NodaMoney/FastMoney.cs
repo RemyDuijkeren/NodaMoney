@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace NodaMoney;
 
-// TODO: Do we want to implement a Money type based on integer? That has a default scale of 4 or operate scale? Instead of using Decimal type?
+// TODO: Do we want to implement a Money type based on integer? That has a default scale of 4? Instead of using Decimal type?
 
 /// <summary>Represents a fast money value with a currency unit. Scaled integer</summary>
 /// <remarks>Size from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 of the minor unit (like cents)</remarks>
@@ -38,13 +38,11 @@ internal readonly struct FastMoney : IEquatable<FastMoney>
     public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
         Currency = currency;
-
-        decimal rounded = Round(amount, currency, rounding);
-        _amount = (long)(rounded * (decimal)Math.Pow(10, 2));
+        _amount = decimal.ToOACurrency(amount);
     }
 
     /// <summary>Gets the amount of money.</summary>
-    public decimal Amount => _amount / (decimal)Math.Pow(10, 2);
+    public decimal Amount => decimal.FromOACurrency(_amount);
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
     public Currency Currency { get; }
@@ -92,27 +90,6 @@ internal readonly struct FastMoney : IEquatable<FastMoney>
     {
         amount = Amount;
         currency = Currency;
-    }
-
-    private static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding)
-    {
-        var currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
-
-        if (currencyInfo.MinorUnitIsDecimalBased)
-        {
-            // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
-            // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
-            return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
-        }
-        else
-        {
-            // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
-            // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
-            // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
-            // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
-            // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
-            return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
-        }
     }
 
     private static void EnsureSameCurrency(in Money left, in Money right)
