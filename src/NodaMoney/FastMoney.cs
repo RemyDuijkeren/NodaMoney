@@ -1,9 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
 
-// Good spec document https://cs-syd.eu/posts/2022-08-22-how-to-deal-with-money-in-software
+// TODO: Do we want to implement a Money type based on integer? That has a default scale of 4 or operate scale? Instead of using Decimal type?
 
 /// <summary>Represents a fast money value with a currency unit. Scaled integer</summary>
 /// <remarks>Size from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 of the minor unit (like cents)</remarks>
@@ -14,7 +13,7 @@ namespace NodaMoney;
 /// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct FastMoney : IEquatable<FastMoney>
+internal readonly struct FastMoney : IEquatable<FastMoney>
 {
     readonly long _amount;
 
@@ -26,23 +25,7 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount, string code)
-        : this(amount, new Currency(code))
-    {
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="currency">The Currency of the money.</param>
-    /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
-    /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
-    /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
-    /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount, Currency currency)
-        : this(amount, currency, MidpointRounding.ToEven)
-    {
-    }
+    public FastMoney(decimal amount, string code) : this(amount, new Currency(code)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -50,13 +33,9 @@ public readonly struct FastMoney : IEquatable<FastMoney>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
-    public FastMoney(decimal amount, string code, MidpointRounding rounding)
-        : this(amount, new Currency(code), rounding)
-    {
-    }
+    public FastMoney(decimal amount, string code, MidpointRounding rounding) : this(amount, new Currency(code), rounding) { }
 
-    public FastMoney(decimal amount, Currency currency, MidpointRounding rounding)
-        : this()
+    public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
         Currency = currency;
 
@@ -115,46 +94,28 @@ public readonly struct FastMoney : IEquatable<FastMoney>
         currency = Currency;
     }
 
-    private static decimal Round(in decimal amount, in Currency currencyUnit, in MidpointRounding rounding)
+    private static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding)
     {
-        // https://stackoverflow.com/questions/43289478/how-can-i-tell-if-a-number-is-a-power-of-10-in-kotlin-or-java
-        static bool IsPowerOf10(long n)
+        var currencyInfo = CurrencyInfo.FromCurrencyUnit(currency);
+
+        if (currencyInfo.MinorUnitIsDecimalBased)
         {
-            while (n > 9 && n % 10 == 0)
-            {
-                n /= 10;
-            }
-
-            return n == 1;
+            // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
+            // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
+            return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
         }
-
-        // NOT GOOD, IS ONLY FOR INT. EXTEND
-        static bool IsPowerOfTen(in double x)
+        else
         {
-            return x == 1
-                   || x == 10
-                   || x == 100
-                   || x == 1000
-                   || x == 10000
-                   || x == 100000
-                   || x == 1000000
-                   || x == 10000000
-                   || x == 100000000
-                   || x == 1000000000;
+            // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
+            // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
+            // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
+            // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
+            // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
+            return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
         }
-
-        CurrencyInfo currency = CurrencyRegistry.Get(currencyUnit);
-        return IsPowerOfTen(currency.MinorUnits)
-            ? Math.Round(amount, currency.DecimalDigits, rounding)
-            : Math.Round(amount / currency.MinimalAmount, 0, rounding) * currency.MinimalAmount;
     }
 
-    [SuppressMessage(
-        "Microsoft.Globalization",
-        "CA1305:SpecifyIFormatProvider",
-        MessageId = "System.String.Format(System.String,System.Object[])",
-        Justification = "Test fail when Invariant is used. Inline JIT bug? When cloning CultureInfo it works.")]
-    private static void AssertIsSameCurrency(in Money left, in Money right)
+    private static void EnsureSameCurrency(in Money left, in Money right)
     {
         if (left.Currency != right.Currency)
             throw new InvalidCurrencyException(left.Currency, right.Currency);

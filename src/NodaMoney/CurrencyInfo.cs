@@ -180,7 +180,7 @@ public record CurrencyInfo : IFormatProvider
         get
         {
 #if NET5_0_OR_GREATER
-            // In >.NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
+            // In >= .NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
             var currentCulture = CultureInfo.CurrentCulture;
             if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted

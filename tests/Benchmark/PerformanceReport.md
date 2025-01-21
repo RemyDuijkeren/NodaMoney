@@ -23,21 +23,21 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ExplicitCurrencyAsString            | 483.87 ns |  6.370 ns |  5.319 ns | 483.75 ns |  1.00 |    0.00 | 0.0753 |     632 B |
 | ExplicitCurrencyAsStringAndRounding | 496.87 ns |  9.720 ns | 12.976 ns | 493.09 ns |  1.02 |    0.03 | 0.0753 |     632 B |
 | ExplicitCurrencyFromCode            | 521.25 ns | 16.493 ns | 48.630 ns | 494.71 ns |  1.16 |    0.03 | 0.0753 |     632 B |
-| HelperMethod                        | 490.89 ns |  7.103 ns |  5.931 ns | 492.29 ns |  1.01 |    0.02 | 0.0753 |     632 B |
+| ExtensionMethod                     | 490.89 ns |  7.103 ns |  5.931 ns | 492.29 ns |  1.01 |    0.02 | 0.0753 |     632 B |
 | ImplicitCurrencyByConstructor       | 114.69 ns |  2.276 ns |  2.017 ns | 115.09 ns |  0.24 |    0.00 | 0.0057 |      48 B |
 | ImplicitCurrencyByCasting           | 113.58 ns |  1.579 ns |  1.477 ns | 113.67 ns |  0.23 |    0.00 | 0.0057 |      48 B |
 | Deconstruct                         |  34.86 ns |  0.348 ns |  0.309 ns |  34.80 ns |  0.07 |    0.00 |      - |         - |
 #### after
 | Method                              |       Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
 |-------------------------------------|-----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
-| ExplicitCurrencyAsString            | 26.9613 ns | 0.2283 ns | 0.2024 ns |  1.00 |    0.01 |      - |         - |          NA |
-| ExplicitCurrencyAsStringAndRounding | 31.1517 ns | 0.4379 ns | 0.4096 ns |  1.16 |    0.02 |      - |         - |          NA |
-| ExplicitCurrencyFromCode            | 26.9785 ns | 0.5146 ns | 0.4562 ns |  1.00 |    0.02 |      - |         - |          NA |
-| ExplicitCurrencyInfoFromCode        | 26.7266 ns | 0.4335 ns | 0.3843 ns |  0.99 |    0.02 |      - |         - |          NA |
-| HelperMethod                        | 25.8243 ns | 0.0778 ns | 0.0689 ns |  0.96 |    0.01 |      - |         - |          NA |
-| ImplicitCurrencyByConstructor       | 74.5446 ns | 0.6375 ns | 0.5963 ns |  2.77 |    0.03 | 0.0076 |      64 B |          NA |
-| ExplicitCurrencyByCasting           | 76.0093 ns | 0.5610 ns | 0.5247 ns |  2.82 |    0.03 | 0.0076 |      64 B |          NA |
-| Deconstruct                         |  0.4148 ns | 0.0151 ns | 0.0141 ns |  0.02 |    0.00 |      - |         - |          NA |
+| ExplicitCurrencyAsString            | 20.6864 ns | 0.4303 ns | 0.5122 ns |  1.00 |    0.03 |      - |         - |          NA |
+| ExplicitCurrencyAsStringAndRounding | 22.6839 ns | 0.4136 ns | 0.3666 ns |  1.10 |    0.03 |      - |         - |          NA |
+| ExplicitCurrencyFromCode            | 25.9768 ns | 0.2673 ns | 0.2501 ns |  1.26 |    0.03 |      - |         - |          NA |
+| ExplicitCurrencyInfoFromCode        | 20.5756 ns | 0.2304 ns | 0.2155 ns |  1.00 |    0.03 |      - |         - |          NA |
+| ExtensionMethod                     | 20.9704 ns | 0.4374 ns | 0.5987 ns |  1.01 |    0.04 |      - |         - |          NA |
+| ImplicitCurrencyByConstructor       | 69.7052 ns | 1.2334 ns | 1.1537 ns |  3.37 |    0.10 | 0.0076 |      64 B |          NA |
+| ImplicitCurrencyByCasting           | 68.7810 ns | 1.2390 ns | 1.3257 ns |  3.33 |    0.10 | 0.0076 |      64 B |          NA |
+| Deconstruct                         |  0.4898 ns | 0.0126 ns | 0.0105 ns |  0.02 |    0.00 |      - |         - |          NA |
 
 ## MoneyOperations
 #### before (v1.x)
@@ -118,7 +118,6 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 |-----------------------------|---------:|---------:|---------:|---------:|---------:|---------:|----------:|
 | CreatingOneMillionCurrency  | 15.38 ms | 0.222 ms | 0.208 ms | 468.7500 | 468.7500 | 468.7500 |   1.91 MB |
 | CreatingOneMillionMoney     | 28.84 ms | 0.247 ms | 0.231 ms | 656.2500 | 656.2500 | 656.2500 |  22.89 MB |
-| CreatingOneMillionMoneyUnit | 49.90 ms | 0.332 ms | 0.294 ms | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |
 
 ## Create CurrencyUNit
 | Method                             |      Mean |     Error |    StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |

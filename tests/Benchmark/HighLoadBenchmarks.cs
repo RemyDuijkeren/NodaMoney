@@ -44,22 +44,22 @@ public class HighLoadBenchmarks
         return money;
     }
 
-    [Benchmark]
-    public FastMoney[] CreatingOneMillionMoneyUnit()
-    {
-        int max = 1_000_000;
-        FastMoney[] money = new FastMoney[max];
-
-        for (int i = 0; i < max; i++)
-        {
-            if (i % 3 == 0)
-                money[i] = new FastMoney(10M, "EUR");
-            else if (i % 2 == 0)
-                money[i] = new FastMoney(10M, "USD");
-            else
-                money[i] = new FastMoney(10M, "JPY");
-        }
-
-        return money;
-    }
+    // [Benchmark]
+    // public FastMoney[] CreatingOneMillionMoneyFastMoney()
+    // {
+    //     int max = 1_000_000;
+    //     FastMoney[] money = new FastMoney[max];
+    //
+    //     for (int i = 0; i < max; i++)
+    //     {
+    //         if (i % 3 == 0)
+    //             money[i] = new FastMoney(10M, "EUR");
+    //         else if (i % 2 == 0)
+    //             money[i] = new FastMoney(10M, "USD");
+    //         else
+    //             money[i] = new FastMoney(10M, "JPY");
+    //     }
+    //
+    //     return money;
+    // }
 }

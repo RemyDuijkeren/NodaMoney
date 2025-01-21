@@ -5,7 +5,7 @@ namespace NodaMoney.Tests.MoneySpec;
 
 public class GivenIWantMoneyFromNumericTypeAndAnExplicitCurrencyObject
 {
-    private readonly Currency _euro = Currency.FromCode("EUR");
+    private readonly Currency _euro = CurrencyInfo.FromCode("EUR");
 
     [Fact]
     public void WhenValueIsByte_ThenCreatingShouldSucceed()

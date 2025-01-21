@@ -24,7 +24,7 @@ public class InitializingMoneyBenchmarks
     [Benchmark]
     public Money ExplicitCurrencyFromCode()
     {
-        return new Money(6.54m, CurrencyInfo.FromCode("EUR"));
+        return new Money(6.54m, Currency.FromCode("EUR"));
     }
 
     [Benchmark]
@@ -34,7 +34,7 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
-    public Money HelperMethod()
+    public Money ExtensionMethod()
     {
         return Money.Euro(6.54m);
     }
@@ -46,7 +46,7 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyByCasting()
+    public Money ImplicitCurrencyByCasting()
     {
         Money money = (Money)6.54m;
         return money;

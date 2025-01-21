@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ISO 4217 Amendment Number 174 HRK/191
 - ISO 4217 Amendment Number 176 ANG/532 XCG/532
 - System.Text.Json serialization support
-- Added CurrencyInfo to provide information about a currency. It implicitly cast to Currency.
+- Added CurrencyInfo to provide information about a currency and also acts as an IFormatProvider. It implicitly cast
+  to Currency.
 - Support for .NET 6.0, .NET 8.0 and .NET 9.0 (next to already supported .NET Standard 2.0)
 -
 - Currency.NumericCode is a three-digit code number of the currency
@@ -28,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CurrencyBuilder is renamed to CurrencyInfoBuilder and returns CurrencyInfo instead of Currency.
 -
 - Performance improvement on:
-  - init of currency (14x) and money (7x)
-  - parsing money (2x)
-  - smaller footprint and memory allocation (12x)
+  - init of currency (32x) and money (20x)
+  - parsing money (110x)
+  - smaller footprint and memory allocation (30x smaller)
 - Currency.Number is changed from `string` to `short`
 - Currency.DecimalDigits is changed from `decimal` to `int`
 - Currency.MinorUnit changed to total number of minor units of one currency major unit
@@ -88,9 +89,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Chinese Yuan to MostUsedCurrencies (`var yuan = Money.Yuan(23)`)
 - ISO 4217 Amendment Number 161 implemented #33
 - Added Standard Money Format 'I' to display code instead of symbol #46
-- Added the El Salvador Colón (SVC) to ISO-4217 list
+- Added the El Salvador Colï¿½n (SVC) to ISO-4217 list
 - Added historic ISO-4217 currencies #30
-- Added default currency sign ¤ (`Currency.CurrencySign`)
+- Added default currency sign ï¿½ (`Currency.CurrencySign`)
 - Fixed NodaMoney.Serialization.AspNet targets problem #42
 - NodaMoney now targets .NET 4.0, .NET 4.5, .NET Standard 1.0, .NET Standard 1.6, PCL
 - Changed from GitFlow to GitHub Flow strategy
