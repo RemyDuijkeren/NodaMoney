@@ -1,5 +1,6 @@
 using System;
 using FluentAssertions;
+using NodaMoney.Exchange;
 using NodaMoney.Tests.Helpers;
 using Xunit;
 

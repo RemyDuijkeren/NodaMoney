@@ -1,7 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
-namespace NodaMoney;
+namespace NodaMoney.Exchange;
 
 /// <summary>A conversion of money of one currency into money of another currency.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>

@@ -1,4 +1,6 @@
-﻿namespace NodaMoney;
+﻿using NodaMoney.Exchange;
+
+namespace NodaMoney;
 
 /// <summary>Represents a general transaction done in a web shop.</summary>
 public class Transaction
