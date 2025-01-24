@@ -21,7 +21,7 @@ namespace NodaMoney;
 /// <remarks>See http://en.wikipedia.org/wiki/Currency and
 /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
 /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
-public record CurrencyInfo : IFormatProvider
+public record CurrencyInfo : IFormatProvider, ICustomFormatter
 {
     /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency and
@@ -47,7 +47,7 @@ public record CurrencyInfo : IFormatProvider
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
-    //[ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
+    // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
 
     // static CurrencyInfo()
     // {
@@ -55,9 +55,6 @@ public record CurrencyInfo : IFormatProvider
     // }
 
     public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
-
-    /// <summary>Get the (ISO-4217) three-character code of the currency.</summary>
-    //public string Code { get; init; } = Code;
 
     public bool IsIso4217 { get; init; } = true;
 
@@ -200,7 +197,7 @@ public record CurrencyInfo : IFormatProvider
 
     public static CurrencyInfo FromCode(string code) => CurrencyRegistry.Get(code);
 
-    public static CurrencyInfo FromCurrencyUnit(Currency currency) => CurrencyRegistry.Get(currency);
+    public static CurrencyInfo FromCurrency(Currency currency) => CurrencyRegistry.Get(currency);
 
     /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified <see cref="RegionInfo"/>.</summary>
     /// <param name="region"><see cref="RegionInfo"/> to get a <see cref="Currency"/> for.</param>
@@ -251,15 +248,20 @@ public record CurrencyInfo : IFormatProvider
         return FromRegion(culture.Name);
     }
 
-    public void Deconstruct(out string Code, out short Number, out MinorUnit MinorUnit, out string EnglishName, out string Symbol)
+    /// <summary>Deconstructs the current <see cref="CurrencyInfo" /> instance into its components.</summary>
+    /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>
+    /// <param name="symbol">The currency symbol of the current instance.</param>
+    /// <param name="number">The numeric currency code (ISO-4217) of the current instance.</param>
+    public void Deconstruct(out string code, out string symbol, out short number)
     {
-        Code = this.Code;
-        Number = this.Number;
-        MinorUnit = this.MinorUnit;
-        EnglishName = this.EnglishName;
-        Symbol = this.Symbol;
+        code = Code;
+        number = Number;
+        symbol = Symbol;
     }
 
+    /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the provided <see cref="IFormatProvider"/>.</summary>
+    /// <param name="formatProvider">The format provider used to determine the currency information. This can be a <see cref="CurrencyInfo"/>, <see cref="CultureInfo"/>, or <see cref="NumberFormatInfo"/>. If null, the current currency is returned.</param>
+    /// <returns>A <see cref="CurrencyInfo"/> instance based on the provided format provider or the current currency if no suitable provider is found.</returns>
     public static CurrencyInfo GetInstance(IFormatProvider? formatProvider)
     {
         if (formatProvider == null)
@@ -295,39 +297,122 @@ public record CurrencyInfo : IFormatProvider
         // }
     }
 
+    //public static CurrencyInfo GetInstance(RegionInfo? region);
+    //public static CurrencyInfo GetInstance(Currency? currency);
+    //public static CurrencyInfo GetInstance(string? code);
+
     /// <inheritdoc />
     public object? GetFormat(Type? formatType)
     {
         if (formatType == typeof(CurrencyInfo))
             return this;
 
+        if (formatType == typeof(ICustomFormatter))
+            return this;
+
         if (formatType == typeof(NumberFormatInfo))
-        {
-            return this.ToNumberFormatInfo(formatProvider: null);
-        }
+            return ToNumberFormatInfo(formatProvider: null);
 
         return null;
     }
 
-    public NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useISOCurrencySymbol = false)
+    /// <inheritdoc />
+    public string Format(string? format, object? arg, IFormatProvider? formatProvider)
+    {
+        // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
+        // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
+        // TODO: Hacked solution, solve with better implementation
+
+        if (arg is null)
+            throw new ArgumentNullException(nameof(arg));
+
+        // If argument is not a Money, fallback to default formatting
+        if (arg is not Money money)
+        {
+            return arg is IFormattable formattable
+                ? formattable.ToString(format, formatProvider)
+                : arg.ToString() ?? string.Empty;
+        }
+
+        // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+        // G: General format => Now Symbol, change to ISO Code or change to Decimal G (no currency)?
+        // C: Currency Symbol format => Symbol, € 23.002,43 , € 23,002.43, 23,002.43 €
+        // I: Currency ISO code format (default) :  EUR 23.002,43 , EUR 23,002.43 , 23.002,43 EUR
+        // F: Currency english name pattern => 23.002,43 dollar
+
+        // f: currency native name pattern => 23.002,43 dólar
+
+        // R or r: Round-trip money pattern => EUR 23002.43
+        // N or n: Number format
+        // F or f: Fixed point format
+
+        // TODO: also allow Decimal formatting?
+        // TODO: check if Money.Currency and this is equal, and also check IFormatProvider? What to do if not equal?
+
+        NumberFormatInfo numberFormatInfo;
+        string formatForDecimal = "C"; // Currency
+        if (format is not null && format.StartsWith("I", StringComparison.Ordinal) && format.Length is >= 1 and <= 2)
+        {
+            formatForDecimal = "C" + format.Substring(1);
+            numberFormatInfo = ToNumberFormatInfo(formatProvider, true);
+        }
+        else
+        {
+            numberFormatInfo = ToNumberFormatInfo(formatProvider);
+        }
+
+        if (format is not null && format.StartsWith("G", StringComparison.Ordinal))
+        {
+            formatForDecimal = "C" + format.Substring(1);
+        }
+
+        if (format is not null && format.StartsWith("C", StringComparison.Ordinal))
+        {
+            formatForDecimal = format;
+        }
+
+        if (format is not null && format.StartsWith("F", StringComparison.Ordinal))
+        {
+            formatForDecimal = "N" + format.Substring(1);
+
+            if (format.Length == 1)
+            {
+                formatForDecimal += DecimalDigits;
+            }
+
+            return $"{money.Amount.ToString(formatForDecimal, numberFormatInfo)} {EnglishName}";
+        }
+
+        return money.Amount.ToString(formatForDecimal ?? "C", numberFormatInfo);
+    }
+
+    /// <summary>
+    /// Converts the currency information into a <see cref="NumberFormatInfo"/> object, setting the currency formatting properties based
+    /// on the current currency settings and optionally replacing the currency symbol with the currency code.
+    /// </summary>
+    /// <param name="formatProvider">An optional format provider to influence the number formatting. If null, the current culture's format provider is used.</param>
+    /// <param name="useCurrencyCode">A boolean value indicating whether the currency symbol should be replaced with the currency code. Default is false.</param>
+    /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
+    public NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false)
     {
         NumberFormatInfo numberFormatInfo = (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone();
         if (formatProvider != null)
         {
-            if (formatProvider is CultureInfo ci)
-                numberFormatInfo = (NumberFormatInfo)ci.NumberFormat.Clone();
-
-            if (formatProvider is NumberFormatInfo nfi)
-                numberFormatInfo = (NumberFormatInfo)nfi.Clone();
+            numberFormatInfo = formatProvider switch
+            {
+                CultureInfo ci => (NumberFormatInfo)ci.NumberFormat.Clone(),
+                NumberFormatInfo nfi => (NumberFormatInfo)nfi.Clone(),
+                _ => numberFormatInfo // use current culture
+            };
         }
 
-        numberFormatInfo.CurrencyDecimalDigits = this.DecimalDigits;
-        numberFormatInfo.CurrencySymbol = this.Symbol;
+        numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
+        numberFormatInfo.CurrencySymbol = Symbol;
 
-        if (!useISOCurrencySymbol) return numberFormatInfo;
+        if (!useCurrencyCode) return numberFormatInfo;
 
-        // Replace symbol with the code
-        numberFormatInfo.CurrencySymbol = this.Code;
+        // Replace currency symbol with the code
+        numberFormatInfo.CurrencySymbol = Code;
 
         // For PositivePattern and NegativePattern add space between code and value
         if (numberFormatInfo.CurrencyPositivePattern == 0) // $n

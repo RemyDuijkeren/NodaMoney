@@ -49,6 +49,17 @@ public class MoneyAsString
     }
 
     [Fact]
+    [UseCulture(null)]
+    public void WhenToStringAndCurrentCultureInvariant_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCulture()
+    {
+        Thread.CurrentThread.CurrentCulture.Name.Should().Be(""); // InvariantCulture
+        _yen.ToString().Should().Be("¥765");
+        _euro.ToString().Should().Be("€765.43");
+        _dollar.ToString().Should().Be("$765.43");
+        _dinar.ToString().Should().Be("BD765.432");
+    }
+
+    [Fact]
     public void WhenNullFormat_ThenThisShouldNotThrow()
     {
         Action action = () => _yen.ToString((string)null);
