@@ -21,19 +21,16 @@ public class UseCultureAttribute : BeforeAfterTestAttribute
     /// <remarks>
     /// <para>This constructor overload uses <paramref name="culture" /> for both <see cref="Culture" /> and <see cref="UICulture" />.</para>
     /// </remarks>
-    public UseCultureAttribute(string culture)
-        : this(culture, culture)
-    {
-        }
+    public UseCultureAttribute(string culture) : this(culture, culture) { }
 
     /// <summary>Replaces the culture and UI culture of the current thread with <paramref name="culture" /> and <paramref name="uiCulture" /></summary>
     /// <param name="culture">The name of the culture.</param>
     /// <param name="uiCulture">The name of the UI culture.</param>
     public UseCultureAttribute(string culture, string uiCulture)
     {
-            Culture = (culture == null) ? CultureInfo.InvariantCulture : new CultureInfo(culture, false);
-            UICulture = (uiCulture == null) ? CultureInfo.InvariantCulture : new CultureInfo(uiCulture, false);
-        }
+        Culture = (culture == null) ? CultureInfo.InvariantCulture : new CultureInfo(culture, false);
+        UICulture = (uiCulture == null) ? CultureInfo.InvariantCulture : new CultureInfo(uiCulture, false);
+    }
 
     /// <summary>Gets the culture.</summary>
     public CultureInfo Culture { get; }
@@ -48,20 +45,20 @@ public class UseCultureAttribute : BeforeAfterTestAttribute
     /// <param name="methodUnderTest">The method under test</param>
     public override void Before(MethodInfo methodUnderTest)
     {
-            _originalCulture = Thread.CurrentThread.CurrentCulture;
-            _originalUiCulture = Thread.CurrentThread.CurrentUICulture;
+        _originalCulture = Thread.CurrentThread.CurrentCulture;
+        _originalUiCulture = Thread.CurrentThread.CurrentUICulture;
 
-            Thread.CurrentThread.CurrentCulture = Culture;
-            Thread.CurrentThread.CurrentUICulture = UICulture;
-                        
-            // Change the default culture of any new threads created by the application domain.
-            // These properties are only available as of .NET 4.5.
-            // CultureInfo.DefaultThreadCurrentCulture = Culture;
-            // CultureInfo.DefaultThreadCurrentUICulture = UICulture;
+        Thread.CurrentThread.CurrentCulture = Culture;
+        Thread.CurrentThread.CurrentUICulture = UICulture;
 
-            CultureInfo.CurrentCulture.ClearCachedData();
-            CultureInfo.CurrentUICulture.ClearCachedData();
-        }
+        // Change the default culture of any new threads created by the application domain.
+        // These properties are only available as of .NET 4.5.
+        // CultureInfo.DefaultThreadCurrentCulture = Culture;
+        // CultureInfo.DefaultThreadCurrentUICulture = UICulture;
+
+        CultureInfo.CurrentCulture.ClearCachedData();
+        CultureInfo.CurrentUICulture.ClearCachedData();
+    }
 
     /// <summary>Restores the original <see cref="CultureInfo.CurrentCulture" /> and
     /// <see cref="CultureInfo.CurrentUICulture" /> to <see cref="Thread.CurrentPrincipal" />
@@ -69,13 +66,13 @@ public class UseCultureAttribute : BeforeAfterTestAttribute
     /// <param name="methodUnderTest">The method under test</param>
     public override void After(MethodInfo methodUnderTest)
     {
-            Thread.CurrentThread.CurrentCulture = _originalCulture;
-            Thread.CurrentThread.CurrentUICulture = _originalUiCulture;
-            
-            // CultureInfo.DefaultThreadCurrentCulture = _originalCulture;
-            // CultureInfo.DefaultThreadCurrentUICulture = _originalUiCulture;
-            
-            CultureInfo.CurrentCulture.ClearCachedData();
-            CultureInfo.CurrentUICulture.ClearCachedData();
-        }
+        Thread.CurrentThread.CurrentCulture = _originalCulture;
+        Thread.CurrentThread.CurrentUICulture = _originalUiCulture;
+
+        // CultureInfo.DefaultThreadCurrentCulture = _originalCulture;
+        // CultureInfo.DefaultThreadCurrentUICulture = _originalUiCulture;
+
+        CultureInfo.CurrentCulture.ClearCachedData();
+        CultureInfo.CurrentUICulture.ClearCachedData();
+    }
 }

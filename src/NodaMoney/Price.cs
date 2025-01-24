@@ -18,7 +18,22 @@ namespace NodaMoney;
 // Hour rate could also have business rules about rounding.You could do for example:
 // TimeSpan * HourRate = (Total) Amount
 //
-// Do you see other places, besides price, where you need more precision?
+//
+// ### **Recommendation:**
+// The choice depends on your priorities for **clarity** and **domain alignment**:
+// 1. **General financial clarity** → Use **`Rate`**. (or MonetaryRate)
+// - Works well for generic cases or if you want flexibility to expand usage to rates beyond price alone (e.g., exchange rates, fee rates).
+// - Gives your type room to grow without feeling too application-specific.
+//
+// 2. **Specificity and common business terminology** → Use **`Price`**. (or UnitPrice)
+// - If this type is primarily meant to represent **money/unit transaction costs**, `Price` is simple, intuitive, and aligns with user expectations.
+// - "Price" implies rounding in some cases: Many users might associate "price" with rounded monetary values (e.g., price tags or displayed
+//   transaction amounts). Since your `Price` type specifically allows **unrounded decimals** to preserve precision, the term might be slightly misleading.
+//
+// 3. **Precision and clarity** → Use **`UnitPrice`** or **`PricePerUnit`**.
+// - These work if you want to explicitly distinguish between total amounts and per-unit prices.
+//
+//     If you're planning to make strict distinctions between `Price` and `Rate` types (e.g., `Rate` for fees and taxes, `Price` for fixed costs like products or services), I suggest reserving **`Price` for fixed money/unit relationships** and using **`Rate` for more general financial ratios.** This aligns better with domain conventions.
 
 // public readonly struct Price<T>(decimal ratio, Currency currency, T unit)
 // {

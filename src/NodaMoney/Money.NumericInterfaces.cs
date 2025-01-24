@@ -15,8 +15,8 @@ public partial struct Money
     public static Money MinValue { get; } = new(decimal.MinValue, Currency.NoCurrency);
 
     /// <inheritdoc/>
-    public static decimal MultiplicativeIdentity => 1m;
+    public static decimal MultiplicativeIdentity => decimal.One;
 
     /// <inheritdoc/>
-    public static Money AdditiveIdentity => new(0m, Currency.NoCurrency);
+    public static Money AdditiveIdentity => new(decimal.Zero, Currency.NoCurrency);
 }

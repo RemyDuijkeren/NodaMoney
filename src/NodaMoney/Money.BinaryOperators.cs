@@ -106,7 +106,12 @@ public partial struct Money
     /// <param name="money1">The first <see cref="Money"/> object.</param>
     /// <param name="money2">The second <see cref="decimal"/> object.</param>
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="decimal"/> objects added.</returns>
-    public static Money Add(in Money money1, in decimal money2) => new Money(decimal.Add(money1.Amount, money2), money1.Currency);
+    public static Money Add(in Money money1, in decimal money2)
+    {
+        if (money2 == decimal.Zero) return money1;
+        if (money1.Amount == decimal.Zero) return new Money(money2, money1.Currency);
+        return new Money(decimal.Add(money1.Amount, money2), money1.Currency);
+    }
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
@@ -135,7 +140,12 @@ public partial struct Money
     /// <param name="money1">The first <see cref="Money"/> object.</param>
     /// <param name="money2">The second <see cref="decimal"/> object.</param>
     /// <returns>A <see cref="Money"/> object where the second <see cref="decimal"/> object is subtracted from the first.</returns>
-    public static Money Subtract(in Money money1, in decimal money2) => new Money(decimal.Subtract(money1.Amount, money2), money1.Currency);
+    public static Money Subtract(in Money money1, in decimal money2)
+    {
+        if (money2 == decimal.Zero) return money1;
+        if (money1.Amount == decimal.Zero) return new Money(-money2, money1.Currency);
+        return new Money(decimal.Subtract(money1.Amount, money2), money1.Currency);
+    }
 
     /// <summary>Multiplies the specified money.</summary>
     /// <param name="money">The money.</param>
@@ -143,6 +153,7 @@ public partial struct Money
     /// <returns>The result as <see cref="Money"/> after multiplying.</returns>
     public static Money Multiply(in Money money, in decimal multiplier)
     {
+        if (multiplier == MultiplicativeIdentity) return money;
         try
         {
             return new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
@@ -158,7 +169,11 @@ public partial struct Money
     /// <param name="divisor">The divider.</param>
     /// <returns>The division as <see cref="Money"/>.</returns>
     /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
-    public static Money Divide(in Money money, in decimal divisor) => new Money(decimal.Divide(money.Amount, divisor), money.Currency);
+    public static Money Divide(in Money money, in decimal divisor)
+    {
+        if (divisor == MultiplicativeIdentity) return money;
+        return new Money(decimal.Divide(money.Amount, divisor), money.Currency);
+    }
 
     /// <summary>Divides the specified money.</summary>
     /// <param name="money1">The money.</param>

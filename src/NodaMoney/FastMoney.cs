@@ -13,7 +13,7 @@ namespace NodaMoney;
 /// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct FastMoney : IEquatable<FastMoney>
+internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface IMoney or IMonetary or IMonetaryAmount?
 {
     readonly long _amount;
 

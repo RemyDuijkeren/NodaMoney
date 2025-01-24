@@ -10,8 +10,8 @@ public readonly partial record struct Currency
     // ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.
     readonly ushort _encodedValue;
 
-    // store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
-    //readonly byte _listAndMinorUnit;
+    // TODO: store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
+    // readonly byte _listAndMinorUnit;
 
     public static readonly Currency NoCurrency = new();
 
@@ -100,8 +100,8 @@ public readonly partial record struct Currency
     public string Symbol => CurrencyInfo.FromCode(Code).Symbol;
 
     /// <summary>Deconstructs the current instance into its components.</summary>
-    /// <param name="code">The code.</param>
-    /// <param name="symbol">The currency symbol.</param>
+    /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>
+    /// <param name="symbol">The currency symbol of the current instance.</param>
     public void Deconstruct(out string code, out string symbol)
     {
         code = Code;

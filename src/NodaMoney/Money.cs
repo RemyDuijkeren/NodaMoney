@@ -223,7 +223,7 @@ public readonly partial struct Money : IEquatable<Money>
     }
 
     private static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding) =>
-        Round(amount, CurrencyInfo.FromCurrencyUnit(currency), rounding);
+        Round(amount, CurrencyInfo.FromCurrency(currency), rounding);
 
     private static decimal Round(in decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding)
     {

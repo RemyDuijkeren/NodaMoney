@@ -1,3 +1,6 @@
+// Declaring the assembly as CLS-compliant
+[assembly: CLSCompliant(true)]
+
 #if !NET5_0_OR_GREATER
 // Init setters in C# 9 only works from .NET 5 and higher, see https://www.mking.net/blog/error-cs0518-isexternalinit-not-defined
 namespace System.Runtime.CompilerServices
