@@ -72,10 +72,10 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 #### after
 | Method             |     Mean |   Error |   StdDev |   Median |   Gen0 | Allocated |
 |--------------------|---------:|--------:|---------:|---------:|-------:|----------:|
-| Implicit           | 119.2 ns | 2.38 ns |  3.09 ns | 119.9 ns | 0.0420 |     352 B |
-| ImplicitWithFormat | 111.3 ns | 3.47 ns | 10.24 ns | 110.1 ns | 0.0421 |     352 B |
-| Explicit           | 141.5 ns | 2.89 ns |  6.97 ns | 138.2 ns | 0.0792 |     664 B |
-| ExplicitWithFormat | 159.3 ns | 3.78 ns | 11.10 ns | 157.6 ns | 0.0792 |     664 B |
+| Implicit           | 107.3 ns | 2.19 ns |  3.95 ns | 107.7 ns | 0.0468 |     392 B |
+| ImplicitWithFormat | 113.3 ns | 2.27 ns |  3.25 ns | 112.8 ns | 0.0468 |     392 B |
+| Explicit           | 143.9 ns | 2.89 ns |  5.84 ns | 144.3 ns | 0.0842 |     704 B |
+| ExplicitWithFormat | 154.6 ns | 3.97 ns | 11.65 ns | 151.1 ns | 0.0842 |     704 B |
 
 ## MoneyParsing
 #### before (v1.x)

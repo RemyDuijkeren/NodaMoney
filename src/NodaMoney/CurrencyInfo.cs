@@ -318,6 +318,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <inheritdoc />
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
+    //     => Format(format.AsSpan(), arg, formatProvider);
+    // public string Format(ReadOnlySpan<char> format, object? arg, IFormatProvider? formatProvider)
     {
         // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
         // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
@@ -335,55 +337,59 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         }
 
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
-        // G: General format => Now Symbol, change to ISO Code or change to Decimal G (no currency)?
-        // C: Currency Symbol format => Symbol, € 23.002,43 , € 23,002.43, 23,002.43 €
-        // I: Currency ISO code format (default) :  EUR 23.002,43 , EUR 23,002.43 , 23.002,43 EUR
-        // F: Currency english name pattern => 23.002,43 dollar
+        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
+        // C: Currency Symbol format, like € 23.002,43 , € 23,002.43, 23,002.43 €
+        // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
+        // C => TODO: use C for long version (US$) and c for short version ($) in some locals
+        // R: Round-trip format with currency code
+        // N: Number format = decimal
+        // F: Fixed point format = decimal
+        // L: English name, like 23.002,43 dollar
+        // l: Native name, like 23.002,43 dólar
 
-        // f: currency native name pattern => 23.002,43 dólar
+        // TODO: short= $13B, $12.8B or long= $14 billion
 
-        // R or r: Round-trip money pattern => EUR 23002.43
-        // N or n: Number format
-        // F or f: Fixed point format
+        // TODO: CLDR-data: https://github.com/unicode-org/cldr-json/tree/main/cldr-json/cldr-numbers-full
+        // For example USD in NL
+        // "USD": {
+        //     "displayName": "Amerikaanse dollar",
+        //     "displayName-count-one": "Amerikaanse dollar",
+        //     "displayName-count-other": "Amerikaanse dollar",
+        //     "symbol": "US$",
+        //     "symbol-alt-narrow": "$"
+        // },
+        // https://github.com/globalizejs/globalize/blob/master/doc/api/currency/currency-formatter.md
 
-        // TODO: also allow Decimal formatting?
         // TODO: check if Money.Currency and this is equal, and also check IFormatProvider? What to do if not equal?
+        // Always use CurrencyDecimalDigits and CurrencySymbol from CurrencyInfo, but override other properties?
 
-        NumberFormatInfo numberFormatInfo;
-        string formatForDecimal = "C"; // Currency
-        if (format is not null && format.StartsWith("I", StringComparison.Ordinal) && format.Length is >= 1 and <= 2)
+        NumberFormatInfo nfi = ToNumberFormatInfo(formatProvider);
+        char fmt = ParseFormatSpecifier(format.AsSpan(), out int digits);
+        if (fmt == 0)
         {
-            formatForDecimal = "C" + format.Substring(1);
-            numberFormatInfo = ToNumberFormatInfo(formatProvider, true);
-        }
-        else
-        {
-            numberFormatInfo = ToNumberFormatInfo(formatProvider);
+            // custom format
+            return money.Amount.ToString(format, nfi);
         }
 
-        if (format is not null && format.StartsWith("G", StringComparison.Ordinal))
+        switch (fmt)
         {
-            formatForDecimal = "C" + format.Substring(1);
+            case 'C' when digits == -1:
+                return money.Amount.ToString("C", nfi);
+            case 'C' or 'c': // TODO: use C for long version (US$) and c for short version ($) in some locals?
+                return money.Amount.ToString(format, nfi);
+            case 'G' or 'g':
+                nfi = ToNumberFormatInfo(formatProvider, true); // replace currency symbol with code
+                return money.Amount.ToString($"C{format.AsSpan(1).ToString()}", nfi);
+            case 'L': // 1 US dollar, 0 US dollars, 1.000 US dollars, 1,000 US dollars
+            case 'l': // future: use lower-case for local native name
+                // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
+                nfi.NumberDecimalDigits = nfi.CurrencyDecimalDigits;
+                return $"{money.Amount.ToString($"N{format.AsSpan(1).ToString()}", nfi)} {EnglishName}";
+            case 'R' or 'r':
+                return $"{Code} {money.Amount.ToString(format, nfi)}";
+            default:
+                return money.Amount.ToString(format, nfi);
         }
-
-        if (format is not null && format.StartsWith("C", StringComparison.Ordinal))
-        {
-            formatForDecimal = format;
-        }
-
-        if (format is not null && format.StartsWith("F", StringComparison.Ordinal))
-        {
-            formatForDecimal = "N" + format.Substring(1);
-
-            if (format.Length == 1)
-            {
-                formatForDecimal += DecimalDigits;
-            }
-
-            return $"{money.Amount.ToString(formatForDecimal, numberFormatInfo)} {EnglishName}";
-        }
-
-        return money.Amount.ToString(formatForDecimal ?? "C", numberFormatInfo);
     }
 
     /// <summary>
@@ -393,7 +399,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <param name="formatProvider">An optional format provider to influence the number formatting. If null, the current culture's format provider is used.</param>
     /// <param name="useCurrencyCode">A boolean value indicating whether the currency symbol should be replaced with the currency code. Default is false.</param>
     /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
-    public NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false)
+    private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false)
     {
         NumberFormatInfo numberFormatInfo = (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone();
         if (formatProvider != null)
@@ -409,7 +415,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
         numberFormatInfo.CurrencySymbol = Symbol;
 
-        if (!useCurrencyCode) return numberFormatInfo;
+        // check if we need to replace with currency code
+        if (!useCurrencyCode || Symbol != GenericCurrencySign) return numberFormatInfo;
 
         // Replace currency symbol with the code
         numberFormatInfo.CurrencySymbol = Code;
@@ -449,5 +456,89 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         }
 
         return numberFormatInfo;
+    }
+
+    private static char ParseFormatSpecifier(ReadOnlySpan<char> format, out int digits)
+    {
+        char c = default;
+        if (format.Length > 0)
+        {
+            // If the format begins with a symbol, see if it's a standard format
+            // with or without a specified number of digits.
+            c = format[0];
+#if NET7_0_OR_GREATER
+            if (char.IsAsciiLetter(c))
+#else
+            // char.IsAsciiLetter(c) => (uint)((c | 0x20) - 'a') <= 'z' - 'a'
+            if ((uint)((c | 0x20) - 'a') <= 'z' - 'a')
+#endif
+            {
+                // Fast path for sole symbol, e.g. "D"
+                if (format.Length == 1)
+                {
+                    digits = -1;
+                    return c;
+                }
+
+                if (format.Length == 2)
+                {
+                    // Fast path for symbol and single digit, e.g. "X4"
+                    int d = format[1] - '0';
+                    if ((uint)d < 10)
+                    {
+                        digits = d;
+                        return c;
+                    }
+                }
+                else if (format.Length == 3)
+                {
+                    // Fast path for symbol and double-digit, e.g. "F12"
+                    int d1 = format[1] - '0', d2 = format[2] - '0';
+                    if ((uint)d1 < 10 && (uint)d2 < 10)
+                    {
+                        digits = d1 * 10 + d2;
+                        return c;
+                    }
+                }
+
+                // Fallback for symbol and any length digits.  The digits value must be >= 0 && <= 999_999_999,
+                // but it can begin with any number of 0s, and thus we may need to check more than 9
+                // digits.  Further, for compat, we need to stop when we hit a null char.
+                int n = 0;
+                int i = 1;
+                while ((uint)i < (uint)format.Length &&
+#if NET7_0_OR_GREATER
+                        char.IsAsciiDigit(format[i])
+#else
+                        // char.IsAsciiDigit(format[i])) => char.IsBetween(format[i], '0', '9')) => (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive)
+                        (uint)(format[i] - '0') <= (uint)('9' - '0')
+#endif
+                      )
+                {
+                    // Check if we are about to overflow past our limit of 9 digits
+                    if (n >= 100_000_000)
+                    {
+                        throw new FormatException("format is invalid!");
+                    }
+
+                    n = (n * 10) + format[i++] - '0';
+                }
+
+                // If we're at the end of the digits rather than having stopped because we hit something
+                // other than a digit or overflowed, return the standard format info.
+                if ((uint)i >= (uint)format.Length || format[i] == '\0')
+                {
+                    digits = n;
+                    return c;
+                }
+            }
+        }
+
+        // Default empty format to be "C"; custom format is signified with '\0'.
+        digits = -1;
+        return format.Length == 0 || c == '\0'
+            ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
+            'C'
+            : '\0';
     }
 }

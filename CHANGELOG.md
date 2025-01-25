@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for OLE Automation Currency conversion using ToOACurrency() and FromOACurrency()
 - Add support for [Generic Math](https://devblogs.microsoft.com/dotnet/dotnet-7-generic-math/)
 - Add Parsing for `ReadOnlySpan<char>`
+- Formatting added format L for currency format using full english name (was format F)
 -
 - Currency.NumericCode is a three-digit code number of the currency
 - Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
@@ -30,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   This is a breaking change for XML serialization, but deserialization of the old format is supported for migration purposes.
 - Currency is now a 2byte struct and only contains basic information. Use CurrencyInfo to retrieve more info for a Currency.
 - CurrencyBuilder is renamed to CurrencyInfoBuilder and returns CurrencyInfo instead of Currency.
+- Formatting format G is now Currency format with currency code instead of currency symbol
+- Formatting format F is now Fixed point format (same as for Decimal)
+- Formatting format C is Currency format with currency symbol, but if there is none, currency code will be used.
 - Performance improvement on:
   - init of currency (32x faster) and money (20x faster)
   - parsing money (110x faster)
@@ -42,6 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
 - Removed support .NET Core 3.1, .NET 4.0 and .NET 4.61 (implicitly supported by .NET Standard 2.0)
 - Removed support .NET Standard 2.1
+- Formatting format I is removed (replaced by format G)
+- Formatting format O is removed (replaced by format R)
 
 - Currency.MajorUnit
 

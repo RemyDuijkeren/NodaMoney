@@ -41,6 +41,7 @@ public class CompareNodaMoneyWithIso4127 : IClassFixture<Iso4127ListFixture>
     }
 
     [Fact(Skip = "Names contains countries at the moment")]
+    //[Fact]
     public void WhenCompareCurrencies_ThenTheyShouldHaveTheSameEnglishName()
     {
         var differences = new List<string>();
