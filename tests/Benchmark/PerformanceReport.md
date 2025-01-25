@@ -51,15 +51,15 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | Increment                | 374.80 ns | 7.507 ns | 11.907 ns |         - |
 | Decrement                | 369.70 ns | 7.295 ns | 14.229 ns |         - |
 #### after
-| Method                   |       Mean |     Error |    StdDev |   Gen0 | Allocated |
-|--------------------------|-----------:|----------:|----------:|-------:|----------:|
-| Addition                 |  12.311 ns | 0.2696 ns | 0.3599 ns |      - |         - |
-| Subtraction              |  17.913 ns | 0.3833 ns | 0.5497 ns |      - |         - |
-| CompareSameCurrency      |   3.570 ns | 0.0905 ns | 0.0846 ns |      - |         - |
-| CompareDifferentCurrency |   3.833 ns | 0.1055 ns | 0.1579 ns |      - |         - |
-| CompareAmount            |   4.470 ns | 0.0475 ns | 0.0421 ns |      - |         - |
-| Increment                | 105.702 ns | 1.3173 ns | 1.1000 ns | 0.0038 |      32 B |
-| Decrement                | 110.203 ns | 0.8956 ns | 0.7939 ns | 0.0038 |      32 B |
+| Method                   |      Mean |     Error |    StdDev |   Gen0 | Allocated |
+|--------------------------|----------:|----------:|----------:|-------:|----------:|
+| Addition                 | 16.804 ns | 0.1825 ns | 0.1618 ns |      - |         - |
+| Subtraction              | 15.575 ns | 0.1926 ns | 0.1707 ns |      - |         - |
+| CompareSameCurrency      |  3.639 ns | 0.0401 ns | 0.0356 ns |      - |         - |
+| CompareDifferentCurrency |  3.667 ns | 0.0303 ns | 0.0253 ns |      - |         - |
+| CompareAmount            |  3.897 ns | 0.0780 ns | 0.0609 ns |      - |         - |
+| Increment                | 98.307 ns | 0.7919 ns | 0.7020 ns | 0.0038 |      32 B |
+| Decrement                | 99.775 ns | 1.5502 ns | 1.3743 ns | 0.0038 |      32 B |
 
 ## MoneyFormatting
 #### before (v1.x)
@@ -70,12 +70,12 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | Explicit           | 271.5 ns | 5.50 ns |  9.33 ns | 0.0525 |     440 B |
 | ExplicitWithFormat | 270.3 ns | 5.42 ns | 12.56 ns | 0.0525 |     440 B |
 #### after
-| Method             |     Mean |   Error |   StdDev |   Median |   Gen0 | Allocated |
-|--------------------|---------:|--------:|---------:|---------:|-------:|----------:|
-| Implicit           | 107.3 ns | 2.19 ns |  3.95 ns | 107.7 ns | 0.0468 |     392 B |
-| ImplicitWithFormat | 113.3 ns | 2.27 ns |  3.25 ns | 112.8 ns | 0.0468 |     392 B |
-| Explicit           | 143.9 ns | 2.89 ns |  5.84 ns | 144.3 ns | 0.0842 |     704 B |
-| ExplicitWithFormat | 154.6 ns | 3.97 ns | 11.65 ns | 151.1 ns | 0.0842 |     704 B |
+| Method             |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|--------------------|---------:|--------:|--------:|-------:|----------:|
+| Implicit           | 109.6 ns | 2.24 ns | 4.14 ns | 0.0467 |     392 B |
+| ImplicitWithFormat | 143.4 ns | 2.89 ns | 3.33 ns | 0.0505 |     424 B |
+| Explicit           | 111.5 ns | 2.25 ns | 4.44 ns | 0.0468 |     392 B |
+| ExplicitWithFormat | 140.2 ns | 2.75 ns | 5.43 ns | 0.0505 |     424 B |
 
 ## MoneyParsing
 #### before (v1.x)

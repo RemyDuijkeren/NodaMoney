@@ -41,10 +41,10 @@ public partial struct Money
     /// <summary>Increments the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Increment(in Money money) => Add(money, new Money(money.Currency.MinimalAmount, money.Currency));
+    public static Money Increment(in Money money) => Add(money, money.Currency.MinimalAmount);
 
     /// <summary>Decrements the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Decrement(in Money money) => Subtract(money, new Money(money.Currency.MinimalAmount, money.Currency));
+    public static Money Decrement(in Money money) => Subtract(money, money.Currency.MinimalAmount);
 }

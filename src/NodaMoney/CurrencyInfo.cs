@@ -319,11 +319,18 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <inheritdoc />
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     //     => Format(format.AsSpan(), arg, formatProvider);
-    // public string Format(ReadOnlySpan<char> format, object? arg, IFormatProvider? formatProvider)
+    //private string Format(ReadOnlySpan<char> format, object? arg, IFormatProvider? formatProvider)
     {
-        // TODO: Add Round-trip format specifier (R) https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#round-trip-format-specifier-r
-        // TODO: ICustomFormat : http://msdn.microsoft.com/query/dev12.query?appId=Dev12IDEF1&l=EN-US&k=k(System.IFormatProvider);k(TargetFrameworkMoniker-.NETPortable,Version%3Dv4.6);k(DevLang-csharp)&rd=true
-        // TODO: Hacked solution, solve with better implementation
+        // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
+        // C: Currency Symbol format, like € 23.002,43 , € 23,002.43, 23,002.43 €
+        // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
+        // C => TODO: use C for long version (US$) and c for short version ($) in some locals
+        // R: Round-trip format with currency code
+        // N: Number format = decimal
+        // F: Fixed point format = decimal
+        // L: English name, like 23.002,43 dollar
+        // l: Native name, like 23.002,43 dólar
 
         if (arg is null)
             throw new ArgumentNullException(nameof(arg));
@@ -336,19 +343,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                 : arg.ToString() ?? string.Empty;
         }
 
-        // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
-        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
-        // C: Currency Symbol format, like € 23.002,43 , € 23,002.43, 23,002.43 €
-        // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
-        // C => TODO: use C for long version (US$) and c for short version ($) in some locals
-        // R: Round-trip format with currency code
-        // N: Number format = decimal
-        // F: Fixed point format = decimal
-        // L: English name, like 23.002,43 dollar
-        // l: Native name, like 23.002,43 dólar
-
         // TODO: short= $13B, $12.8B or long= $14 billion
-
         // TODO: CLDR-data: https://github.com/unicode-org/cldr-json/tree/main/cldr-json/cldr-numbers-full
         // For example USD in NL
         // "USD": {
@@ -371,25 +366,29 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             return money.Amount.ToString(format, nfi);
         }
 
-        switch (fmt)
+        return fmt switch
         {
-            case 'C' when digits == -1:
-                return money.Amount.ToString("C", nfi);
-            case 'C' or 'c': // TODO: use C for long version (US$) and c for short version ($) in some locals?
-                return money.Amount.ToString(format, nfi);
-            case 'G' or 'g':
-                nfi = ToNumberFormatInfo(formatProvider, true); // replace currency symbol with code
-                return money.Amount.ToString($"C{format.AsSpan(1).ToString()}", nfi);
-            case 'L': // 1 US dollar, 0 US dollars, 1.000 US dollars, 1,000 US dollars
-            case 'l': // future: use lower-case for local native name
+            // Currency formats
+            'C' when digits == -1 => money.Amount.ToString("C", nfi),
+            'C' or 'c' => // TODO: use C for long version (US$) and c for short version ($) in some locals?
+                money.Amount.ToString($"C{digits}", nfi),
+
+            // General format (uses currency code as symbol)
+            'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, true)),
+            'G' or 'g' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, true)),
+
+            // English Name currency (e.g., "1234.56 US dollars") // TODO: future use lower-case for local native name
+            'L' or 'l' when digits == -1 =>
                 // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
-                nfi.NumberDecimalDigits = nfi.CurrencyDecimalDigits;
-                return $"{money.Amount.ToString($"N{format.AsSpan(1).ToString()}", nfi)} {EnglishName}";
-            case 'R' or 'r':
-                return $"{Code} {money.Amount.ToString(format, nfi)}";
-            default:
-                return money.Amount.ToString(format, nfi);
-        }
+                $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
+            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
+
+            // Round-trip format (e.g., "USD 1234.56")
+            'R' or 'r' when digits == -1 => $"{Code} {money.Amount.ToString("R", nfi)}",
+            'R' or 'r' => $"{Code} {money.Amount.ToString($"R{digits} ", nfi)}",
+
+            _ => money.Amount.ToString(format, nfi)
+        };
     }
 
     /// <summary>
@@ -401,16 +400,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
     private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false)
     {
-        NumberFormatInfo numberFormatInfo = (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone();
-        if (formatProvider != null)
+        NumberFormatInfo numberFormatInfo = formatProvider switch
         {
-            numberFormatInfo = formatProvider switch
-            {
-                CultureInfo ci => (NumberFormatInfo)ci.NumberFormat.Clone(),
-                NumberFormatInfo nfi => (NumberFormatInfo)nfi.Clone(),
-                _ => numberFormatInfo // use current culture
-            };
-        }
+            CultureInfo ci => (NumberFormatInfo)ci.NumberFormat.Clone(),
+            NumberFormatInfo nfi => (NumberFormatInfo)nfi.Clone(),
+            _ => (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone()
+        };
 
         numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
         numberFormatInfo.CurrencySymbol = Symbol;
@@ -421,39 +416,27 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // Replace currency symbol with the code
         numberFormatInfo.CurrencySymbol = Code;
 
-        // For PositivePattern and NegativePattern add space between code and value
-        if (numberFormatInfo.CurrencyPositivePattern == 0) // $n
-            numberFormatInfo.CurrencyPositivePattern = 2; // $ n
-        if (numberFormatInfo.CurrencyPositivePattern == 1) // n$
-            numberFormatInfo.CurrencyPositivePattern = 3; // n $
-
-        switch (numberFormatInfo.CurrencyNegativePattern)
+        // For PositivePattern add space between code and value
+        numberFormatInfo.CurrencyPositivePattern = numberFormatInfo.CurrencyPositivePattern switch
         {
-            case 0: // ($n)
-                numberFormatInfo.CurrencyNegativePattern = 14; // ($ n)
-                break;
-            case 1: // -$n
-                numberFormatInfo.CurrencyNegativePattern = 9; // -$ n
-                break;
-            case 2: // $-n
-                numberFormatInfo.CurrencyNegativePattern = 12; // $ -n
-                break;
-            case 3: // $n-
-                numberFormatInfo.CurrencyNegativePattern = 11; // $ n-
-                break;
-            case 4: // (n$)
-                numberFormatInfo.CurrencyNegativePattern = 15; // (n $)
-                break;
-            case 5: // -n$
-                numberFormatInfo.CurrencyNegativePattern = 8; // -n $
-                break;
-            case 6: // n-$
-                numberFormatInfo.CurrencyNegativePattern = 13; // n- $
-                break;
-            case 7: // n$-
-                numberFormatInfo.CurrencyNegativePattern = 10; // n $-
-                break;
-        }
+            0 => 2, // $n -> $ n
+            1 => 3, // n$ -> n $
+            _ => numberFormatInfo.CurrencyPositivePattern // No change needed
+        };
+
+        // For NegativePattern add space between code and value
+        numberFormatInfo.CurrencyNegativePattern = numberFormatInfo.CurrencyNegativePattern switch
+        {
+            0 => 14, // ($n) -> ($ n)
+            1 => 9, // -$n -> -$ n
+            2 => 12, // $-n -> $ -n
+            3 => 11, // $n- -> $ n-
+            4 => 15, // (n$) -> (n $)
+            5 => 8, // -n$ -> -n $
+            6 => 13, // n-$ -> n- $
+            7 => 10, // n$- -> n $-
+            _ => numberFormatInfo.CurrencyNegativePattern // No change needed
+        };
 
         return numberFormatInfo;
     }
