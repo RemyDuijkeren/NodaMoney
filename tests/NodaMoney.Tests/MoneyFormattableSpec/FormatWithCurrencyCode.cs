@@ -14,6 +14,17 @@ public class FormatWithCurrencyCode
     private readonly Money _dinar = new Money(2765.4321m, CurrencyInfo.FromCode("BHD"));
 
     [Fact]
+    [UseCulture(null)]
+    public void WhenCurrentCultureInvariant_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCulture()
+    {
+        Thread.CurrentThread.CurrentCulture.Name.Should().Be(""); // Invariant Culture
+        _yen.ToString("G").Should().Be("JPY 2,765");
+        _euro.ToString("G").Should().Be("EUR 2,765.43");
+        _dollar.ToString("G").Should().Be("USD 2,765.43");
+        _dinar.ToString("G").Should().Be("BHD 2,765.432");
+    }
+
+    [Fact]
     [UseCulture("en-US")]
     public void WhenCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
     {

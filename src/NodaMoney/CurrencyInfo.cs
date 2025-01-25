@@ -416,7 +416,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         numberFormatInfo.CurrencySymbol = Symbol;
 
         // check if we need to replace with currency code
-        if (!useCurrencyCode || Symbol != GenericCurrencySign) return numberFormatInfo;
+        if (!useCurrencyCode && Symbol != GenericCurrencySign) return numberFormatInfo;
 
         // Replace currency symbol with the code
         numberFormatInfo.CurrencySymbol = Code;
