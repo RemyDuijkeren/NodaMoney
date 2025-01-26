@@ -15,9 +15,8 @@ change can be accepted quickly.
 * If possible, create an issue for big improvements or features, so that people can discuss.
 * Make commits of logical units, so that we can pick and choose.
 * Make sure your commit messages have a good description.
-* Complies with StyleCop rules and Code Analysis (runs on Release configuration).
-* Complies with Coding Guidelines (see document in solution).
 * Make sure you have added the necessary tests for your changes.
+* Make sure there are no warnings when building.
 * Run _all_ the tests to assure nothing else was accidentally broken.
 * Push your changes to your fork of the repository.
 * Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to the NodaMoney repository.
@@ -32,6 +31,5 @@ is a fairly thorough document of how to write managed code and should be used as
 The [C# Coding Guidelines](https://csharpcodingguidelines.com/) is a good additional document that focuses on the
 C# language and its best practices.
 
-[Code quality rules](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/) are being
-[analyzed automatically](https://learn.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview?view=vs-2022)
+[Code quality rules](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/) are being [analyzed automatically](https://learn.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview)
 as part of the build. We also added [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers) to enforce an additional set of style and consistency rules.
