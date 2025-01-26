@@ -210,7 +210,7 @@ public partial struct Money
         ReadOnlySpan<char> charSpan = charBuffer[..charsWritten];
 
         // Delegate to the TryParse(charSpan, ...) API
-        return TryParse(charSpan, NumberStyles.Currency | NumberStyles.Number, provider, out result);
+        return TryParse(charSpan, NumberStyles.Currency, provider, out result);
     }
 #endif
 

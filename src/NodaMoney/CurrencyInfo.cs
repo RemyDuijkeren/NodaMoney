@@ -318,8 +318,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <inheritdoc />
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
-    //     => Format(format.AsSpan(), arg, formatProvider);
-    //private string Format(ReadOnlySpan<char> format, object? arg, IFormatProvider? formatProvider)
     {
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
         // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
@@ -332,15 +330,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // L: English name, like 23.002,43 dollar
         // l: Native name, like 23.002,43 dólar
 
-        if (arg is null)
-            throw new ArgumentNullException(nameof(arg));
-
         // If argument is not a Money, fallback to default formatting
         if (arg is not Money money)
         {
             return arg is IFormattable formattable
                 ? formattable.ToString(format, formatProvider)
-                : arg.ToString() ?? string.Empty;
+                : arg?.ToString() ?? string.Empty;
         }
 
         // TODO: short= $13B, $12.8B or long= $14 billion
@@ -479,7 +474,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                     int d1 = format[1] - '0', d2 = format[2] - '0';
                     if ((uint)d1 < 10 && (uint)d2 < 10)
                     {
-                        digits = d1 * 10 + d2;
+                        digits = (d1 * 10) + d2;
                         return c;
                     }
                 }

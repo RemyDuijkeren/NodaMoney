@@ -30,8 +30,8 @@ public class MoneyJsonConverter : JsonConverter<Money>
         };
 
     /// <inheritdoc />
-    public override void Write(Utf8JsonWriter writer, Money money, JsonSerializerOptions options) =>
-        writer.WriteStringValue($"{money.Currency.Code.ToString(CultureInfo.InvariantCulture)} {money.Amount.ToString(CultureInfo.InvariantCulture)}");
+    public override void Write(Utf8JsonWriter writer, Money value, JsonSerializerOptions options) =>
+        writer.WriteStringValue($"{value.Currency.Code.ToString(CultureInfo.InvariantCulture)} {value.Amount.ToString(CultureInfo.InvariantCulture)}");
 
     /// <summary>Parses a JSON string representation of monetary value into a <see cref="Money"/> object.</summary>
     /// <param name="reader">An instance of <see cref="Utf8JsonReader"/> providing the JSON string to parse.</param>
@@ -110,7 +110,6 @@ public class MoneyJsonConverter : JsonConverter<Money>
                 case JsonTokenType.EndObject:
                     return new Money(amount, currency);
                 case JsonTokenType.PropertyName:
-                {
                     string? propertyName = reader.GetString();
                     reader.Read();
                     switch (propertyName)
@@ -121,12 +120,9 @@ public class MoneyJsonConverter : JsonConverter<Money>
                             {
                                 amount = reader.GetDecimal();
                             }
-                            else
+                            else if (!decimal.TryParse(reader.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
                             {
-                                if (!decimal.TryParse(reader.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
-                                {
-                                    throw new JsonException("Can't parse property 'Amount' to a number!");
-                                }
+                                throw new JsonException("Can't parse property 'Amount' to a number!");
                             }
 
                             hasAmount = true;
@@ -153,7 +149,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
                     }
 
                     break;
-                }
+
                 default:
                     throw new JsonException("Invalid JSON format for 'Money'.");
             }

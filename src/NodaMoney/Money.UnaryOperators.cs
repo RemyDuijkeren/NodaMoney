@@ -9,34 +9,34 @@ public partial struct Money
 #endif
 {
     /// <summary>Implements the operator +.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator +(Money money) => Plus(money);
+    public static Money operator +(Money value) => Plus(value);
 
     /// <summary>Implements the operator -.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator -(Money money) => Negate(money);
+    public static Money operator -(Money value) => Negate(value);
 
     /// <summary>Implements the operator ++.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator ++(Money money) => Increment(money);
+    public static Money operator ++(Money value) => Increment(value);
 
     /// <summary>Implements the operator --.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator --(Money money) => Decrement(money);
+    public static Money operator --(Money value) => Decrement(value);
 
     /// <summary>Pluses the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Plus(in Money money) => new Money(+money.Amount, money.Currency);
+    public static Money Plus(in Money money) => new(+money.Amount, money.Currency);
 
     /// <summary>Negates the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Negate(in Money money) => new Money(-money.Amount, money.Currency);
+    public static Money Negate(in Money money) => new(-money.Amount, money.Currency);
 
     /// <summary>Increments the specified money.</summary>
     /// <param name="money">The money.</param>

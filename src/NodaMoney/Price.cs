@@ -1,3 +1,4 @@
+#if NET7_0_OR_GREATER
 using System.Numerics;
 
 namespace NodaMoney;
@@ -35,11 +36,12 @@ namespace NodaMoney;
 //
 //     If you're planning to make strict distinctions between `Price` and `Rate` types (e.g., `Rate` for fees and taxes, `Price` for fixed costs like products or services), I suggest reserving **`Price` for fixed money/unit relationships** and using **`Rate` for more general financial ratios.** This aligns better with domain conventions.
 
-// public readonly struct Price<T>(decimal ratio, Currency currency, T unit)
-// {
-//
-//     public Money Multiple(T unit)
-//     {
-//         return new Money(ratio * unit, Currency);
-//     }
-// }
+internal readonly struct Price<T>(decimal ratio, Currency currency) where T : IMultiplyOperators<T, decimal, decimal>
+{
+    public Money Multiple(T units)
+    {
+        var result = units * ratio;
+        return new Money(result, currency);
+    }
+}
+#endif

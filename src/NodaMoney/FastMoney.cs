@@ -38,7 +38,7 @@ internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface
     public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
         Currency = currency;
-        _amount = decimal.ToOACurrency(amount);
+        _amount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));
     }
 
     /// <summary>Gets the amount of money.</summary>

@@ -222,18 +222,12 @@ public readonly partial struct Money : IEquatable<Money>
         currency = Currency;
     }
 
-    private static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding) =>
+    internal static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding) =>
         Round(amount, CurrencyInfo.FromCurrency(currency), rounding);
 
-    private static decimal Round(in decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding)
+    internal static decimal Round(in decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding)
     {
-        if (currencyInfo.MinorUnitIsDecimalBased)
-        {
-            // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
-            // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
-            return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
-        }
-        else
+        if (!currencyInfo.MinorUnitIsDecimalBased)
         {
             // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
             // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
@@ -242,6 +236,10 @@ public readonly partial struct Money : IEquatable<Money>
             // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
             return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
         }
+
+        // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
+        // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
+        return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
     }
 
     private static void EnsureSameCurrency(in Money left, in Money right)

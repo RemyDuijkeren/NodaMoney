@@ -57,15 +57,15 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
 
     /// <summary>Gets the base currency.</summary>
     /// <value>The base currency.</value>
-    public Currency BaseCurrency { get; private set; }
+    public Currency BaseCurrency { get; }
 
     /// <summary>Gets the quote currency.</summary>
     /// <value>The quote currency.</value>
-    public Currency QuoteCurrency { get; private set; }
+    public Currency QuoteCurrency { get; }
 
     /// <summary>Gets the value of the exchange rate.</summary>
     /// <value>The value of the exchange rate.</value>
-    public decimal Value { get; private set; }
+    public decimal Value { get; }
 
     /// <summary>Implements the operator ==.</summary>
     /// <param name="left">The left ExchangeRate.</param>
@@ -105,31 +105,29 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// valid format, or represents a number less than MinValue
     /// or greater than MaxValue. This parameter is passed uninitialized.</param>
     /// <returns><b>true</b> if rate was converted successfully; otherwise, <b>false</b>.</returns>
+    /// <exception cref="ArgumentNullException">if <see cref="rate"/> is null or whitespace</exception>
     public static bool TryParse(string rate, out ExchangeRate result)
     {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(rate))
-                    throw new ArgumentNullException(nameof(rate));
+        try
+        {
+            if (string.IsNullOrWhiteSpace(rate))
+                throw new ArgumentNullException(nameof(rate));
 
-                rate = rate.Trim();
-                var baseCurrency = CurrencyInfo.FromCode(rate.Substring(0, 3));
-                int index = rate.Substring(3, 1) == "/" ? 4 : 3;
-                var quoteCurrency = CurrencyInfo.FromCode(rate.Substring(index, 3));
-                var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
+            rate = rate.Trim();
+            var baseCurrency = CurrencyInfo.FromCode(rate.Substring(0, 3));
+            int index = rate.Substring(3, 1) == "/" ? 4 : 3;
+            var quoteCurrency = CurrencyInfo.FromCode(rate.Substring(index, 3));
+            var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
 
-                result = new ExchangeRate(baseCurrency, quoteCurrency, value);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is FormatException) && !(ex is OverflowException) && !(ex is ArgumentException))
-                    throw;
-
-                result = default;
-                return false;
-            }
+            result = new ExchangeRate(baseCurrency, quoteCurrency, value);
+            return true;
         }
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
+        {
+            result = default;
+            return false;
+        }
+    }
 
     /// <summary>Deconstruct the current instance into its components.</summary>
     /// <param name="baseCurrency">The base currency.</param>
@@ -137,10 +135,10 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// <param name="rate">The rate of the exchange.</param>
     public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
     {
-            baseCurrency = BaseCurrency;
-            quoteCurrency = QuoteCurrency;
-            rate = Value;
-        }
+        baseCurrency = BaseCurrency;
+        quoteCurrency = QuoteCurrency;
+        rate = Value;
+    }
 
     /// <summary>Converts the specified money.</summary>
     /// <param name="money">The money.</param>
@@ -148,26 +146,26 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// <exception cref="System.ArgumentException">Money should have the same currency as the base currency or the quote currency.</exception>
     public Money Convert(Money money)
     {
-            if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
-            {
-                throw new ArgumentException(
-                    "Money should have the same currency as the base currency or the quote currency!",
-                    nameof(money));
-            }
-
-            return money.Currency == BaseCurrency
-                       ? new Money(money.Amount * Value, QuoteCurrency)
-                       : new Money(money.Amount / Value, BaseCurrency);
+        if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
+        {
+            throw new ArgumentException(
+                "Money should have the same currency as the base currency or the quote currency!",
+                nameof(money));
         }
+
+        return money.Currency == BaseCurrency
+            ? new Money(money.Amount * Value, QuoteCurrency)
+            : new Money(money.Amount / Value, BaseCurrency);
+    }
 
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
     public override int GetHashCode()
     {
-            unchecked
-            {
-                return Value.GetHashCode() + (397 * BaseCurrency.GetHashCode()) + (397 * QuoteCurrency.GetHashCode());
-            }
+        unchecked
+        {
+            return Value.GetHashCode() + (397 * BaseCurrency.GetHashCode()) + (397 * QuoteCurrency.GetHashCode());
+        }
     }
 
     /// <summary>Indicates whether this instance and a specified <see cref="ExchangeRate"/> are equal.</summary>

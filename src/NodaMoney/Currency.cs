@@ -7,7 +7,7 @@ public readonly partial record struct Currency
     const string NoCurrencyCode = "XXX";
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
 
-    // ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.
+    /// <summary>ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.</summary>
     readonly ushort _encodedValue;
 
     // TODO: store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)

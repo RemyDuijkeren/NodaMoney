@@ -22,8 +22,10 @@ public class CurrencyInfoBuilder
 
         // check that code exist out of only out of three capital letters
         foreach (var c in code)
+        {
             if (c is < 'A' or > 'Z')
                 throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+        }
 
         Code = code;
         IsIso4217 = false;
@@ -36,6 +38,7 @@ public class CurrencyInfoBuilder
     public string Symbol { get; set; } = CurrencyInfo.GenericCurrencySign;
 
     /// <summary>Gets or sets the numeric ISO 4217 currency code.</summary>
+    /// <exception cref="ArgumentException">When not a number</exception>
     public string NumericCode
     {
         get => _number.ToString("D3", CultureInfo.InvariantCulture);
@@ -51,6 +54,7 @@ public class CurrencyInfoBuilder
     }
 
     /// <summary>Gets or sets the number of digits after the decimal separator.</summary>
+    /// <exception cref="ArgumentOutOfRangeException">DecimalDigits must greater or equal to zero and smaller or equal to 13, or -1 if not applicable!</exception>
     public double DecimalDigits
     {
         get => _decimalDigits;
@@ -58,8 +62,10 @@ public class CurrencyInfoBuilder
         {
             // TODO: Fix constraints
             if (value is < 0 or > 13)
+            {
                 throw new ArgumentOutOfRangeException(nameof(value),
                     "DecimalDigits must greater or equal to zero and smaller or equal to 13, or -1 if not applicable!");
+            }
 
             _decimalDigits = (byte)value;
         }
@@ -114,7 +120,6 @@ public class CurrencyInfoBuilder
         if (string.IsNullOrWhiteSpace(Symbol))
             Symbol = CurrencyInfo.GenericCurrencySign;
 
-
         return new CurrencyInfo(Code, _number, (MinorUnit)_decimalDigits, EnglishName, Symbol)
         {
             IntroducedOn = ValidFrom,
@@ -125,14 +130,14 @@ public class CurrencyInfoBuilder
 
     /// <summary>Registers the current <see cref="CurrencyInfoBuilder"/> object as a custom currency for the current AppDomain.</summary>
     /// <returns>A <see cref="CurrencyInfo"/> instance that is build and registered.</returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="InvalidCurrencyException">
     ///     <para>The custom currency is already registered -or-.</para>
     ///     <para>The current CurrencyBuilder object has a property that must be set before the currency can be registered.</para>
     /// </exception>
     public CurrencyInfo Register()
     {
         CurrencyInfo currency = Build();
-        if (CurrencyRegistry.TryAdd(currency) == false)
+        if (!CurrencyRegistry.TryAdd(currency))
             throw new InvalidCurrencyException($"The currency {Code} is already registered.");
 
         return currency;
