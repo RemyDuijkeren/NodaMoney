@@ -5,9 +5,9 @@ namespace NodaMoney.Tests.Serialization.XmlSerializationSpec;
 
 public class SerializeCurrencyWithXmlSerializer : XmlSerializationHelper
 {
-    readonly Currency _yen = Currency.FromCode("JPY");
-    readonly Currency _euro = Currency.FromCode("EUR");
-    readonly Currency _bitcoin = Currency.FromCode("BTC");
+    readonly Currency _yen = CurrencyInfo.FromCode("JPY");
+    readonly Currency _euro = CurrencyInfo.FromCode("EUR");
+    readonly Currency _bitcoin = CurrencyInfo.FromCode("BTC");
 
     [Fact]
     public void WhenSerializingYen_ThenThisShouldSucceed()

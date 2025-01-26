@@ -34,5 +34,4 @@ C# language and its best practices.
 
 [Code quality rules](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/) are being
 [analyzed automatically](https://learn.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview?view=vs-2022)
-as part of the build. We also added [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers) to enforce an
-additional set of style and consistency rules.
+as part of the build. We also added [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers) to enforce an additional set of style and consistency rules.
