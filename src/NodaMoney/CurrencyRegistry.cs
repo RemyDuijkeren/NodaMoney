@@ -38,6 +38,7 @@ static class CurrencyRegistry
     /// <param name="code">A currency code, like EUR or USD.</param>
     /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="CurrencyInfo"/> with the specified code; otherwise, <b>false</b>.</returns>
     /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
+    /// <exception cref="InvalidCurrencyException"> when <see cref="code"/> is unknown currency code.</exception>
     public static CurrencyInfo Get(string code)
     {
         if (code is null) throw new ArgumentNullException(nameof(code));
@@ -50,6 +51,7 @@ static class CurrencyRegistry
     /// <param name="currency">A currency, like EUR or USD.</param>
     /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="CurrencyInfo"/> with the specified code; otherwise, <b>false</b>.</returns>
     /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
+    /// <exception cref="InvalidCurrencyException"> when <see cref="currency"/> is unknown currency.</exception>
     public static CurrencyInfo Get(Currency currency) => s_lookupCurrencies.TryGetValue(currency, out var ci)
         ? ci
         : throw new InvalidCurrencyException($"{currency} is unknown currency code!");

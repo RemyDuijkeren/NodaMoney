@@ -123,7 +123,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     public Money(long amount) : this((decimal)amount) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
@@ -131,7 +131,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     public Money(long amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
@@ -139,7 +139,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="currency">The Currency of the money.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     public Money(long amount, Currency currency) : this((decimal)amount, currency) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -147,7 +147,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// or <see cref="byte"/>.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount) : this((decimal)amount) { }
 
@@ -157,7 +157,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
 
@@ -167,7 +167,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="currency">The Currency of the money.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
-    /// <code>Money money = new Money(10, "EUR");</code></remarks>
+    /// <c>Money money = new Money(10, "EUR");</c></remarks>
     [CLSCompliant(false)]
     public Money(ulong amount, Currency currency) : this((decimal)amount, currency) { }
 

@@ -83,6 +83,7 @@ public struct ExchangeRate : IEquatable<ExchangeRate>
     /// <param name="rate">The string representation of the exchange rate to convert.</param>
     /// <returns>The equivalent to the exchange rate contained in rate.</returns>
     /// <exception cref="System.FormatException">rate is not in the correct format.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="rate"/> is <c>null</c>.</exception>
     public static ExchangeRate Parse(string rate)
     {
             if (rate == null)

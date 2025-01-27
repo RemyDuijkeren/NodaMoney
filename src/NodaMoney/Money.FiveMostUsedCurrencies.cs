@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NodaMoney;
+﻿namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
@@ -22,7 +20,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -35,7 +33,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public static Money Euro(double amount, MidpointRounding rounding) => new Money(amount, CurrencyInfo.FromCode("EUR"), rounding);
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> structure in euro's.</summary>
@@ -66,7 +64,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -79,7 +77,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public static Money USDollar(double amount, MidpointRounding rounding) => new Money(amount, CurrencyInfo.FromCode("USD"), rounding);
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> structure in US dollars.</summary>
@@ -110,7 +108,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -123,7 +121,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public static Money Yen(double amount, MidpointRounding rounding) => new Money(amount, CurrencyInfo.FromCode("JPY"), rounding);
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Japanese Yens.</summary>
@@ -154,7 +152,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -167,7 +165,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public static Money PoundSterling(double amount, MidpointRounding rounding) => new Money(amount, CurrencyInfo.FromCode("GBP"), rounding);
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> structure in British pounds.</summary>
@@ -198,7 +196,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
@@ -211,7 +209,7 @@ public partial struct Money
     /// <remarks>This method will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</para></remarks>
+    /// (<see cref="CurrencyInfo.DecimalDigits"/>).</para></remarks>
     public static Money Yuan(double amount, MidpointRounding rounding) => new Money(amount, CurrencyInfo.FromCode("CNY"), rounding);
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> structure in Chinese Yuan.</summary>

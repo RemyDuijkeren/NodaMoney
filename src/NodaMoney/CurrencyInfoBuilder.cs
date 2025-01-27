@@ -98,6 +98,7 @@ public class CurrencyInfoBuilder
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentException">code specifies a currency that is not found in the given namespace.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="code" /> is <see langword="null" /> or empty.</exception>
+    /// <exception cref="InvalidCurrencyException"> when currency is not registered.</exception>
     public static CurrencyInfo Unregister(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
@@ -165,6 +166,7 @@ public class CurrencyInfoBuilder
     /// <summary>Sets the properties of the current <see cref="CurrencyInfoBuilder"/> object with the corresponding properties of
     /// the specified <see cref="CurrencyInfo"/> object, except for the code and namespace.</summary>
     /// <param name="currencyInfo">The object whose properties will be used.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="currencyInfo"/> is <c>null</c>.</exception>
     public void LoadDataFromCurrencyInfo(CurrencyInfo currencyInfo)
     {
         if (currencyInfo == null)

@@ -248,6 +248,17 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         return FromRegion(culture.Name);
     }
 
+    private static CurrencyInfo FromNumberFormatInfo(NumberFormatInfo nfi)
+    {
+        if (nfi == null)
+            throw new ArgumentNullException(nameof(nfi));
+        if (string.IsNullOrEmpty(nfi.CurrencySymbol))
+            throw new ArgumentException("Currency symbol in NumberFormatInfo is null or empty!", nameof(nfi));
+        if (nfi.CurrencySymbol == GenericCurrencySign)
+            throw new ArgumentException("Currency symbol in NumberFormatInfo is generic currency sign!", nameof(nfi));
+        return Money.ParseCurrencyInfo(nfi.CurrencySymbol.AsSpan()); // throws FormatException if invalid
+    }
+
     /// <summary>Deconstructs the current <see cref="CurrencyInfo" /> instance into its components.</summary>
     /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>
     /// <param name="symbol">The currency symbol of the current instance.</param>
@@ -273,8 +284,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         if (formatProvider is CultureInfo cultureInfo)
             return FromCulture(cultureInfo);
 
-        if (formatProvider is NumberFormatInfo)
-            throw new NotImplementedException();
+        if (formatProvider is NumberFormatInfo numberFormatInfo)
+            return FromNumberFormatInfo(numberFormatInfo);
 
         return CurrentCurrency;
 

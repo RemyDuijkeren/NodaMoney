@@ -214,7 +214,12 @@ public partial struct Money
     }
 #endif
 
-    private static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> s, CurrencyInfo? specifiedCurrency = null)
+    /// <summary>Parses the currency information from the given span of characters, optionally using a specified currency.</summary>
+    /// <param name="s">A span of characters containing the input string to parse for currency information.</param>
+    /// <param name="specifiedCurrency">An optional currency to use when resolving the currency information.</param>
+    /// <returns>The parsed <see cref="CurrencyInfo"/> representing the currency information found in the input.</returns>
+    /// <exception cref="FormatException">Thrown when no matching currency symbol or code can be resolved from the input.</exception>
+    internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> s, CurrencyInfo? specifiedCurrency = null)
     {
         // remove non-numeric characters to get currency char or code
         Span<char> buffer = stackalloc char[s.Length];
@@ -235,34 +240,7 @@ public partial struct Money
             return specifiedCurrency ?? CurrencyInfo.CurrentCurrency;
         }
 
-        // // try to match with known currencies
-        // // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
-        // List<CurrencyInfo> match = [];
-        // foreach (var currency in CurrencyInfo.GetAllCurrencies())
-        // {
-        //     if (MatchesCurrency(possibleCurrency, currency))
-        //     {
-        //         match.Add(currency);
-        //     }
-        // }
-        //
-        // // depending on the matches, return CurrencyInfo or throw
-        // switch (match.Count)
-        // {
-        //     case 0:
-        //         throw new FormatException($"{possibleCurrency.ToString()} is an unknown currency sign or code!");
-        //     case > 1 when specifiedCurrency == null:
-        //         throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with multiple known currencies! Specify currency or culture explicit.");
-        //     case > 1 when match.Any(c => c == specifiedCurrency):
-        //         return match.First(c => c == specifiedCurrency);
-        //     case > 1:
-        //         throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with multiple known currencies, but none match with specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
-        //     case 1 when (specifiedCurrency is not null && match[0] != specifiedCurrency):
-        //         throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with {match[0].Code} or {match[0].Symbol}, but doesn't match with specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
-        //     default:
-        //         return match[0];
-        // }
-
+        // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
         // try to find a match
         CurrencyInfo? matchedCurrency = null;
         bool multipleMatches = false;
@@ -288,19 +266,19 @@ public partial struct Money
         }
 
         if (matchedCurrency is null)
-            throw new FormatException($"{possibleCurrency.ToString()} is an unknown currency sign or code!");
+            throw new FormatException($"{possibleCurrency.ToString()} is an unknown currency symbol or code!");
 
         if (multipleMatches)
         {
             if (specifiedCurrency is null)
-                throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with multiple known currencies! Specify currency or culture explicitly.");
+                throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with multiple known currencies! Specify currency or culture explicitly.");
 
-            throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
+            throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
         }
 
         if (specifiedCurrency is not null && matchedCurrency != specifiedCurrency)
         {
-            throw new FormatException($"Currency sign {possibleCurrency.ToString()} matches with {matchedCurrency.Code} or {matchedCurrency.Symbol}, but doesn't match the specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
+            throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with {matchedCurrency.Code} or {matchedCurrency.Symbol}, but doesn't match the specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
         }
 
         return matchedCurrency;
