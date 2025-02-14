@@ -158,7 +158,6 @@ static class CurrencyRegistry
             new ("COP", 170, MinorUnit.Two, "Colombian peso", "$"),
             new ("COU", 970, MinorUnit.Two, "Unidad de Valor Real", CurrencyInfo.GenericCurrencySign), // ???
             new ("CRC", 188, MinorUnit.Two, "Costa Rican colon", "₡"),
-            new ("CUC", 931, MinorUnit.Two, "Cuban convertible peso", "CUC$"), // $ or CUC
             new ("CUP", 192, MinorUnit.Two, "Cuban peso", "$"), // or ₱ (obsolete?)
             new ("CVE", 132, MinorUnit.Two, "Cape Verde escudo", "$"),
             new ("CZK", 203, MinorUnit.Two, "Czech koruna", "Kč"),
@@ -306,6 +305,7 @@ static class CurrencyRegistry
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
             // Historic ISO-4217 currencies (list three)
+            new ("CUC", 931, MinorUnit.Two, "Cuban convertible peso", "CUC$") { ExpiredOn = new DateTime(2021, 06, 30), IntroducedOn = new DateTime(2009, 03, 01) }, // $ or CUC // Amendment 178, replace by CUP/192,
             new ("ZWL", 932, MinorUnit.Two, "Zimbabwean dollar", "$") { ExpiredOn = new DateTime(2024, 08, 31) }, // Amendment 177, replaces ZWG/924,
             new ("HRK", 191, MinorUnit.Two, "Croatian kuna", "kn") { ExpiredOn = new DateTime(2022, 12, 31) }, // replaced by EUR/978
             new ("SLL", 694, MinorUnit.Two, "Sierra Leonean leone", "Le") { ExpiredOn = new DateTime(2022, 9, 30) }, // replaced by SLE/925, redenominated by removing three (3) zeros from the denominations
