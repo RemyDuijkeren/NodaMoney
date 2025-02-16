@@ -14,9 +14,9 @@ public class TryParseImplicitCurrency
         Thread.CurrentThread.CurrentCulture.Name.Should().Be(""); // InvariantCulture
 
         Money euro;
-        Money.TryParse("€ 765.43", out euro).Should().BeTrue();
+        Money.TryParse("(€ 98,765.43)", out euro).Should().BeTrue();
 
-        euro.Should().Be(new Money(765.43m, "EUR"));
+        euro.Should().Be(new Money( -98_765.43m, "EUR"));
     }
 
     [Fact, UseCulture("nl-BE")]
@@ -24,9 +24,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-BE");
         Money euro;
-        Money.TryParse("€ 765,43", out euro).Should().BeTrue();
+        Money.TryParse("€ -98.765,43", out euro).Should().BeTrue();
 
-        euro.Should().Be(new Money(765.43m, "EUR"));
+        euro.Should().Be(new Money(-98_765.43m, "EUR"));
     }
 
     [Fact, UseCulture("fr-BE")]
@@ -34,9 +34,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-BE");
         Money euro;
-        Money.TryParse("765,43 €", out euro).Should().BeTrue();
+        Money.TryParse("-98 765,43 €", out euro).Should().BeTrue();
 
-        euro.Should().Be(new Money(765.43, "EUR"));
+        euro.Should().Be(new Money(-98_765.43, "EUR"));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -44,9 +44,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
         Money euro;
-        Money.TryParse("765,43", out euro).Should().BeTrue();
+        Money.TryParse("-98.765,43", out euro).Should().BeTrue();
 
-        euro.Should().Be(new Money(765.43, "EUR"));
+        euro.Should().Be(new Money(-98_765.43, "EUR"));
     }
 
     [Fact, UseCulture("ja-JP")]
@@ -54,9 +54,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("ja-JP");
         Money yen;
-        Money.TryParse("¥ 765", out yen).Should().BeTrue();
+        Money.TryParse("¥ -98,765", out yen).Should().BeTrue();
 
-        yen.Should().Be(new Money(765m, "JPY"));
+        yen.Should().Be(new Money(-98_765m, "JPY"));
     }
 
     [Fact, UseCulture("zh-CN")]
@@ -64,9 +64,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("zh-CN");
         Money yuan;
-        Money.TryParse("¥ 765", out yuan).Should().BeTrue();
+        Money.TryParse("¥ -98,765", out yuan).Should().BeTrue();
 
-        yuan.Should().Be(new Money(765m, "CNY"));
+        yuan.Should().Be(new Money(-98_765m, "CNY"));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -75,7 +75,7 @@ public class TryParseImplicitCurrency
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
         // ¥ symbol is used for Japanese yen and Chinese yuan
         Money money;
-        Money.TryParse("¥ 765", out money).Should().BeFalse();
+        Money.TryParse("¥ -98,765", out money).Should().BeFalse();
 
         money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
     }
@@ -85,9 +85,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
         Money dollar;
-        Money.TryParse("$765.43", out dollar).Should().BeTrue();
+        Money.TryParse("$-98,765.43", out dollar).Should().BeTrue();
 
-        dollar.Should().Be(new Money(765.43m, "USD"));
+        dollar.Should().Be(new Money(-98_765.43m, "USD"));
     }
 
     [Fact, UseCulture("es-AR")]
@@ -95,9 +95,9 @@ public class TryParseImplicitCurrency
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("es-AR");
         Money peso;
-        Money.TryParse("$765,43", out peso).Should().BeTrue();
+        Money.TryParse("$-98.765,43", out peso).Should().BeTrue();
 
-        peso.Should().Be(new Money(765.43m, "ARS"));
+        peso.Should().Be(new Money(-98_765.43m, "ARS"));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -106,7 +106,7 @@ public class TryParseImplicitCurrency
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
         // $ symbol is used for multiple currencies
         Money money;
-        Money.TryParse("$ 765,43", out money).Should().BeFalse();
+        Money.TryParse("$ -98.765,43", out money).Should().BeFalse();
 
         money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
     }

@@ -12,7 +12,7 @@ static class CurrencyRegistry
     {
         s_currencies = InitializeCurrencies();
 
-        // TODO: allow duplicates? (e.g. non ISO-4217 currencies)
+        // TODO: allow duplicates? (e.g. non ISO-4217 currencies). For now we don't allow.
         s_lookupCurrencies = new Dictionary<Currency, CurrencyInfo>(s_currencies.Length);
         foreach (var ci in s_currencies)
         {
@@ -150,7 +150,7 @@ static class CurrencyRegistry
             new ("CAD", 124, MinorUnit.Two, "Canadian dollar", "$"),
             new ("CDF", 976, MinorUnit.Two, "Congolese franc", "FC"),
             new ("CHE", 947, MinorUnit.Two, "WIR Euro (complementary currency)", "CHE"),
-            new ("CHF", 756, MinorUnit.Two, "Swiss franc", "fr."), // or CHF
+            new ("CHF", 756, MinorUnit.Two, "Swiss franc", "CHF"), // informally "Fr.", outdated "SFr."
             new ("CHW", 948, MinorUnit.Two, "WIR Franc (complementary currency)", "CHW"),
             new ("CLF", 990, MinorUnit.Four, "Unidad de Fomento (funds code)", "CLF"),
             new ("CLP", 152, MinorUnit.Zero, "Chilean peso", "$"),

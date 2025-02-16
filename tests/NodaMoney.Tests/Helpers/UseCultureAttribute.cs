@@ -28,8 +28,8 @@ public class UseCultureAttribute : BeforeAfterTestAttribute
     /// <param name="uiCulture">The name of the UI culture.</param>
     public UseCultureAttribute(string culture, string uiCulture)
     {
-        Culture = (culture == null) ? CultureInfo.InvariantCulture : new CultureInfo(culture, false);
-        UICulture = (uiCulture == null) ? CultureInfo.InvariantCulture : new CultureInfo(uiCulture, false);
+        Culture = string.IsNullOrEmpty(culture) ? CultureInfo.InvariantCulture : new CultureInfo(culture, false);
+        UICulture = string.IsNullOrEmpty(uiCulture) ? CultureInfo.InvariantCulture : new CultureInfo(uiCulture, false);
     }
 
     /// <summary>Gets the culture.</summary>

@@ -14,11 +14,19 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("JPY");
 
         // Act
-        bool parseResult = Money.TryParse("¥ 765", currencyInfo, out Money yen);
+        bool parseResult = Money.TryParse("¥ -98.765", currencyInfo, out Money yen);
 
         // Assert
         parseResult.Should().BeTrue();
-        yen.Should().Be(new Money(765, currencyInfo));
+        yen.Should().Be(new Money(-98_765, currencyInfo));
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenParsingSwissFrancInNetherlands_ThenThisShouldSucceed()
+    {
+        Money.TryParse("CHF -98.765", CurrencyInfo.FromCode("CHF"), out Money money).Should().BeTrue();
+
+        money.Should().Be(new Money(-98765m, "CHF"));
     }
 
     [Fact, UseCulture("en-US")]
@@ -28,11 +36,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("ARS");
 
         // Act
-        bool parseResult = Money.TryParse("$765.43", currencyInfo, out Money peso);
+        bool parseResult = Money.TryParse("$-98,765.43", currencyInfo, out Money peso);
 
         // Assert
         parseResult.Should().BeTrue();
-        peso.Should().Be(new Money(765.43m, currencyInfo));
+        peso.Should().Be(new Money(-98_765.43m, currencyInfo));
     }
 
     [Fact, UseCulture("es-AR")]
@@ -42,11 +50,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("USD");
 
         // Act
-        bool parseResult = Money.TryParse("$765,43", currencyInfo, out Money dollar);
+        bool parseResult = Money.TryParse("$-98.765,43", currencyInfo, out Money dollar);
 
         // Assert
         parseResult.Should().BeTrue();
-        dollar.Should().Be(new Money(765.43m, currencyInfo));
+        dollar.Should().Be(new Money(-98_765.43m, currencyInfo));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -56,11 +64,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("USD"); // $ symbol is used for multiple currencies
 
         // Act
-        bool parseResult = Money.TryParse("$765,43", currencyInfo, out Money dollar);
+        bool parseResult = Money.TryParse("$-98.765,43", currencyInfo, out Money dollar);
 
         // Assert
         parseResult.Should().BeTrue();
-        dollar.Should().Be(new Money(765.43m, currencyInfo));
+        dollar.Should().Be(new Money(-98_765.43m, currencyInfo));
     }
 
     [Fact, UseCulture("nl-BE")]
@@ -70,11 +78,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("EUR");
 
         // Act
-        bool parseResult = Money.TryParse("€ 765,43", currencyInfo, out Money euro);
+        bool parseResult = Money.TryParse("€ -98.765,43", currencyInfo, out Money euro);
 
         // Assert
         parseResult.Should().BeTrue();
-        euro.Should().Be(new Money(765.43m, currencyInfo));
+        euro.Should().Be(new Money(-98_765.43m, currencyInfo));
     }
 
     [Fact, UseCulture("fr-BE")]
@@ -84,11 +92,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("EUR");
 
         // Act
-        bool parseResult = Money.TryParse("765,43 €", currencyInfo, out Money euro);
+        bool parseResult = Money.TryParse("-98 765,43 €", currencyInfo, out Money euro);
 
         // Assert
         parseResult.Should().BeTrue();
-        euro.Should().Be(new Money(765.43, currencyInfo));
+        euro.Should().Be(new Money(-98_765.43, currencyInfo));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -98,11 +106,11 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("USD");
 
         // Act
-        bool parseResult = Money.TryParse("765,43", currencyInfo, out Money euro);
+        bool parseResult = Money.TryParse("-98.765,43", currencyInfo, out Money euro);
 
         // Assert
         parseResult.Should().BeTrue();
-        euro.Should().Be(new Money(765.43, currencyInfo));
+        euro.Should().Be(new Money(-98_765.43, currencyInfo));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -112,10 +120,18 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("USD");
 
         // Act
-        bool parseResult = Money.TryParse("€ 765,43", currencyInfo, out Money money);
+        bool parseResult = Money.TryParse("€ -98.765,43", currencyInfo, out Money money);
 
         // Assert
         parseResult.Should().BeFalse();
         money.Should().Be(new Money(0m, CurrencyInfo.NoCurrency));
+    }
+
+    [Fact, UseCulture("de-CH")]
+    public void WhenParsingSwissFrancInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
+    {
+        Money.TryParse("CHF -98’765", CurrencyInfo.FromCode("CHF"), out Money money).Should().BeTrue();
+
+        money.Should().Be(new Money(-98_765m, "CHF"));
     }
 }

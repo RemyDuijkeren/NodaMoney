@@ -10,10 +10,23 @@ namespace NodaMoney.Tests.MoneyFormattableSpec;
 [Collection(nameof(NoParallelization))]
 public class DefaultFormat
 {
-    private readonly Money _yen = new Money(2765.4321m, CurrencyInfo.FromCode("JPY"));
-    private readonly Money _euro = new Money(2765.4321m, CurrencyInfo.FromCode("EUR"));
-    private readonly Money _dollar = new Money(2765.4321m, CurrencyInfo.FromCode("USD"));
-    private readonly Money _dinar = new Money(2765.4321m, CurrencyInfo.FromCode("BHD"));
+    private readonly Money _yen = new Money(-98_765.4321m, CurrencyInfo.FromCode("JPY"));
+    private readonly Money _euro = new Money(-98_765.4321m, CurrencyInfo.FromCode("EUR"));
+    private readonly Money _dollar = new Money(-98_765.4321m, CurrencyInfo.FromCode("USD"));
+    private readonly Money _dinar = new Money(-98_765.4321m, CurrencyInfo.FromCode("BHD"));
+    private readonly Money _swissFranc = new Money(-98_765.4321m, CurrencyInfo.FromCode("CHF"));
+
+    [Fact]
+    [UseCulture(null)]
+    public void WhenCurrentCultureInvariant_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCulture()
+    {
+        Thread.CurrentThread.CurrentCulture.Name.Should().Be(""); // InvariantCulture
+        _yen.ToString().Should().Be("(¥98,765)");
+        _euro.ToString().Should().Be("(€98,765.43)");
+        _dollar.ToString().Should().Be("($98,765.43)");
+        _dinar.ToString().Should().Be("(BD98,765.432)");
+        _swissFranc.ToString().Should().Be("(CHF98,765.43)");
+    }
 
     [Fact]
     [UseCulture("en-US")]
@@ -31,10 +44,11 @@ public class DefaultFormat
     public void WhenCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureUS()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-        _yen.ToString().Should().Be("¥2,765");
-        _euro.ToString().Should().Be("€2,765.43");
-        _dollar.ToString().Should().Be("$2,765.43");
-        _dinar.ToString().Should().Be("BD2,765.432");
+        _yen.ToString().Should().Be("-¥98,765");
+        _euro.ToString().Should().Be("-€98,765.43");
+        _dollar.ToString().Should().Be("-$98,765.43");
+        _dinar.ToString().Should().Be("-BD98,765.432");
+        _swissFranc.ToString().Should().Be("-CHF98,765.43");
     }
 
     [Fact]
@@ -42,32 +56,36 @@ public class DefaultFormat
     public void WhenCurrentCultureNL_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureNL()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
-        _yen.ToString().Should().Be("¥ 2.765");
-        _euro.ToString().Should().Be("€ 2.765,43");
-        _dollar.ToString().Should().Be("$ 2.765,43");
-        _dinar.ToString().Should().Be("BD 2.765,432");
+        _yen.ToString().Should().Be("¥ -98.765");
+        _euro.ToString().Should().Be("€ -98.765,43");
+        _dollar.ToString().Should().Be("$ -98.765,43");
+        _dinar.ToString().Should().Be("BD -98.765,432");
+        _swissFranc.ToString().Should().Be("CHF -98.765,43");
     }
 
     [Fact]
     [UseCulture("fr-FR")]
     public void WhenCurrentCultureFR_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
     {
+        //   is a non-breaking space for group separator
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-FR");
-        _yen.ToString().Should().Be("2 765 ¥");
-        _euro.ToString().Should().Be("2 765,43 €");
-        _dollar.ToString().Should().Be("2 765,43 $");
-        _dinar.ToString().Should().Be("2 765,432 BD");
+        _yen.ToString().Should().Be("-98 765 ¥");
+        _euro.ToString().Should().Be("-98 765,43 €");
+        _dollar.ToString().Should().Be("-98 765,43 $");
+        _dinar.ToString().Should().Be("-98 765,432 BD");
+        _swissFranc.ToString().Should().Be("-98 765,43 CHF");
     }
 
     [Fact]
-    [UseCulture(null)]
-    public void WhenCurrentCultureInvariant_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCulture()
+    [UseCulture("de-CH")]
+    public void WhenToStringAndCurrentCultureDeCH_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
     {
-        Thread.CurrentThread.CurrentCulture.Name.Should().Be(""); // InvariantCulture
-        _yen.ToString().Should().Be("¥2,765");
-        _euro.ToString().Should().Be("€2,765.43");
-        _dollar.ToString().Should().Be("$2,765.43");
-        _dinar.ToString().Should().Be("BD2,765.432");
+        Thread.CurrentThread.CurrentCulture.Name.Should().Be("de-CH");
+        _yen.ToString().Should().Be("¥-98’765");
+        _euro.ToString().Should().Be("€-98’765.43");
+        _dollar.ToString().Should().Be("$-98’765.43");
+        _dinar.ToString().Should().Be("BD-98’765.432");
+        _swissFranc.ToString().Should().Be("CHF-98’765.43");
     }
 
     [Fact]
@@ -85,10 +103,11 @@ public class DefaultFormat
         var ci = new CultureInfo("nl-NL");
 
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-        _yen.ToString(ci).Should().Be("¥ 2.765");
-        _euro.ToString(ci).Should().Be("€ 2.765,43");
-        _dollar.ToString(ci).Should().Be("$ 2.765,43");
-        _dinar.ToString(ci).Should().Be("BD 2.765,432");
+        _yen.ToString(ci).Should().Be("¥ -98.765");
+        _euro.ToString(ci).Should().Be("€ -98.765,43");
+        _dollar.ToString(ci).Should().Be("$ -98.765,43");
+        _dinar.ToString(ci).Should().Be("BD -98.765,432");
+        _swissFranc.ToString(ci).Should().Be("CHF -98.765,43");
     }
 
     [Fact]
@@ -98,10 +117,11 @@ public class DefaultFormat
         var nfi = new CultureInfo("nl-NL").NumberFormat;
 
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-        _yen.ToString(nfi).Should().Be("¥ 2.765");
-        _euro.ToString(nfi).Should().Be("€ 2.765,43");
-        _dollar.ToString(nfi).Should().Be("$ 2.765,43");
-        _dinar.ToString(nfi).Should().Be("BD 2.765,432");
+        _yen.ToString(nfi).Should().Be("¥ -98.765");
+        _euro.ToString(nfi).Should().Be("€ -98.765,43");
+        _dollar.ToString(nfi).Should().Be("$ -98.765,43");
+        _dinar.ToString(nfi).Should().Be("BD -98.765,432");
+        _swissFranc.ToString(nfi).Should().Be("CHF -98.765,43");
     }
 
     [Fact]
@@ -131,10 +151,8 @@ public class DefaultFormat
     }
 
     [Fact]
-    public void WhenUsingToStringWithGFormat_ThenReturnsTheSameAsTheDefaultFormat()
+    public void WhenUsingToStringWithCFormat_ThenReturnsTheSameAsTheDefaultFormat()
     {
-        // according to https://docs.microsoft.com/en-us/dotnet/api/system.iformattable.tostring?view=netframework-4.7.2#notes-to-implementers
-        // the result of using "G" should return the same result as using <null>
         _yen.ToString("C", null).Should().Be(_yen.ToString(null, null));
     }
 
@@ -149,7 +167,7 @@ public class DefaultFormat
     [Fact]
     public void WhenNumberOfDecimalsIsNotApplicable_ThenToStringShouldNotFail()
     {
-        var xdr = new Money(765.4321m, Currency.FromCode("XDR"));
+        var xdr = new Money(765.4321m, CurrencyInfo.FromCode("XDR"));
 
         Action action = () => xdr.ToString();
 

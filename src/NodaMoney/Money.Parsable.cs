@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
 namespace NodaMoney;
@@ -234,6 +235,10 @@ public partial struct Money
 
         ReadOnlySpan<char> possibleCurrency = buffer.Slice(0, position);
 
+        // TODO: this code above is flawed because Symbols can have a period (.) and group separators can by other chars,
+        // like  , space, Apostrophe (’), etc. See PR https://github.com/RemyDuijkeren/NodaMoney/pull/96
+        possibleCurrency = ParseSymbol(s.ToString()).AsSpan();
+
         // if no currency is found or exact match with 'specifiedCurrency' then return specifiedCurrency
         if (possibleCurrency.IsEmpty || MatchesCurrency(possibleCurrency, CurrencyInfo.CurrentCurrency))
         {
@@ -291,4 +296,36 @@ public partial struct Money
     // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
     private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency) =>
         currency.Symbol.AsSpan().SequenceEqual(possibleCurrency) || currency.Code.AsSpan().SequenceEqual(possibleCurrency);
+
+    private const int SuffixSymbolGroupIndex = 4;
+    private const int PrefixSymbolGroupIndex = 5;
+    private static readonly Regex s_currencySymbolMatcher = new Regex(@"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$");
+
+    /// <summary>Extracts the currency symbol from a given money value.</summary>
+    /// <param name="moneyValue">The string representation of the money value to parse.</param>
+    /// <returns>Returns the currency symbol extracted from the specified <paramref name="moneyValue"/>,
+    /// or <see cref="string.Empty"/> if no curreny symbol was found.</returns>
+    /// <exception cref="System.ArgumentNullException">The <i>moneyValue</i> is <b>null</b> or empty.</exception>
+    private static string ParseSymbol(string moneyValue)
+    {
+        if (string.IsNullOrWhiteSpace(moneyValue))
+            return string.Empty;
+
+        var match = s_currencySymbolMatcher.Match(moneyValue);
+        string symbol;
+        if (match.Success)
+        {
+            var suffixSymbol = match.Groups[SuffixSymbolGroupIndex].Value;
+            var prefixSymbol = match.Groups[PrefixSymbolGroupIndex].Value;
+            symbol = suffixSymbol.Length == 0
+                ? prefixSymbol
+                : prefixSymbol.Length == 0 ? suffixSymbol : string.Empty;
+        }
+        else
+        {
+            symbol = string.Empty;
+        }
+
+        return symbol;
+    }
 }
