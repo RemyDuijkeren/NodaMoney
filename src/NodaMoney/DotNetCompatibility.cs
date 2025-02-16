@@ -11,7 +11,7 @@ namespace System.Runtime.CompilerServices
 
 #endif
 
-#if !NETCOREAPP3_0_OR_GREATER
+#if !NETCOREAPP3_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
 // NotNullWhen attribute is introduced in .NET Core 3.0
 namespace System.Diagnostics.CodeAnalysis
 {

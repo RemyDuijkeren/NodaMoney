@@ -12,10 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ISO 4217 Amendment Number 172 SLL/694
 - ISO 4217 Amendment Number 174 HRK/191
 - ISO 4217 Amendment Number 176 ANG/532 XCG/532
+- ISO 4217 Amendment Number 178 CUC/931 CUP/192
 - System.Text.Json serialization support
 - Added CurrencyInfo to provide information about a currency and also acts as an IFormatProvider. It implicitly cast
   to Currency.
-- Support for .NET 6.0, .NET 8.0 and .NET 9.0 (next to already supported .NET Standard 2.0)
+- Support for .NET 9.0, .NET 8.0, .NET Standard 2.0 and .NET Standard 2.1
 - Support for OLE Automation Currency conversion using ToOACurrency() and FromOACurrency()
 - Add support for [Generic Math](https://devblogs.microsoft.com/dotnet/dotnet-7-generic-math/)
 - Add Parsing for `ReadOnlySpan<char>`
@@ -44,8 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
-- Removed support .NET Core 3.1, .NET 4.0 and .NET 4.61 (implicitly supported by .NET Standard 2.0)
-- Removed support .NET Standard 2.1
+- Removed support .NET Core 3.1, .NET 4.0 and .NET 4.5 (implicitly supported by .NET Standard 2.0)
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
 

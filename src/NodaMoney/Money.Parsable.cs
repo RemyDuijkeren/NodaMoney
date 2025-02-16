@@ -69,7 +69,7 @@ public partial struct Money
         CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(s, ci) : ParseCurrencyInfo(s);
         provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
-#if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         decimal amount = decimal.Parse(s, style, provider);
 #else
         decimal amount = decimal.Parse(s.ToString(), style, provider);
@@ -169,7 +169,7 @@ public partial struct Money
             CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(s, ci) : ParseCurrencyInfo(s);
             provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
-#if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             bool isParsingSuccessful = decimal.TryParse(s, style, provider, out decimal amount);
 #else
             bool isParsingSuccessful = decimal.TryParse(s.ToString(), style, provider, out decimal amount);
