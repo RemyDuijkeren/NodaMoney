@@ -9,6 +9,7 @@
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+<!--    <IsAotCompatible>true</IsAotCompatible>-->
   </PropertyGroup>
 
   <PropertyGroup Label="PackageProperties">

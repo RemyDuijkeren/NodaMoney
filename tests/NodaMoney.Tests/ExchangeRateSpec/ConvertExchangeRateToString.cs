@@ -8,7 +8,7 @@ namespace NodaMoney.Tests.ExchangeRateSpec;
 [Collection(nameof(NoParallelization))]
 public class ConvertExchangeRateToString
 {
-    ExchangeRate fx = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2524);
+    ExchangeRate fx = new ExchangeRate(CurrencyInfo.FromCode("EUR"), CurrencyInfo.FromCode("USD"), 1.2524);
 
     [Fact, UseCulture("en-US")]
     public void WhenShowingExchangeRateInAmerica_ThenReturnCurrencyPairWithDot()

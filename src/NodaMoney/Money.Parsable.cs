@@ -317,9 +317,19 @@ public partial struct Money
         {
             var suffixSymbol = match.Groups[SuffixSymbolGroupIndex].Value;
             var prefixSymbol = match.Groups[PrefixSymbolGroupIndex].Value;
-            symbol = suffixSymbol.Length == 0
-                ? prefixSymbol
-                : prefixSymbol.Length == 0 ? suffixSymbol : string.Empty;
+
+            if (suffixSymbol.Length == 0)
+            {
+                symbol = prefixSymbol;
+            }
+            else if (prefixSymbol.Length == 0)
+            {
+                symbol = suffixSymbol;
+            }
+            else
+            {
+                symbol = string.Empty;
+            }
         }
         else
         {

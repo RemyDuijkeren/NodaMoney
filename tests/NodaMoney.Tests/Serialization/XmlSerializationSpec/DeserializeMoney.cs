@@ -40,7 +40,7 @@ public class DeserializeMoney :  XmlSerializationHelper
         Money money = DeserializeFromXml<Money>(xml);
 
         // Assert
-        money.Should().Be(new Money(765.43m, Currency.FromCode("USD")));
+        money.Should().Be(new Money(765.43m, CurrencyInfo.FromCode("USD")));
     }
 
     [Fact]

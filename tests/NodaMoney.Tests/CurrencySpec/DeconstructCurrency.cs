@@ -8,7 +8,7 @@ public class DeconstructCurrency
     [Fact]
     public void WhenDeConstructing_ThenShouldSucceed()
     {
-        var currency = Currency.FromCode("EUR");
+        Currency currency = CurrencyInfo.FromCode("EUR");
 
         var (code, symbol) = currency;
 
