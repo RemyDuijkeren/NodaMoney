@@ -222,22 +222,22 @@ public partial struct Money
     /// <exception cref="FormatException">Thrown when no matching currency symbol or code can be resolved from the input.</exception>
     internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> s, CurrencyInfo? specifiedCurrency = null)
     {
-        // remove non-numeric characters to get currency char or code
-        Span<char> buffer = stackalloc char[s.Length];
-        int position = 0;
-        foreach (char c in s)
-        {
-            if (IsNotNumericCharacter(c))
-            {
-                buffer[position++] = c;
-            }
-        }
-
-        ReadOnlySpan<char> possibleCurrency = buffer.Slice(0, position);
+        // // remove non-numeric characters to get currency char or code
+        // Span<char> buffer = stackalloc char[s.Length];
+        // int position = 0;
+        // foreach (char c in s)
+        // {
+        //     if (IsNotNumericCharacter(c))
+        //     {
+        //         buffer[position++] = c;
+        //     }
+        // }
+        //
+        // ReadOnlySpan<char> possibleCurrency = buffer.Slice(0, position);
 
         // TODO: this code above is flawed because Symbols can have a period (.) and group separators can by other chars,
         // like  , space, Apostrophe (’), etc. See PR https://github.com/RemyDuijkeren/NodaMoney/pull/96
-        possibleCurrency = ParseSymbol(s.ToString()).AsSpan();
+        ReadOnlySpan<char> possibleCurrency = ParseSymbol(s);
 
         // if no currency is found or exact match with 'specifiedCurrency' then return specifiedCurrency
         if (possibleCurrency.IsEmpty || MatchesCurrency(possibleCurrency, CurrencyInfo.CurrentCurrency))
@@ -297,45 +297,62 @@ public partial struct Money
     private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency) =>
         currency.Symbol.AsSpan().SequenceEqual(possibleCurrency) || currency.Code.AsSpan().SequenceEqual(possibleCurrency);
 
-    private const int SuffixSymbolGroupIndex = 4;
-    private const int PrefixSymbolGroupIndex = 5;
-    private static readonly Regex s_currencySymbolMatcher = new Regex(@"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$");
+    // Regex to capture symbol (4 or 5) and amount (6): @"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$"
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^\(?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$", RegexOptions.CultureInvariant | RegexOptions.Singleline)]
+    private static partial Regex s_currencySymbolMatcher();
+#else
+    private static readonly Regex s_currencySymbolMatcher = new(@"^\(?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
+#endif
 
-    /// <summary>Extracts the currency symbol from a given money value.</summary>
-    /// <param name="moneyValue">The string representation of the money value to parse.</param>
-    /// <returns>Returns the currency symbol extracted from the specified <paramref name="moneyValue"/>,
-    /// or <see cref="string.Empty"/> if no curreny symbol was found.</returns>
-    /// <exception cref="System.ArgumentNullException">The <i>moneyValue</i> is <b>null</b> or empty.</exception>
-    private static string ParseSymbol(string moneyValue)
+    private static ReadOnlySpan<char> ParseSymbol(ReadOnlySpan<char> s)
     {
-        if (string.IsNullOrWhiteSpace(moneyValue))
-            return string.Empty;
-
-        var match = s_currencySymbolMatcher.Match(moneyValue);
-        string symbol;
-        if (match.Success)
+        // Return immediately if the input is empty or whitespace
+        if (s.IsEmpty || s.IsWhiteSpace())
         {
-            var suffixSymbol = match.Groups[SuffixSymbolGroupIndex].Value;
-            var prefixSymbol = match.Groups[PrefixSymbolGroupIndex].Value;
-
-            if (suffixSymbol.Length == 0)
-            {
-                symbol = prefixSymbol;
-            }
-            else if (prefixSymbol.Length == 0)
-            {
-                symbol = suffixSymbol;
-            }
-            else
-            {
-                symbol = string.Empty;
-            }
-        }
-        else
-        {
-            symbol = string.Empty;
+            return [];
         }
 
-        return symbol;
+#if NET7_0_OR_GREATER // Use Span-based regex matcher if available
+        var match = s_currencySymbolMatcher().Match(s.ToString());
+        if (!match.Success)
+        {
+            return [];
+        }
+
+        var suffixSymbol = match.Groups[1].ValueSpan; // SuffixSymbolGroupIndex
+        var prefixSymbol = match.Groups[2].ValueSpan; // PrefixSymbolGroupIndex
+
+        if (!suffixSymbol.IsEmpty)
+        {
+            return suffixSymbol;
+        }
+        else if (!prefixSymbol.IsEmpty)
+        {
+            return prefixSymbol;
+        }
+
+#else // Fall back to full string in non-Span implementation
+        var match = s_currencySymbolMatcher.Match(s.ToString());
+        if (!match.Success)
+        {
+            return [];
+        }
+
+        var suffixSymbol = match.Groups[1].Value; // SuffixSymbolGroupIndex
+        var prefixSymbol = match.Groups[2].Value; // PrefixSymbolGroupIndex
+
+        if (!string.IsNullOrEmpty(suffixSymbol))
+        {
+            return suffixSymbol.AsSpan();
+        }
+        else if (!string.IsNullOrEmpty(prefixSymbol))
+        {
+            return prefixSymbol.AsSpan();
+        }
+#endif
+
+        return [];
     }
 }

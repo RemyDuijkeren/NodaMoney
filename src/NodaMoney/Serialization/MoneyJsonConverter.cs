@@ -44,7 +44,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
 
         // Get the JSON value as UTF-8 bytes and then decode to a ReadOnlySpan<char>, avoiding intermediate string allocations.
         ReadOnlySpan<byte> valueBytes = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         ReadOnlySpan<char> valueChars = System.Text.Encoding.UTF8.GetString(valueBytes).AsSpan();
 #else
         ReadOnlySpan<char> valueChars = System.Text.Encoding.UTF8.GetString(valueBytes.ToArray()).AsSpan();

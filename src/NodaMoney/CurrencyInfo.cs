@@ -174,7 +174,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     {
         get
         {
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             // In >= .NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
             var currentCulture = CultureInfo.CurrentCulture;

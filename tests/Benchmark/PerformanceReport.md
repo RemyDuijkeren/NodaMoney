@@ -72,10 +72,10 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 #### after
 | Method             |     Mean |   Error |  StdDev |   Gen0 | Allocated |
 |--------------------|---------:|--------:|--------:|-------:|----------:|
-| Implicit           | 109.6 ns | 2.24 ns | 4.14 ns | 0.0467 |     392 B |
-| ImplicitWithFormat | 143.4 ns | 2.89 ns | 3.33 ns | 0.0505 |     424 B |
-| Explicit           | 111.5 ns | 2.25 ns | 4.44 ns | 0.0468 |     392 B |
-| ExplicitWithFormat | 140.2 ns | 2.75 ns | 5.43 ns | 0.0505 |     424 B |
+| Implicit           | 126.8 ns | 2.58 ns | 4.31 ns | 0.0467 |     392 B |
+| ImplicitWithFormat | 157.5 ns | 3.22 ns | 5.63 ns | 0.0505 |     424 B |
+| Explicit           | 125.4 ns | 2.73 ns | 7.96 ns | 0.0467 |     392 B |
+| ExplicitWithFormat | 157.1 ns | 3.15 ns | 5.00 ns | 0.0505 |     424 B |
 
 ## MoneyParsing
 #### before (v1.x)
@@ -94,6 +94,15 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | ExplicitAsSpan    | 272.3 ns | 5.12 ns |  4.79 ns | 271.1 ns | 0.0448 |     376 B |
 | ExplicitTry       | 253.4 ns | 5.10 ns |  6.64 ns | 252.6 ns | 0.0448 |     376 B |
 | ExplicitTryAsSpan | 263.9 ns | 3.65 ns |  3.41 ns | 262.5 ns | 0.0448 |     376 B |
+#### after (ParseSymbol using Regex)
+| Method            |     Mean |    Error |   StdDev |   Gen0 | Allocated |
+|-------------------|---------:|---------:|---------:|-------:|----------:|
+| Implicit          | 570.2 ns | 11.09 ns | 13.20 ns | 0.1135 |     952 B |
+| ImplicitTry       | 574.6 ns | 11.36 ns | 10.62 ns | 0.1135 |     952 B |
+| Explicit          | 545.4 ns | 10.64 ns | 13.06 ns | 0.1059 |     888 B |
+| ExplicitAsSpan    | 530.5 ns | 10.63 ns | 16.23 ns | 0.1059 |     888 B |
+| ExplicitTry       | 508.4 ns | 10.18 ns | 15.23 ns | 0.1059 |     888 B |
+| ExplicitTryAsSpan | 514.1 ns |  9.77 ns | 10.46 ns | 0.1059 |     888 B |
 
 ## AddingCustomCurrency
 #### before (v1.x)

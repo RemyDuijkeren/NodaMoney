@@ -64,7 +64,7 @@ public readonly partial record struct Currency
             result[1] = (char)((_encodedValue >> 5 & 0x1F) + 'A' - 1);
             result[2] = (char)((_encodedValue & 0x1F) + 'A' - 1);
 
-#if NET5_0_OR_GREATER  // Optimize by using Span<char>
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER // Optimize by using Span<char>
             return new string(result);
 #else
             return new string(result.ToArray());
