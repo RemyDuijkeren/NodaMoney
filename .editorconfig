@@ -1,18 +1,13 @@
-# EditorConfig is awesome:
-#https://EditorConfig.org
-#https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
-
 # top-most EditorConfig file
 root = true
 
-# Default settings:
-# A newline ending every file, Use 4 spaces as indentation, Trim trailing whitespace
+# Default settings: A newline ending every file, Use 4 spaces as indentation, Trim trailing whitespace
 [*]
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
-max_line_length = 160
+max_line_length = 140 # but aim for 120
 
 # Xml project files
 [*.{csproj,vbproj,cdsproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj,projitems,shproj}]

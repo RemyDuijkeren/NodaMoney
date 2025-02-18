@@ -66,13 +66,17 @@ public partial struct Money
     /// <exception cref="System.OverflowException">Thrown when the numeric value represented by <paramref name="s"/> is less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
     public static Money Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider)
     {
-        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(s, ci) : ParseCurrencyInfo(s);
+        ReadOnlySpan<char> currencyChars = ParseSymbol(s);
+
+        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencyChars, ci) : ParseCurrencyInfo(currencyChars);
         provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
+        ReadOnlySpan<char> numericInput = RemoveCurrencyChars(s, currencyChars);
+
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        decimal amount = decimal.Parse(s, style, provider);
+        decimal amount = decimal.Parse(numericInput, style, provider);
 #else
-        decimal amount = decimal.Parse(s.ToString(), style, provider);
+        decimal amount = decimal.Parse(numericInput.ToString(), style, provider);
 #endif
 
         return new Money(amount, currencyInfo);
@@ -154,7 +158,8 @@ public partial struct Money
     /// <param name="provider">An object that provides culture-specific formatting information.</param>
     /// <param name="result">When this method returns, contains the <see cref="Money"/> value equivalent to the money amount in <paramref name="s"/>, if the conversion succeeded, or the default value of <see cref="Money"/> if the conversion failed.</param>
     /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result) => TryParse(s, NumberStyles.Currency, provider, out result);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result) =>
+        TryParse(s, NumberStyles.Currency, provider, out result);
 
     /// <summary>Attempts to convert the span representation of a money value to its <see cref="Money"/> equivalent.</summary>
     /// <param name="s">A span containing the representation of the money value to convert.</param>
@@ -166,13 +171,17 @@ public partial struct Money
     {
         try
         {
-            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(s, ci) : ParseCurrencyInfo(s);
+            ReadOnlySpan<char> currencyChars = ParseSymbol(s);
+
+            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencyChars, ci) : ParseCurrencyInfo(currencyChars);
             provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
+            ReadOnlySpan<char> numericInput = RemoveCurrencyChars(s, currencyChars);
+
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsingSuccessful = decimal.TryParse(s, style, provider, out decimal amount);
+            bool isParsingSuccessful = decimal.TryParse(numericInput, style, provider, out decimal amount);
 #else
-            bool isParsingSuccessful = decimal.TryParse(s.ToString(), style, provider, out decimal amount);
+            bool isParsingSuccessful = decimal.TryParse(numericInput.ToString(), style, provider, out decimal amount);
 #endif
             if (isParsingSuccessful)
             {
@@ -216,36 +225,18 @@ public partial struct Money
 #endif
 
     /// <summary>Parses the currency information from the given span of characters, optionally using a specified currency.</summary>
-    /// <param name="s">A span of characters containing the input string to parse for currency information.</param>
+    /// <param name="currencyChars">A span of characters containing the input string to parse for currency information.</param>
     /// <param name="specifiedCurrency">An optional currency to use when resolving the currency information.</param>
     /// <returns>The parsed <see cref="CurrencyInfo"/> representing the currency information found in the input.</returns>
     /// <exception cref="FormatException">Thrown when no matching currency symbol or code can be resolved from the input.</exception>
-    internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> s, CurrencyInfo? specifiedCurrency = null)
+    internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> currencyChars, CurrencyInfo? specifiedCurrency = null)
     {
-        // // remove non-numeric characters to get currency char or code
-        // Span<char> buffer = stackalloc char[s.Length];
-        // int position = 0;
-        // foreach (char c in s)
-        // {
-        //     if (IsNotNumericCharacter(c))
-        //     {
-        //         buffer[position++] = c;
-        //     }
-        // }
-        //
-        // ReadOnlySpan<char> possibleCurrency = buffer.Slice(0, position);
-
-        // TODO: this code above is flawed because Symbols can have a period (.) and group separators can by other chars,
-        // like  , space, Apostrophe (’), etc. See PR https://github.com/RemyDuijkeren/NodaMoney/pull/96
-        ReadOnlySpan<char> possibleCurrency = ParseSymbol(s);
-
-        // if no currency is found or exact match with 'specifiedCurrency' then return specifiedCurrency
-        if (possibleCurrency.IsEmpty || MatchesCurrency(possibleCurrency, CurrencyInfo.CurrentCurrency))
-        {
+        if (currencyChars.IsEmpty)
             return specifiedCurrency ?? CurrencyInfo.CurrentCurrency;
-        }
 
-        // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
+        if (specifiedCurrency is null && MatchesCurrency(currencyChars, CurrencyInfo.CurrentCurrency))
+            return CurrencyInfo.CurrentCurrency;
+
         // try to find a match
         CurrencyInfo? matchedCurrency = null;
         bool multipleMatches = false;
@@ -253,7 +244,7 @@ public partial struct Money
         foreach (var currency in CurrencyInfo.GetAllCurrencies())
         {
             // Skip if no match
-            if (!MatchesCurrency(possibleCurrency, currency)) continue;
+            if (!MatchesCurrency(currencyChars, currency)) continue;
 
             // If specifiedCurrency matches, prioritize it and return immediately
             if (currency == specifiedCurrency)
@@ -271,40 +262,93 @@ public partial struct Money
         }
 
         if (matchedCurrency is null)
-            throw new FormatException($"{possibleCurrency.ToString()} is an unknown currency symbol or code!");
+            throw new FormatException($"{currencyChars.ToString()} is an unknown currency symbol or code!");
 
         if (multipleMatches)
         {
             if (specifiedCurrency is null)
-                throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with multiple known currencies! Specify currency or culture explicitly.");
+                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple known currencies! Specify currency or culture explicitly.");
 
-            throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
+            throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
         }
 
         if (specifiedCurrency is not null && matchedCurrency != specifiedCurrency)
         {
-            throw new FormatException($"Currency symbol {possibleCurrency.ToString()} matches with {matchedCurrency.Code} or {matchedCurrency.Symbol}, but doesn't match the specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
+            throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with {matchedCurrency.Code} or {matchedCurrency.Symbol}, but doesn't match the specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
         }
 
         return matchedCurrency;
     }
 
-    private static bool IsNotNumericCharacter(char character) =>
-        !char.IsDigit(character) && !char.IsWhiteSpace(character) &&
-        character != '.' && character != ',' && character != '(' && character != ')' && character != '+' && character != '-';
+    private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency)
+    {
+        if (currency.InternationalSymbol.AsSpan().SequenceEqual(possibleCurrency) ||
+            currency.Symbol.AsSpan().SequenceEqual(possibleCurrency) ||
+            currency.Code.AsSpan().SequenceEqual(possibleCurrency))
+        {
+            return true;
+        }
 
-    // TODO: How to handle alternative symbols, like US$ => AlternativeCurrencySymbols in CurrencyInfo?
-    private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency) =>
-        currency.Symbol.AsSpan().SequenceEqual(possibleCurrency) || currency.Code.AsSpan().SequenceEqual(possibleCurrency);
+        // Not using LINQ because we want to compare with Span
+        foreach (string symbol in currency.AlternativeSymbols)
+        {
+            if (possibleCurrency.SequenceEqual(symbol.AsSpan()))
+                return true;
+        }
 
-    // Regex to capture symbol (4 or 5) and amount (6): @"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$"
-#if NET7_0_OR_GREATER
-    [GeneratedRegex(@"^\(?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$", RegexOptions.CultureInvariant | RegexOptions.Singleline)]
-    private static partial Regex s_currencySymbolMatcher();
-#else
-    private static readonly Regex s_currencySymbolMatcher = new(@"^\(?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
-#endif
+        return false;
+    }
+
+    private static ReadOnlySpan<char> RemoveCurrencyChars(ReadOnlySpan<char> s, ReadOnlySpan<char> currencyChars)
+    {
+        // Find the first occurrence of the matched currency characters in the input
+        int matchStartIndex = s.IndexOf(currencyChars, StringComparison.Ordinal);
+        if (matchStartIndex >= 0)
+        {
+            // If a match is found, return a slice excluding the match
+            int matchEndIndex = matchStartIndex + currencyChars.Length;
+
+            // Trim spaces before the match
+            while (matchStartIndex > 0 && char.IsWhiteSpace(s[matchStartIndex - 1]))
+            {
+                matchStartIndex--;
+            }
+
+            // Trim spaces after the match
+            while (matchEndIndex < s.Length && char.IsWhiteSpace(s[matchEndIndex]))
+            {
+                matchEndIndex++;
+            }
+
+            if (matchStartIndex == 0 && matchEndIndex == s.Length) // Match covers the entire input
+            {
+                return [];
+            }
+            else if (matchStartIndex == 0) // Match is at the beginning
+            {
+                return s.Slice(matchEndIndex);
+            }
+            else if (matchEndIndex >= s.Length) // Match is at the end
+            {
+                return s.Slice(0, matchStartIndex);
+            }
+            else // Match is in the middle
+            {
+                var beforeMatch = s.Slice(0, matchStartIndex);
+                var afterMatch = s.Slice(matchEndIndex);
+
+                // Allocate a new buffer only when necessary for combining slices
+                char[] buffer = new char[beforeMatch.Length + afterMatch.Length];
+                beforeMatch.CopyTo(buffer);
+                afterMatch.CopyTo(buffer.AsSpan(beforeMatch.Length));
+
+                return buffer;
+            }
+        }
+
+        // If no match is found, return the input as is
+        return s;
+    }
 
     private static ReadOnlySpan<char> ParseSymbol(ReadOnlySpan<char> s)
     {
@@ -314,7 +358,7 @@ public partial struct Money
             return [];
         }
 
-#if NET7_0_OR_GREATER // Use Span-based regex matcher if available
+#if NET7_0_OR_GREATER
         var match = s_currencySymbolMatcher().Match(s.ToString());
         if (!match.Success)
         {
@@ -333,7 +377,7 @@ public partial struct Money
             return prefixSymbol;
         }
 
-#else // Fall back to full string in non-Span implementation
+#else
         var match = s_currencySymbolMatcher.Match(s.ToString());
         if (!match.Success)
         {
@@ -355,4 +399,14 @@ public partial struct Money
 
         return [];
     }
+
+    // Regex to capture symbol (4 or 5) and amount (6): @"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$"
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^[-(]?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
+        RegexOptions.CultureInvariant | RegexOptions.Singleline)]
+    private static partial Regex s_currencySymbolMatcher();
+#else
+    private static readonly Regex s_currencySymbolMatcher = new(@"^[-(]?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
+#endif
 }

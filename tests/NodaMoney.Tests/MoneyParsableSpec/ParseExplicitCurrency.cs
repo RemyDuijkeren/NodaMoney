@@ -66,12 +66,21 @@ public class ParseExplicitCurrency
         euro.Should().Be(new Money(-98_765.43, "EUR"));
     }
 
+
     [Fact, UseCulture("de-CH")]
     public void WhenParsingSwissFrancInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
     {
+        var money = Money.Parse("Fr.-98’765.43", CurrencyInfo.FromCode("CHF"));
+
+        money.Should().Be(new Money(-98_765.43m, "CHF"));
+    }
+
+    [Fact, UseCulture("de-CH")]
+    public void WhenParsingSwissFrancInSwitzerlandGermanSpeakingInternationalSymbol_ThenThisShouldSucceed()
+    {
         var money = Money.Parse("CHF-98’765.43", CurrencyInfo.FromCode("CHF"));
 
-        money.Should().Be(new Money(-98765.43m, "CHF"));
+        money.Should().Be(new Money(-98_765.43m, "CHF"));
     }
 
     [Fact, UseCulture("nl-NL")]
@@ -87,7 +96,7 @@ public class ParseExplicitCurrency
     {
         Action action = () => Money.Parse("€ -98.765,43", CurrencyInfo.FromCode("USD"));
 
-        action.Should().Throw<FormatException>(); //.WithMessage("Input string was not in a correct format.");
+        action.Should().Throw<FormatException>("given provider always overrule, even current culture");
     }
 
     [Fact, UseCulture("nl-NL")]

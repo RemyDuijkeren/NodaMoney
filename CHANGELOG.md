@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for [Generic Math](https://devblogs.microsoft.com/dotnet/dotnet-7-generic-math/)
 - Add Parsing for `ReadOnlySpan<char>`
 - Formatting added format L for currency format using full english name (was format F)
+- Added InternationalSymbol to CurrencyInfo (Symbol: $, InternationalSymbol: US$)
+- Added AlternativeSymbols to CurrencyInfo
 -
 - Currency.NumericCode is a three-digit code number of the currency
 - Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
@@ -48,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed support .NET Core 3.1, .NET 4.0 and .NET 4.5 (implicitly supported by .NET Standard 2.0)
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
+- Formatting format F is removed (replaced by format L)
 
 - Currency.MajorUnit
 

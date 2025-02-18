@@ -47,6 +47,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
+    readonly string? _internationalSymbol;
+
     // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
 
     // static CurrencyInfo()
@@ -140,7 +142,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public double MinorUnits => Math.Pow(10, MinorUnitAsExponentOfBase10);
 
     // public string NativeName { get; init; } = EnglishName;
-    // public string FractionalUnit { get; init; } = "Cent";
+    // public string FractionalSingularUnitName { get; init; } = "cent";
+    // public string FractionalPluralUnitName { get; init; } = "cents";
+    // public string SingularUnitName { get; init; } = "dollar";
+    // public string PluralUnitName { get; init; } = "dollars";
 
     /// <summary>Gets a value indicating whether currency is historic.</summary>
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
@@ -158,8 +163,29 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>The english name of the currency</summary>
     public string EnglishName { get; init; }
 
-    /// <summary>The currency symbol.</summary>
+    /// <summary>The (local) currency symbol.</summary>
     public string Symbol { get; init; }
+
+    /// <summary>The international currency symbol.</summary>
+    public string InternationalSymbol
+    {
+        get => _internationalSymbol ?? Symbol;
+        init => _internationalSymbol = value;
+    }
+
+    /// <summary>Gets the HTML symbol associated with the currency, typically used to represent the currency in web or digital contexts.</summary>
+    /// <remarks>
+    /// The HTML symbol is commonly used in formatting monetary values in web pages or other platforms that support HTML content.
+    /// The value may vary based on region and currency standards.
+    /// </remarks>
+    public string? HtmlSymbol { get; init; }
+
+    /// <summary>Gets a collection of alternative symbols used to represent the currency.</summary>
+    /// <remarks>
+    /// This property includes any unconventional or secondary symbols that may be associated with the currency,
+    /// in addition to its primary symbol.
+    /// </remarks>
+    public IReadOnlyList<string> AlternativeSymbols { get; init; } = [];
 
     /// <summary>Check a value indication whether currency is valid on a given date.</summary>
     /// <param name="date">The date on which the Currency should be valid.</param>

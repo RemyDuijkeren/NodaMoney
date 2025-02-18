@@ -19,4 +19,9 @@ public partial struct Money
 
     /// <inheritdoc/>
     public static Money AdditiveIdentity => new(decimal.Zero, Currency.NoCurrency);
+
+    // public static Money Zero => new(0m, Currency.NoCurrency);
+    // public static Money One => new(1m, Currency.NoCurrency);
+    // public static Money MinusOne => new(-1m, Currency.NoCurrency);
+    //public static Money Zero(Currency currency) => new(1m, currency);
 }

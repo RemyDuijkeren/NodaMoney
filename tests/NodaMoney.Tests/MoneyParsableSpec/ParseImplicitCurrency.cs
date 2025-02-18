@@ -93,6 +93,14 @@ public class ParseImplicitCurrency
     [Fact, UseCulture("de-CH")]
     public void WhenParsingChfSymbolInSwitzerlandGermanSpeaking_ThenThisShouldReturnSwissFranc()
     {
+        var money = Money.Parse("-98’765.23 Fr.");
+
+        money.Should().Be(new Money(-98_765.23m, "CHF"));
+    }
+
+    [Fact, UseCulture("de-CH")]
+    public void WhenParsingChfInternationalSymbolInSwitzerlandGermanSpeaking_ThenThisShouldReturnSwissFranc()
+    {
         var money = Money.Parse("-98’765.23 CHF");
 
         money.Should().Be(new Money(-98_765.23m, "CHF"));

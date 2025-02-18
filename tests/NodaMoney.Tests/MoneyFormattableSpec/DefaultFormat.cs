@@ -25,7 +25,7 @@ public class DefaultFormat
         _euro.ToString().Should().Be("(€98,765.43)");
         _dollar.ToString().Should().Be("($98,765.43)");
         _dinar.ToString().Should().Be("(BD98,765.432)");
-        _swissFranc.ToString().Should().Be("(CHF98,765.43)");
+        _swissFranc.ToString().Should().Be("(Fr.98,765.43)");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class DefaultFormat
         _euro.ToString().Should().Be("-€98,765.43");
         _dollar.ToString().Should().Be("-$98,765.43");
         _dinar.ToString().Should().Be("-BD98,765.432");
-        _swissFranc.ToString().Should().Be("-CHF98,765.43");
+        _swissFranc.ToString().Should().Be("-Fr.98,765.43");
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class DefaultFormat
         _euro.ToString().Should().Be("€ -98.765,43");
         _dollar.ToString().Should().Be("$ -98.765,43");
         _dinar.ToString().Should().Be("BD -98.765,432");
-        _swissFranc.ToString().Should().Be("CHF -98.765,43");
+        _swissFranc.ToString().Should().Be("Fr. -98.765,43");
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class DefaultFormat
         _euro.ToString().Should().Be("-98 765,43 €");
         _dollar.ToString().Should().Be("-98 765,43 $");
         _dinar.ToString().Should().Be("-98 765,432 BD");
-        _swissFranc.ToString().Should().Be("-98 765,43 CHF");
+        _swissFranc.ToString().Should().Be("-98 765,43 Fr.");
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class DefaultFormat
         _euro.ToString().Should().Be("€-98’765.43");
         _dollar.ToString().Should().Be("$-98’765.43");
         _dinar.ToString().Should().Be("BD-98’765.432");
-        _swissFranc.ToString().Should().Be("CHF-98’765.43");
+        _swissFranc.ToString().Should().Be("Fr.-98’765.43");
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class DefaultFormat
         _euro.ToString(ci).Should().Be("€ -98.765,43");
         _dollar.ToString(ci).Should().Be("$ -98.765,43");
         _dinar.ToString(ci).Should().Be("BD -98.765,432");
-        _swissFranc.ToString(ci).Should().Be("CHF -98.765,43");
+        _swissFranc.ToString(ci).Should().Be("Fr. -98.765,43");
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class DefaultFormat
         _euro.ToString(nfi).Should().Be("€ -98.765,43");
         _dollar.ToString(nfi).Should().Be("$ -98.765,43");
         _dinar.ToString(nfi).Should().Be("BD -98.765,432");
-        _swissFranc.ToString(nfi).Should().Be("CHF -98.765,43");
+        _swissFranc.ToString(nfi).Should().Be("Fr. -98.765,43");
     }
 
     [Fact]

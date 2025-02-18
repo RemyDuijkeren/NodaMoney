@@ -12,7 +12,7 @@ static class CurrencyRegistry
     {
         s_currencies = InitializeCurrencies();
 
-        // TODO: allow duplicates? (e.g. non ISO-4217 currencies). For now we don't allow.
+        // TODO: allow duplicates with priority? (e.g. non ISO-4217 currencies). For now we don't allow.
         s_lookupCurrencies = new Dictionary<Currency, CurrencyInfo>(s_currencies.Length);
         foreach (var ci in s_currencies)
         {
@@ -125,61 +125,61 @@ static class CurrencyRegistry
             new ("AED", 784, MinorUnit.Two, "United Arab Emirates dirham", "د.إ"),
             new ("AFN", 971, MinorUnit.Two, "Afghan afghani", "؋"),
             new ("ALL", 008, MinorUnit.Two, "Albanian lek", "L"),
-            new ("AMD", 051, MinorUnit.Two, "Armenian dram", "֏"),
+            new ("AMD", 051, MinorUnit.Two, "Armenian dram", "֏") { HtmlSymbol = "&#x58F;", AlternativeSymbols = ["dram"] },
             new ("AOA", 973, MinorUnit.Two, "Angolan kwanza", "Kz"),
-            new ("ARS", 032, MinorUnit.Two, "Argentine peso", "$"),
-            new ("AUD", 036, MinorUnit.Two, "Australian dollar", "$"),
+            new ("ARS", 032, MinorUnit.Two, "Argentine peso", "$") { InternationalSymbol = "ARS" },
+            new ("AUD", 036, MinorUnit.Two, "Australian dollar", "$") { InternationalSymbol = "A$" },
             new ("AWG", 533, MinorUnit.Two, "Aruban florin", "ƒ"),
             new ("AZN", 944, MinorUnit.Two, "Azerbaijan Manat", "ман"), // AZERBAIJAN
             new ("BAM", 977, MinorUnit.Two, "Bosnia and Herzegovina convertible mark", "KM"),
-            new ("BBD", 052, MinorUnit.Two, "Barbados dollar", "$"),
-            new ("BDT", 050, MinorUnit.Two, "Bangladeshi taka", "৳"), // or Tk
+            new ("BBD", 052, MinorUnit.Two, "Barbados dollar", "$") { InternationalSymbol = "BBD$", AlternativeSymbols = ["Bds$", "BB$", "BDS$"] },
+            new ("BDT", 050, MinorUnit.Two, "Bangladeshi taka", "৳") { InternationalSymbol = "Tk" },
             new ("BGN", 975, MinorUnit.Two, "Bulgarian lev", "лв."),
             new ("BHD", 048, MinorUnit.Three, "Bahraini dinar", "BD"), // or د.ب. (switched for unit tests to work)
             new ("BIF", 108, MinorUnit.Zero, "Burundian franc", "FBu"),
-            new ("BMD", 060, MinorUnit.Two, "Bermudian dollar", "$"),
-            new ("BND", 096, MinorUnit.Two, "Brunei dollar", "$"), // or B$
+            new ("BMD", 060, MinorUnit.Two, "Bermudian dollar", "$") { InternationalSymbol = "BD$" },
+            new ("BND", 096, MinorUnit.Two, "Brunei dollar", "$") { InternationalSymbol = "BND$", AlternativeSymbols = ["B$"] },
             new ("BOB", 068, MinorUnit.Two, "Boliviano", "Bs."), // or BS or $b
             new ("BOV", 984, MinorUnit.Two, "Bolivian Mvdol (funds code)"), // <==== not found symbol. Is generic currency sign correct?
             new ("BRL", 986, MinorUnit.Two, "Brazilian real", "R$"),
-            new ("BSD", 044, MinorUnit.Two, "Bahamian dollar", "$"),
+            new ("BSD", 044, MinorUnit.Two, "Bahamian dollar", "$") { InternationalSymbol = "BSD$", AlternativeSymbols = ["B$"] },
             new ("BTN", 064, MinorUnit.Two, "Bhutanese ngultrum", "Nu."),
             new ("BWP", 072, MinorUnit.Two, "Botswana pula", "P"),
             new ("BYN", 933, MinorUnit.Two, "Belarusian ruble", "Br") { IntroducedOn = new DateTime(2006, 06, 01) },
             new ("BZD", 084, MinorUnit.Two, "Belize dollar", "BZ$"),
-            new ("CAD", 124, MinorUnit.Two, "Canadian dollar", "$"),
+            new ("CAD", 124, MinorUnit.Two, "Canadian dollar", "$") { InternationalSymbol = "CA$", AlternativeSymbols = ["C$"] },
             new ("CDF", 976, MinorUnit.Two, "Congolese franc", "FC"),
             new ("CHE", 947, MinorUnit.Two, "WIR Euro (complementary currency)", "CHE"),
-            new ("CHF", 756, MinorUnit.Two, "Swiss franc", "CHF"), // informally "Fr.", outdated "SFr."
+            new ("CHF", 756, MinorUnit.Two, "Swiss franc", "Fr.") { InternationalSymbol = "CHF", AlternativeSymbols = ["fr.", "SFr."] }, // outdated "SFr."
             new ("CHW", 948, MinorUnit.Two, "WIR Franc (complementary currency)", "CHW"),
             new ("CLF", 990, MinorUnit.Four, "Unidad de Fomento (funds code)", "CLF"),
-            new ("CLP", 152, MinorUnit.Zero, "Chilean peso", "$"),
+            new ("CLP", 152, MinorUnit.Zero, "Chilean peso", "$") { InternationalSymbol = "CLP$" },
             new ("CNY", 156, MinorUnit.Two, "Chinese yuan", "¥"),
-            new ("COP", 170, MinorUnit.Two, "Colombian peso", "$"),
+            new ("COP", 170, MinorUnit.Two, "Colombian peso", "$") { InternationalSymbol = "COP$", AlternativeSymbols = ["Col$"] },
             new ("COU", 970, MinorUnit.Two, "Unidad de Valor Real", CurrencyInfo.GenericCurrencySign), // ???
             new ("CRC", 188, MinorUnit.Two, "Costa Rican colon", "₡"),
-            new ("CUP", 192, MinorUnit.Two, "Cuban peso", "$"), // or ₱ (obsolete?)
-            new ("CVE", 132, MinorUnit.Two, "Cape Verde escudo", "$"),
+            new ("CUP", 192, MinorUnit.Two, "Cuban peso", "$") { InternationalSymbol = "CUP$", AlternativeSymbols = ["₱"] },
+            new ("CVE", 132, MinorUnit.Two, "Cape Verde escudo", "$") { InternationalSymbol = "CVE", AlternativeSymbols = ["Esc"] },
             new ("CZK", 203, MinorUnit.Two, "Czech koruna", "Kč"),
             new ("DJF", 262, MinorUnit.Zero, "Djiboutian franc", "Fdj"),
             new ("DKK", 208, MinorUnit.Two, "Danish krone", "kr."),
-            new ("DOP", 214, MinorUnit.Two, "Dominican peso", "RD$"), // or $
+            new ("DOP", 214, MinorUnit.Two, "Dominican peso", "$") { InternationalSymbol = "RD$" },
             new ("DZD", 012, MinorUnit.Two, "Algerian dinar", "DA"), // (Latin) or د.ج (Arabic)
             new ("EGP", 818, MinorUnit.Two, "Egyptian pound", "LE"), // or E£ or ج.م (Arabic)
             new ("ERN", 232, MinorUnit.Two, "Eritrean nakfa", "ERN"),
             new ("ETB", 230, MinorUnit.Two, "Ethiopian birr", "Br"), // (Latin) or ብር (Ethiopic)
             new ("EUR", 978, MinorUnit.Two, "Euro", "€"),
-            new ("FJD", 242, MinorUnit.Two, "Fiji dollar", "$"), // or FJ$
+            new ("FJD", 242, MinorUnit.Two, "Fiji dollar", "$") { InternationalSymbol = "FJ$" },
             new ("FKP", 238, MinorUnit.Two, "Falkland Islands pound", "£"),
             new ("GBP", 826, MinorUnit.Two, "Pound sterling", "£"),
             new ("GEL", 981, MinorUnit.Two, "Georgian lari", "ლ."), // TODO: new symbol since July 18, 2014 => see http://en.wikipedia.org/wiki/Georgian_lari
-            new ("GHS", 936, MinorUnit.Two, "Ghanaian cedi", "GH¢"), // or GH₵
+            new ("GHS", 936, MinorUnit.Two, "Ghanaian cedi", "GH₵") { AlternativeSymbols = ["GH¢"] },
             new ("GIP", 292, MinorUnit.Two, "Gibraltar pound", "£"),
             new ("GMD", 270, MinorUnit.Two, "Gambian dalasi", "D"),
-            new ("GNF", 324, MinorUnit.Zero, "Guinean Franc", "FG"), // (possibly also Fr or GFr)  GUINEA
+            new ("GNF", 324, MinorUnit.Zero, "Guinean Franc", "FG") { AlternativeSymbols = ["Fr", "GFr"] }, // GUINEA
             new ("GTQ", 320, MinorUnit.Two, "Guatemalan quetzal", "Q"),
-            new ("GYD", 328, MinorUnit.Two, "Guyanese dollar", "$"), // or G$
-            new ("HKD", 344, MinorUnit.Two, "Hong Kong dollar", "HK$"), // or $
+            new ("GYD", 328, MinorUnit.Two, "Guyanese dollar", "$") { InternationalSymbol = "G$", AlternativeSymbols = ["GY$"] },
+            new ("HKD", 344, MinorUnit.Two, "Hong Kong dollar", "$") { InternationalSymbol = "HK$" },
             new ("HNL", 340, MinorUnit.Two, "Honduran lempira", "L"),
             new ("HTG", 332, MinorUnit.Two, "Haitian gourde", "G"),
             new ("HUF", 348, MinorUnit.Two, "Hungarian forint", "Ft"),
@@ -189,7 +189,7 @@ static class CurrencyRegistry
             new ("IQD", 368, MinorUnit.Three, "Iraqi dinar", "د.ع"),
             new ("IRR", 364, MinorUnit.Two, "Iranian rial", "ريال"),
             new ("ISK", 352, MinorUnit.Zero, "Icelandic króna", "kr"),
-            new ("JMD", 388, MinorUnit.Two, "Jamaican dollar", "J$"), // or $
+            new ("JMD", 388, MinorUnit.Two, "Jamaican dollar", "$") { InternationalSymbol = "J$" },
             new ("JOD", 400, MinorUnit.Three, "Jordanian dinar", "د.ا.‏"),
             new ("JPY", 392, MinorUnit.Zero, "Japanese yen", "¥"),
             new ("KES", 404, MinorUnit.Two, "Kenyan shilling", "KSh"),
@@ -198,81 +198,81 @@ static class CurrencyRegistry
             new ("KMF", 174, MinorUnit.Zero, "Comorian Franc", "CF"), // COMOROS (THE)
             new ("KPW", 408, MinorUnit.Two, "North Korean won", "₩"),
             new ("KRW", 410, MinorUnit.Zero, "South Korean won", "₩"),
-            new ("KWD", 414, MinorUnit.Three, "Kuwaiti dinar", "د.ك"), // or K.D.
+            new ("KWD", 414, MinorUnit.Three, "Kuwaiti dinar", "د.ك") { AlternativeSymbols = ["KD"] },
             new ("KYD", 136, MinorUnit.Two, "Cayman Islands dollar", "$"),
             new ("KZT", 398, MinorUnit.Two, "Kazakhstani tenge", "₸"),
-            new ("LAK", 418, MinorUnit.Two, "Lao Kip", "₭"), // or ₭N,  LAO PEOPLE’S DEMOCRATIC REPUBLIC(THE), ISO says minor unit=2 but wiki says Historically, one kip was divided into 100 att (ອັດ).
+            new ("LAK", 418, MinorUnit.Two, "Lao Kip", "₭") { AlternativeSymbols = ["₭N"] }, // LAO PEOPLE’S DEMOCRATIC REPUBLIC(THE), ISO says minor unit=2 but wiki says Historically, one kip was divided into 100 att (ອັດ).
             new ("LBP", 422, MinorUnit.Two, "Lebanese pound", "ل.ل"),
-            new ("LKR", 144, MinorUnit.Two, "Sri Lankan rupee", "Rs"), // or රු
-            new ("LRD", 430, MinorUnit.Two, "Liberian dollar", "$"), // or L$, LD$
-            new ("LSL", 426, MinorUnit.Two, "Lesotho loti", "L"), // L or M (pl.)
-            new ("LYD", 434, MinorUnit.Three, "Libyan dinar", "ل.د"), // or LD
+            new ("LKR", 144, MinorUnit.Two, "Sri Lankan rupee", "Rs") { AlternativeSymbols = ["රු", "௹"] },
+            new ("LRD", 430, MinorUnit.Two, "Liberian dollar", "$") { InternationalSymbol = "L$", AlternativeSymbols = ["LD$"] },
+            new ("LSL", 426, MinorUnit.Two, "Lesotho loti", "L") { AlternativeSymbols = ["M"] }, // M is for plural
+            new ("LYD", 434, MinorUnit.Three, "Libyan dinar", "ل.د") { AlternativeSymbols = ["LD"] },
             new ("MAD", 504, MinorUnit.Two, "Moroccan dirham", "د.م."),
             new ("MDL", 498, MinorUnit.Two, "Moldovan leu", "L"),
-            new ("MGA", 969, MinorUnit.OneFifth, "Malagasy ariary", "Ar"),  // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
+            new ("MGA", 969, MinorUnit.OneFifth, "Malagasy ariary", "Ar"), // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
             new ("MKD", 807, MinorUnit.Two, "Macedonian denar", "ден"),
             new ("MMK", 104, MinorUnit.Two, "Myanma kyat", "K"),
             new ("MNT", 496, MinorUnit.Two, "Mongolian tugrik", "₮"),
             new ("MOP", 446, MinorUnit.Two, "Macanese pataca", "MOP$"),
             new ("MRU", 929, MinorUnit.OneFifth, "Mauritanian ouguiya", "UM") { IntroducedOn = new DateTime(2018, 01, 01) }, // divided into five subunits rather than by a power of ten. 5 is 10 to the power of 0.69897...
             new ("MUR", 480, MinorUnit.Two, "Mauritian rupee", "Rs"),
-            new ("MVR", 462, MinorUnit.Two, "Maldivian rufiyaa", "Rf"), // or , MRf, MVR, .ރ or /-
+            new ("MVR", 462, MinorUnit.Two, "Maldivian rufiyaa", "Rf") { AlternativeSymbols = ["ރ"]},
             new ("MWK", 454, MinorUnit.Two, "Malawi kwacha", "MK"),
-            new ("MXN", 484, MinorUnit.Two, "Mexican peso", "$"),
+            new ("MXN", 484, MinorUnit.Two, "Mexican peso", "$") { InternationalSymbol = "Mex$", AlternativeSymbols = ["MX$"] },
             new ("MXV", 979, MinorUnit.Two, "Mexican Unidad de Inversion (UDI) (funds code)"),  // <==== not found
             new ("MYR", 458, MinorUnit.Two, "Malaysian ringgit", "RM"),
-            new ("MZN", 943, MinorUnit.Two, "Mozambican metical", "MTn"), // or MTN
-            new ("NAD", 516, MinorUnit.Two, "Namibian dollar", "N$"), // or $
+            new ("MZN", 943, MinorUnit.Two, "Mozambican metical", "MT") { AlternativeSymbols = ["MTn"]},
+            new ("NAD", 516, MinorUnit.Two, "Namibian dollar", "$") { InternationalSymbol = "N$" },
             new ("NGN", 566, MinorUnit.Two, "Nigerian naira", "₦"),
             new ("NIO", 558, MinorUnit.Two, "Nicaraguan córdoba", "C$"),
             new ("NOK", 578, MinorUnit.Two, "Norwegian krone", "kr"),
-            new ("NPR", 524, MinorUnit.Two, "Nepalese rupee", "Rs"), // or ₨ or रू
-            new ("NZD", 554, MinorUnit.Two, "New Zealand dollar", "$"),
+            new ("NPR", 524, MinorUnit.Two, "Nepalese rupee", "रु") { AlternativeSymbols = ["₨", "Rs"]},
+            new ("NZD", 554, MinorUnit.Two, "New Zealand dollar", "$") { InternationalSymbol = "NZ$" },
             new ("OMR", 512, MinorUnit.Three, "Omani rial", "ر.ع."),
             new ("PAB", 590, MinorUnit.Two, "Panamanian balboa", "B/."),
             new ("PEN", 604, MinorUnit.Two, "Peruvian sol", "S/."),
             new ("PGK", 598, MinorUnit.Two, "Papua New Guinean kina", "K"),
-            new ("PHP", 608, MinorUnit.Two, "Philippine Peso", "₱"), // or P or PHP or PhP
+            new ("PHP", 608, MinorUnit.Two, "Philippine Peso", "₱") { AlternativeSymbols = ["P", "PhP"] },
             new ("PKR", 586, MinorUnit.Two, "Pakistani rupee", "Rs"),
             new ("PLN", 985, MinorUnit.Two, "Polish złoty", "zł"),
             new ("PYG", 600, MinorUnit.Zero, "Paraguayan guaraní", "₲"),
-            new ("QAR", 634, MinorUnit.Two, "Qatari riyal", "ر.ق"), // or QR
+            new ("QAR", 634, MinorUnit.Two, "Qatari riyal", "ر.ق") { AlternativeSymbols = ["QR"] },
             new ("RON", 946, MinorUnit.Two, "Romanian new leu", "lei"),
-            new ("RSD", 941, MinorUnit.Two, "Serbian dinar", "РСД"), // or RSD (or дин or d./д)
-            new ("RUB", 643, MinorUnit.Two, "Russian rouble", "₽"), // or R or руб (both onofficial)
-            new ("RWF", 646, MinorUnit.Zero, "Rwandan franc", "RFw"), // or RF, R₣
-            new ("SAR", 682, MinorUnit.Two, "Saudi riyal", "ر.س"), // or SR (Latin) or ﷼‎ (Unicode)
-            new ("SBD", 090, MinorUnit.Two, "Solomon Islands dollar", "SI$"),
-            new ("SCR", 690, MinorUnit.Two, "Seychelles rupee", "SR"), // or SRe
+            new ("RSD", 941, MinorUnit.Two, "Serbian dinar", "дин.") { AlternativeSymbols = ["din."] },
+            new ("RUB", 643, MinorUnit.Two, "Russian rouble", "₽"),
+            new ("RWF", 646, MinorUnit.Zero, "Rwandan franc", "RFw") { AlternativeSymbols = ["RF", "R₣"]},
+            new ("SAR", 682, MinorUnit.Two, "Saudi riyal", "ر.س") { AlternativeSymbols = ["SR"] },
+            new ("SBD", 090, MinorUnit.Two, "Solomon Islands dollar", "$") { InternationalSymbol = "SI$"},
+            new ("SCR", 690, MinorUnit.Two, "Seychelles rupee", "Rs") { AlternativeSymbols = ["Re", "Rs.", "Re."] },
             new ("SDG", 938, MinorUnit.Two, "Sudanese pound", "ج.س."),
             new ("SEK", 752, MinorUnit.Two, "Swedish krona/kronor", "kr"),
-            new ("SGD", 702, MinorUnit.Two, "Singapore dollar", "S$"), // or $
+            new ("SGD", 702, MinorUnit.Two, "Singapore dollar", "$") { InternationalSymbol = "S$" },
             new ("SHP", 654, MinorUnit.Two, "Saint Helena pound", "£"),
-            new ("SOS", 706, MinorUnit.Two, "Somali shilling", "S"), // or Sh.So.
-            new ("SRD", 968, MinorUnit.Two, "Surinamese dollar", "$"),
-            new ("SSP", 728, MinorUnit.Two, "South Sudanese pound", "£"), // not sure about symbol...
+            new ("SOS", 706, MinorUnit.Two, "Somali shilling", "Sh.So."),
+            new ("SRD", 968, MinorUnit.Two, "Surinamese dollar", "$") { InternationalSymbol = "Sr$" },
+            new ("SSP", 728, MinorUnit.Two, "South Sudanese pound", "£") { InternationalSymbol = "SSP" },
             new ("SVC", 222, MinorUnit.Two, "El Salvador Colon", "₡"),
-            new ("SYP", 760, MinorUnit.Two, "Syrian pound", "ܠ.ܣ.‏"), // or LS or £S (or £)
-            new ("SZL", 748, MinorUnit.Two, "Swazi lilangeni", "L"), // or E (plural)
+            new ("SYP", 760, MinorUnit.Two, "Syrian pound", "ل.س") { AlternativeSymbols = ["LS", "£S"] },
+            new ("SZL", 748, MinorUnit.Two, "Swazi lilangeni", "L") { AlternativeSymbols = ["E"] }, // E is for plural
             new ("THB", 764, MinorUnit.Two, "Thai baht", "฿"),
             new ("TJS", 972, MinorUnit.Two, "Tajikistani somoni", "смн"),
-            new ("TMT", 934, MinorUnit.Two, "Turkmenistani manat", "m"), // or T?
-            new ("TND", 788, MinorUnit.Three, "Tunisian dinar", "د.ت"), // or DT (Latin)
-            new ("TOP", 776, MinorUnit.Two, "Tongan paʻanga", "T$"), // (sometimes PT)
+            new ("TMT", 934, MinorUnit.Two, "Turkmenistani manat", "m") { HtmlSymbol = "&#0109;" },
+            new ("TND", 788, MinorUnit.Three, "Tunisian dinar", "د.ت") { AlternativeSymbols = ["DT"]},
+            new ("TOP", 776, MinorUnit.Two, "Tongan paʻanga", "T$"),
             new ("TRY", 949, MinorUnit.Two, "Turkish lira", "₺"),
-            new ("TTD", 780, MinorUnit.Two, "Trinidad and Tobago dollar", "$"), // or TT$
-            new ("TWD", 901, MinorUnit.Two, "New Taiwan dollar", "NT$"), // or $
-            new ("TZS", 834, MinorUnit.Two, "Tanzanian shilling", "x/y"), // or TSh
+            new ("TTD", 780, MinorUnit.Two, "Trinidad and Tobago dollar", "$") { InternationalSymbol = "TT$" },
+            new ("TWD", 901, MinorUnit.Two, "New Taiwan dollar", "$") { InternationalSymbol = "NT$" },
+            new ("TZS", 834, MinorUnit.Two, "Tanzanian shilling", "TSh"), // often written in x/y format, where x is the amount above 1 shilling, while y is the amount in cents
             new ("UAH", 980, MinorUnit.Two, "Ukrainian hryvnia", "₴"),
             new ("UGX", 800, MinorUnit.Zero, "Ugandan shilling", "USh"),
-            new ("USD", 840, MinorUnit.Two, "United States dollar", "$"), // or US$
+            new ("USD", 840, MinorUnit.Two, "United States dollar", "$") { InternationalSymbol = "US$"},
             new ("USN", 997, MinorUnit.Two, "United States dollar (next day) (funds code)", "$"),
             new ("UYI", 940, MinorUnit.Zero, "Uruguay Peso en Unidades Indexadas (UI) (funds code)"), // List two
-            new ("UYU", 858, MinorUnit.Two, "Uruguayan peso", "$"), // or $U
-            new ("UZS", 860, MinorUnit.Two, "Uzbekistan som", "лв"), // or сўм ?
+            new ("UYU", 858, MinorUnit.Two, "Uruguayan peso", "$") { InternationalSymbol = "$U" },
+            new ("UZS", 860, MinorUnit.Two, "Uzbekistan som", "сўм") { AlternativeSymbols = ["soʻm"]},
             new ("VND", 704, MinorUnit.Zero, "Vietnamese dong", "₫"),
             new ("VUV", 548, MinorUnit.Zero, "Vanuatu vatu", "VT"),
-            new ("WST", 882, MinorUnit.Two, "Samoan tala", "WS$"), // sometimes SAT, ST or T
+            new ("WST", 882, MinorUnit.Two, "Samoan tala", "$") { InternationalSymbol = "WS$", AlternativeSymbols = ["SAT", "ST", "T"] },
             new ("XAF", 950, MinorUnit.Zero, "CFA franc BEAC", "FCFA"),
             new ("XAG", 961, MinorUnit.NotApplicable, "Silver (one troy ounce)"),
             new ("XAU", 959, MinorUnit.NotApplicable, "Gold (one troy ounce)"),
@@ -280,7 +280,7 @@ static class CurrencyRegistry
             new ("XBB", 956, MinorUnit.NotApplicable, "European Monetary Unit (E.M.U.-6) (bond market unit)"),
             new ("XBC", 957, MinorUnit.NotApplicable, "European Unit of Account 9 (E.U.A.-9) (bond market unit)"),
             new ("XBD", 958, MinorUnit.NotApplicable, "European Unit of Account 17 (E.U.A.-17) (bond market unit)"),
-            new ("XCD", 951, MinorUnit.Two, "East Caribbean dollar", "$"), // or EC$
+            new ("XCD", 951, MinorUnit.Two, "East Caribbean dollar", "$") { InternationalSymbol = "EC$" },
             new ("XDR", 960, MinorUnit.NotApplicable, "Special drawing rights"),
             new ("XOF", 952, MinorUnit.Zero, "CFA franc BCEAO", "CFA"),
             new ("XPD", 964, MinorUnit.NotApplicable, "Palladium (one troy ounce)"),
@@ -290,16 +290,16 @@ static class CurrencyRegistry
             new ("XTS", 963, MinorUnit.NotApplicable, "Code reserved for testing purposes"),
             new ("XUA", 965, MinorUnit.NotApplicable, "ADB Unit of Account"),
             new ("XXX", 999, MinorUnit.NotApplicable, "No currency"),
-            new ("YER", 886, MinorUnit.Two, "Yemeni rial", "﷼"), // or ر.ي.‏‏ ?
+            new ("YER", 886, MinorUnit.Two, "Yemeni rial", "﷼") { AlternativeSymbols = ["YRI", "YRIs"]}, // YRI is for singular and YRIs for plural
             new ("ZAR", 710, MinorUnit.Two, "South African rand", "R"),
-            new ("ZMW", 967, MinorUnit.Two, "Zambian kwacha", "ZK"), // or ZMW
+            new ("ZMW", 967, MinorUnit.Two, "Zambian kwacha", "ZK"),
             new ("STN", 930, MinorUnit.Two, "Dobra", "Db") { IntroducedOn = new DateTime(2018, 1, 1) }, // New Currency of São Tomé and Príncipe from 1 Jan 2018 (Amendment 164)
             new ("UYW", 927, MinorUnit.Four, "Unidad Previsional", "Db") { IntroducedOn = new DateTime(2018, 8, 29) },
             new ("VES", 928, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2018, 8, 20) }, // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug. // Replaced by VED/926 but stays active for now
             new ("VED", 926, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2021, 10, 01) }, // replaces VES/928 (Amendment 170)
             new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2021, 04, 01) }, // replaces SLL/694
             new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaced by XCG/532
-            new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "$") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
+            new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "ZiG") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
 
             // Still Active (list one), will move to Historic (list three) in the future
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025

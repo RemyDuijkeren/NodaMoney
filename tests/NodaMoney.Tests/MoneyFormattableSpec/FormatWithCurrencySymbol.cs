@@ -23,7 +23,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C").Should().Be("(€98,765.43)");
         _dollar.ToString("C").Should().Be("($98,765.43)");
         _dinar.ToString("C").Should().Be("(BD98,765.432)");
-        _swissFranc.ToString("C").Should().Be("(CHF98,765.43)");
+        _swissFranc.ToString("C").Should().Be("(Fr.98,765.43)");
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C").Should().Be("-€98,765.43");
         _dollar.ToString("C").Should().Be("-$98,765.43");
         _dinar.ToString("C").Should().Be("-BD98,765.432");
-        _swissFranc.ToString("C").Should().Be("-CHF98,765.43");
+        _swissFranc.ToString("C").Should().Be("-Fr.98,765.43");
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C").Should().Be("€ -98.765,43");
         _dollar.ToString("C").Should().Be("$ -98.765,43");
         _dinar.ToString("C").Should().Be("BD -98.765,432");
-        _swissFranc.ToString("C").Should().Be("CHF -98.765,43");
+        _swissFranc.ToString("C").Should().Be("Fr. -98.765,43");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C").Should().Be("-98 765,43 €");
         _dollar.ToString("C").Should().Be("-98 765,43 $");
         _dinar.ToString("C").Should().Be("-98 765,432 BD");
-        _swissFranc.ToString("C").Should().Be("-98 765,43 CHF");
+        _swissFranc.ToString("C").Should().Be("-98 765,43 Fr.");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C0").Should().Be("-€98,765");
         _dollar.ToString("C0").Should().Be("-$98,765");
         _dinar.ToString("C0").Should().Be("-BD98,765");
-        _swissFranc.ToString("C0").Should().Be("-CHF98,765");
+        _swissFranc.ToString("C0").Should().Be("-Fr.98,765");
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C1").Should().Be("-€98,765.4");
         _dollar.ToString("C1").Should().Be("-$98,765.4");
         _dinar.ToString("C1").Should().Be("-BD98,765.4");
-        _swissFranc.ToString("C1").Should().Be("-CHF98,765.4");
+        _swissFranc.ToString("C1").Should().Be("-Fr.98,765.4");
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C2").Should().Be("-€98,765.43");
         _dollar.ToString("C2").Should().Be("-$98,765.43");
         _dinar.ToString("C2").Should().Be("-BD98,765.43");
-        _swissFranc.ToString("C2").Should().Be("-CHF98,765.43");
+        _swissFranc.ToString("C2").Should().Be("-Fr.98,765.43");
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C3").Should().Be("-€98,765.430");
         _dollar.ToString("C3").Should().Be("-$98,765.430");
         _dinar.ToString("C3").Should().Be("-BD98,765.432");
-        _swissFranc.ToString("C3").Should().Be("-CHF98,765.430");
+        _swissFranc.ToString("C3").Should().Be("-Fr.98,765.430");
     }
 
     [Fact]
@@ -119,6 +119,6 @@ public class FormatWithCurrencySymbol
         _euro.ToString("C4").Should().Be("-€98,765.4300");
         _dollar.ToString("C4").Should().Be("-$98,765.4300");
         _dinar.ToString("C4").Should().Be("-BD98,765.4320");
-        _swissFranc.ToString("C4").Should().Be("-CHF98,765.4300");
+        _swissFranc.ToString("C4").Should().Be("-Fr.98,765.4300");
     }
 }
