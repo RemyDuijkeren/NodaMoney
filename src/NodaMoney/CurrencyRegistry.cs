@@ -1,40 +1,28 @@
-﻿namespace NodaMoney;
+﻿#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
+
+namespace NodaMoney;
 
 /// <summary>Represent the central thread-safe registry for currencies.</summary>
 static class CurrencyRegistry
 {
-    static CurrencyInfo[] s_currencies;
-    static readonly Dictionary<Currency, CurrencyInfo> s_lookupByCurrency;
-    static readonly Dictionary<string, CurrencyInfo> s_lookupByCode;
-    static ILookup<string, CurrencyInfo> s_lookupByCodeAndSymbol;
     static readonly object s_changeLock = new();
+    static CurrencyInfo[] s_currencies;
+
+    static ILookup<string, CurrencyInfo> s_lookupByCodeAndSymbol = null!;
+#if NET8_0_OR_GREATER
+    static FrozenDictionary<Currency, CurrencyInfo> s_lookupByCurrency = null!;
+    static FrozenDictionary<string, CurrencyInfo> s_lookupByCode = null!;
+#else
+    static Dictionary<Currency, CurrencyInfo> s_lookupByCurrency = null!;
+    static Dictionary<string, CurrencyInfo> s_lookupByCode = null!;
+#endif
 
     static CurrencyRegistry()
     {
         s_currencies = InitializeCurrencies();
-
-        // TODO: allow duplicates with priority? (e.g. non ISO-4217 currencies). For now we don't allow.
-        s_lookupByCurrency = new Dictionary<Currency, CurrencyInfo>(s_currencies.Length);
-        foreach (var ci in s_currencies)
-        {
-            s_lookupByCurrency[ci] = ci;
-        }
-
-        s_lookupByCode = new Dictionary<string, CurrencyInfo>(s_currencies.Length);
-        foreach (var ci in s_currencies)
-        {
-            s_lookupByCode[ci.Code] = ci;
-        }
-
-        s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
-
-        // TODO: Use FrozenDictionary in .NET 8?
-        //FrozenDictionary<Currency, CurrencyInfo> frozenDictionary = s_lookupCurrencies.ToFrozenDictionary();
-
-        // TODO: Parallel foreach? ReadOnlySpan<T>.
-        // var xa = Currencies.AsMemory();
-        // TODO: Use ReadOnlySpan<T> or ReadOnlyMemory<T>  to split up namespaces? 0..999 ISO4127, 1000..9999 ISO4127-HISTORIC
-        // To much useless gaps, but for first 0..999 performance boost, because of no key lookup?
+        BuildCurrencyLookups();
     }
 
     /// <summary>Tries the get <see cref="CurrencyInfo"/> of the given code and namespace.</summary>
@@ -72,14 +60,11 @@ static class CurrencyRegistry
                 return false;
             }
 
-            s_lookupByCurrency[currency] = currency;
-            s_lookupByCode[currency.Code] = currency;
-
             Array.Resize(ref s_currencies, s_currencies.Length + 1);
             int index = s_currencies.Length - 1;
             s_currencies[index] = currency;
 
-            s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
+            BuildCurrencyLookups();
 
             return true;
         }
@@ -93,29 +78,22 @@ static class CurrencyRegistry
     {
         lock (s_changeLock)
         {
-            if (!s_lookupByCurrency.Remove(currency))
+            int index = Array.IndexOf(s_currencies, currency);
+            if (index == -1) // Not found
             {
                 return false;
-            }
-
-            s_lookupByCode.Remove(currency.Code);
-
-            int index = Array.IndexOf(s_currencies, currency);
-            if (index == -1)
-            {
-                return true;
             }
 
             int lastIndex = s_currencies.Length - 1;
             if (index != lastIndex)
             {
-                // Move the last element to the vacated spot.
+                // Switch position by moving the last element to the vacated spot.
                 s_currencies[index] = s_currencies[lastIndex];
             }
 
             Array.Resize(ref s_currencies, s_currencies.Length - 1);
 
-            s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
+            BuildCurrencyLookups();
 
             return true;
         }
@@ -129,6 +107,19 @@ static class CurrencyRegistry
     /// <param name="currencyChars">The Currency Code or Symbol to match.</param>
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies that matches.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => [.. s_lookupByCodeAndSymbol[currencyChars.ToString()]];
+
+    static void BuildCurrencyLookups()
+    {
+        // TODO: allow duplicates with priority? (e.g. non ISO-4217 currencies). For now we don't allow.
+        s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
+#if NET8_0_OR_GREATER
+        s_lookupByCode = s_currencies.ToFrozenDictionary(ci => ci.Code, ci => ci);
+        s_lookupByCurrency = s_currencies.ToFrozenDictionary(ci => (Currency)ci, ci => ci);
+#else
+        s_lookupByCode = s_currencies.ToDictionary(ci => ci.Code, ci => ci);
+        s_lookupByCurrency = s_currencies.ToDictionary(ci => (Currency)ci, ci => ci);
+#endif
+    }
 
     static ILookup<string, CurrencyInfo> LookupByCodeAndSymbol() =>
         s_currencies

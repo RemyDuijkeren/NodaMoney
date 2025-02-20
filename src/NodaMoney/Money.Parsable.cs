@@ -266,25 +266,6 @@ public partial struct Money
         }
     }
 
-    private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency)
-    {
-        if (currency.InternationalSymbol.AsSpan().SequenceEqual(possibleCurrency) ||
-            currency.Symbol.AsSpan().SequenceEqual(possibleCurrency) ||
-            currency.Code.AsSpan().SequenceEqual(possibleCurrency))
-        {
-            return true;
-        }
-
-        // Not using LINQ because we want to compare with Span
-        foreach (string symbol in currency.AlternativeSymbols)
-        {
-            if (possibleCurrency.SequenceEqual(symbol.AsSpan()))
-                return true;
-        }
-
-        return false;
-    }
-
     private static ReadOnlySpan<char> RemoveCurrencyChars(ReadOnlySpan<char> s, ReadOnlySpan<char> currencyChars)
     {
         // Find the first occurrence of the matched currency characters in the input
