@@ -141,7 +141,7 @@ static class CurrencyRegistry
             new ("AED", 784, MinorUnit.Two, "United Arab Emirates dirham", "د.إ"),
             new ("AFN", 971, MinorUnit.Two, "Afghan afghani", "؋"),
             new ("ALL", 008, MinorUnit.Two, "Albanian lek", "L"),
-            new ("AMD", 051, MinorUnit.Two, "Armenian dram", "֏") { HtmlSymbol = "&#x58F;", AlternativeSymbols = ["dram"] },
+            new ("AMD", 051, MinorUnit.Two, "Armenian dram", "֏") { AlternativeSymbols = ["dram"] },
             new ("AOA", 973, MinorUnit.Two, "Angolan kwanza", "Kz"),
             new ("ARS", 032, MinorUnit.Two, "Argentine peso", "$") { InternationalSymbol = "ARS" },
             new ("AUD", 036, MinorUnit.Two, "Australian dollar", "$") { InternationalSymbol = "A$" },
@@ -272,7 +272,7 @@ static class CurrencyRegistry
             new ("SZL", 748, MinorUnit.Two, "Swazi lilangeni", "L") { AlternativeSymbols = ["E"] }, // E is for plural
             new ("THB", 764, MinorUnit.Two, "Thai baht", "฿"),
             new ("TJS", 972, MinorUnit.Two, "Tajikistani somoni", "смн"),
-            new ("TMT", 934, MinorUnit.Two, "Turkmenistani manat", "m") { HtmlSymbol = "&#0109;" },
+            new ("TMT", 934, MinorUnit.Two, "Turkmenistani manat", "m"),
             new ("TND", 788, MinorUnit.Three, "Tunisian dinar", "د.ت") { AlternativeSymbols = ["DT"]},
             new ("TOP", 776, MinorUnit.Two, "Tongan paʻanga", "T$"),
             new ("TRY", 949, MinorUnit.Two, "Turkish lira", "₺"),

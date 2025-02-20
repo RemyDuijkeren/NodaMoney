@@ -173,13 +173,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         init => _internationalSymbol = value;
     }
 
-    /// <summary>Gets the HTML symbol associated with the currency, typically used to represent the currency in web or digital contexts.</summary>
-    /// <remarks>
-    /// The HTML symbol is commonly used in formatting monetary values in web pages or other platforms that support HTML content.
-    /// The value may vary based on region and currency standards.
-    /// </remarks>
-    public string? HtmlSymbol { get; init; }
-
     /// <summary>Gets a collection of alternative symbols used to represent the currency.</summary>
     /// <remarks>
     /// This property includes any unconventional or secondary symbols that may be associated with the currency,
