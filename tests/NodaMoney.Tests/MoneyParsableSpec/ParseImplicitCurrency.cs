@@ -54,7 +54,7 @@ public class ParseImplicitCurrency
         // ¥ symbol is used for Japanese yen and Chinese yuan
         Action action = () => Money.Parse("¥ -98,765");
 
-        action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
+        action.Should().Throw<FormatException>().WithMessage("*multiple currencies*");
     }
 
     [Fact, UseCulture("en-US")]
@@ -79,7 +79,7 @@ public class ParseImplicitCurrency
         // $ symbol is used for multiple currencies
         Action action = () => Money.Parse("$ 765,43");
 
-        action.Should().Throw<FormatException>().WithMessage("*multiple known currencies*");
+        action.Should().Throw<FormatException>().WithMessage("*multiple currencies*");
     }
 
     [Fact, UseCulture("en-US")]

@@ -218,8 +218,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     }
 
     /// <summary>Get all currencies.</summary>
-    /// <returns>An <see cref="IEnumerable{CurrencyInfo}"/> of all registered currencies.</returns>
-    public static IEnumerable<CurrencyInfo> GetAllCurrencies() => CurrencyRegistry.GetAllCurrencies();
+    /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies.</returns>
+    public static IReadOnlyList<CurrencyInfo> GetAllCurrencies() => CurrencyRegistry.GetAllCurrencies();
+
+    /// <summary>Get all currencies that matches the given Currency Code or Symbol.</summary>
+    /// <param name="currencyChars">The Currency Code or Symbol to match.</param>
+    /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all currencies that matches.</returns>
+    public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => CurrencyRegistry.GetAllCurrencies(currencyChars);
 
     public static CurrencyInfo FromCode(string code) => CurrencyRegistry.Get(code);
 

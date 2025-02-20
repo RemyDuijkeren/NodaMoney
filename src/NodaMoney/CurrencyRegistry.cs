@@ -4,8 +4,9 @@
 static class CurrencyRegistry
 {
     static CurrencyInfo[] s_currencies;
-    static readonly Dictionary<Currency, CurrencyInfo> s_lookupCurrencies;
-    static readonly Dictionary<string, CurrencyInfo> s_lookupCurrenciesByCode;
+    static readonly Dictionary<Currency, CurrencyInfo> s_lookupByCurrency;
+    static readonly Dictionary<string, CurrencyInfo> s_lookupByCode;
+    static ILookup<string, CurrencyInfo> s_lookupByCodeAndSymbol;
     static readonly object s_changeLock = new();
 
     static CurrencyRegistry()
@@ -13,17 +14,19 @@ static class CurrencyRegistry
         s_currencies = InitializeCurrencies();
 
         // TODO: allow duplicates with priority? (e.g. non ISO-4217 currencies). For now we don't allow.
-        s_lookupCurrencies = new Dictionary<Currency, CurrencyInfo>(s_currencies.Length);
+        s_lookupByCurrency = new Dictionary<Currency, CurrencyInfo>(s_currencies.Length);
         foreach (var ci in s_currencies)
         {
-            s_lookupCurrencies[ci] = ci;
+            s_lookupByCurrency[ci] = ci;
         }
 
-        s_lookupCurrenciesByCode = new Dictionary<string, CurrencyInfo>(s_currencies.Length);
+        s_lookupByCode = new Dictionary<string, CurrencyInfo>(s_currencies.Length);
         foreach (var ci in s_currencies)
         {
-            s_lookupCurrenciesByCode[ci.Code] = ci;
+            s_lookupByCode[ci.Code] = ci;
         }
+
+        s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
 
         // TODO: Use FrozenDictionary in .NET 8?
         //FrozenDictionary<Currency, CurrencyInfo> frozenDictionary = s_lookupCurrencies.ToFrozenDictionary();
@@ -42,7 +45,7 @@ static class CurrencyRegistry
     public static CurrencyInfo Get(string code)
     {
         if (code is null) throw new ArgumentNullException(nameof(code));
-        return s_lookupCurrenciesByCode.TryGetValue(code, out var ci)
+        return s_lookupByCode.TryGetValue(code, out var ci)
             ? ci
             : throw new InvalidCurrencyException($"{code} is unknown currency code!");
     }
@@ -52,7 +55,7 @@ static class CurrencyRegistry
     /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="CurrencyInfo"/> with the specified code; otherwise, <b>false</b>.</returns>
     /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
     /// <exception cref="InvalidCurrencyException"> when <see cref="currency"/> is unknown currency.</exception>
-    public static CurrencyInfo Get(Currency currency) => s_lookupCurrencies.TryGetValue(currency, out var ci)
+    public static CurrencyInfo Get(Currency currency) => s_lookupByCurrency.TryGetValue(currency, out var ci)
         ? ci
         : throw new InvalidCurrencyException($"{currency} is unknown currency code!");
 
@@ -64,17 +67,19 @@ static class CurrencyRegistry
     {
         lock (s_changeLock)
         {
-            if (s_lookupCurrencies.ContainsKey(currency))
+            if (s_lookupByCurrency.ContainsKey(currency))
             {
                 return false;
             }
 
-            s_lookupCurrencies[currency] = currency;
-            s_lookupCurrenciesByCode[currency.Code] = currency;
+            s_lookupByCurrency[currency] = currency;
+            s_lookupByCode[currency.Code] = currency;
 
             Array.Resize(ref s_currencies, s_currencies.Length + 1);
             int index = s_currencies.Length - 1;
             s_currencies[index] = currency;
+
+            s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
 
             return true;
         }
@@ -88,12 +93,12 @@ static class CurrencyRegistry
     {
         lock (s_changeLock)
         {
-            if (!s_lookupCurrencies.Remove(currency))
+            if (!s_lookupByCurrency.Remove(currency))
             {
                 return false;
             }
 
-            s_lookupCurrenciesByCode.Remove(currency.Code);
+            s_lookupByCode.Remove(currency.Code);
 
             int index = Array.IndexOf(s_currencies, currency);
             if (index == -1)
@@ -110,13 +115,33 @@ static class CurrencyRegistry
 
             Array.Resize(ref s_currencies, s_currencies.Length - 1);
 
+            s_lookupByCodeAndSymbol = LookupByCodeAndSymbol();
+
             return true;
         }
     }
 
     /// <summary>Get all registered currencies.</summary>
-    /// <returns>An <see cref="IEnumerable{Currency}"/> of all registered currencies.</returns>
-    public static IEnumerable<CurrencyInfo> GetAllCurrencies() => s_currencies.AsEnumerable();
+    /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies.</returns>
+    public static IReadOnlyList<CurrencyInfo> GetAllCurrencies() => s_currencies;
+
+    /// <summary>Get all registered currencies that matches the given Currency Code or Symbol.</summary>
+    /// <param name="currencyChars">The Currency Code or Symbol to match.</param>
+    /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies that matches.</returns>
+    public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => [.. s_lookupByCodeAndSymbol[currencyChars.ToString()]];
+
+    static ILookup<string, CurrencyInfo> LookupByCodeAndSymbol() =>
+        s_currencies
+            .SelectMany(currency =>
+                new[]
+                {
+                    new { Key = currency.Code, Currency = currency },
+                    new { Key = currency.Symbol, Currency = currency },
+                    new { Key = currency.InternationalSymbol, Currency = currency },
+                }
+                .Concat(currency.AlternativeSymbols.Select(symbol => new { Key = symbol, Currency = currency }))
+                .Distinct()) // Needed because Code, Symbol and InternationalSymbol can be the same
+            .ToLookup(item => item.Key, item => item.Currency);
 
     // TODO: Move to resource file?
     static CurrencyInfo[] InitializeCurrencies() =>

@@ -229,55 +229,41 @@ public partial struct Money
     /// <param name="specifiedCurrency">An optional currency to use when resolving the currency information.</param>
     /// <returns>The parsed <see cref="CurrencyInfo"/> representing the currency information found in the input.</returns>
     /// <exception cref="FormatException">Thrown when no matching currency symbol or code can be resolved from the input.</exception>
+    /// <exception cref="IndexOutOfRangeException"></exception>
     internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> currencyChars, CurrencyInfo? specifiedCurrency = null)
     {
         if (currencyChars.IsEmpty)
             return specifiedCurrency ?? CurrencyInfo.CurrentCurrency;
 
-        if (specifiedCurrency is null && MatchesCurrency(currencyChars, CurrencyInfo.CurrentCurrency))
-            return CurrencyInfo.CurrentCurrency;
-
         // try to find a match
-        CurrencyInfo? matchedCurrency = null;
-        bool multipleMatches = false;
-
-        foreach (var currency in CurrencyInfo.GetAllCurrencies())
+        var matchedCurrencies = CurrencyInfo.GetAllCurrencies(currencyChars);
+        switch (matchedCurrencies.Count)
         {
-            // Skip if no match
-            if (!MatchesCurrency(currencyChars, currency)) continue;
+            case 0:
+                throw new FormatException($"{currencyChars.ToString()} is an unknown currency symbol or code!");
+            case 1:
+                if (specifiedCurrency is not null && matchedCurrencies[0] != specifiedCurrency)
+                    throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with {matchedCurrencies[0].Code}, but doesn't match the specified {specifiedCurrency.Code}!");
 
-            // If specifiedCurrency matches, prioritize it and return immediately
-            if (currency == specifiedCurrency)
-                return specifiedCurrency;
+                return matchedCurrencies[0];
+            case > 1:
+                // If specifiedCurrency matches, prioritize it and return immediately
+                var matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == specifiedCurrency);
+                if (matchedCurrency is not null) return matchedCurrency;
 
-            // Handle the first match
-            if (matchedCurrency is null)
-            {
-                matchedCurrency = currency;
-            }
-            else
-            {
-                multipleMatches = true;
-            }
+                if (specifiedCurrency is null)
+                {
+                    // If the current currency matches, prioritize it and return immediately
+                    matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == CurrencyInfo.CurrentCurrency);
+                    if (matchedCurrency is not null) return matchedCurrency;
+
+                    throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies! Specify currency or culture explicitly.");
+                }
+
+                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code}!");
+            default:
+                throw new IndexOutOfRangeException($"MatchedCurrencies.Count {matchedCurrencies.Count} has to be 0, 1 or > 1!"); // Should never happen
         }
-
-        if (matchedCurrency is null)
-            throw new FormatException($"{currencyChars.ToString()} is an unknown currency symbol or code!");
-
-        if (multipleMatches)
-        {
-            if (specifiedCurrency is null)
-                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple known currencies! Specify currency or culture explicitly.");
-
-            throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
-        }
-
-        if (specifiedCurrency is not null && matchedCurrency != specifiedCurrency)
-        {
-            throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with {matchedCurrency.Code} or {matchedCurrency.Symbol}, but doesn't match the specified {specifiedCurrency.Code} or {specifiedCurrency.Symbol}!");
-        }
-
-        return matchedCurrency;
     }
 
     private static bool MatchesCurrency(ReadOnlySpan<char> possibleCurrency, CurrencyInfo currency)
