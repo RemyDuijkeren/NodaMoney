@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using FluentAssertions;
-using Xunit;
+﻿using System.Linq;
 using NodaMoney.Extensions;
 
 namespace NodaMoney.Tests.Extensions.MoneyExtensionsSafeDivideSpec;

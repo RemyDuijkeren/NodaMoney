@@ -1,7 +1,3 @@
-using System;
-using FluentAssertions;
-using Xunit;
-
 namespace NodaMoney.Tests.MoneyComparableSpec;
 
 public class CompareMoney

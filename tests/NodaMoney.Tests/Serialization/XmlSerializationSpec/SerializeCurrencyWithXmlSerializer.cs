@@ -1,6 +1,3 @@
-using FluentAssertions;
-using Xunit;
-
 namespace NodaMoney.Tests.Serialization.XmlSerializationSpec;
 
 public class SerializeCurrencyWithXmlSerializer : XmlSerializationHelper

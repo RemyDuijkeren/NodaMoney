@@ -1,8 +1,6 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
-using FluentAssertions;
-using Xunit;
 
 namespace NodaMoney.Tests.Serialization.DataContractSerializerSpec;
 

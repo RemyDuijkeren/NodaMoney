@@ -1,7 +1,4 @@
-using System;
 using System.Globalization;
-using FluentAssertions;
-using Xunit;
 
 namespace NodaMoney.Tests.CurrencyInfoSpec;
 

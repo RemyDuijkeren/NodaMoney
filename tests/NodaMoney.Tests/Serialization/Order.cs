@@ -1,5 +1,3 @@
-using System;
-
 namespace NodaMoney.Tests.Serialization;
 
 [Serializable]

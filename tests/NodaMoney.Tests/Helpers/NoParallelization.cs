@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NodaMoney.Tests.Helpers;
+﻿namespace NodaMoney.Tests.Helpers;
 
 [CollectionDefinition(nameof(NoParallelization), DisableParallelization = true)]
 public class NoParallelization

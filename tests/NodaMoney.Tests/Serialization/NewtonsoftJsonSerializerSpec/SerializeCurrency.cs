@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Xunit;
 using Newtonsoft.Json;
 
 namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;

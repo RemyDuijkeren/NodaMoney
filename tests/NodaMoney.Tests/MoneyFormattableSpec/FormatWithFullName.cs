@@ -1,6 +1,4 @@
 using System.Threading;
-using FluentAssertions;
-using Xunit;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyFormattableSpec;

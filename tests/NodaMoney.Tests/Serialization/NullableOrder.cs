@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NodaMoney.Tests.Serialization;
+﻿namespace NodaMoney.Tests.Serialization;
 
 [Serializable]
 public class NullableOrder

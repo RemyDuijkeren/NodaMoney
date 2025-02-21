@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using FluentAssertions;
 using Newtonsoft.Json;
-using Xunit;
 
 namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;
 

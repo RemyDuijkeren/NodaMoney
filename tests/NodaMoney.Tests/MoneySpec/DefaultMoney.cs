@@ -1,7 +1,4 @@
-﻿using FluentAssertions;
-using Xunit;
-
-namespace NodaMoney.Tests.MoneySpec;
+﻿namespace NodaMoney.Tests.MoneySpec;
 
 public class DefaultMoney
 {

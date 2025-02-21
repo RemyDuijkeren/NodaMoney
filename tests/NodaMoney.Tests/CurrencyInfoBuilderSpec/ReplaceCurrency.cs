@@ -1,7 +1,4 @@
-﻿using System;
-using FluentAssertions;
-using Xunit;
-using NodaMoney.Tests.Helpers;
+﻿using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.CurrencyInfoBuilderSpec;
 

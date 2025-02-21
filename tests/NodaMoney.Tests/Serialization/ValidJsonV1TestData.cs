@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace NodaMoney.Tests.Serialization;
 
 public class ValidJsonV1TestData : TheoryData<string, Money>

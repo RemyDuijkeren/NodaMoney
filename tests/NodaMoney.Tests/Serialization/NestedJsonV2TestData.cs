@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace NodaMoney.Tests.Serialization;
 
 public class NestedJsonV2TestData : TheoryData<string, Order>

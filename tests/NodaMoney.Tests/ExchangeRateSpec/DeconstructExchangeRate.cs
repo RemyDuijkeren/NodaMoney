@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using NodaMoney.Exchange;
-using Xunit;
+﻿using NodaMoney.Exchange;
 
 namespace NodaMoney.Tests.ExchangeRateSpec;
 

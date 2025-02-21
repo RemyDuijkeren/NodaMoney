@@ -32,7 +32,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <param name="MinorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
     /// <param name="EnglishName">The english name of the currency</param>
     /// <param name="Symbol">The currency symbol.</param>
-    public CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName = "", string Symbol = CurrencyInfo.GenericCurrencySign)
+    internal CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName = "", string Symbol = CurrencyInfo.GenericCurrencySign)
     {
         this.Code = Code ?? throw new ArgumentNullException(nameof(Code));
         this.Number = Number;
@@ -354,16 +354,20 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <inheritdoc />
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
+        // styles: symbol, code, name, accounting
+
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
         // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
         // C: Currency Symbol format, like € 23.002,43 , € 23,002.43, 23,002.43 €
         // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
-        // C => TODO: use C for long version (US$) and c for short version ($) in some locals
+        // c => TODO: use C for international version (US$) and c for local version ($) in some locals?
         // R: Round-trip format with currency code
         // N: Number format = decimal
         // F: Fixed point format = decimal
         // L: English name, like 23.002,43 dollar
         // l: Native name, like 23.002,43 dólar
+        // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
+        // ?: Accounting ($23.002,43) for negative numbers
 
         // If argument is not a Money, fallback to default formatting
         if (arg is not Money money)
@@ -400,7 +404,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         {
             // Currency formats
             'C' when digits == -1 => money.Amount.ToString("C", nfi),
-            'C' or 'c' => // TODO: use C for long version (US$) and c for short version ($) in some locals?
+            'C' or 'c' => // TODO: use C for international version (US$) and c for local version ($) in some locals
                 money.Amount.ToString($"C{digits}", nfi),
 
             // General format (uses currency code as symbol)

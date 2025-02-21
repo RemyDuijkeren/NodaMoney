@@ -1,8 +1,5 @@
-using System;
 using System.Linq;
-using FluentAssertions;
 using Raven.TestDriver;
-using Xunit;
 
 namespace NodaMoney.Tests.Serialization.RavenDbSerializationSpec;
 

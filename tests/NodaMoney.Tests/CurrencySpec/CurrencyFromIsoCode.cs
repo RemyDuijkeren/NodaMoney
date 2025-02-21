@@ -1,7 +1,3 @@
-using System;
-using FluentAssertions;
-using Xunit;
-
 namespace NodaMoney.Tests.CurrencySpec;
 
 public class CurrencyFromIsoCode
