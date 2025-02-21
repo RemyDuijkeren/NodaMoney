@@ -4,7 +4,7 @@ public class ValidJsonV1TestData : TheoryData<string, Money>
 {
     public ValidJsonV1TestData()
     {
-        var money = new Money(234.25m, Currency.FromCode("EUR"));
+        var money = new Money(234.25m, CurrencyInfo.FromCode("EUR"));
 
         Add("""{ "Amount": 234.25, "Currency": "EUR" }""", money); // PascalCase, Amount as number
         Add("""{ "Currency": "EUR", "Amount": 234.25 }""", money); // PascalCase, Amount as number, Reversed members

@@ -34,7 +34,7 @@ public partial struct Money : IFormattable
 
     private string Format(string? format, IFormatProvider? formatProvider)
     {
-        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrency(Currency);
+        CurrencyInfo currencyInfo = CurrencyInfo.GetInstance(Currency);
         return currencyInfo.Format(format, this, formatProvider);
     }
 }

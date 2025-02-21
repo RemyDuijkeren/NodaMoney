@@ -1,5 +1,6 @@
+using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Xml.Linq;
 
 namespace NodaMoney.Tests.Iso4127Spec;
@@ -12,20 +13,24 @@ public class Iso4127ListFixture
     public Iso4127ListFixture()
     {
         const string fileName = "iso4127.xml";
+        const string listOneUrl = "https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml";
 
-        ServicePointManager.Expect100Continue = true;
-        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        // Download ISO-4127 XML as file
+        using HttpClient client = new();
+        using (Stream contentStream = client.GetStreamAsync(listOneUrl).GetAwaiter().GetResult())
+        {
+            using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
+            contentStream.CopyTo(fileStream);
+        }
 
-        using var client = new WebClient();
-        client.DownloadFile(new Uri("https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml"), fileName);
-
+        // Parse XML
         var document = XDocument.Load(fileName);
 
-        Currencies = document.Element("ISO_4217").Element("CcyTbl").Elements("CcyNtry")
+        Currencies = document.Element("ISO_4217")!.Element("CcyTbl")!.Elements("CcyNtry")
                              .Select(e =>
                                  new Iso4127Currency
                                  {
-                                     CountryName = e.Element("CtryNm").Value,
+                                     CountryName = e.Element("CtryNm")!.Value,
                                      CurrencyName = e.Element("CcyNm")?.Value,
                                      Currency = e.Element("Ccy")?.Value,
                                      CurrencyNumber = e.Element("CcyNbr")?.Value,
@@ -34,6 +39,6 @@ public class Iso4127ListFixture
                              .Where(a => !string.IsNullOrEmpty(a.Currency)) // ignore currencies without a currency name
                              .ToArray();
 
-        PublishDate = DateTime.Parse(document.Element("ISO_4217").Attribute("Pblshd").Value);
+        PublishDate = DateTime.Parse(document.Element("ISO_4217")!.Attribute("Pblshd")!.Value);
     }
 }

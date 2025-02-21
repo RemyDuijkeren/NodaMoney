@@ -66,6 +66,8 @@ public class SerializeMoney
     public static T Clone<T>(object source)
     {
         // Console.WriteLine(Serialize(source).ToString());
+#pragma warning disable CS0618 // Type or member is obsolete
         return Deserialize<T>(Serialize(source));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

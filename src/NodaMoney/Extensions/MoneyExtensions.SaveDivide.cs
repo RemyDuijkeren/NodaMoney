@@ -32,7 +32,7 @@ public static class MoneyExtensions
 
         IEnumerable<Money> SafeDivideIterator()
         {
-            decimal shareAmount = Math.Round(money.Amount / shares, (int)CurrencyInfo.FromCurrency(money.Currency).DecimalDigits, rounding);
+            decimal shareAmount = Math.Round(money.Amount / shares, (int)CurrencyInfo.GetInstance(money.Currency).DecimalDigits, rounding);
             decimal remainder = money.Amount;
 
             for (int i = 0; i < shares - 1; i++)
@@ -79,7 +79,7 @@ public static class MoneyExtensions
             {
                 decimal ratioAmount = Math.Round(
                     money.Amount * ratios[i] / ratios.Sum(),
-                    (int)CurrencyInfo.FromCurrency(money.Currency).DecimalDigits,
+                    (int)CurrencyInfo.GetInstance(money.Currency).DecimalDigits,
                     rounding);
 
                 remainder -= ratioAmount;

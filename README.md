@@ -43,18 +43,34 @@ The main classes are:
 - Currency: A small immutable structure that represents a currency unit.
 - CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
 and custom currencies. It auto-converts to Currency.
-- CurrencyInfoBuilder: Defines a custom currency that is new or based on another currency.
 - ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
 
-**Initalizing money**
+**Initializing Currency**
+
+```C#
+// Create Currency Unit
+Currency euro = Currency.FromCode("EUR");
+
+// Create CurrencyInfo (for metadata about Currency)
+CurrencyInfo info = CurrencyInfo.FromCode("EUR");
+CurrencyInfo info = CurrencyInfo.GetInstance(euro); // Currency to CurrencyInfo
+Currencyinfo info = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
+Currencyinfo info = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
+Currencyinfo info = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
+CurrencyInfo info = CurrencyInfo.CurrentCurrency;
+
+Currency euro = info; // implicit cast to Currency Unit
+```
+
+**Initializing money**
 
 ```C#
 // Define money with explicit currency
 Money euros = new Money(6.54m, "EUR");
 Money euros = new (6.54m, "EUR");
-Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
 Money euros = new Money(6.54m, Currency.FromCode("EUR"));
+Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
 
 // Define money explicit using helper method for most used currencies in the world
 Money money = Money.Euro(6.54m);
@@ -62,7 +78,7 @@ Money money = Money.USDollar(6.54m);
 Money money = Money.PoundSterling(6.54m);
 Money money = Money.Yen(6);
 
-// Use current culture/region to auto populate Currency.
+// Implicit Currency based on current culture/region.
 // When culture is 'NL-nl' code below results in Euros.
 Money money = new Money(6.54m);
 Money money = new (6.54m);
@@ -103,7 +119,7 @@ Money euro10 = euro10 + zeroDollar; // doesn't throw when adding zero
 euro20 += euro10; // EUR 30
 euro20 -= euro10; // EUR 10
 
-// Add and Substract with Implied Currency Context
+// Add and Substract with implied Currency Context
 Money euro30 = euro10 + 20m; // decimal value is assumed to have the same currency context
 Money euro10 = euro20 - 10m; // decimal value is assumed to have the same currency context
 
@@ -214,14 +230,14 @@ Money euro;
 Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 ```
 
-**Adding custom currencies**
+**Create custom Currency**
 
 ```C#
 // Build custom currency
 CurrencyInfo myCurrency = CurrencyInfo.New("BTA") with
 {
     Symbol = "$",
-    Number = 666,
+    Number = 1023,
     InternationalSymbol = "CC$",
     MinorUnit = MinorUnit.Two,
     EnglishName = "My Custom Currency",
@@ -231,7 +247,7 @@ CurrencyInfo myCurrency = CurrencyInfo.New("BTA") with
     ExpiredOn = new DateTime(2030, 1, 1),
 };
 
-// Will fails because it's not registred
+// Fails because it's not registred
 var notExisting = CurrencyInfo.FromCode("BTA"); // throw exception
 
 // Register it for the life-time of the app domain
@@ -239,7 +255,7 @@ CurrencyInfo.Register(myCurrency);
 var exists = CurrencyInfo.FromCode("BTA"); // returns myCurrency
 
 // Register custom currency based on existing
-CurrencyInfo myCurrency = CurrencyInfo.Get("EUR") with { Code = "EUA", EnglishName = "New Euro" };
+CurrencyInfo myCurrency = CurrencyInfo.FromCode("EUR") with { Code = "EUA", EnglishName = "New Euro" };
 CurrencyInfo.Register(myCurrency);
 
 var myEuro = Currency.FromCode("EUA"); // returns myCurrency

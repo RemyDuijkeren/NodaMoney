@@ -7,7 +7,7 @@ public class CurrencyFromRegionOrCulture
     [Fact]
     public void WhenUsingRegionInfo_ThenCreatingShouldSucceed()
     {
-        var currency = CurrencyInfo.FromRegion(new RegionInfo("NL"));
+        var currency = CurrencyInfo.GetInstance(new RegionInfo("NL"));
 
         currency.Should().NotBeNull();
         currency.Symbol.Should().Be("€");
@@ -18,15 +18,15 @@ public class CurrencyFromRegionOrCulture
     [Fact]
     public void WhenRegionInfoIsNull_ThenCreatingShouldThrow()
     {
-        Action action = () => CurrencyInfo.FromRegion((RegionInfo)null);
+        Action action = () => CurrencyInfo.GetInstance((RegionInfo)null);
 
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void WhenUsingRegionName_ThenCreatingShouldSucceed()
+    public void WhenUsingCultureInfo_ThenCreatingShouldSucceed()
     {
-        var currency = CurrencyInfo.FromRegion("NL");
+        var currency = CurrencyInfo.GetInstance(CultureInfo.CreateSpecificCulture("nl-NL"));
 
         currency.Should().NotBeNull();
         currency.Symbol.Should().Be("€");
@@ -35,17 +35,10 @@ public class CurrencyFromRegionOrCulture
     }
 
     [Fact]
-    public void WhenUsingRegionNameThatIsNull_ThenCreatingShouldThrow()
+    public void WhenUsingNumberFormatInfo_ThenCreatingShouldSucceed()
     {
-        Action action = () => CurrencyInfo.FromRegion((string)null);
-
-        action.Should().Throw<ArgumentNullException>();
-    }
-
-    [Fact]
-    public void WhenUsingCultureInfo_ThenCreatingShouldSucceed()
-    {
-        var currency = CurrencyInfo.FromCulture(CultureInfo.CreateSpecificCulture("nl-NL"));
+        NumberFormatInfo nfi = CultureInfo.CreateSpecificCulture("nl-NL").NumberFormat;
+        var currency = CurrencyInfo.GetInstance(nfi);
 
         currency.Should().NotBeNull();
         currency.Symbol.Should().Be("€");
@@ -56,7 +49,7 @@ public class CurrencyFromRegionOrCulture
     [Fact]
     public void WhenCultureInfoIsNull_ThenCreatingShouldThrow()
     {
-        Action action = () => CurrencyInfo.FromCulture(null);
+        Action action = () => CurrencyInfo.GetInstance((IFormatProvider)null);
 
         action.Should().Throw<ArgumentNullException>();
     }
@@ -64,19 +57,8 @@ public class CurrencyFromRegionOrCulture
     [Fact]
     public void WhenCultureInfoIsNeutralCulture_ThenCreatingShouldThrow()
     {
-        Action action = () => CurrencyInfo.FromCulture(new CultureInfo("en"));
+        Action action = () => CurrencyInfo.GetInstance(new CultureInfo("en"));
 
         action.Should().Throw<ArgumentException>();
-    }
-
-    [Fact]
-    public void WhenUsingCultureName_ThenCreatingShouldSucceed()
-    {
-        var currency = CurrencyInfo.FromRegion("nl-NL");
-
-        currency.Should().NotBeNull();
-        currency.Symbol.Should().Be("€");
-        currency.Code.Should().Be("EUR");
-        currency.EnglishName.Should().Be("Euro");
     }
 }

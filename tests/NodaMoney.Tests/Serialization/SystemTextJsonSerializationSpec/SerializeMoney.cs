@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace NodaMoney.Tests.Serialization.SystemTextJsonSerializationSpec;
 
+[SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters")]
 public class SerializeMoney
 {
     public static IEnumerable<object[]> TestData => new[]
@@ -44,6 +46,8 @@ public class SerializeMoney
 
         var clone = JsonSerializer.Deserialize<Order>(json);
         clone.Should().BeEquivalentTo(order);
+        clone.Total.Should().NotBeNull();
+        clone.Total.Should().Be(money);
     }
 
     [Theory]
@@ -51,7 +55,7 @@ public class SerializeMoney
     public void WhenNullableOrderWithTotal_ThenThisShouldSucceed(Money money, string expectedCurrency, string expectedMoney)
     {
         // Arrange
-        var order = new NullableOrder() { Id = 123, Name = "Foo", Total = money };
+        var order = new NullableOrder { Id = 123, Name = "Foo", Total = money };
         string expected = $$"""{"Id":123,"Total":"{{expectedMoney}}","Name":"Foo"}""";
 
         // Act
@@ -62,6 +66,7 @@ public class SerializeMoney
 
         var clone = JsonSerializer.Deserialize<NullableOrder>(json);
         clone.Should().BeEquivalentTo(order);
+        clone.Total.Should().NotBeNull();
         clone.Total.Should().Be(money);
     }
 

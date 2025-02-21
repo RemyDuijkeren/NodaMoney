@@ -238,7 +238,7 @@ public partial struct Money
     public long ToOACurrency()
     {
         // OACurrency, OLE Automation Currency, supports up to 4 decimals max
-        CurrencyInfo currencyInfo = CurrencyInfo.FromCurrency(Currency);
+        CurrencyInfo currencyInfo = CurrencyInfo.GetInstance(Currency);
         if (currencyInfo.DecimalDigits > 4)
             throw new InvalidCurrencyException($"The currency '{Currency.Code}' requires more than 4 decimal places, which cannot be represented by OLE Automation Currency.");
 
@@ -247,7 +247,7 @@ public partial struct Money
 
     public static Money FromOACurrency(long oaCurrencyValue) => FromOACurrency(oaCurrencyValue, CurrencyInfo.CurrentCurrency);
 
-    public static Money FromOACurrency(long oaCurrencyValue, Currency currency) => FromOACurrency(oaCurrencyValue, CurrencyInfo.FromCurrency(currency));
+    public static Money FromOACurrency(long oaCurrencyValue, Currency currency) => FromOACurrency(oaCurrencyValue, CurrencyInfo.GetInstance(currency));
 
     public static Money FromOACurrency(long oaCurrencyValue, CurrencyInfo currencyInfo)
     {

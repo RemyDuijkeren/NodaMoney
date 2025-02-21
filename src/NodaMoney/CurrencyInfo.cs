@@ -75,8 +75,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
             return FromCulture(currentCulture);
 #else
-            var currentRegion = RegionInfo.CurrentRegion;
-            return currentRegion.Name == "IV" ? NoCurrency : FromRegion(currentRegion);
+            RegionInfo currentRegion = RegionInfo.CurrentRegion;
+            return currentRegion.Name == "IV" ? NoCurrency : GetInstance(currentRegion);
 #endif
         }
     }
@@ -270,111 +270,43 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all currencies that matches.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => CurrencyRegistry.GetAllCurrencies(currencyChars);
 
+    /// <summary>Create an instance of the <see cref="CurrencyInfo"/> based on a ISO 4217 currency code.</summary>
+    /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
+    /// <returns>An instance of the type <see cref="CurrencyInfo"/>.</returns>
+    /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
+    /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
     public static CurrencyInfo FromCode(string code) => CurrencyRegistry.Get(code);
 
-    public static CurrencyInfo FromCurrency(Currency currency) => CurrencyRegistry.Get(currency);
+    /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the provided <see cref="IFormatProvider"/>.</summary>
+    /// <param name="formatProvider">
+    /// The <see cref="IFormatProvider"/> instance used to determine the currency information. This can be a
+    /// <see cref="CurrencyInfo"/>, <see cref="CultureInfo"/>, or <see cref="NumberFormatInfo"/>.
+    /// </param>
+    /// <returns>A <see cref="CurrencyInfo"/> instance based on the provided format provider or the current currency if no suitable provider is found.</returns>
+    /// <exception cref="ArgumentNullException">The value of 'formatProvider' cannot be null.</exception>
+    /// <exception cref="NotSupportedException">Can't create instance from unknown IFormatProvider.</exception>
+    public static CurrencyInfo GetInstance(IFormatProvider formatProvider) =>
+        formatProvider switch
+        {
+            null => throw new ArgumentNullException(nameof(formatProvider)),
+            CurrencyInfo currencyInfo => currencyInfo,
+            CultureInfo cultureInfo => FromCulture(cultureInfo),
+            NumberFormatInfo numberFormatInfo => FromNumberFormatInfo(numberFormatInfo),
+            _ => throw new NotSupportedException($"Can't create instance from IFormatProvider {formatProvider.GetType()}!")
+        };
 
-    /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified <see cref="RegionInfo"/>.</summary>
+    /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance used within the specified <see cref="RegionInfo"/>.</summary>
     /// <param name="region"><see cref="RegionInfo"/> to get a <see cref="Currency"/> for.</param>
     /// <returns>The <see cref="CurrencyInfo"/> instance used within the specified <see cref="RegionInfo"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'region' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
-    public static CurrencyInfo FromRegion(RegionInfo region)
-    {
-        if (region == null)
-            throw new ArgumentNullException(nameof(region));
+    public static CurrencyInfo GetInstance(RegionInfo region) =>
+        region != null ? FromCode(region.ISOCurrencySymbol) : throw new ArgumentNullException(nameof(region));
 
-        return FromCode(region.ISOCurrencySymbol);
-    }
-
-    /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified name of the region or culture.</summary>
-    /// <param name="name">
-    /// <para>A string that contains a two-letter code defined in ISO 3166 for country/region.</para>
-    /// <para>-or-</para>
-    /// <para>A string that contains the culture name for a specific culture, custom culture, or Windows-only culture. If the
-    /// culture name is not in RFC 4646 format, your application should specify the entire culture name instead of just the
-    /// country/region. See also <seealso cref="System.Globalization.RegionInfo(string)"/>.</para>
-    /// </param>
-    /// <returns>The <see cref="CurrencyInfo"/> instance used within the specified region.</returns>
-    /// <exception cref="ArgumentNullException">The value of 'name' cannot be null.</exception>
-    public static CurrencyInfo FromRegion(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentNullException(nameof(name));
-
-        return FromRegion(new RegionInfo(name));
-    }
-
-    /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified <see cref="CultureInfo"/>.</summary>
-    /// <param name="culture"><see cref="CultureInfo"/> to get a <see cref="Currency"/> for.</param>
-    /// <returns>The <see cref="CurrencyInfo"/> instance used within the specified <see cref="CultureInfo"/>.</returns>
-    /// <exception cref="ArgumentNullException">The value of 'culture' cannot be null.</exception>
-    /// <exception cref="ArgumentException">
-    /// Culture is a neutral culture, from which no region information can be extracted -or-
-    /// The 'code' is an unknown ISO 4217 currency code.
-    /// </exception>
-    public static CurrencyInfo FromCulture(CultureInfo culture)
-    {
-        if (culture == null)
-            throw new ArgumentNullException(nameof(culture));
-        if (Equals(culture, CultureInfo.InvariantCulture))
-            throw new ArgumentException("Culture {0} is a invariant culture, from which no region information can be extracted!", culture.Name);
-
-        return FromRegion(culture.Name);
-    }
-
-    private static CurrencyInfo FromNumberFormatInfo(NumberFormatInfo nfi)
-    {
-        if (nfi == null)
-            throw new ArgumentNullException(nameof(nfi));
-        if (string.IsNullOrEmpty(nfi.CurrencySymbol))
-            throw new ArgumentException("Currency symbol in NumberFormatInfo is null or empty!", nameof(nfi));
-        if (nfi.CurrencySymbol == GenericCurrencySign)
-            throw new ArgumentException("Currency symbol in NumberFormatInfo is generic currency sign!", nameof(nfi));
-        return Money.ParseCurrencyInfo(nfi.CurrencySymbol.AsSpan()); // throws FormatException if invalid
-    }
-
-    /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the provided <see cref="IFormatProvider"/>.</summary>
-    /// <param name="formatProvider">The format provider used to determine the currency information. This can be a <see cref="CurrencyInfo"/>, <see cref="CultureInfo"/>, or <see cref="NumberFormatInfo"/>. If null, the current currency is returned.</param>
-    /// <returns>A <see cref="CurrencyInfo"/> instance based on the provided format provider or the current currency if no suitable provider is found.</returns>
-    public static CurrencyInfo GetInstance(IFormatProvider? formatProvider)
-    {
-        if (formatProvider == null)
-            return CurrentCurrency;
-
-        if (formatProvider is CurrencyInfo currencyInfo)
-            return currencyInfo;
-
-        if (formatProvider is CultureInfo cultureInfo)
-            return FromCulture(cultureInfo);
-
-        if (formatProvider is NumberFormatInfo numberFormatInfo)
-            return FromNumberFormatInfo(numberFormatInfo);
-
-        return CurrentCurrency;
-
-        // return formatProvider == null ?
-        //     CurrentInfo : // Fast path for a null provider
-        //     GetProviderNonNull(formatProvider);
-        //
-        // static NumberFormatInfo GetProviderNonNull(IFormatProvider provider)
-        // {
-        //     // Fast path for a regular CultureInfo
-        //     if (provider is CultureInfo cultureProvider && !cultureProvider._isInherited)
-        //     {
-        //         return cultureProvider._numInfo ?? cultureProvider.NumberFormat;
-        //     }
-        //
-        //     return
-        //         provider as NumberFormatInfo ?? // Fast path for an NFI
-        //         provider.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo ??
-        //         CurrentInfo;
-        // }
-    }
-
-    //public static CurrencyInfo GetInstance(RegionInfo? region);
-    //public static CurrencyInfo GetInstance(Currency? currency);
-    //public static CurrencyInfo GetInstance(string? code);
+    /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the specified <see cref="Currency"/>.</summary>
+    /// <param name="currency">The <see cref="Currency"/> for which the <see cref="CurrencyInfo"/> should be retrieved.</param>
+    /// <returns>An instance of <see cref="CurrencyInfo"/> corresponding to the provided <see cref="Currency"/>.</returns>
+    public static CurrencyInfo GetInstance(Currency currency) => CurrencyRegistry.Get(currency);
 
     /// <inheritdoc />
     public object? GetFormat(Type? formatType)
@@ -474,6 +406,35 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         code = Code;
         number = Number;
         symbol = Symbol;
+    }
+
+    /// <summary>Creates an instance of the <see cref="CurrencyInfo"/> used within the specified <see cref="CultureInfo"/>.</summary>
+    /// <param name="culture"><see cref="CultureInfo"/> to get a <see cref="Currency"/> for.</param>
+    /// <returns>The <see cref="CurrencyInfo"/> instance used within the specified <see cref="CultureInfo"/>.</returns>
+    /// <exception cref="ArgumentNullException">The value of 'culture' cannot be null.</exception>
+    /// <exception cref="ArgumentException">
+    /// Culture is a neutral culture, from which no region information can be extracted -or-
+    /// The 'code' is an unknown ISO 4217 currency code.
+    /// </exception>
+    private static CurrencyInfo FromCulture(CultureInfo culture)
+    {
+        if (culture == null)
+            throw new ArgumentNullException(nameof(culture));
+        if (Equals(culture, CultureInfo.InvariantCulture))
+            throw new ArgumentException("Culture {0} is a invariant culture, from which no region information can be extracted!", culture.Name);
+
+        return GetInstance(new RegionInfo(culture.Name));
+    }
+
+    private static CurrencyInfo FromNumberFormatInfo(NumberFormatInfo nfi)
+    {
+        if (nfi == null)
+            throw new ArgumentNullException(nameof(nfi));
+        if (string.IsNullOrEmpty(nfi.CurrencySymbol))
+            throw new ArgumentException("Currency symbol in NumberFormatInfo is null or empty!", nameof(nfi));
+        if (nfi.CurrencySymbol == GenericCurrencySign)
+            throw new ArgumentException("Currency symbol in NumberFormatInfo is generic currency sign!", nameof(nfi));
+        return Money.ParseCurrencyInfo(nfi.CurrencySymbol.AsSpan()); // throws FormatException if invalid
     }
 
     /// <summary>

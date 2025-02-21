@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;
 
+[SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters")]
 public class SerializeMoney
 {
     public static IEnumerable<object[]> TestData => new[]
