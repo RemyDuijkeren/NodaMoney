@@ -218,30 +218,36 @@ Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 
 ```C#
 // Build custom currency
-var builder = new CurrencyInfoBuilder("BTC", "virtual")
+CurrencyInfo myCurrency = CurrencyInfo.New("BTA") with
 {
-    EnglishName = "Bitcoin",
-    Symbol = "฿",
-    ISONumber = "123", // iso number
-    DecimalDigits = 8
+    Symbol = "$",
+    Number = 666,
+    InternationalSymbol = "CC$",
+    MinorUnit = MinorUnit.Two,
+    EnglishName = "My Custom Currency",
+    IsIso4217 = false,
+    AlternativeSymbols = ["cc$"],
+    IntroducedOn = new DateTime(2022, 1, 1),
+    ExpiredOn = new DateTime(2030, 1, 1),
 };
 
-// Build, but will not register it
-CurrencyInfo bitcoin = builder.Build();
+// Will fails because it's not registred
+var notExisting = CurrencyInfo.FromCode("BTA"); // throw exception
 
-// Build and register it for the life-time of the app domain in the namespace 'virtual'
-CurrencyInfo bitcoin = builder.Register();
-Money bitcoins = new Money(1.2, "BTC"); // works if no overlap with other namespaces
-Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
+// Register it for the life-time of the app domain
+CurrencyInfo.Register(myCurrency);
+var exists = CurrencyInfo.FromCode("BTA"); // returns myCurrency
+
+// Register custom currency based on existing
+CurrencyInfo myCurrency = CurrencyInfo.Get("EUR") with { Code = "EUA", EnglishName = "New Euro" };
+CurrencyInfo.Register(myCurrency);
+
+var myEuro = Currency.FromCode("EUA"); // returns myCurrency
 
 // Replace ISO 4217 currency for the life-time of the app domain
-CurrencyInfo oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+CurrencyInfo oldEuro = CurrencyInfo.Unregister("EUR");
+CurrencyInfo newEuro = oldEuro with { Symbol = "€U", EnglishName = "New Euro" };
+CurrencyInfo.Register(newEuro);
 
-var builder = new CurrencyBuilder("EUR", "ISO-4217");
-builder.LoadDataFromCurrencyInfo(oldEuro);
-builder.EnglishName = "New Euro";
-builder.DecimalDigits = 1;
-builder.Register();
-
-Currency newEuro = Currency.FromCode("EUR");
+var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```

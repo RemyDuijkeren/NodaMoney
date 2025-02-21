@@ -55,7 +55,7 @@ static class CurrencyRegistry
     {
         lock (s_changeLock)
         {
-            if (s_lookupByCurrency.ContainsKey(currency))
+            if (s_lookupByCode.ContainsKey(currency.Code))
             {
                 return false;
             }

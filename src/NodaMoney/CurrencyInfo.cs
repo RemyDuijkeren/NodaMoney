@@ -27,6 +27,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
     public const string GenericCurrencySign = "¤";
 
+    const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
+
     readonly string? _internationalSymbol;
 
     // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
@@ -48,7 +50,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     internal CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName = "", string Symbol = CurrencyInfo.GenericCurrencySign)
     {
         this.Code = Code ?? throw new ArgumentNullException(nameof(Code));
-        this.Number = Number;
+        this.Number = Number; // TODO: Should reserve 1-999 for ISO-4217? 0 and >999 for non-ISO?
         this.MinorUnit = MinorUnit;
         this.EnglishName = EnglishName ?? string.Empty;
         this.Symbol = Symbol ?? CurrencyInfo.GenericCurrencySign;
@@ -108,6 +110,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// </remarks>
     public IReadOnlyList<string> AlternativeSymbols { get; init; } = [];
 
+    /// <summary>Indicates whether the currency is in the ISO 4217 standard.</summary>
+    /// <remarks>
+    /// ISO 4217 is an international standard for defining codes for the representation of currencies and funds.
+    /// This property specifies whether the currency code conforms to this standard.
+    /// </remarks>
     public bool IsIso4217 { get; init; } = true;
 
     /// <summary>Gets the date when the currency is expired on (list 3 Historic).</summary>
@@ -203,20 +210,48 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
 
-    /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
-    public MinorUnit MinorUnit { get; init; }
-
-    /// <summary>The english name of the currency</summary>
-    public string EnglishName { get; init; }
-
-    /// <summary>The (local) currency symbol.</summary>
-    public string Symbol { get; init; }
-
-    /// <summary>The international currency symbol.</summary>
-    public string InternationalSymbol
+    /// <summary>Creates a new instance of <see cref="CurrencyInfo"/> with the specified three-character currency code.</summary>
+    /// <param name="code">The (ISO-4217) three-character currency code.</param>
+    /// <remarks>The returned <see cref="CurrencyInfo"/> can be altered further by using the record <c>with { }</c> syntax.</remarks>
+    /// <returns>The created <see cref="CurrencyInfo"/> instance.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the specified code is null or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when the specified code is not exactly three characters long or does not consist of three uppercase letters.</exception>
+    public static CurrencyInfo New(string code)
     {
-        get => _internationalSymbol ?? Symbol;
-        init => _internationalSymbol = value;
+        ValidateCurrencyCode(code);
+
+        return new CurrencyInfo(code, 0, MinorUnit.NotApplicable) { IsIso4217 = false };
+    }
+
+    /// <summary>Registers the specified <see cref="CurrencyInfo"/> as a custom currency for the current AppDomain.</summary>
+    /// <param name="currencyInfo">The given <see cref="CurrencyInfo"/></param>
+    /// <exception cref="ArgumentNullException">Thrown when the specified code is null or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when the specified code is not exactly three characters long or does not consist of three uppercase letters.</exception>
+    /// <exception cref="InvalidCurrencyException">The custom currency is already registered.</exception>
+    public static void Register(CurrencyInfo currencyInfo)
+    {
+        ValidateCurrencyCode(currencyInfo.Code);
+
+        if (!CurrencyRegistry.TryAdd(currencyInfo))
+            throw new InvalidCurrencyException($"The currency {currencyInfo.Code} is already registered.");
+    }
+
+    /// <summary>Unregisters the specified currency code from the current AppDomain and returns it.</summary>
+    /// <param name="code">The name of the currency to unregister.</param>
+    /// <returns>An instance of the type <see cref="CurrencyInfo"/>.</returns>
+    /// <exception cref="ArgumentException">code specifies a currency that is not found in the register.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="code" /> is <see langword="null" /> or empty.</exception>
+    /// <exception cref="InvalidCurrencyException"> when currency is not registered.</exception>
+    public static CurrencyInfo Unregister(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            throw new ArgumentNullException(nameof(code));
+
+        CurrencyInfo currencyInfo = FromCode(code);
+        if (CurrencyRegistry.TryRemove(currencyInfo))
+            return currencyInfo;
+
+        throw new InvalidCurrencyException($"Can't unregister the currency {code} because it is not registered!");
     }
 
     /// <summary>Check a value indication whether currency is valid on a given date.</summary>
@@ -573,5 +608,21 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
             'C'
             : '\0';
+    }
+
+    private static void ValidateCurrencyCode(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            throw new ArgumentNullException(nameof(code));
+
+        if (code.Length != 3)
+            throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+
+        // Only capital letters
+        foreach (var c in code)
+        {
+            if (c is < 'A' or > 'Z')
+                throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+        }
     }
 }

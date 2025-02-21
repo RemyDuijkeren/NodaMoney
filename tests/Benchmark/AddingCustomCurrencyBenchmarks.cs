@@ -6,54 +6,51 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class AddingCustomCurrencyBenchmarks
 {
-    readonly CurrencyInfoBuilder _builder = new CurrencyInfoBuilder("BTX")
+    readonly CurrencyInfo _newCurrency = CurrencyInfo.New("BTX") with
     {
         EnglishName = "Bitcoin",
         Symbol = "฿",
-        NumericCode = "123", // iso number
-        DecimalDigits = 8
+        Number = 123, // iso number
+        MinorUnit = MinorUnit.Eight,
     };
 
     [Benchmark]
-    public CurrencyInfoBuilder CreateBuilder()
+    public CurrencyInfo Build()
     {
-        return new CurrencyInfoBuilder("BTX")
+        var ci = CurrencyInfo.New("BTX") with
         {
             EnglishName = "Bitcoin",
             Symbol = "฿",
-            NumericCode = "123", // iso number
-            DecimalDigits = 8
+            Number = 123, // iso number
+            MinorUnit = MinorUnit.Eight,
         };
+
+        return ci;
     }
 
     [Benchmark]
-    public Currency Build()
+    public void Register()
     {
-        return _builder.Build();
+        CurrencyInfo.Register(_newCurrency);
     }
 
-    //[Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
-    public Currency Register()
+    [Benchmark]
+    public CurrencyInfo Unregister()
     {
-        return _builder.Register();
+        return CurrencyInfo.Unregister("USD");
     }
 
-    //[Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
-    public Currency Unregister()
+    [Benchmark]
+    public void Replace()
     {
-        return CurrencyInfoBuilder.Unregister("USD");
-    }
+        CurrencyInfo oldEuro = CurrencyInfo.Unregister("EUR");
 
-    // [Benchmark] NodaMoney.InvalidCurrencyException: The currency BTC is already registered in virtual
-    public Currency Replace()
-    {
-        CurrencyInfo oldEuro = CurrencyInfoBuilder.Unregister("EUR");
+        var newEuro = oldEuro with
+        {
+            EnglishName = "New Euro",
+            MinorUnit = MinorUnit.One
+        };
 
-        var builder = new CurrencyInfoBuilder("EUR");
-        builder.LoadDataFromCurrencyInfo(oldEuro);
-        builder.EnglishName = "New Euro";
-        builder.DecimalDigits = 1;
-
-        return builder.Register();
+        CurrencyInfo.Register(newEuro);
     }
 }

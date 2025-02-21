@@ -28,19 +28,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
 
 ### Changed
+- Big overall performance improvement on:
+  - init of currency (32x faster) and money (20x faster)
+  - parsing money (110x faster)
+  - smaller footprint and memory allocation (30x fewer allocations)
 - JSON Serialization format is changed from `{ "Cost": {"Amount":1.23,"Currency":"USD"} }` to `{ "Cost":"USD 1.23" }`. This is a breaking change
   for JSON serialization, but deserialization of the old format is supported for migration purposes.
 - XML Serialization format is change from `<Money Amount="765.43" Currency="USD" />` to `<Money Currency="USD">765.43</Money>`.
   This is a breaking change for XML serialization, but deserialization of the old format is supported for migration purposes.
 - Currency is now a 2byte struct and only contains basic information. Use CurrencyInfo to retrieve more info for a Currency.
-- CurrencyBuilder is renamed to CurrencyInfoBuilder and returns CurrencyInfo instead of Currency.
 - Formatting format G is now Currency format with currency code instead of currency symbol
 - Formatting format F is now Fixed point format (same as for Decimal)
 - Formatting format C is Currency format with currency symbol, but if there is none, currency code will be used.
-- Performance improvement on:
-  - init of currency (32x faster) and money (20x faster)
-  - parsing money (110x faster)
-  - smaller footprint and memory allocation (30x fewer allocations)
 - Currency.Number is changed from `string` to `short`
 - Currency.DecimalDigits is changed from `decimal` to `int`
 - Currency.MinorUnit changed to total number of minor units of one currency major unit
@@ -48,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
 - Removed support .NET Core 3.1, .NET 4.0 and .NET 4.5 (implicitly supported by .NET Standard 2.0)
+- CurrencyBuilder is removed (use CurrencyInfo to (un)register).
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
 - Formatting format F is removed (replaced by format L)
