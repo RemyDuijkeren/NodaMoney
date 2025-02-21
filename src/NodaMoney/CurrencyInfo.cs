@@ -23,6 +23,19 @@ namespace NodaMoney;
 /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
 public record CurrencyInfo : IFormatProvider, ICustomFormatter
 {
+    /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
+    /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
+    public const string GenericCurrencySign = "¤";
+
+    readonly string? _internationalSymbol;
+
+    // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
+
+    // static CurrencyInfo()
+    // {
+    //     s_currentThreadCurrency = NoCurrency;
+    // }
+
     /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency and
     /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
@@ -41,22 +54,59 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         this.Symbol = Symbol ?? CurrencyInfo.GenericCurrencySign;
     }
 
-    /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
-    /// <remarks>See https://en.wikipedia.org/wiki/Currency_sign_(typography). </remarks>
-    public const string GenericCurrencySign = "¤";
-
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
-    readonly string? _internationalSymbol;
+    /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
+    /// <value>The Currency that represents the country/region used by the current thread.</value>
+    public static CurrencyInfo CurrentCurrency
+    {
+        get
+        {
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            // In >= .NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
+            // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
+            var currentCulture = CultureInfo.CurrentCulture;
+            if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
+            {
+                return NoCurrency;
+            }
 
-    // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
+            return FromCulture(currentCulture);
+#else
+            var currentRegion = RegionInfo.CurrentRegion;
+            return currentRegion.Name == "IV" ? NoCurrency : FromRegion(currentRegion);
+#endif
+        }
+    }
 
-    // static CurrencyInfo()
-    // {
-    //     s_currentThreadCurrency = NoCurrency;
-    // }
+    /// <summary>The (ISO-4217) three-character code of the currency.</summary>
+    public string Code { get; init; }
 
-    public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
+    /// <summary>The (ISO-4217) number of the currency.</summary>
+    public short Number { get; init; }
+
+    /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
+    public MinorUnit MinorUnit { get; init; }
+
+    /// <summary>The english name of the currency</summary>
+    public string EnglishName { get; init; }
+
+    /// <summary>The (local) currency symbol.</summary>
+    public string Symbol { get; init; }
+
+    /// <summary>The international currency symbol.</summary>
+    public string InternationalSymbol
+    {
+        get => _internationalSymbol ?? Symbol;
+        init => _internationalSymbol = value;
+    }
+
+    /// <summary>Gets a collection of alternative symbols used to represent the currency.</summary>
+    /// <remarks>
+    /// This property includes any unconventional or secondary symbols that may be associated with the currency,
+    /// in addition to its primary symbol.
+    /// </remarks>
+    public IReadOnlyList<string> AlternativeSymbols { get; init; } = [];
 
     public bool IsIso4217 { get; init; } = true;
 
@@ -151,11 +201,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
     public bool IsHistoric => !IsActiveOn(DateTime.Today);
 
-    /// <summary>The (ISO-4217) three-character code of the currency.</summary>
-    public string Code { get; init; }
-
-    /// <summary>The (ISO-4217) number of the currency.</summary>
-    public short Number { get; init; }
+    public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
 
     /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
     public MinorUnit MinorUnit { get; init; }
@@ -173,42 +219,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         init => _internationalSymbol = value;
     }
 
-    /// <summary>Gets a collection of alternative symbols used to represent the currency.</summary>
-    /// <remarks>
-    /// This property includes any unconventional or secondary symbols that may be associated with the currency,
-    /// in addition to its primary symbol.
-    /// </remarks>
-    public IReadOnlyList<string> AlternativeSymbols { get; init; } = [];
-
     /// <summary>Check a value indication whether currency is valid on a given date.</summary>
     /// <param name="date">The date on which the Currency should be valid.</param>
     /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
     public bool IsActiveOn(DateTime date) =>
         (!IntroducedOn.HasValue || IntroducedOn <= date) &&
         (!ExpiredOn.HasValue || ExpiredOn >= date);
-
-    /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
-    /// <value>The Currency that represents the country/region used by the current thread.</value>
-    public static CurrencyInfo CurrentCurrency
-    {
-        get
-        {
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            // In >= .NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
-            // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
-            var currentCulture = CultureInfo.CurrentCulture;
-            if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
-            {
-                return NoCurrency;
-            }
-
-            return FromCulture(currentCulture);
-#else
-            var currentRegion = RegionInfo.CurrentRegion;
-            return currentRegion.Name == "IV" ? NoCurrency : FromRegion(currentRegion);
-#endif
-        }
-    }
 
     /// <summary>Get all currencies.</summary>
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies.</returns>
@@ -281,17 +297,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         if (nfi.CurrencySymbol == GenericCurrencySign)
             throw new ArgumentException("Currency symbol in NumberFormatInfo is generic currency sign!", nameof(nfi));
         return Money.ParseCurrencyInfo(nfi.CurrencySymbol.AsSpan()); // throws FormatException if invalid
-    }
-
-    /// <summary>Deconstructs the current <see cref="CurrencyInfo" /> instance into its components.</summary>
-    /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>
-    /// <param name="symbol">The currency symbol of the current instance.</param>
-    /// <param name="number">The numeric currency code (ISO-4217) of the current instance.</param>
-    public void Deconstruct(out string code, out string symbol, out short number)
-    {
-        code = Code;
-        number = Number;
-        symbol = Symbol;
     }
 
     /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the provided <see cref="IFormatProvider"/>.</summary>
@@ -423,6 +428,17 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
             _ => money.Amount.ToString(format, nfi)
         };
+    }
+
+    /// <summary>Deconstructs the current <see cref="CurrencyInfo" /> instance into its components.</summary>
+    /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>
+    /// <param name="symbol">The currency symbol of the current instance.</param>
+    /// <param name="number">The numeric currency code (ISO-4217) of the current instance.</param>
+    public void Deconstruct(out string code, out string symbol, out short number)
+    {
+        code = Code;
+        number = Number;
+        symbol = Symbol;
     }
 
     /// <summary>
