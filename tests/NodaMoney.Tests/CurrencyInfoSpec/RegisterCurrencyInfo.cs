@@ -3,12 +3,12 @@ namespace NodaMoney.Tests.CurrencyInfoSpec;
 public class RegisterCurrencyInfo
 {
     [Fact]
-    public void WhenBuildNewWithDefaults_ReturnDefaultAndNonIso4217AndGenericCurrencySign()
+    public void WhenCreateWithDefaults_ReturnDefaultWithNonIso4217AndGenericCurrencySign()
     {
         // Arrange
 
         // Act
-        CurrencyInfo result = CurrencyInfo.New("BTA");
+        CurrencyInfo result = CurrencyInfo.Create("BTA");
 
         // Assert
         result.Code.Should().Be("BTA");
@@ -24,12 +24,12 @@ public class RegisterCurrencyInfo
     }
 
     [Fact]
-    public void WhenBuildCodeIsNull_ThrowArgumentNullException()
+    public void WhenCreateCodeIsNull_ThrowArgumentNullException()
     {
         // Arrange
 
         // Act
-        Action action = () => CurrencyInfo.New(null!);
+        Action action = () => CurrencyInfo.Create(null!);
 
         // Assert
         action.Should().Throw<ArgumentNullException>();
@@ -41,24 +41,24 @@ public class RegisterCurrencyInfo
     [InlineData("AB")]
     [InlineData("ABCD")]
     [InlineData("Abc")]
-    public void WhenBuildCodeIsInvalid_ThrowArgumentException(string code)
+    public void WhenCreateCodeIsInvalid_ThrowArgumentException(string code)
     {
         // Arrange
 
         // Act
-        Action action = () => CurrencyInfo.New(code);
+        Action action = () => CurrencyInfo.Create(code);
 
         // Assert
         action.Should().Throw<ArgumentException>();
     }
 
     [Fact]
-    public void WhenBuildNewWith_ReturnCurrencyInfo()
+    public void WhenCreateWith_ReturnCurrencyInfo()
     {
         // Arrange
 
         // Act
-        CurrencyInfo result = CurrencyInfo.New("BTA") with
+        CurrencyInfo result = CurrencyInfo.Create("BTA") with
         {
             Symbol = "$",
             Number = 666,
@@ -85,10 +85,10 @@ public class RegisterCurrencyInfo
     }
 
     [Fact]
-    public void WhenBuild_ShouldNotBeRegistered()
+    public void WhenCreate_ShouldNotBeRegistered()
     {
         // Arrange
-        CurrencyInfo bta = CurrencyInfo.New("BTA");
+        CurrencyInfo bta = CurrencyInfo.Create("BTA");
 
         // Act
         Action action = () => CurrencyInfo.FromCode("BTA");
@@ -101,7 +101,7 @@ public class RegisterCurrencyInfo
     public void WhenRegister_ShouldBeRegistered()
     {
         // Arrange
-        CurrencyInfo ci = CurrencyInfo.New("BTZ");
+        CurrencyInfo ci = CurrencyInfo.Create("BTZ");
 
         // Act
         CurrencyInfo.Register(ci);
@@ -119,7 +119,7 @@ public class RegisterCurrencyInfo
     public void WhenRegisterExistingCode_ThrowInvalidCurrencyException()
     {
         // Arrange
-        CurrencyInfo ci = CurrencyInfo.New("EUR");
+        CurrencyInfo ci = CurrencyInfo.Create("EUR");
 
         // Act
         Action action = () => CurrencyInfo.Register(ci);

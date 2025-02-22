@@ -6,7 +6,7 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class AddingCustomCurrencyBenchmarks
 {
-    readonly CurrencyInfo _newCurrency = CurrencyInfo.New("BTX") with
+    readonly CurrencyInfo _newCurrency = CurrencyInfo.Create("BTX") with
     {
         EnglishName = "Bitcoin",
         Symbol = "฿",
@@ -17,7 +17,7 @@ public class AddingCustomCurrencyBenchmarks
     [Benchmark]
     public CurrencyInfo Build()
     {
-        var ci = CurrencyInfo.New("BTX") with
+        var ci = CurrencyInfo.Create("BTX") with
         {
             EnglishName = "Bitcoin",
             Symbol = "฿",

@@ -216,7 +216,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>The created <see cref="CurrencyInfo"/> instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the specified code is null or whitespace.</exception>
     /// <exception cref="ArgumentException">Thrown when the specified code is not exactly three characters long or does not consist of three uppercase letters.</exception>
-    public static CurrencyInfo New(string code)
+    public static CurrencyInfo Create(string code)
     {
         ValidateCurrencyCode(code);
 

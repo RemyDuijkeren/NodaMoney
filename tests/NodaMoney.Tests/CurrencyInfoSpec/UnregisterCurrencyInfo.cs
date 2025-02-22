@@ -24,7 +24,7 @@ public class UnregisterCurrencyInfo
     public void WhenUnregisterNonIso_ShouldNotBeRegistered()
     {
         // Arrange
-        var ci = CurrencyInfo.New("XYZ") with
+        var ci = CurrencyInfo.Create("XYZ") with
         {
             EnglishName = "Xyz",
             Symbol = "฿",

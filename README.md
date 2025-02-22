@@ -233,8 +233,8 @@ Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 **Create custom Currency**
 
 ```C#
-// Build custom currency
-CurrencyInfo myCurrency = CurrencyInfo.New("BTA") with
+// Create custom currency
+CurrencyInfo myCurrency = CurrencyInfo.Create("BTA") with
 {
     Symbol = "$",
     Number = 1023,
@@ -244,7 +244,7 @@ CurrencyInfo myCurrency = CurrencyInfo.New("BTA") with
     IsIso4217 = false,
     AlternativeSymbols = ["cc$"],
     IntroducedOn = new DateTime(2022, 1, 1),
-    ExpiredOn = new DateTime(2030, 1, 1),
+    ExpiredOn = new DateTime(2030, 1, 1)
 };
 
 // Fails because it's not registred
@@ -254,13 +254,13 @@ var notExisting = CurrencyInfo.FromCode("BTA"); // throw exception
 CurrencyInfo.Register(myCurrency);
 var exists = CurrencyInfo.FromCode("BTA"); // returns myCurrency
 
-// Register custom currency based on existing
+// Create custom currency based on existing currency
 CurrencyInfo myCurrency = CurrencyInfo.FromCode("EUR") with { Code = "EUA", EnglishName = "New Euro" };
 CurrencyInfo.Register(myCurrency);
 
 var myEuro = Currency.FromCode("EUA"); // returns myCurrency
 
-// Replace ISO 4217 currency for the life-time of the app domain
+// Replace currency for the life-time of the app domain
 CurrencyInfo oldEuro = CurrencyInfo.Unregister("EUR");
 CurrencyInfo newEuro = oldEuro with { Symbol = "€U", EnglishName = "New Euro" };
 CurrencyInfo.Register(newEuro);

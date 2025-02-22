@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
 - Removed support .NET Core 3.1, .NET 4.0 and .NET 4.5 (implicitly supported by .NET Standard 2.0)
-- CurrencyBuilder is removed (use CurrencyInfo to (un)register).
+- CurrencyBuilder is removed (use CurrencyInfo to Create, Register and Unregister).
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
 - Formatting format F is removed (replaced by format L)
