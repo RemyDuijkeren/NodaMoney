@@ -4,7 +4,7 @@ using NodaMoney;
 namespace Benchmark;
 
 [MemoryDiagnoser]
-public class AddingCustomCurrencyBenchmarks
+public class CreateCustomCurrencyBenchmarks
 {
     readonly CurrencyInfo _newCurrency = CurrencyInfo.Create("BTX") with
     {
@@ -15,7 +15,7 @@ public class AddingCustomCurrencyBenchmarks
     };
 
     [Benchmark]
-    public CurrencyInfo Build()
+    public CurrencyInfo Create()
     {
         var ci = CurrencyInfo.Create("BTX") with
         {
@@ -26,18 +26,6 @@ public class AddingCustomCurrencyBenchmarks
         };
 
         return ci;
-    }
-
-    [Benchmark]
-    public void Register()
-    {
-        CurrencyInfo.Register(_newCurrency);
-    }
-
-    [Benchmark]
-    public CurrencyInfo Unregister()
-    {
-        return CurrencyInfo.Unregister("USD");
     }
 
     [Benchmark]
