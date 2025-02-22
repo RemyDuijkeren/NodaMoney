@@ -4,18 +4,20 @@ title: NodaMoney
 
 NodaMoney
 =========
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
+<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png"></img>
 You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
-[github releases page](https://github.com/remyvd/NodaMoney/releases).
+[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
 
-If you'd like to work with the bleeding edge, you can use our [custom Nuget feed](https://ci.appveyor.com/nuget/nodamoney-pmrx3j3p32f2).
+If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
 Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
 
 For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
 [guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/o656q9bagslgusj9?svg=true)](https://ci.appveyor.com/project/remyvd/nodamoney)
-[![Coverage Status](https://coveralls.io/repos/remyvd/NodaMoney/badge.svg?branch=master)](https://coveralls.io/r/remyvd/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
+[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
 
 See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
@@ -25,7 +27,7 @@ NodaMoney provides a library that treats Money as a first class citizen in .NET 
 and formatting.
 
 We have the [decimal type](http://msdn.microsoft.com/en-us/library/364x0z75.aspx) in .NET to store an amount of money, which can
-be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units, 
+be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units,
 formatting, etc. The .NET Framework has the System.Globalization namespace that helps with formatting of money in different cultures and regions,
 but it only captures some info about currencies, but not everything.
 
@@ -34,81 +36,131 @@ conversion, etc. that motivates to have a Money type that contains all the domai
 his book [Patterns of Enterprise Application Architecture](http://martinfowler.com/eaaCatalog/money.html)
 
 NodaMoney represents the .NET counterpart of java library [JodaMoney](http://www.joda.org/joda-money/), like NodaTime is the .NET
-counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and 
+counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and
 obvious. This is because the requirements for these algorithms vary widely between domains. This library is intended to act as the
 base layer, providing classes that should be in the .NET Framework. It complies with the currencies in [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).
 
 Usage
 -----
-At the moment there are four classes:
-- Currency: An immutable structure that represents a currency. It can give all ISO 4217 and custom currencies.
+The main classes are:
 - Money: An immutable structure that represents money in a specified currency.
-- ExchangeRate: A stucture that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
+- Currency: A small immutable structure that represents a currency unit.
+- CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
+and custom currencies. It auto-converts to Currency.
+- ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
 from one currency to another currency.
-- CurrencyBuilder: Defines a custom currency that is new or based on another currency.
 
-**Initalizing money**
+**Initializing Currency**
 
 ```C#
-// define money with explicit currency
-var euros = new Money(6.54m, Currency.FromCode("EUR"));
-var euros = new Money(6.54m, "EUR");
+// Create Currency Unit
+Currency euro = Currency.FromCode("EUR");
 
-// define money explicit using helper method for most used currencies in the world
-var money = Money.Euro(6.54m);
-var money = Money.USDollar(6.54m);
-var money = Money.PoundSterling(6.54m);
-var money = Money.Yen(6);
+// Create CurrencyInfo (for metadata about Currency)
+CurrencyInfo info = CurrencyInfo.FromCode("EUR");
+CurrencyInfo info = CurrencyInfo.GetInstance(euro); // Currency to CurrencyInfo
+Currencyinfo info = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
+Currencyinfo info = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
+Currencyinfo info = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
+CurrencyInfo info = CurrencyInfo.CurrentCurrency;
 
-// define money implicit using currency of current culture/region
-var money = new Money(6.54m);
-Money money = 6.54m;
-Money money = 6;
-Money money = (Money)6.54; // need explict cast from double data type  
+Currency euro = info; // implicit cast to Currency Unit
+```
 
-// auto-rounding to the minor unit will take place with MidpointRounding.ToEven
-// also known as banker's rounding 
-var euro = new Money(765.425m, "EUR"); // EUR 765.42
-var euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
+**Initializing money**
+
+```C#
+// Define money with explicit currency
+Money euros = new Money(6.54m, "EUR");
+Money euros = new (6.54m, "EUR");
+Money euros = new Money(6.54m, Currency.FromCode("EUR"));
+Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
+
+// Define money explicit using helper method for most used currencies in the world
+Money money = Money.Euro(6.54m);
+Money money = Money.USDollar(6.54m);
+Money money = Money.PoundSterling(6.54m);
+Money money = Money.Yen(6);
+
+// Implicit Currency based on current culture/region.
+// When culture is 'NL-nl' code below results in Euros.
+Money money = new Money(6.54m);
+Money money = new (6.54m);
+Money money = (Money)6.54m;
+Money money = (Money)6;
+Money money = (Money)6.54;
+
+// Auto-rounding to the minor unit will take place with MidpointRounding.ToEven
+// also known as banker's rounding
+Money euro = new Money(765.425m, "EUR"); // EUR 765.42
+Money euro = new Money(765.425m, "EUR", MidpointRounding.AwayFromZero); // EUR 765.43
+
+// Deconstruct money
+Money money = new Money(10m, "EUR");
+var (amount, currency) = money;
 ```
 
 **Money operations**
 
 ```C#
-var euro10 = Money.Euro(10);
-var euro20 = Money.Euro(20);
-var dollar10 = Money.USDollar(10);
+Money euro10 = Money.Euro(10);
+Money euro20 = Money.Euro(20);
+Money dollar10 = Money.USDollar(10);
+Money zeroDollar = Money.USDollar(0);
 
-// add and substract
-var euro30 = euro10 + euro20;
-var euro10 = euro20 - euro10;
-var m = euro10 + dollar10; // will throw exception!
-euro10 += euro20;
-euro10 -= euro20;
-
-// compare money
+// Compare money
 euro10 == euro20; // false
 euro10 != euro20; // true;
 euro10 == dollar10; // false;
 euro20 > euro10; // true;
-euro10 <= dollar10; // will throw exception!
+euro10 <= dollar10; // throws InvalidCurrencyException!
 
-// decrement and increment by minor unit
-var yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
-var euro = new Money(765.43m, "EUR");
+// Add and Substract
+Money euro30 = euro10 + euro20;
+Money euro10 = euro20 - euro10;
+Money m = euro10 + dollar10; // throws InvalidCurrencyException!
+Money euro10 = euro10 + zeroDollar; // doesn't throw when adding zero
+euro20 += euro10; // EUR 30
+euro20 -= euro10; // EUR 10
+
+// Add and Substract with implied Currency Context
+Money euro30 = euro10 + 20m; // decimal value is assumed to have the same currency context
+Money euro10 = euro20 - 10m; // decimal value is assumed to have the same currency context
+
+// Decrement and Increment by minor unit
+Money yen = new Money(765m, "JPY"); // the smallest unit is 1 yen
+Money euro = new Money(765.43m, "EUR"); // the smallest unit is 1 cent (1EUR = 100 cent)
 ++yen; // JPY 766
 --yen; // JPY 765
 ++euro; // EUR 765.44
 --euro; // EUR 765.43
+
+// Multiply
+Money m = euro10 * euro20; // doesn't compile!
+Money euro20 = euro10 * 2;
+Money discount = euro10 * 0.15m;
+
+// Divide
+decimal ratio = euro20 / euro10;
+Money euro5 = euro10 / 2;
+
+// Divide without losing money
+Money total = new Money(101m, "USD");
+IEnumerable<Money> shares = total.SafeDivide(4); // [USD 25, USD 25, USD 25, USD 26]
+
+// Modulus / Remainder
+Money total = new Money(105.50m, "USD");
+Money unitPrice = new Money(20.00m, "USD"); // USD 20 * 5 = USD 100
+Money remainder = total % unitPrice; // USD 5.50
 ```
 
 **Money formatting**
 
 ```C#
-var yen = new Money(765m, "JPY");
-var euro = new Money(765.43m, "EUR");
-var dollar = new Money(765.43m, "USD");
-var dinar = new Money(765.432m, "BHD");
+Money yen = new Money(765m, "JPY");
+Money euro = new Money(765.43m, "EUR");
+Money dollar = new Money(765.43m, "USD");
+Money dinar = new Money(765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
 yen.ToString();    // "¥765"
@@ -182,32 +234,40 @@ Money euro;
 Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 ```
 
-**Adding custom currencies**
+**Create custom Currency**
 
 ```C#
-// Create custom currency and register it (for the life-time of the app domain)
-var builder = new CurrencyBuilder("BTC", "virtual")
-				{
-					EnglishName = "Bitcoin",
-					Symbol = "฿",
-					DecimalDigits = 8
-				};
+// Create custom currency
+CurrencyInfo myCurrency = CurrencyInfo.Create("BTA") with
+{
+    Symbol = "$",
+    Number = 1023,
+    InternationalSymbol = "CC$",
+    MinorUnit = MinorUnit.Two,
+    EnglishName = "My Custom Currency",
+    IsIso4217 = false,
+    AlternativeSymbols = ["cc$"],
+    IntroducedOn = new DateTime(2022, 1, 1),
+    ExpiredOn = new DateTime(2030, 1, 1)
+};
 
-var bitcoin = builder.Build(); // build BTC, but will not register it
-var bitcoin = builder.Register(); // build and register BTC in namespace 'virtual'
+// Fails because it's not registred
+var notExisting = CurrencyInfo.FromCode("BTA"); // throw exception
 
-// When the custom is registered, it can be called as any other currency
-Money bitcoins = new Money(1.2, Currency.FromCode("BTC", "virtual"));
-Money bitcoins = new Money(1.2. "BTC");
+// Register it for the life-time of the app domain
+CurrencyInfo.Register(myCurrency);
+var exists = CurrencyInfo.FromCode("BTA"); // returns myCurrency
 
-// Replace ISO 4217 currency (for the life-time of the app domain)
-Currency oldEuro = CurrencyBuilder.Unregister("EUR", "ISO-4217");
+// Create custom currency based on existing currency
+CurrencyInfo myCurrency = CurrencyInfo.FromCode("EUR") with { Code = "EUA", EnglishName = "New Euro" };
+CurrencyInfo.Register(myCurrency);
 
-var builder = new CurrencyBuilder("EUR", "ISO-4217");
-builder.LoadDataFromCurrency(oldEuro);
-builder.EnglishName = "New Euro";
-builder.DecimalDigits = 1;
-builder.Register();
+var myEuro = Currency.FromCode("EUA"); // returns myCurrency
 
-Currency newEuro = Currency.FromCode("EUR");
+// Replace currency for the life-time of the app domain
+CurrencyInfo oldEuro = CurrencyInfo.Unregister("EUR");
+CurrencyInfo newEuro = oldEuro with { Symbol = "€U", EnglishName = "New Euro" };
+CurrencyInfo.Register(newEuro);
+
+var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```
