@@ -41,6 +41,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
     static Money ParseMoneyFromString(ref Utf8JsonReader reader)
     {
         // TODO: serialize non-ISO-4217 currencies with same code as ISO-4217 currencies, like "XXX;NON-ISO 234.25" or something else?
+        // TODO: code is now overall unique, so no need for non-ISO-4217 indicator
 
         // Get the JSON value as UTF-8 bytes and then decode to a ReadOnlySpan<char>, avoiding intermediate string allocations.
         ReadOnlySpan<byte> valueBytes = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
@@ -63,22 +64,22 @@ public class MoneyJsonConverter : JsonConverter<Money>
 
         try
         {
-            Currency currency = new(currencySpan);
+            CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
             decimal amount = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 
-            return new Money(amount, currency);
+            return new Money(amount, currencyInfo);
         }
-        catch (Exception ex) when (ex is FormatException or ArgumentException)
+        catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidCurrencyException)
         {
             // Retry using reverse format, like '234.25 EUR'
             try
             {
-                Currency currency = new(amountSpan);
+                Currency currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
                 decimal amount = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 
-                return new Money(amount, currency);
+                return new Money(amount, currencyInfo);
             }
-            catch (Exception reverseException) when (reverseException is FormatException or ArgumentException)
+            catch (Exception reverseException) when (reverseException is FormatException or ArgumentException or InvalidCurrencyException)
             {
                 // Throw with original exception because using reverse format also failed!
                 throw new JsonException(InvalidFormatMessage, ex);
@@ -133,13 +134,14 @@ public class MoneyJsonConverter : JsonConverter<Money>
                             if (valueAsString == null) break;
 
                             string[] v = valueAsString.Split([';']);
-                            if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
+                            try
                             {
-                                currency = new Currency(v[0]);
+                                // Ignore everything after ; like ISO-4217 or other namespace. Just use CurrencyInfo for lookup.
+                                currency = CurrencyInfo.FromCode(v[0]);
                             }
-                            else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
+                            catch (InvalidCurrencyException ex)
                             {
-                                currency = new Currency(v[0]) { IsIso4217 = false };
+                                throw new JsonException("Can't parse property 'Currency' to a currency code! {ex.message}");
                             }
 
                             hasCurrency = true;

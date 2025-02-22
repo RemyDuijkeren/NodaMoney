@@ -33,28 +33,16 @@ public class CurrencyTypeConverter : TypeConverter
             return base.ConvertFrom(context, culture, value!);
 
         var valueAsSpan = valueAsString.AsSpan();
-            var separatorIndex = valueAsSpan.IndexOf(';');
-            if (separatorIndex == -1)
-            {
-                return new Currency(valueAsSpan.ToString());
-            }
-
+        var separatorIndex = valueAsSpan.IndexOf(';');
+        if (separatorIndex != -1) // Has 2de part
+        {
+            // In V1 if the 2nd part is not empty and not "ISO-4217" then it is a non-iso4217 currency,
+            // but in V2 it doesn't matter because currency codes are unique
             var currencyCode = valueAsSpan.Slice(0, separatorIndex).ToString();
-            var currencyType = valueAsSpan.Slice(separatorIndex + 1).ToString();
-            return string.IsNullOrWhiteSpace(currencyType) || currencyType == "ISO-4217"
-                ? new Currency(currencyCode)
-                : new Currency(currencyCode) { IsIso4217 = false };
+            return (Currency)CurrencyInfo.FromCode(currencyCode);
+        }
 
-            // string[] v = valueAsString.Split([';']);
-            // if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
-            // {
-            //     return new Currency(v[0]);
-            // }
-            // else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
-            // {
-            //     return new Currency(v[0]) { IsIso4217 = false };
-            // }
-
+        return (Currency)CurrencyInfo.FromCode(valueAsSpan.ToString());
     }
 
     /// <summary>Converts the given value object to the specified type, using the specified context and culture information.</summary>
@@ -71,10 +59,6 @@ public class CurrencyTypeConverter : TypeConverter
             {
                     var result = new StringBuilder();
                     result.Append(currency.Code);
-                    if (!currency.IsIso4217)
-                    {
-                        result.Append(";CUSTOM");
-                    }
                     return result.ToString();
             }
 

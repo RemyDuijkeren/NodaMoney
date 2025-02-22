@@ -208,7 +208,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
     public bool IsHistoric => !IsActiveOn(DateTime.Today);
 
-    public static implicit operator Currency(CurrencyInfo currency) => new(currency.Code);
+    public static implicit operator Currency(CurrencyInfo currencyInfo) => new(currencyInfo.Code.AsSpan(), currencyInfo.IsIso4217);
 
     /// <summary>Creates a new instance of <see cref="CurrencyInfo"/> with the specified three-character currency code.</summary>
     /// <param name="code">The (ISO-4217) three-character currency code.</param>

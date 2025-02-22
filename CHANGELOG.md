@@ -23,9 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Formatting added format L for currency format using full english name (was format F)
 - Added InternationalSymbol to CurrencyInfo (Symbol: $, InternationalSymbol: US$)
 - Added AlternativeSymbols to CurrencyInfo
--
-- Currency.NumericCode is a three-digit code number of the currency
-- Currency.MinimalAmount is the minimal amount the currency can be increased or decreased
+- Added NumericCode to CurrencyInfo. This is a three-digit code number as string (like '034')
+- Added MinimalAmount to CurrencyInfo. This is the minimal amount the currency can be increased or decreased.
 
 ### Changed
 - Big overall performance improvement on:
@@ -33,16 +32,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - parsing money (110x faster)
   - smaller footprint and memory allocation (30x fewer allocations)
 - JSON Serialization format is changed from `{ "Cost": {"Amount":1.23,"Currency":"USD"} }` to `{ "Cost":"USD 1.23" }`. This is a breaking change
-  for JSON serialization, but deserialization of the old format is supported for migration purposes.
+  for JSON serialization, but deserialization of the old format is partly supported for migration purposes (only for System.Text.Json).
 - XML Serialization format is change from `<Money Amount="765.43" Currency="USD" />` to `<Money Currency="USD">765.43</Money>`.
   This is a breaking change for XML serialization, but deserialization of the old format is supported for migration purposes.
-- Currency is now a 2byte struct and only contains basic information. Use CurrencyInfo to retrieve more info for a Currency.
+- Currency is now a 2byte struct and only contains basic information. Other info is moved to CurrencyInfo.
+- Namespaces are replaced by IsIso4217 (yes/no). Codes needs to be unique overall.
 - Formatting format G is now Currency format with currency code instead of currency symbol
 - Formatting format F is now Fixed point format (same as for Decimal)
 - Formatting format C is Currency format with currency symbol, but if there is none, currency code will be used.
-- Currency.Number is changed from `string` to `short`
-- Currency.DecimalDigits is changed from `decimal` to `int`
-- Currency.MinorUnit changed to total number of minor units of one currency major unit
+- Changed Number on CurrencyInfo is changed from `string` to `short`
+- Changed DecimalDigits on CurrencyInfo from `decimal` to `int`
+- Changed MinorUnit on CurrencyInfo changed to total number of minor units of one currency major unit
 
 ### Removed
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
@@ -51,8 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
 - Formatting format F is removed (replaced by format L)
-
-- Currency.MajorUnit
+- Removed MajorUnit from CurrencyInfo
 
 ## [1.0.5] - 2018-08-29
 

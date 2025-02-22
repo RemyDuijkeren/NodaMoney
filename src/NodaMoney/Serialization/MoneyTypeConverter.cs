@@ -36,22 +36,22 @@ public class MoneyTypeConverter : TypeConverter
 
         try
         {
-            Currency currency1 = new Currency(currencySpan.ToString());
-            decimal amount1 = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+            CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
+            decimal amount = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 
-            return new Money(amount1, currency1);
+            return new Money(amount, currencyInfo);
         }
-        catch (Exception ex) when (ex is FormatException or ArgumentException)
+        catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidCurrencyException)
         {
             try
             {
                 // try reverse: 234.25 EUR
-                Currency currency1 = new Currency(amountSpan.ToString());
-                decimal amount1 = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+                CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
+                decimal amount = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 
-                return new Money(amount1, currency1);
+                return new Money(amount, currencyInfo);
             }
-            catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException)
+            catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException or InvalidCurrencyException)
             {
                 // throw with original exception!
                 throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);

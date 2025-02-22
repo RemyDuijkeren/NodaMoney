@@ -6,6 +6,7 @@ public readonly partial record struct Currency
 {
     const string NoCurrencyCode = "XXX";
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
+    const ushort Iso4217BitMask = 1 << 15;
 
     /// <summary>ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.</summary>
     readonly ushort _encodedValue;
@@ -17,13 +18,15 @@ public readonly partial record struct Currency
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
+    /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
-    public Currency(string code) : this(code.AsSpan()) { }
+    internal Currency(string code, bool isIso4217 = true) : this(code.AsSpan(), isIso4217) { }
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
+    /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
-    public Currency(ReadOnlySpan<char> code)
+    internal Currency(ReadOnlySpan<char> code, bool isIso4217 = true)
     {
         // Special handling for no currency. Use 0 for 'XXX' (No Currency)
         if (code.Length == 3 && code[0] == 'X' && code[1] == 'X' && code[2] == 'X')
@@ -36,7 +39,7 @@ public readonly partial record struct Currency
         if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
 
         // A-Z (65-90 in ASCII), move to 1-26 so that it fits in 5 bits.
-        // Store in ushort (2 bytes) by shifting 5 bits to the left for each byte.
+        // Store in ushort (2 bytes) by shifting 5 bits to the left for each char.
         _encodedValue = 0;
         foreach (var c in code)
         {
@@ -46,7 +49,7 @@ public readonly partial record struct Currency
             _encodedValue = (ushort)(_encodedValue << 5 | (c - 'A' + 1));
         }
 
-        IsIso4217 = true;
+        IsIso4217 = isIso4217;
     }
 
     /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>
@@ -77,11 +80,11 @@ public readonly partial record struct Currency
     {
         get
         {
-            return (_encodedValue & 1 << 15) != 1; // get last bit
+            return (_encodedValue & Iso4217BitMask) == 0; // Check if the 15th bit is NOT set
         }
         init
         {
-            if (!value) _encodedValue |= 1 << 15; // set last bit to 1 if not ISO-4217 (so default is 0=true!)
+            if (!value) _encodedValue |= Iso4217BitMask; // Set the 15th bit (= non ISO-4217)
         }
     }
 

@@ -5,7 +5,7 @@ namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;
 
 public class DeserializeMoney
 {
-    [Theory(Skip = "This test is not working.")]
+    [Theory(Skip = "This test is not working. Can't fix this without Newtonsoft dependency.")]
     [ClassData(typeof(ValidJsonV1TestData))]
     public void WhenDeserializingV1_ThenThisShouldSucceed(string json, Money expected)
     {
@@ -14,7 +14,7 @@ public class DeserializeMoney
         clone.Should().Be(expected);
     }
 
-    [Theory(Skip = "This test is not working.")]
+    [Theory(Skip = "This test is not working. Can't fix this without Newtonsoft dependency.")]
     [ClassData(typeof(InvalidJsonV1TestData))]
     public void WhenDeserializingWithInvalidJSONV1_ThenThisShouldFail(string json)
     {
@@ -23,7 +23,7 @@ public class DeserializeMoney
         action.Should().Throw<SerializationException>();
     }
 
-    [Theory(Skip = "This test is not working.")]
+    [Theory(Skip = "This test is not working. Can't fix this without Newtonsoft dependency.")]
     [ClassData(typeof(NestedJsonV1TestData))]
     public void WhenDeserializingWithNestedV1_ThenThisShouldSucceed(string json, Order expected)
     {
