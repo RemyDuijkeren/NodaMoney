@@ -1,9 +1,14 @@
+using System.Diagnostics;
+
 namespace NodaMoney;
 
 /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Currency</remarks>
 public readonly partial record struct Currency
 {
+    /// <summary>Represents an empty or undefined currency, commonly used to indicate the absence of a valid currency.</summary>
+    public static readonly Currency NoCurrency = new();
+
     const string NoCurrencyCode = "XXX";
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
     const ushort Iso4217BitMask = 1 << 15;
@@ -13,8 +18,6 @@ public readonly partial record struct Currency
 
     // TODO: store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
     // readonly byte _listAndMinorUnit;
-
-    public static readonly Currency NoCurrency = new();
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
@@ -28,15 +31,15 @@ public readonly partial record struct Currency
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
     internal Currency(ReadOnlySpan<char> code, bool isIso4217 = true)
     {
+        if (code.IsEmpty) throw new ArgumentNullException(nameof(code));
+        if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+
         // Special handling for no currency. Use 0 for 'XXX' (No Currency)
-        if (code.Length == 3 && code[0] == 'X' && code[1] == 'X' && code[2] == 'X')
+        if (code[0] == 'X' && code[1] == 'X' && code[2] == 'X')
         {
             _encodedValue = 0;
             return;
         }
-
-        if (code.IsEmpty) throw new ArgumentNullException(nameof(code));
-        if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
 
         // A-Z (65-90 in ASCII), move to 1-26 so that it fits in 5 bits.
         // Store in ushort (2 bytes) by shifting 5 bits to the left for each char.
@@ -50,6 +53,10 @@ public readonly partial record struct Currency
         }
 
         IsIso4217 = isIso4217;
+
+        Debug.Assert(Code != null, "Code should not be null");
+        Debug.Assert(Code.Length == 3, InvalidCurrencyMessage);
+        Debug.Assert(Code.All(c => c is >= 'A' and <= 'Z'), InvalidCurrencyMessage);
     }
 
     /// <summary>Gets the (ISO-4217) three-character code of the currency.</summary>

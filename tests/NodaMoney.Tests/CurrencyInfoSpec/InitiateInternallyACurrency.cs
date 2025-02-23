@@ -17,7 +17,7 @@ public class InitiateInternallyACurrency
     [Fact]
     public void WhenCodeIsNull_ThenCreatingShouldThrow()
     {
-        Action action = () => { var eur = new CurrencyInfo(null, 978, MinorUnit.Two, "Euro", "€"); };
+        Action action = () => new CurrencyInfo(null!, 978, MinorUnit.Two, "Euro", "€");
 
         action.Should().Throw<ArgumentException>();
     }

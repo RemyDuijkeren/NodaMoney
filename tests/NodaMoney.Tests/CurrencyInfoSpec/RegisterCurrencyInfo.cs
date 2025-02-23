@@ -240,4 +240,21 @@ public class RegisterCurrencyInfo
         // Assert
         action.Should().Throw<ArgumentException>();
     }
+
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1000, true)]
+    [InlineData(1, false)]
+    [InlineData(99, false)]
+    public void WhenRegisterWithInvalidNumber_ThrowArgumentException(short number, bool isIso4217)
+    {
+        // Arrange
+        var created = CurrencyInfo.Create("ABC") with { Number = number, IsIso4217 = isIso4217 };
+
+        // Act
+        Action action = () => CurrencyInfo.Register(created);
+
+        // Assert
+        action.Should().Throw<ArgumentException>();
+    }
 }

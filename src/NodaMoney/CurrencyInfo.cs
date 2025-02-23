@@ -1,8 +1,9 @@
+using System.Diagnostics;
 using System.Globalization;
 
 namespace NodaMoney;
 
-// TODO: Add support for the following properties:
+// TODO: Add support for the following properties?
 // Thread.CurrentThread.CurrentCulture = new CurrentInfo("")
 // Thread.CurrentThread.CurrentCurrency = new CurrencyInfo("");
 //
@@ -10,8 +11,7 @@ namespace NodaMoney;
 //
 // var x = CurrencyInfo.CurrentCurrency;
 //
-// IsObsolete, IsDeprecated
-// ReplacedBy, Replaces, AlternativeSymbol, Locals (NL, EN),
+// IsObsolete, IsDeprecated, ReplacedBy, Replaces, Locals (NL, EN),
 // Order/Priority/Weight=1,0.8,0.6 = q-factor weighting (value between 0 and 1) = Any value placed in an order of preference expressed using a relative quality value called weight.
 
 // TODO: Should we use internal sealed class CurrencyData to store the data? CultureInfo has a similar structure called
@@ -32,7 +32,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     readonly string? _internationalSymbol;
 
     // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
-
+    //
     // static CurrencyInfo()
     // {
     //     s_currentThreadCurrency = NoCurrency;
@@ -42,18 +42,25 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <remarks>See http://en.wikipedia.org/wiki/Currency and
     /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
     /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
-    /// <param name="Code">The (ISO-4217) three-character code of the currency.</param>
-    /// <param name="Number">The (ISO-4217) number of the currency.</param>
-    /// <param name="MinorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
-    /// <param name="EnglishName">The english name of the currency</param>
-    /// <param name="Symbol">The currency symbol.</param>
-    internal CurrencyInfo(string Code, short Number, MinorUnit MinorUnit, string EnglishName = "", string Symbol = CurrencyInfo.GenericCurrencySign)
+    /// <param name="code">The (ISO-4217) three-character code of the currency.</param>
+    /// <param name="number">The (ISO-4217) number of the currency.</param>
+    /// <param name="minorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
+    /// <param name="englishName">The english name of the currency</param>
+    /// <param name="symbol">The currency symbol.</param>
+    internal CurrencyInfo(string code, short number, MinorUnit minorUnit, string englishName = "", string symbol = GenericCurrencySign)
     {
-        this.Code = Code ?? throw new ArgumentNullException(nameof(Code));
-        this.Number = Number; // TODO: Should reserve 1-999 for ISO-4217? 0 and >999 for non-ISO?
-        this.MinorUnit = MinorUnit;
-        this.EnglishName = EnglishName ?? string.Empty;
-        this.Symbol = Symbol ?? CurrencyInfo.GenericCurrencySign;
+        Code = code ?? throw new ArgumentNullException(nameof(code));
+        Number = number;
+        MinorUnit = minorUnit;
+        EnglishName = englishName ?? string.Empty;
+        Symbol = symbol ?? GenericCurrencySign;
+
+        Debug.Assert(Code != null, "Code should not be null");
+        Debug.Assert(Code.Length == 3, InvalidCurrencyMessage);
+        Debug.Assert(Code.All(c => c is >= 'A' and <= 'Z'), InvalidCurrencyMessage);
+        Debug.Assert(Number >= 0, "Number should be greater or equal to 0");
+        Debug.Assert(EnglishName != null, "EnglishName should not be null");
+        Debug.Assert(Symbol != null, "Symbol should not be null");
     }
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
@@ -208,6 +215,9 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
     public bool IsHistoric => !IsActiveOn(DateTime.Today);
 
+    /// <summary>Defines an implicit conversion operator from <see cref="CurrencyInfo"/> to <see cref="Currency"/>.</summary>
+    /// <param name="currencyInfo">The currency information from which a <see cref="Currency"/> instance will be created.</param>
+    /// <returns>A new instance of <see cref="Currency"/> initialized with the provided <see cref="CurrencyInfo"/>.</returns>
     public static implicit operator Currency(CurrencyInfo currencyInfo) => new(currencyInfo.Code.AsSpan(), currencyInfo.IsIso4217);
 
     /// <summary>Creates a new instance of <see cref="CurrencyInfo"/> with the specified three-character currency code.</summary>
@@ -231,6 +241,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public static void Register(CurrencyInfo currencyInfo)
     {
         ValidateCurrencyCode(currencyInfo.Code);
+        ValidateCurrencyNumber(currencyInfo.Number, currencyInfo.IsIso4217);
 
         if (!CurrencyRegistry.TryAdd(currencyInfo))
             throw new InvalidCurrencyException($"The currency {currencyInfo.Code} is already registered.");
@@ -584,6 +595,22 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         {
             if (c is < 'A' or > 'Z')
                 throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
+        }
+    }
+
+    private static void ValidateCurrencyNumber(short number, bool isIso4217)
+    {
+        if (number < 0)
+        {
+            throw new ArgumentException($"The number code '{number}' must be greater than 0!");
+        }
+
+        switch (isIso4217)
+        {
+            case true when (number is < 1 or > 999):
+                throw new ArgumentException($"For ISO 4217 the number code '{number}' must be between 1 and 999!");
+            case false when (number is >= 1 and <= 999):
+                throw new ArgumentException($"For non ISO 4217 the number code '{number}' must be 0 or greater than 999!");
         }
     }
 }
