@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Next]
+
+### Added
+-
+
+### Changed
+-
+
+### Removed
+-
+
 ## [2.0]
 
 ### Added
@@ -21,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for [Generic Math](https://devblogs.microsoft.com/dotnet/dotnet-7-generic-math/)
 - Add Parsing for `ReadOnlySpan<char>`
 - Formatting added format L for currency format using full english name (was format F)
-- Added InternationalSymbol to CurrencyInfo (Symbol: $, InternationalSymbol: US$)
+- Added InternationalSymbol to CurrencyInfo (Symbol: `$`, InternationalSymbol: `US$`)
 - Added AlternativeSymbols to CurrencyInfo
 - Added NumericCode to CurrencyInfo. This is a three-digit code number as string (like '034')
 - Added MinimalAmount to CurrencyInfo. This is the minimal amount the currency can be increased or decreased.

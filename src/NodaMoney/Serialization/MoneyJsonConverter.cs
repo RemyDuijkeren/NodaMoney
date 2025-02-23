@@ -141,7 +141,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
                             }
                             catch (InvalidCurrencyException ex)
                             {
-                                throw new JsonException("Can't parse property 'Currency' to a currency code! {ex.message}");
+                                throw new JsonException($"Can't parse property 'Currency' to Currency! {ex.Message}");
                             }
 
                             hasCurrency = true;
