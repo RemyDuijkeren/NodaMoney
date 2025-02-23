@@ -3,6 +3,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - '**' # all branches but excludes tags
     paths-ignore:
       - docs/**
   pull_request:
