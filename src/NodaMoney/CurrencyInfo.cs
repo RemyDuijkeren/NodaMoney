@@ -56,7 +56,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         Symbol = symbol ?? GenericCurrencySign;
 
         Debug.Assert(Code != null, "Code should not be null");
-        Debug.Assert(Code.Length == 3, InvalidCurrencyMessage);
+        Debug.Assert(Code!.Length == 3, InvalidCurrencyMessage);
         Debug.Assert(Code.All(c => c is >= 'A' and <= 'Z'), InvalidCurrencyMessage);
         Debug.Assert(Number >= 0, "Number should be greater or equal to 0");
         Debug.Assert(EnglishName != null, "EnglishName should not be null");
@@ -98,10 +98,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public MinorUnit MinorUnit { get; init; }
 
     /// <summary>The english name of the currency</summary>
-    public string EnglishName { get; init; }
+    public string EnglishName { get; init; } = string.Empty;
 
     /// <summary>The (local) currency symbol.</summary>
-    public string Symbol { get; init; }
+    public string Symbol { get; init; } = GenericCurrencySign;
 
     /// <summary>The international currency symbol.</summary>
     public string InternationalSymbol

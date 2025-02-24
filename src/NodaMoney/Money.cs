@@ -56,18 +56,6 @@ public readonly partial struct Money : IEquatable<Money>
         Amount = Round(amount, currency, rounding);
     }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="currencyInfo">The Currency of the money.</param>
-    /// <param name="rounding">The rounding mode.</param>
-    /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    public Money(decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding = MidpointRounding.ToEven) : this()
-    {
-        this.Currency = currencyInfo;
-        Amount = Round(amount, currencyInfo, rounding);
-    }
-
     // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -84,7 +72,7 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
-    /// casted to double).</param>
+    /// cast to double).</param>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
@@ -97,7 +85,7 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
-    /// casted to double).</param>
+    /// cast to double).</param>
     /// <param name="currency">The Currency of the money.</param>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
@@ -203,15 +191,7 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            int hash = 17;
-            hash = (hash * 23) + Amount.GetHashCode();
-            return (hash * 23) + Currency.GetHashCode();
-        }
-    }
+    public override int GetHashCode() => HashCode.Combine(Amount, Currency);
 
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

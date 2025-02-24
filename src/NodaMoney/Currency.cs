@@ -55,7 +55,7 @@ public readonly partial record struct Currency
         IsIso4217 = isIso4217;
 
         Debug.Assert(Code != null, "Code should not be null");
-        Debug.Assert(Code.Length == 3, InvalidCurrencyMessage);
+        Debug.Assert(Code!.Length == 3, InvalidCurrencyMessage);
         Debug.Assert(Code.All(c => c is >= 'A' and <= 'Z'), InvalidCurrencyMessage);
     }
 

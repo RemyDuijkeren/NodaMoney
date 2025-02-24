@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace NodaMoney;
@@ -11,17 +12,20 @@ namespace NodaMoney;
 /// This representation provides a range of -922,337,203,685,477.5808 to 922,337,203,685,477.5807.
 /// The type-declaration character for Currency is the at (@) sign.
 /// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
+/// See also OLE Automation Currency and SQL Currency type.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface IMoney or IMonetary or IMonetaryAmount?
+internal readonly struct FastMoney : IEquatable<FastMoney> // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount?
 {
-    readonly long _amount;
+    /// <summary>Stored as an integer scaled by 10,000</summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public long OACurrencyAmount { get; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
@@ -32,17 +36,31 @@ internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface
     /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.Currency.DecimalDigits"/>).</remarks>
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public FastMoney(decimal amount, string code, MidpointRounding rounding) : this(amount, new Currency(code), rounding) { }
 
     public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
+        CheckedEnsureValidRange(amount); // Ensure the decimal is in the valid range.
+
+        OACurrencyAmount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));
         Currency = currency;
-        _amount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));
+    }
+
+    internal FastMoney(long oaCurrencyAmount, Currency currency)
+    {
+        // Determine the scaling factor based on the currency's allowed decimal places
+        CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
+        int scaleDifference = 4 - ci.DecimalDigits; // Example: For USD (2 decimals), scaleDifference = 2
+        long scalingFactor = (long)Math.Pow(10, scaleDifference); // 10^scaleDifference
+
+        // Round `oaCurrencyAmount` to the number of decimals allowed by the currency
+        OACurrencyAmount = (oaCurrencyAmount + (scalingFactor / 2)) / scalingFactor * scalingFactor;
+        Currency = currency;
     }
 
     /// <summary>Gets the amount of money.</summary>
-    public decimal Amount => decimal.FromOACurrency(_amount);
+    public decimal Amount => decimal.FromOACurrency(OACurrencyAmount);
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
     public Currency Currency { get; }
@@ -63,7 +81,7 @@ internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface
     /// value.</summary>
     /// <param name="other">A <see cref="Money"/> object.</param>
     /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-    public bool Equals(FastMoney other) => Amount == other.Amount && Currency == other.Currency;
+    public bool Equals(FastMoney other) => OACurrencyAmount == other.OACurrencyAmount && Currency == other.Currency;
 
     /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
     /// and value.</summary>
@@ -73,15 +91,7 @@ internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface
 
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            int hash = 17;
-            hash = (hash * 23) + Amount.GetHashCode();
-            return (hash * 23) + Currency.GetHashCode();
-        }
-    }
+    public override int GetHashCode() => HashCode.Combine(OACurrencyAmount, Currency);
 
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -92,7 +102,31 @@ internal readonly struct FastMoney : IEquatable<FastMoney> // TODO add interface
         currency = Currency;
     }
 
-    private static void EnsureSameCurrency(in Money left, in Money right)
+    /// <summary>Addition Example</summary>
+    /// <param name="other">other</param>
+    public FastMoney Add(FastMoney other)
+    {
+        EnsureSameCurrency(this, other); // Ensure currencies match
+        long totalAmount = checked(OACurrencyAmount + other.OACurrencyAmount); // Use checked for overflow
+
+        return new FastMoney(totalAmount, Currency);
+    }
+
+    /// <summary>Constants for range</summary>
+    public static readonly decimal MinValue = -922_337_203_685_477.5808m;
+    public static readonly decimal MaxValue = 922_337_203_685_477.5807m;
+
+    /// <summary>Ensures the numeric range is valid for FastMoney </summary>
+    /// <param name="amount"></param>
+    private static void CheckedEnsureValidRange(decimal amount)
+    {
+        if (amount < MinValue || amount > MaxValue)
+        {
+            throw new OverflowException("The amount is outside the allowable range for FastMoney.");
+        }
+    }
+
+    private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
     {
         if (left.Currency != right.Currency)
             throw new InvalidCurrencyException(left.Currency, right.Currency);
