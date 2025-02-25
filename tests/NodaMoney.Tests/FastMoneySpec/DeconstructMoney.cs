@@ -1,11 +1,11 @@
-namespace NodaMoney.Tests.UnroundedMoneySpec;
+namespace NodaMoney.Tests.FastMoneySpec;
 
 public class DeconstructMoney
 {
     [Fact]
     public void WhenDeConstructing_ThenShouldSucceed()
     {
-        var money = new UnroundedMoney(10m, "EUR");
+        var money = new FastMoney(10m, "EUR");
 
         var (amount, currency) = money;
 

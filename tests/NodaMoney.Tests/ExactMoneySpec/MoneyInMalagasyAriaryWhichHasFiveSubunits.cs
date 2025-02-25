@@ -1,4 +1,4 @@
-namespace NodaMoney.Tests.UnroundedMoneySpec;
+namespace NodaMoney.Tests.ExactMoneySpec;
 
 public class MoneyInMalagasyAriaryWhichHasFiveSubunits
 {
@@ -35,7 +35,7 @@ public class MoneyInMalagasyAriaryWhichHasFiveSubunits
     public void WhenOnlyAmount_ThenItShouldRoundUp(decimal input)
     {
         // 1 MGA = 5 iraimbilanja
-        var money = new UnroundedMoney(input, "MGA");
+        var money = new ExactMoney(input, "MGA");
 
         money.Amount.Should().Be(input);
     }

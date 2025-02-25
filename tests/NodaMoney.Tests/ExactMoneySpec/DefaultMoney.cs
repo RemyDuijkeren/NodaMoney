@@ -1,11 +1,11 @@
-﻿namespace NodaMoney.Tests.UnroundedMoneySpec;
+﻿namespace NodaMoney.Tests.ExactMoneySpec;
 
 public class DefaultMoney
 {
     [Fact]
     public void WhenCreatingDefault_ThenItShouldBeNoCurrency()
     {
-        UnroundedMoney money = default;
+        ExactMoney money = default;
 
         money.Should().NotBeNull();
         money.Currency.Should().Be(default(Currency));

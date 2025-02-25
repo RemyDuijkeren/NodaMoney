@@ -1,4 +1,4 @@
-namespace NodaMoney.Tests.UnroundedMoneySpec;
+namespace NodaMoney.Tests.ExactMoneySpec;
 
 public class CreateMoneyWithMinAndMaxValues
 {
@@ -8,7 +8,7 @@ public class CreateMoneyWithMinAndMaxValues
          // Arrange
 
          // Act
-         var money = new UnroundedMoney(decimal.MaxValue, "EUR");
+         var money = new ExactMoney(decimal.MaxValue, "EUR");
 
          // Assert
          money.Amount.Should().Be(decimal.MaxValue);
@@ -21,7 +21,7 @@ public class CreateMoneyWithMinAndMaxValues
          // Arrange
 
          // Act
-         var money = new UnroundedMoney(decimal.MinValue, "EUR");
+         var money = new ExactMoney(decimal.MinValue, "EUR");
 
          // Assert
          money.Amount.Should().Be(decimal.MinValue);

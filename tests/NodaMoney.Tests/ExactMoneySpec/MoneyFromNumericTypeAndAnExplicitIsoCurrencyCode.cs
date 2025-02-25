@@ -1,4 +1,4 @@
-namespace NodaMoney.Tests.UnroundedMoneySpec;
+namespace NodaMoney.Tests.ExactMoneySpec;
 
 public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
 {
@@ -8,7 +8,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsByte_ThenCreatingShouldSucceed()
     {
         const byte byteValue = 50;
-        var money = new UnroundedMoney(byteValue, "EUR");
+        var money = new ExactMoney(byteValue, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(50);
@@ -18,7 +18,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsSbyte_ThenCreatingShouldSucceed()
     {
         const sbyte sbyteValue = 75;
-        var money = new UnroundedMoney(sbyteValue, "EUR");
+        var money = new ExactMoney(sbyteValue, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(75);
@@ -28,7 +28,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsInt16_ThenCreatingShouldSucceed()
     {
         const short int16Value = 100;
-        var money = new UnroundedMoney(int16Value, "EUR");
+        var money = new ExactMoney(int16Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(100);
@@ -38,7 +38,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsInt32_ThenCreatingShouldSucceed()
     {
         const int int32Value = 200;
-        var money = new UnroundedMoney(int32Value, "EUR");
+        var money = new ExactMoney(int32Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(200);
@@ -48,7 +48,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsInt64_ThenCreatingShouldSucceed()
     {
         const long int64Value = 300;
-        var money = new UnroundedMoney(int64Value, "EUR");
+        var money = new ExactMoney(int64Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(300);
@@ -58,7 +58,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsUint16_ThenCreatingShouldSucceed()
     {
         const ushort uInt16Value = 400;
-        var money = new UnroundedMoney(uInt16Value, "EUR");
+        var money = new ExactMoney(uInt16Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(400);
@@ -68,7 +68,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsUint32_ThenCreatingShouldSucceed()
     {
         const uint uInt32Value = 500;
-        var money = new UnroundedMoney(uInt32Value, "EUR");
+        var money = new ExactMoney(uInt32Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(500);
@@ -78,7 +78,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsUint64_ThenCreatingShouldSucceed()
     {
         const ulong uInt64Value = 600;
-        var money = new UnroundedMoney(uInt64Value, "EUR");
+        var money = new ExactMoney(uInt64Value, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(600);
@@ -88,7 +88,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsSingle_ThenCreatingShouldSucceed()
     {
         const float singleValue = 700;
-        var money = new UnroundedMoney(singleValue, "EUR");
+        var money = new ExactMoney(singleValue, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(700);
@@ -98,7 +98,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsDouble_ThenCreatingShouldSucceed()
     {
         const double doubleValue = 800;
-        var money = new UnroundedMoney(doubleValue, "EUR");
+        var money = new ExactMoney(doubleValue, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(800);
@@ -108,7 +108,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     public void WhenValueIsDecimal_ThenCreatingShouldSucceed()
     {
         const decimal decimalValue = 900;
-        var money = new UnroundedMoney(decimalValue, "EUR");
+        var money = new ExactMoney(decimalValue, "EUR");
 
         money.Currency.Should().Be(_euro);
         money.Amount.Should().Be(900);
@@ -117,7 +117,7 @@ public class MoneyFromNumericTypeAndAnExplicitIsoCurrencyCode
     [Fact]
     public void WhenUnknownIsoCurrencySymbol_ThenThrowException()
     {
-        Action action = () => new UnroundedMoney(123.25M, "XYZ");
+        Action action = () => new ExactMoney(123.25M, "XYZ");
 
         action.Should().Throw<InvalidCurrencyException>();
     }
