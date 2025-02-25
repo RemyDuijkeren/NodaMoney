@@ -20,6 +20,7 @@
             <Acronym>USDollar</Acronym>
             <Acronym>ISO</Acronym>
             <Acronym>Json</Acronym>
+            <Acronym>OACurrency</Acronym>
         </CasingExceptions>
     </Acronyms>
 </Dictionary>

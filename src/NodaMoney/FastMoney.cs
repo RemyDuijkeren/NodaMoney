@@ -17,8 +17,8 @@ namespace NodaMoney;
 internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount?
 {
     /// <summary>Stored as an integer scaled by 10,000</summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "OACurrency is also used by Microsoft and is well know")]
-    public long OACurrencyAmount { get; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
 
     public FastMoney(Money money) : this(money.Amount, money.Currency) { }
 
@@ -44,13 +44,16 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
 
     public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
-        CheckedEnsureValidRange(amount); // Ensure the decimal is in the valid range.
+        if (amount < MinValue || amount > MaxValue)
+        {
+            throw new ArgumentException("The amount is outside the allowable range for FastMoney.", nameof(amount));
+        }
 
-        // Ensure Currency is withing 4 decimal digits
         CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
         if (ci.DecimalDigits > 4)
         {
-            throw new ArgumentException("Currency decimal digits must be lower or equal to 4!", nameof(currency));
+            throw new ArgumentException("The Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.",
+                nameof(currency));
         }
 
         OACurrencyAmount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));
@@ -78,18 +81,6 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     [CLSCompliant(false)]
     public FastMoney(ulong amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
 
-    // internal FastMoney(long oaCurrencyAmount, Currency currency)
-    // {
-    //     // Determine the scaling factor based on the currency's allowed decimal places
-    //     CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
-    //     int scaleDifference = 4 - ci.DecimalDigits; // Example: For USD (2 decimals), scaleDifference = 2
-    //     long scalingFactor = (long)Math.Pow(10, scaleDifference); // 10^scaleDifference
-    //
-    //     // Round `oaCurrencyAmount` to the number of decimals allowed by the currency
-    //     OACurrencyAmount = (oaCurrencyAmount + (scalingFactor / 2)) / scalingFactor * scalingFactor;
-    //     Currency = currency;
-    // }
-
     /// <summary>Gets the amount of money.</summary>
     public decimal Amount => decimal.FromOACurrency(OACurrencyAmount);
 
@@ -102,66 +93,25 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
         currency = Currency;
     }
 
-    // /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
-    // /// <param name="left">A <see cref="Money"/> object on the left side.</param>
-    // /// <param name="right">A <see cref="Money"/> object on the right side.</param>
-    // /// <returns>true if left and right are equal; otherwise, false.</returns>
-    // public static bool operator ==(FastMoney left, FastMoney right) => left.Equals(right);
-    //
-    // /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are not equal.</summary>
-    // /// <param name="left">A <see cref="Money"/> object on the left side.</param>
-    // /// <param name="right">A <see cref="Money"/> object on the right side.</param>
-    // /// <returns>true if left and right are not equal; otherwise, false.</returns>
-    // public static bool operator !=(FastMoney left, FastMoney right) => !(left == right);
-    //
-    // /// <summary>Returns a value indicating whether this instance and a specified <see cref="Money"/> object represent the same
-    // /// value.</summary>
-    // /// <param name="other">A <see cref="Money"/> object.</param>
-    // /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-    // public bool Equals(FastMoney other) => OACurrencyAmount == other.OACurrencyAmount && Currency == other.Currency;
-    //
-    // /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
-    // /// and value.</summary>
-    // /// <param name="obj">An <see cref="object"/>.</param>
-    // /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-    // public override bool Equals(object? obj) => obj is FastMoney money && this.Equals(money);
-    //
-    // /// <summary>Returns the hash code for this instance.</summary>
-    // /// <returns>A 32-bit signed integer hash code.</returns>
-    // public override int GetHashCode() => HashCode.Combine(OACurrencyAmount, Currency);
-    //
-    // /// <summary>Deconstructs the current instance into its components.</summary>
-    // /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    // /// <param name="currency">The Currency of the money.</param>
-    // public void Deconstruct(out decimal amount, out Currency currency)
-    // {
-    //     amount = Amount;
-    //     currency = Currency;
-    // }
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static long ToOACurrency(FastMoney money) => money.OACurrencyAmount;
 
-    /// <summary>Addition Example</summary>
-    /// <param name="other">other</param>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static FastMoney FromOACurrency(long cy, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) =>
+        new(decimal.FromOACurrency(cy), currency, rounding);
+
     public FastMoney Add(FastMoney other)
     {
         EnsureSameCurrency(this, other); // Ensure currencies match
         long totalAmount = checked(OACurrencyAmount + other.OACurrencyAmount); // Use checked for overflow
 
-        return new FastMoney(totalAmount, Currency);
+        return this with { OACurrencyAmount = totalAmount };
     }
 
     /// <summary>Constants for range</summary>
     public static readonly decimal MinValue = -922_337_203_685_477.5808m;
-    public static readonly decimal MaxValue = 922_337_203_685_477.5807m;
 
-    /// <summary>Ensures the numeric range is valid for FastMoney </summary>
-    /// <param name="amount"></param>
-    private static void CheckedEnsureValidRange(decimal amount)
-    {
-        if (amount < MinValue || amount > MaxValue)
-        {
-            throw new OverflowException("The amount is outside the allowable range for FastMoney.");
-        }
-    }
+    public static readonly decimal MaxValue = 922_337_203_685_477.5807m;
 
     private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
     {

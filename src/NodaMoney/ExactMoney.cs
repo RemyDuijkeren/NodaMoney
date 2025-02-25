@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace NodaMoney;
 
-// name of type: UnroundedMoney, IntermediateMoney, RawMoney, ExactMoney, PreciseMoney?
+// name of type: UnroundedMoney (focus on what it doesnt do), IntermediateMoney, RawMoney, ExactMoney, PreciseMoney?
 // TODO add interface IMoney or IMonetary or IMonetaryAmount?
 
 /// <summary>Represents a monetary value along with its associated currency without performing any rounding operations.</summary>

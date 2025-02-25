@@ -5,7 +5,7 @@ namespace NodaMoney;
 public partial struct Money
 #if NET7_0_OR_GREATER
     : IMinMaxValue<Money>, IMultiplicativeIdentity<Money, decimal>, IAdditiveIdentity<Money, Money>
-    // Decimal implements IFloatingPoint, IMinMaxValue
+    // Decimal implements IFloatingPoint, INumber, INumberBase, ISignedNumber, IFloatingPointConstants (E, Pi, Tua)
 #endif
 {
     /// <inheritdoc/>
@@ -22,6 +22,6 @@ public partial struct Money
 
     // public static Money Zero => new(0m, Currency.NoCurrency);
     // public static Money One => new(1m, Currency.NoCurrency);
-    // public static Money MinusOne => new(-1m, Currency.NoCurrency);
+    // public static Money NegativeOne => new(-1m, Currency.NoCurrency);
     //public static Money Zero(Currency currency) => new(1m, currency);
 }
