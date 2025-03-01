@@ -63,7 +63,7 @@ public partial struct Money
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
     /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
     /// <returns>The <see cref="Money"/> result of dividing left with right.</returns>
-    /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
+    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split()"/> to do a safe division.</remarks>
     public static Money operator /(Money left, decimal right) => Divide(left, right);
 
     /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>
@@ -168,7 +168,7 @@ public partial struct Money
     /// <param name="money">The money.</param>
     /// <param name="divisor">The divider.</param>
     /// <returns>The division as <see cref="Money"/>.</returns>
-    /// <remarks>This division can lose money! Use <see cref="Extensions.MoneyExtensions.SafeDivide(Money, int)"/> to do a safe division.</remarks>
+    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split"/> to do a safe division.</remarks>
     public static Money Divide(in Money money, in decimal divisor)
     {
         if (divisor == MultiplicativeIdentity) return money;

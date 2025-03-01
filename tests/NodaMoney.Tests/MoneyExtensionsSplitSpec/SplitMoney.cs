@@ -1,9 +1,8 @@
 ﻿using System.Linq;
-using NodaMoney.Extensions;
 
-namespace NodaMoney.Tests.Extensions.MoneyExtensionsSafeDivideSpec;
+namespace NodaMoney.Tests.MoneyExtensionsSplitSpec;
 
-public class SafelyDivideMoney
+public class SplitMoney
 {
     private Money _eurocent5 = new Money(0.05m, "EUR");
     private Money _euro1 = new Money(1.0m, "EUR");
@@ -14,7 +13,7 @@ public class SafelyDivideMoney
             // Foemmel's Conundrum test (see PEAA, page 495)
             // http://thierryroussel.free.fr/java/books/martinfowler/www.martinfowler.com/isa/money.html
 
-            var enumerable = _eurocent5.SafeDivide(2).ToList();
+            var enumerable = _eurocent5.Split(2).ToList();
 
             enumerable.Should().NotBeNullOrEmpty()
                 .And.HaveCount(2)
@@ -31,7 +30,7 @@ public class SafelyDivideMoney
     [Fact]
     public void WhenDividing5CentsByThree_ThenDivisionShouldNotLoseCents()
     {
-            var enumerable = _eurocent5.SafeDivide(3).ToList();
+            var enumerable = _eurocent5.Split(3).ToList();
 
             enumerable.Should().NotBeNullOrEmpty()
                 .And.HaveCount(3)
@@ -49,7 +48,7 @@ public class SafelyDivideMoney
     [Fact]
     public void WhenDividing1EuroByGivenRatios_ThenDivisionShouldNotLoseCents()
     {
-            var enumerable = _euro1.SafeDivide(new[] { 2, 3, 3 }).ToList();
+            var enumerable = _euro1.Split([2, 3, 3]).ToList();
 
             enumerable.Should().NotBeNullOrEmpty()
                 .And.HaveCount(3)
@@ -67,7 +66,7 @@ public class SafelyDivideMoney
     [Fact]
     public void WhenDividing1EuroByGivenRatiosWhereOneIsVerySmall_ThenDivisionShouldNotLoseCents()
     {
-            var enumerable = _euro1.SafeDivide(new[] { 200, 300, 1 }).ToList();
+            var enumerable = _euro1.Split([200, 300, 1]).ToList();
 
             enumerable.Should().NotBeNullOrEmpty()
                 .And.HaveCount(3)
@@ -83,17 +82,17 @@ public class SafelyDivideMoney
         }
 
     [Fact]
-    public void WhenDividingByMinus1_ThenAnExceptionShouldBeThrowed()
+    public void WhenDividingByMinus1_ThrowArgumentOutOfRangeException()
     {
-            Action action = () => _euro1.SafeDivide(-1).ToList();
+            Action action = () => _euro1.Split(-1).ToList();
 
             action.Should().Throw<ArgumentOutOfRangeException>();
         }
 
     [Fact]
-    public void WhenDividingByGivenRatiosWithMinus1_ThenAnExceptionShouldBeThrowed()
+    public void WhenDividingByGivenRatiosWithMinus1_ThrowArgumentOutOfRangeException()
     {
-            Action action = () => _euro1.SafeDivide(new[] { 2, -1, 3 }).ToList();
+            Action action = () => _euro1.Split([2, -1, 3]).ToList();
 
             action.Should().Throw<ArgumentOutOfRangeException>()
                 .WithMessage("*1*");
