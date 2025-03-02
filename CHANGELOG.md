@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- ISpanFormattable implementation
 
 ### Changed
--
+- Rename SafeDivide to Split and move in NodaMoney namespace
+- NotNullWhenAttribute is now internal #101
 
 ### Removed
 -

@@ -28,7 +28,7 @@ public class CreateMoneyWithMinAndMaxValues
      }
 
      [Fact]
-     public void WhenDecimalMaxValue_ThrowOverflowException()
+     public void WhenDecimalMaxValue_ThrowArgumentException()
      {
          // Arrange
 
@@ -36,12 +36,12 @@ public class CreateMoneyWithMinAndMaxValues
          Action action = () => new FastMoney(decimal.MaxValue, "EUR");
 
          // Assert
-         action.Should().Throw<OverflowException>();
+         action.Should().Throw<ArgumentException>();
 
      }
 
      [Fact]
-     public void WhenDecimalMinValue_ThrowOverflowException()
+     public void WhenDecimalMinValue_ThrowArgumentException()
      {
          // Arrange
 
@@ -49,7 +49,7 @@ public class CreateMoneyWithMinAndMaxValues
          Action action = () => new FastMoney(decimal.MinValue, "EUR");
 
          // Assert
-         action.Should().Throw<OverflowException>();
+         action.Should().Throw<ArgumentException>();
      }
 
      [Fact]
