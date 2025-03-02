@@ -41,7 +41,7 @@ public class CalculationsWithoutRoundingInBetween
         result1.Should().Be(5.0000000000000000000000000001M);
 
         // Calculating with Money
-        var subject = new Money(5m);
+        var subject = new Money(5m, "USD");
         var result = (subject / 3m) * 3m;
         result.Amount.Should().Be(5.01M); // expect 5m
         //Money result = subject.Perform(fx);
@@ -63,7 +63,7 @@ public class CalculationsWithoutRoundingInBetween
         }
 
         // Calculating with Money
-        var subject = new Money(5m);
+        var subject = new Money(5m, "USD");
         var result = (subject / 3m) * 3m;
         result.Amount.Should().Be(5.01M); // expect 5m
         //Money result = subject.Perform(fx);
@@ -89,7 +89,7 @@ public class CalculationsWithoutRoundingInBetween
         }
 
         // Calculating with Money
-        var subject = new Money(5m);
+        var subject = new Money(5m, "USD");
         var result = (subject / 3m) * 3m;
         result.Amount.Should().Be(5.01M); // expect 5m
 
@@ -113,7 +113,7 @@ public class CalculationsWithoutRoundingInBetween
         }
 
         // Calculating with Money
-        var subject = new Money(5m);
+        var subject = new Money(5m, "USD");
         var result = (subject / 3m) * 3m;
         result.Amount.Should().Be(5.01M); // expect 5m
 
