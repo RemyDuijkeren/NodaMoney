@@ -71,7 +71,7 @@ public partial struct Money : IXmlSerializable, ISerializable
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
 
     /// <inheritdoc/>
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
     {
         if (info == null)
             throw new ArgumentNullException(nameof(info));

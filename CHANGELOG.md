@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - ISpanFormattable and IUtf8SpanFormattable implementation
+- Partially implemented INumber<Money> by adding Radix, Zero, One, NegativeOne,
+  Abs(), IsNegative(), IsPositive(), IsZero(), MinMagnitude(), MaxMagnitude()
 
 ### Changed
 - Rename SafeDivide to Split and move in NodaMoney namespace
