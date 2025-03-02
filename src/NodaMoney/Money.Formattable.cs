@@ -3,11 +3,12 @@
 namespace NodaMoney;
 
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
-public partial struct Money :
+public partial struct Money : IFormattable
 #if NET6_0_OR_GREATER
-    ISpanFormattable // also implements IFormattable
-#else
-    IFormattable
+    ,ISpanFormattable
+#endif
+#if NET8_0_OR_GREATER
+    ,IUtf8SpanFormattable
 #endif
 {
     /// <summary>Converts this <see cref="Money"/> instance to its equivalent <see cref="string"/> representation.</summary>
@@ -16,7 +17,7 @@ public partial struct Money :
     /// Converting will use the <see cref="NumberFormatInfo"/> object for the current culture if this has the same
     /// ISOCurrencySymbol, otherwise the <see cref="NumberFormatInfo"/> from the <see cref="Currency"/> will be used.
     /// </remarks>
-    public override string ToString() => $"{nameof(Amount)}: {Amount}, {nameof(Currency)}: {Currency}";
+    public override string ToString() => Format(null, null);
 
     /// <summary>Converts the <see cref="Money"/> value of this instance to its equivalent <see cref="string"/> representation
     /// using the specified format.</summary>
@@ -63,5 +64,30 @@ public partial struct Money :
         return true;
 
         //return destination.TryWrite(provider, $"{nameof(Amount)}: {Amount}, {nameof(Currency)}: {Currency}", out charsWritten);
+    }
+
+    /// <inheritdoc />
+    public bool TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // TODO: optimize to use Span
+
+        // Use the existing Format method to create the formatted string
+        string formattedString = Format(format.ToString(), provider);
+
+        // Convert the formatted string to UTF-8
+        byte[] utf8Bytes = System.Text.Encoding.UTF8.GetBytes(formattedString);
+
+        // Check if the destination buffer is large enough to hold the UTF-8 bytes
+        if (utf8Bytes.Length > utf8Destination.Length)
+        {
+            bytesWritten = 0; // Insufficient space
+            return false;
+        }
+
+        // Copy the UTF-8 bytes into the destination buffer
+        utf8Bytes.AsSpan().CopyTo(utf8Destination);
+        bytesWritten = utf8Bytes.Length;
+
+        return true;
     }
 }
