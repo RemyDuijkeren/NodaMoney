@@ -26,12 +26,10 @@ public class CalculationsWithoutRoundingInBetween
 
 
     [Fact]
-    public void WhenDecimalFunction()
+    public void WhenDecimalLocalFunction()
     {
-        bool executed = false;
         decimal Fx(decimal amount)
         {
-            executed = true;
             return amount / 3m * 3m;
         }
 
@@ -52,12 +50,31 @@ public class CalculationsWithoutRoundingInBetween
     }
 
     [Fact]
+    public void WhenDecimalDelegateFunction()
+    {
+        Func<decimal, decimal> fx = amount => amount / 3m * 3m;
+
+        // Calculating with decimal
+        decimal result1 = fx(5m);
+        result1.Should().Be((5m / 3m) * 3m);
+        result1.Should().Be(5.0000000000000000000000000001M);
+
+        // Calculating with Money
+        var subject = new Money(5m, "USD");
+        var result = (subject / 3m) * 3m;
+        result.Amount.Should().Be(5.01M); // expect 5m
+        //Money result = subject.Perform(fx);
+
+        // Calculating with decimal and final as Rounded Money
+        var subject2 = new Money(fx(5m));
+        subject2.Amount.Should().Be(5.00M); // ok
+    }
+
+    [Fact]
     public void WhenMoneyFunction()
     {
-        bool executed = false;
         Money Fx(Money money)
         {
-            executed = true;
             var result = (money.Amount / 3m) * 3m;
             return new Money(result, money.Currency);
         }
@@ -80,10 +97,8 @@ public class CalculationsWithoutRoundingInBetween
     [Fact]
     public void WhenTupleFunction()
     {
-        bool executed = false;
         (decimal Amount, Currency Currency) Fx(Money money)
         {
-            executed = true;
             var result = (money.Amount / 3m) * 3m;
             return (result, money.Currency);
         }
@@ -104,10 +119,8 @@ public class CalculationsWithoutRoundingInBetween
     [Fact]
     public void WhenNamedTupleFunction()
     {
-        bool executed = false;
         UnroundedMoney Fx(Money money)
         {
-            executed = true;
             var result = (money.Amount / 3m) * 3m;
             return new UnroundedMoney(result, money.Currency);
         }

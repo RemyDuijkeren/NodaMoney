@@ -4,6 +4,7 @@ namespace NodaMoney;
 
 // name of type: UnroundedMoney (focus on what it doesnt do), IntermediateMoney, RawMoney, ExactMoney, PreciseMoney?
 // TODO add interface IMoney or IMonetary or IMonetaryAmount?
+// TODO: instead of this type, add IRoundingStrategy as injected behavior for Money?
 
 /// <summary>Represents a monetary value along with its associated currency without performing any rounding operations.</summary>
 /// <param name="Amount">The Amount of money as <see langword="decimal"/></param>
