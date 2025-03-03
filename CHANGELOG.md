@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 
 ### Removed
--
+- Removed Microsoft.Bcl.HashCode dependency for .NET Standard 2.0
 
 ## [2.1]
 

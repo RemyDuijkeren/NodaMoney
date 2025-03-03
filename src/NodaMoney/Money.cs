@@ -191,7 +191,17 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
+#if NETSTANDARD2_0
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (Amount.GetHashCode() * 31) + Currency.GetHashCode();
+        }
+    }
+#else
     public override int GetHashCode() => HashCode.Combine(Amount, Currency);
+#endif
 
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
