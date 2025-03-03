@@ -36,26 +36,24 @@ public class MoneyTypeConverter : TypeConverter
 
         try
         {
-            CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
-            decimal amount = decimal.Parse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
-
-            return new Money(amount, currencyInfo);
-        }
-        catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidCurrencyException)
-        {
-            try
+            decimal amount;
+            if (decimal.TryParse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
             {
-                // try reverse: 234.25 EUR
-                CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
-                decimal amount = decimal.Parse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
-
+                CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
                 return new Money(amount, currencyInfo);
             }
-            catch (Exception reverseException)  when (reverseException is FormatException or ArgumentException or InvalidCurrencyException)
+            // try reverse: 234.25 EUR
+            else if (decimal.TryParse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
             {
-                // throw with original exception!
-                throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
+                CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
+                return new Money(amount, currencyInfo);
             }
+            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
+        }
+        catch (Exception ex)
+        {
+            // throw with original exception!
+            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
         }
     }
 
