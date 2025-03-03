@@ -142,7 +142,8 @@ Money euro5 = euro10 / 2;
 
 // Divide without losing money
 Money total = new Money(101m, "USD");
-IEnumerable<Money> shares = total.SafeDivide(4); // [USD 25, USD 25, USD 25, USD 26]
+IEnumerable<Money> inShares = total.Split(4); // [USD 25, USD 25, USD 25, USD 26]
+IEnumerable<Money> byRatio = total.Split([2,1,3]); // [USD 33.67, USD 16.83, USD 50.50]
 
 // Modulus / Remainder
 Money total = new Money(105.50m, "USD");

@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
-- ISpanFormattable and IUtf8SpanFormattable implementation
+-
+
+### Changed
+-
+
+### Removed
+-
+
+## [2.1]
+
+### Added
+- ISpanFormattable and IUtf8SpanFormattable implemented
 - Partially implemented INumber<Money> by adding Radix, Zero, One, NegativeOne,
   Abs(), IsNegative(), IsPositive(), IsZero(), MinMagnitude(), MaxMagnitude()
 
