@@ -171,6 +171,12 @@ public partial struct Money
     {
         try
         {
+            if (s.IsEmpty || s.IsWhiteSpace())
+            {
+                result = new Money(0, CurrencyInfo.NoCurrency);
+                return false;
+            }
+
             ReadOnlySpan<char> currencyChars = ParseSymbol(s);
 
             CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencyChars, ci) : ParseCurrencyInfo(currencyChars);
