@@ -1,6 +1,7 @@
 namespace NodaMoney.Rounding;
 
-// TODO: proposal of adding rounding behavior to Money types
+// TODO: proposal of adding rounding behavior to Money types. Add as Static/Global Property to not add to Money struct?
+
 internal interface IRoundingStrategy
 {
     decimal Round(decimal amount, CurrencyInfo currencyInfo);

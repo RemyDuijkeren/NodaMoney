@@ -1,6 +1,8 @@
-﻿NodaMoney
-=========
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png" alt="logo">
+﻿---
+title: NodaMoney
+---
+
+<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
 You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
 
@@ -42,9 +44,9 @@ The main classes are:
 - Money: An immutable structure that represents money in a specified currency.
 - Currency: A small immutable structure that represents a currency unit.
 - CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
-and custom currencies. It auto-converts to Currency.
+  and custom currencies. It auto-converts to Currency.
 - ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
-from one currency to another currency.
+  from one currency to another currency.
 
 **Initializing Currency**
 
