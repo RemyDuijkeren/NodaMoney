@@ -64,21 +64,30 @@ public class MoneyJsonConverter : JsonConverter<Money>
 
         try
         {
-            decimal amount;
-            if (decimal.TryParse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (decimal.TryParse(amountSpan, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal amount))
+#else
+            if (decimal.TryParse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal amount))
+#endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
                 return new Money(amount, currencyInfo);
             }
+
             // Retry using reverse format, like '234.25 EUR'
-            else if (decimal.TryParse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (decimal.TryParse(currencySpan, NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#else
+            if (decimal.TryParse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
                 return new Money(amount, currencyInfo);
             }
+
             throw new JsonException(InvalidFormatMessage);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidCurrencyException)
         {
             throw new JsonException(InvalidFormatMessage, ex);
         }

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 
 ### Changed
--
+- More defensive parsing in JSON converters by @gliljas in #102
 
 ### Removed
 - Removed Microsoft.Bcl.HashCode dependency for .NET Standard 2.0
@@ -54,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Big overall performance improvement on:
   - creation of currency (32x faster) and money (20x faster)
-  - smaller footprint and memory allocation (30x less allocations)
+  - smaller footprint and memory allocation (30x fewer allocations)
   - faster operations, formatting and parsing
 - JSON Serialization format is changed from `{ "Cost": {"Amount":1.23,"Currency":"USD"} }` to `{ "Cost":"USD 1.23" }`. This is a breaking change
   for JSON serialization, but deserialization of the old format is partly supported for migration purposes (only for System.Text.Json).

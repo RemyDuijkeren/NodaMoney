@@ -8,6 +8,8 @@ namespace NodaMoney.Serialization;
 /// <remarks>Used by <see cref="Newtonsoft.Json"/> for JSON Strings to do the serialization.</remarks>
 public class MoneyTypeConverter : TypeConverter
 {
+    const string InvalidFormatMessage = "Invalid format for Money. Expected format is '<Currency> <Amount>', like 'EUR 234.25'.";
+
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
         sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
@@ -21,14 +23,14 @@ public class MoneyTypeConverter : TypeConverter
     {
         // Newtonsoft.Json will only call this method when it is a JSON String, like "EUR 234.25", but if it is
         // a JSON Object (= "{...}") it will not call this method but tries to convert it internal in Newtonsoft.Json (which fails).
-        if (value is null || value is not string jsonString)
+        if (value is not string jsonString)
             return base.ConvertFrom(context, culture, value!);
 
         var valueAsSpan = jsonString.AsSpan();
         var spaceIndex = valueAsSpan.IndexOf(' ');
         if (spaceIndex == -1)
         {
-            throw new FormatException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25', but didn't find a space.");
+            throw new FormatException(InvalidFormatMessage);
         }
 
         ReadOnlySpan<char> currencySpan = valueAsSpan.Slice(0, spaceIndex);
@@ -36,24 +38,32 @@ public class MoneyTypeConverter : TypeConverter
 
         try
         {
-            decimal amount;
-            if (decimal.TryParse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (decimal.TryParse(amountSpan, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal amount))
+#else
+            if (decimal.TryParse(amountSpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal amount))
+#endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
                 return new Money(amount, currencyInfo);
             }
+
             // try reverse: 234.25 EUR
-            else if (decimal.TryParse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (decimal.TryParse(currencySpan, NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#else
+            if (decimal.TryParse(currencySpan.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+#endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
                 return new Money(amount, currencyInfo);
             }
-            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.");
+
+            throw new SerializationException(InvalidFormatMessage);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is FormatException or ArgumentException or InvalidCurrencyException)
         {
-            // throw with original exception!
-            throw new SerializationException("Invalid format for Money. Expected format is 'Currency Amount', like 'EUR 234.25'.", ex);
+            throw new SerializationException(InvalidFormatMessage, ex);
         }
     }
 
