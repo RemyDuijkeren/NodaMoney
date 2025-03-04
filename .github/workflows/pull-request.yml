@@ -1,10 +1,9 @@
 ---
-name: CI
+name: Pull Request
 
 on:
-  push:
-    branches:
-      - '**' # all branches but excludes tags
+  pull_request:
+    branches: [ master, main ]
     paths-ignore:
       - docs/**
 
@@ -46,27 +45,3 @@ jobs:
           dotnet test -f net6.0 -c Release -l trx --results-directory ./artifacts/ --no-build
           dotnet test -f net8.0 -c Release -l trx --results-directory ./artifacts/ --no-build
           dotnet test -f net9.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-
-      - name: 📋 Test reporter
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: unittests
-          path: ./artifacts/*.trx
-          reporter: dotnet-trx
-
-      - name: 📦 Pack
-        run: dotnet pack -c Release -o ./artifacts/ --no-build
-
-      - name: 🚀 Push to GitHub
-        run: |
-          dotnet nuget add source --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-
-      - name: 🗑️ Delete old pre-release packages
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: NodaMoney
-          package-type: nuget
-          min-versions-to-keep: 10
-          delete-only-pre-release-versions: true
