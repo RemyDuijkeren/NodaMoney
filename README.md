@@ -72,6 +72,10 @@ Money euros = new (6.54m, "EUR");
 Money euros = new Money(6.54m, Currency.FromCode("EUR"));
 Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
 
+// From existing money
+Money dollars = euros with { Currency = CurrencyInfo.FromCode("USD") };
+Money myEuros = euros with { Amount = 10.12m };
+
 // Define money explicit using helper method for most used currencies in the world
 Money money = Money.Euro(6.54m);
 Money money = Money.USDollar(6.54m);

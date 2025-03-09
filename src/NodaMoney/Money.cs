@@ -160,10 +160,10 @@ public readonly partial struct Money : IEquatable<Money>
     public Money(ulong amount, Currency currency) : this((decimal)amount, currency) { }
 
     /// <summary>Gets the amount of money.</summary>
-    public decimal Amount { get; }
+    public decimal Amount { get; init; }
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-    public Currency Currency { get; }
+    public Currency Currency { get; init; }
 
     /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
