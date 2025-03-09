@@ -17,8 +17,6 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 [![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
 [![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
 
-See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
-
 About
 ----
 NodaMoney provides a library that treats Money as a first class citizen in .NET and handles all the ugly bits like currencies
