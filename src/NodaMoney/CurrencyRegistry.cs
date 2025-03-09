@@ -314,11 +314,11 @@ static class CurrencyRegistry
             new ("VES", 928, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2018, 8, 20) }, // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug. // Replaced by VED/926 but stays active for now
             new ("VED", 926, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2021, 10, 01) }, // replaces VES/928 (Amendment 170)
             new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2021, 04, 01) }, // replaces SLL/694
-            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaced by XCG/532
             new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "ZiG") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
-
-            // Still Active (list one), will move to Historic (list three) in the future
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
+
+            // Still Active list one: will move to Historic (list three) in the future
+            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaced by XCG/532
 
             // Historic ISO-4217 currencies (list three)
             new ("CUC", 931, MinorUnit.Two, "Cuban convertible peso", "CUC$") { ExpiredOn = new DateTime(2021, 06, 30), IntroducedOn = new DateTime(2009, 03, 01) }, // $ or CUC // Amendment 178, replace by CUP/192,
