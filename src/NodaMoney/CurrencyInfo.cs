@@ -337,7 +337,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <inheritdoc />
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
-        // styles: symbol, code, name, accounting
+        // styles: symbol, international symbol, code, name, local name, accounting
 
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
         // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
@@ -345,8 +345,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
         // c => TODO: use C for international version (US$) and c for local version ($) in some locals?
         // R: Round-trip format with currency code
-        // N: Number format = decimal
-        // F: Fixed point format = decimal
+        // N: Number format = decimal 2.765,43
+        // F: Fixed point format = decimal 2765,43
         // L: English name, like 23.002,43 dollar
         // l: Native name, like 23.002,43 dólar
         // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
@@ -400,11 +400,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                 $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
             'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
 
-            // Round-trip format (e.g., "USD 1234.56")
-            'R' or 'r' when digits == -1 => $"{Code} {money.Amount.ToString("R", nfi)}",
-            'R' or 'r' => $"{Code} {money.Amount.ToString($"R{digits} ", nfi)}",
+            // Round-trip format (e.g., "USD 1234.56"). Ignore precision specifier, like R2
+            'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfi)}",
 
-            _ => money.Amount.ToString(format, nfi)
+            _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
     }
 

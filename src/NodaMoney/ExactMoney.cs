@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 namespace NodaMoney;
 
 // name of type: UnroundedMoney (focus on what it doesnt do), IntermediateMoney, RawMoney, ExactMoney, PreciseMoney?
+// this type is relatble to BigMoney in JodaMoney https://www.joda.org/joda-money/userguide.html
 // TODO add interface IMoney or IMonetary or IMonetaryAmount?
 // TODO: instead of this type, add IRoundingStrategy as injected behavior for Money?
 

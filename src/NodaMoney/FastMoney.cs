@@ -46,13 +46,13 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     {
         if (amount < MinValue || amount > MaxValue)
         {
-            throw new ArgumentException("The amount is outside the allowable range for FastMoney.", nameof(amount));
+            throw new ArgumentException("Amount is outside the allowable range for FastMoney.", nameof(amount));
         }
 
         CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
         if (ci.DecimalDigits > 4)
         {
-            throw new ArgumentException("The Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.",
+            throw new ArgumentException("Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.",
                 nameof(currency));
         }
 

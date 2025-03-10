@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- Allow creating Money using 'with' expression
 
 ### Changed
 - More defensive parsing in JSON converters by @gliljas in #102

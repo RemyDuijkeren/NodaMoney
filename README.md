@@ -114,6 +114,7 @@ euro10 != euro20; // true;
 euro10 == dollar10; // false;
 euro20 > euro10; // true;
 euro10 <= dollar10; // throws InvalidCurrencyException!
+zeroEuro == zeroDollar; // true; special zero handling
 
 // Add and Substract
 Money euro30 = euro10 + euro20;
@@ -158,42 +159,43 @@ Money remainder = total % unitPrice; // USD 5.50
 **Money formatting**
 
 ```csharp
-Money yen = new Money(765m, "JPY");
-Money euro = new Money(765.43m, "EUR");
-Money dollar = new Money(765.43m, "USD");
-Money dinar = new Money(765.432m, "BHD");
+Money yen = new Money(2765m, "JPY");
+Money euro = new Money(2765.43m, "EUR");
+Money dollar = new Money(2765.43m, "USD");
+Money dinar = new Money(2765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
-yen.ToString();    // "¥765"
-euro.ToString();   // "€765.43"
-dollar.ToString(); // "$765.43"
-dinar.ToString();  // "BD765.432"
-
-yen.ToString("C2");    // "¥765.00"
-euro.ToString("C2");   // "€765.43"
-dollar.ToString("C2"); // "$765.43"
-dinar.ToString("C2");  // "BD765.43"
+yen.ToString();    // "¥2,765"
+euro.ToString();   // "€2,765.43"
+dollar.ToString(); // "$2,765.43"
+dinar.ToString();  // "BD2,765.432"
 
 // Implicit when current culture is 'nl-BE'
-yen.ToString();    // "¥ 765"
-euro.ToString();   // "€ 765,43"
-dollar.ToString(); // "$ 765,43"
-dinar.ToString();  // "BD 765,432"
+yen.ToString();    // "¥ 2.765"
+euro.ToString();   // "€ 2.765,43"
+dollar.ToString(); // "$ 2.765,43"
+dinar.ToString();  // "BD 2.765,432"
 
 // Implicit when current culture is 'fr-BE'
-yen.ToString();    // "765 ¥"
-euro.ToString();   // "765,43 €"
-dollar.ToString(); // "765,43 $"
-dinar.ToString();  // "765,432 BD"
-}
+yen.ToString();    // "2.765 ¥"
+euro.ToString();   // "2.765,43 €"
+dollar.ToString(); // "2.765,43 $"
+dinar.ToString();  // "2.765,432 BD"
 
 // Explicit format for culture 'nl-NL'
 var ci = new CultureInfo("nl-NL");
 
-yen.ToString(ci);    // "¥ 765"
-euro.ToString(ci);   // "€ 765,43"
-dollar.ToString(ci); // "$ 765,43"
-dinar.ToString(ci);  // "BD 765,432"
+yen.ToString(ci);    // "¥ 2.765"
+euro.ToString(ci);   // "€ 2.765,43"
+dollar.ToString(ci); // "$ 2.765,43"
+dinar.ToString(ci);  // "BD 2.765,432"
+
+// Standard Formats when currenct culture is 'nl-NL'
+euro.ToString("C"); // "€ 2.765,43"    Currency format
+euro.ToString("C0"); // "€ 2.765"      Currency format with precision specifier
+euro.ToString("G"); // "EUR 2.765,43"  General format (=Currency format but with currency code)
+euro.ToString("L"); // "2.765,43 Euro" English name format
+euro.ToString("R"); // "EUR 2,765.43"  Round-trip format
 ```
 
 **Money parsing**
