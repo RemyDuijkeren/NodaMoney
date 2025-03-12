@@ -58,7 +58,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         Debug.Assert(Code != null, "Code should not be null");
         Debug.Assert(Code!.Length == 3, InvalidCurrencyMessage);
         Debug.Assert(Code.All(c => c is >= 'A' and <= 'Z'), InvalidCurrencyMessage);
-        Debug.Assert(Number >= 0, "Number should be greater or equal to 0");
+        Debug.Assert(Number >= -1, "Number should be greater or equal to -1");
         Debug.Assert(EnglishName != null, "EnglishName should not be null");
         Debug.Assert(Symbol != null, "Symbol should not be null");
     }
@@ -92,7 +92,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public string Code { get; init; }
 
     /// <summary>The (ISO-4217) number of the currency.</summary>
-    public short Number { get; init; }
+    public short Number { get; init; } = -1;
 
     /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
     public MinorUnit MinorUnit { get; init; }
@@ -230,7 +230,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     {
         ValidateCurrencyCode(code);
 
-        return new CurrencyInfo(code, 0, MinorUnit.NotApplicable) { IsIso4217 = false };
+        return new CurrencyInfo(code, -1, MinorUnit.NotApplicable) { IsIso4217 = false };
     }
 
     /// <summary>Registers the specified <see cref="CurrencyInfo"/> as a custom currency for the current AppDomain.</summary>
@@ -608,9 +608,9 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     private static void ValidateCurrencyNumber(short number, bool isIso4217)
     {
-        if (number < 0)
+        if (number < -1)
         {
-            throw new ArgumentException($"The number code '{number}' must be greater than 0!");
+            throw new ArgumentException($"The number code '{number}' must be greater than -1!");
         }
 
         switch (isIso4217)

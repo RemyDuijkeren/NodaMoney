@@ -12,7 +12,7 @@ public class RegisterCurrencyInfo
 
         // Assert
         result.Code.Should().Be("BTA");
-        result.Number.Should().Be(0);
+        result.Number.Should().Be(-1);
         result.MinorUnit.Should().Be(MinorUnit.NotApplicable);
         result.EnglishName.Should().BeEmpty();
         result.Symbol.Should().Be(CurrencyInfo.GenericCurrencySign);
