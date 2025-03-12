@@ -191,11 +191,13 @@ dollar.ToString(ci); // "$ 2.765,43"
 dinar.ToString(ci);  // "BD 2.765,432"
 
 // Standard Formats when currenct culture is 'nl-NL'
-euro.ToString("C"); // "€ 2.765,43"    Currency format
-euro.ToString("C0"); // "€ 2.765"      Currency format with precision specifier
-euro.ToString("G"); // "EUR 2.765,43"  General format (=Currency format but with currency code)
-euro.ToString("L"); // "2.765,43 Euro" English name format
-euro.ToString("R"); // "EUR 2,765.43"  Round-trip format
+euro.ToString("C");  // "€ 2.765,43"    Currency format
+euro.ToString("C0"); // "€ 2.765"       Currency format with precision specifier
+euro.ToString("G");  // "EUR 2.765,43"  General format (= C but with currency code)
+euro.ToString("L");  // "2.765,43 Euro" English name format
+euro.ToString("R");  // "EUR 2,765.43"  Round-trip format
+euro.ToString("N");  // "2,765.43"      Number format
+euro.ToString("F");  // "2765,43"       Fixed point format
 ```
 
 **Money parsing**

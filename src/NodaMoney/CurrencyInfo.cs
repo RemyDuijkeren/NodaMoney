@@ -379,22 +379,23 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         char fmt = ParseFormatSpecifier(format.AsSpan(), out int digits);
         if (fmt == 0)
         {
+            // TODO: allow custom format with currency sign ($)?
             // custom format
             return money.Amount.ToString(format, nfi);
         }
 
         return fmt switch
         {
-            // Currency formats
+            // Currency format (e.g., "$ 2.765,43")
             'C' when digits == -1 => money.Amount.ToString("C", nfi),
             'C' or 'c' => // TODO: use C for international version (US$) and c for local version ($) in some locals
                 money.Amount.ToString($"C{digits}", nfi),
 
-            // General format (uses currency code as symbol)
+            // General format (e.g., "USD 2.765,43")
             'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, true)),
             'G' or 'g' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, true)),
 
-            // English Name currency (e.g., "1234.56 US dollars") // TODO: future use lower-case for local native name
+            // English Name currency (e.g., "1.234.56 US dollars") // TODO: future use lower-case for local native name
             'L' or 'l' when digits == -1 =>
                 // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
                 $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
@@ -402,6 +403,14 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
             // Round-trip format (e.g., "USD 1234.56"). Ignore precision specifier, like R2
             'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfi)}",
+
+            // Number format (e.g., "2.765,43")
+            'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, true)),
+            'N' or 'n' => money.Amount.ToString($"N{digits}", ToNumberFormatInfo(formatProvider, true)),
+
+            // Fixed point format (e.g., "2765,43")
+            'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, true)),
+            'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, true)),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
