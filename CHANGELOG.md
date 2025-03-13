@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Allow creating Money using 'with' expression
+- Add format N, Number format (e.g., "2,765.43")
+- Add format F, Fixed point format (e.g., "2765,43")
 
 ### Changed
 - More defensive parsing in JSON converters by @gliljas in #102

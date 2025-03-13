@@ -1,21 +1,5 @@
 ﻿NodaMoney
 =========
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png" alt="logo">
-You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
-[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
-
-If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
-Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
-
-For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
-[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
-
-[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
-[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
-
-See [http://www.nodamoney.org/](http://www.nodamoney.org/) for more information about this project or below.
 
 About
 ----
@@ -276,3 +260,19 @@ CurrencyInfo.Register(newEuro);
 
 var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```
+
+## Support
+
+You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
+[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
+
+If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
+Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
+
+For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
+[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
+
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
+[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)

@@ -2,21 +2,6 @@
 title: NodaMoney
 ---
 
-<img align="right" src="https://raw.githubusercontent.com/remyvd/NodaMoney/master/docs/logo_nodamoney.png">
-You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
-[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
-
-If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
-Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
-
-For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
-[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
-
-[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
-[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
-
 About
 ----
 NodaMoney provides a library that treats Money as a first class citizen in .NET and handles all the ugly bits like currencies
@@ -72,6 +57,10 @@ Money euros = new (6.54m, "EUR");
 Money euros = new Money(6.54m, Currency.FromCode("EUR"));
 Money euros = new Money(6.54m, CurrencyInfo.FromCode("EUR"));
 
+// From existing money
+Money dollars = euros with { Currency = CurrencyInfo.FromCode("USD") };
+Money myEuros = euros with { Amount = 10.12m };
+
 // Define money explicit using helper method for most used currencies in the world
 Money money = Money.Euro(6.54m);
 Money money = Money.USDollar(6.54m);
@@ -110,6 +99,7 @@ euro10 != euro20; // true;
 euro10 == dollar10; // false;
 euro20 > euro10; // true;
 euro10 <= dollar10; // throws InvalidCurrencyException!
+zeroEuro == zeroDollar; // true; special zero handling
 
 // Add and Substract
 Money euro30 = euro10 + euro20;
@@ -154,42 +144,45 @@ Money remainder = total % unitPrice; // USD 5.50
 **Money formatting**
 
 ```csharp
-Money yen = new Money(765m, "JPY");
-Money euro = new Money(765.43m, "EUR");
-Money dollar = new Money(765.43m, "USD");
-Money dinar = new Money(765.432m, "BHD");
+Money yen = new Money(2765m, "JPY");
+Money euro = new Money(2765.43m, "EUR");
+Money dollar = new Money(2765.43m, "USD");
+Money dinar = new Money(2765.432m, "BHD");
 
 // Implicit when current culture is 'en-US'
-yen.ToString();    // "¥765"
-euro.ToString();   // "€765.43"
-dollar.ToString(); // "$765.43"
-dinar.ToString();  // "BD765.432"
-
-yen.ToString("C2");    // "¥765.00"
-euro.ToString("C2");   // "€765.43"
-dollar.ToString("C2"); // "$765.43"
-dinar.ToString("C2");  // "BD765.43"
+yen.ToString();    // "¥2,765"
+euro.ToString();   // "€2,765.43"
+dollar.ToString(); // "$2,765.43"
+dinar.ToString();  // "BD2,765.432"
 
 // Implicit when current culture is 'nl-BE'
-yen.ToString();    // "¥ 765"
-euro.ToString();   // "€ 765,43"
-dollar.ToString(); // "$ 765,43"
-dinar.ToString();  // "BD 765,432"
+yen.ToString();    // "¥ 2.765"
+euro.ToString();   // "€ 2.765,43"
+dollar.ToString(); // "$ 2.765,43"
+dinar.ToString();  // "BD 2.765,432"
 
 // Implicit when current culture is 'fr-BE'
-yen.ToString();    // "765 ¥"
-euro.ToString();   // "765,43 €"
-dollar.ToString(); // "765,43 $"
-dinar.ToString();  // "765,432 BD"
-}
+yen.ToString();    // "2.765 ¥"
+euro.ToString();   // "2.765,43 €"
+dollar.ToString(); // "2.765,43 $"
+dinar.ToString();  // "2.765,432 BD"
 
 // Explicit format for culture 'nl-NL'
 var ci = new CultureInfo("nl-NL");
 
-yen.ToString(ci);    // "¥ 765"
-euro.ToString(ci);   // "€ 765,43"
-dollar.ToString(ci); // "$ 765,43"
-dinar.ToString(ci);  // "BD 765,432"
+yen.ToString(ci);    // "¥ 2.765"
+euro.ToString(ci);   // "€ 2.765,43"
+dollar.ToString(ci); // "$ 2.765,43"
+dinar.ToString(ci);  // "BD 2.765,432"
+
+// Standard Formats when currenct culture is 'nl-NL'
+euro.ToString("C");  // "€ 2.765,43"    Currency format
+euro.ToString("C0"); // "€ 2.765"       Currency format with precision specifier
+euro.ToString("G");  // "EUR 2.765,43"  General format (= C but with currency code)
+euro.ToString("L");  // "2.765,43 Euro" English name format
+euro.ToString("R");  // "EUR 2,765.43"  Round-trip format
+euro.ToString("N");  // "2,765.43"      Number format
+euro.ToString("F");  // "2765,43"       Fixed point format
 ```
 
 **Money parsing**
@@ -268,3 +261,19 @@ CurrencyInfo.Register(newEuro);
 
 var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```
+
+## Support
+
+You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
+[GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
+
+If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
+Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
+
+For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
+[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
+
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
+[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)

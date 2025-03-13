@@ -1,6 +1,33 @@
 namespace NodaMoney.Rounding;
 
-// TODO: proposal of adding rounding behavior to Money types. Add as Static/Global Property to not add to Money struct?
+// Rounding modes, such as Half-Up or Half-Even (Bankers' Rounding), are primarily determined by business context and accounting standards,
+// rather than being inherently tied to specific currencies. While certain currencies have unique rounding practices due to the availability
+// of denominations, the choice of rounding mode often depends on the financial context and regulatory requirements.
+//
+// Business Context and Accounting Standards:
+//  - Financial Reporting: Many accounting standards recommend specific rounding methods to ensure consistency and accuracy in financial
+//    statements. For instance, Half-Even (Bankers' Rounding) is commonly used to minimize cumulative rounding errors over large datasets.
+//  - Tax Calculations: Tax authorities may prescribe particular rounding rules for calculating tax liabilities, which businesses must
+//    adhere to, regardless of the currency in use.
+//  - Point of Sale (POS) Systems: In retail environments, prices might be rounded to the nearest convenient denomination to simplify cash
+//    transactions and minimize the use of small coins.
+//
+// Currency-Specific Rounding Practices:
+//
+// Certain currencies have unique rounding practices due to the availability of denominations:
+//  - Swiss Franc (CHF): Prices are typically rounded to the nearest 0.05 CHF because the smallest coin in circulation is 5 centimes.
+//  - Swedish Króna (SEK): After the removal of 1 and 2 öre coins, cash transactions are rounded to the nearest 0.05 SEK.
+//
+// These practices are implemented to align with the physical denominations available and to facilitate smoother cash transactions.
+//
+// Conclusion:
+// While certain currencies have specific rounding practices due to their denominations, the choice of rounding mode—such as Half-Up or
+// Half-Even—is typically guided by the business context and applicable accounting standards. Therefore, when modeling financial transactions
+// in programming, it's essential to consider both the currency's characteristics and the relevant financial regulations to determine the
+// appropriate rounding approach.
+
+// Proposal of adding rounding behavior to Money types and/or Currency. Add as Static/Global Property to not add to Money struct
+// but have it as a global context? Or add it to CurrencyInfo? Or both?JavaMoney uses a MoneyContext for this.
 
 internal interface IRoundingStrategy
 {
@@ -8,6 +35,7 @@ internal interface IRoundingStrategy
 }
 
 /// <summary>Represents the default rounding strategy for monetary calculations.</summary>
+/// <param name="Rounding">Specifies the strategy that mathematical rounding methods should use to round a number.</param>
 /// <remarks>
 /// This class provides a rounding strategy that uses a specified midpoint rounding method,
 /// defaulting to <see cref="MidpointRounding.ToEven"/> (Bankers' rounding). It is commonly

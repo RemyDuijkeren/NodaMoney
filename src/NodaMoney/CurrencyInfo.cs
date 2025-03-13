@@ -5,7 +5,7 @@ namespace NodaMoney;
 
 // TODO: Add support for the following properties?
 // Thread.CurrentThread.CurrentCulture = new CurrentInfo("")
-// Thread.CurrentThread.CurrentCurrency = new CurrencyInfo("");
+// Thread.CurrentThread.CurrentCurrency = new CurrencyInfo(""); // extension property not possible
 //
 // CultureInfo.DefaultThreadCurrentCurrency = CurrencyInfo;
 //
