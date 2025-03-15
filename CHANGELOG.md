@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - More defensive parsing in JSON converters by @gliljas in #102
+- Migrate from SLN to SLNX solution file format
 
 ### Removed
 - Removed Microsoft.Bcl.HashCode dependency for .NET Standard 2.0
