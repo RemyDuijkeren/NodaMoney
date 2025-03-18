@@ -42,6 +42,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: 🚦 Test
+        id: test
         run: |
           dotnet test -f net6.0 -c Release -l trx --results-directory ./artifacts/ --no-build
           dotnet test -f net8.0 -c Release -l trx --results-directory ./artifacts/ --no-build
@@ -49,7 +50,7 @@ jobs:
 
       - name: 📋 Test reporter
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() && steps.test.outcome != 'skipped'
         with:
           name: unittests
           path: ./artifacts/*.trx
