@@ -318,7 +318,7 @@ static class CurrencyRegistry
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
 
             // Still Active list one: will move to Historic (list three) in the future
-            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaced by XCG/532
+            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 07, 01) }, // Amendment 176, replaced by XCG/532
 
             // Historic ISO-4217 currencies (list three)
             new ("CUC", 931, MinorUnit.Two, "Cuban convertible peso", "CUC$") { ExpiredOn = new DateTime(2021, 06, 30), IntroducedOn = new DateTime(2009, 03, 01) }, // $ or CUC // Amendment 178, replace by CUP/192,
