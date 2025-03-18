@@ -27,7 +27,7 @@ namespace NodaMoney.Rounding;
 // appropriate rounding approach.
 
 // Proposal of adding rounding behavior to Money types and/or Currency. Add as Static/Global Property to not add to Money struct
-// but have it as a global context? Or add it to CurrencyInfo? Or both?JavaMoney uses a MoneyContext for this.
+// but have it as a global context? Or add it to CurrencyInfo? Or both? JavaMoney uses a MoneyContext for this.
 
 internal interface IRoundingStrategy
 {

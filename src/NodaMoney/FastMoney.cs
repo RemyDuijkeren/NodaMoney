@@ -14,7 +14,7 @@ namespace NodaMoney;
 /// See also OLE Automation Currency and SQL Currency type.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount?
+internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using interface will cause boxing!
 {
     /// <summary>Stored as an integer scaled by 10,000</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]

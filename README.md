@@ -11,9 +11,10 @@ be used for very basic things. But it's still a numeric value without knowledge 
 formatting, etc. The .NET Framework has the System.Globalization namespace that helps with formatting of money in different cultures and regions,
 but it only captures some info about currencies, but not everything.
 
-There is also some business logic surronding money, like dividing without losing pennies (like in the movie [Office Space](http://www.imdb.com/title/tt0151804/)),
-conversion, etc. that motivates to have a Money type that contains all the domain logic, like Martin Fowler already descibed in
-his book [Patterns of Enterprise Application Architecture](http://martinfowler.com/eaaCatalog/money.html)
+There is also some business logic surrounding money, like dividing without losing pennies (like in the movie [Office Space](http://www.imdb.com/title/tt0151804/)),
+conversion, etc. that motivates to have a Money type that contains all the domain logic, like Martin Fowler already described in
+his book Patterns of Enterprise Application Architecture, see pages about [Money](http://martinfowler.com/eaaCatalog/money.html)
+and [Quantity](https://martinfowler.com/eaaDev/Quantity.html).
 
 NodaMoney represents the .NET counterpart of java library [JodaMoney](http://www.joda.org/joda-money/), like NodaTime is the .NET
 counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and

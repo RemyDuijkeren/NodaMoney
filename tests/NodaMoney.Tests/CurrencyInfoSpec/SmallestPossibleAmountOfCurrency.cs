@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace NodaMoney.Tests.CurrencyInfoSpec;
 
 public class SmallestPossibleAmountOfCurrency
@@ -56,5 +58,8 @@ public class SmallestPossibleAmountOfCurrency
         // _mga.MinorUnit.Should().Be(5); // 1/5
         _mga.MinimalAmount.Should().Be(0.2m);
         _mga.DecimalDigits.Should().Be(1); // According to ISO-4217 this is 2
+
+        // var ci = CultureInfo.GetCultureInfo("mg-MG");
+        // ci.NumberFormat.CurrencyDecimalDigits.Should().Be(0);
     }
 }
