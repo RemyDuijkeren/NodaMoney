@@ -16,9 +16,6 @@ public readonly partial record struct Currency
     /// <summary>ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.</summary>
     readonly ushort _encodedValue;
 
-    // TODO: store minor unit in 4 bits (0-15) and currency list in 2 bits (0-3)? : 4+2=6 bits (2bits left for 4 distinct values)
-    // readonly byte _listAndMinorUnit;
-
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
     /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>
@@ -35,15 +32,14 @@ public readonly partial record struct Currency
         if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
 
         // Special handling for no currency. Use 0 for 'XXX' (No Currency)
-        if (code[0] == 'X' && code[1] == 'X' && code[2] == 'X')
+        if (code.SequenceEqual("XXX".AsSpan()))
         {
-            _encodedValue = 0;
+            // _encodedValue is default 0
             return;
         }
 
         // A-Z (65-90 in ASCII), move to 1-26 so that it fits in 5 bits.
         // Store in ushort (2 bytes) by shifting 5 bits to the left for each char.
-        _encodedValue = 0;
         foreach (var c in code)
         {
             if (c is < 'A' or > 'Z')
@@ -100,7 +96,7 @@ public readonly partial record struct Currency
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
-    public static Currency FromCode(string code) => CurrencyRegistry.Get(code);
+    public static Currency FromCode(string code) => CurrencyInfo.FromCode(code);
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>
     public decimal MinimalAmount => CurrencyInfo.FromCode(Code).MinimalAmount;
