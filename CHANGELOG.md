@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow creating Money using 'with' expression
 - Add format N, Number format (e.g., "2,765.43")
 - Add format F, Fixed point format (e.g., "2765,43")
+- Add compatibility with Native AOT and Trimming
 
 ### Changed
 - More defensive parsing in JSON converters by @gliljas in #102
 - Migrate from SLN to SLNX solution file format
+- Aligned the expiration date of the Netherlands Antillean guilder (ANG) with the amended timeline (ISO 4217 AMENDMENT NUMBER 176.)
 
 ### Removed
 - Removed Microsoft.Bcl.HashCode dependency for .NET Standard 2.0

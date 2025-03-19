@@ -64,8 +64,9 @@ public partial struct Money : IXmlSerializable, ISerializable
             throw new SerializationException("Member 'Currency' was not found or not in a correct string format.");
         }
 
-        TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(Currency));
-        Currency = (Currency)(typeConverter.ConvertFromString(currency) ?? new SerializationException("Member 'Currency' could not be converted from string to Currency."));
+        // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
+        CurrencyTypeConverter currencyTypeConverter = new();
+        Currency = (Currency)(currencyTypeConverter.ConvertFromString(currency) ?? new SerializationException("Member 'Currency' could not be converted from string to Currency."));
         Amount = Round(amount, Currency, MidpointRounding.ToEven);
     }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
@@ -76,8 +77,11 @@ public partial struct Money : IXmlSerializable, ISerializable
         if (info == null)
             throw new ArgumentNullException(nameof(info));
 
+        // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
+        CurrencyTypeConverter currencyTypeConverter = new();
+
         info.AddValue("Amount", Amount);
-        info.AddValue("Currency", TypeDescriptor.GetConverter(typeof(Currency)).ConvertToString(Currency));
+        info.AddValue("Currency", currencyTypeConverter.ConvertToString(Currency));
     }
 
     /// <inheritdoc/>
@@ -88,6 +92,9 @@ public partial struct Money : IXmlSerializable, ISerializable
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
+
+        // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
+        CurrencyTypeConverter currencyTypeConverter = new();
 
         // To decide between V1 and V2 format, we need to check the current if it has an attribute "Amount" or "amount"
         // if it has, we are in V1 format, otherwise we are in V2 format
@@ -101,7 +108,7 @@ public partial struct Money : IXmlSerializable, ISerializable
                                        reader.GetAttribute("currency") ??
                                        throw new InvalidOperationException("Couldn't find attribute 'Currency' or 'currency'!");
 
-            var currency = (Currency)(TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currencyAttribute) ??
+            var currency = (Currency)(currencyTypeConverter.ConvertFromString(currencyAttribute) ??
                                       throw new InvalidOperationException($"Converting '{currencyAttribute}' to Currency failed!"));
 
             Unsafe.AsRef(in this) = new Money(amount, currency);
@@ -113,7 +120,7 @@ public partial struct Money : IXmlSerializable, ISerializable
                                        reader.GetAttribute("currency") ??
                                        throw new InvalidOperationException("Couldn't find attribute 'Currency' or 'currency'!");
 
-            var currency = (Currency)(TypeDescriptor.GetConverter(typeof(Currency)).ConvertFromString(currencyAttribute) ??
+            var currency = (Currency)(currencyTypeConverter.ConvertFromString(currencyAttribute) ??
                                       throw new InvalidOperationException($"Converting '{currencyAttribute}' to Currency failed!"));
 
             var content = reader.ReadElementContentAsString();
@@ -130,8 +137,11 @@ public partial struct Money : IXmlSerializable, ISerializable
             if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
 
+            // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
+            CurrencyTypeConverter currencyTypeConverter = new();
+
             // v2 format: <Money Currency="USD">765.43</Money>
-            writer.WriteAttributeString("Currency", TypeDescriptor.GetConverter(typeof(Currency)).ConvertToString(Currency));
+            writer.WriteAttributeString("Currency", currencyTypeConverter.ConvertToString(Currency));
             writer.WriteString(Amount.ToString(CultureInfo.InvariantCulture));
 
             // v1 format: <Money Amount="765.43" Currency="USD" />
