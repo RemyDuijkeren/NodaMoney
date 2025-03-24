@@ -12,19 +12,19 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     /// <param name="rate">The rate of the exchange.</param>
     /// <exception cref="ArgumentNullException">The value of 'baseCurrency' or 'quoteCurrency' cannot be null. </exception>
     /// <exception cref="ArgumentOutOfRangeException">Rate must be greater than zero.</exception>
-    /// <exception cref="ArgumentException">The base and quote currency can't be equal.</exception>
+    /// <exception cref="ArgumentException">When the base and quote currency are equal, the only allowed rate is 1.</exception>
     public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
         : this()
     {
-            if (baseCurrency == quoteCurrency)
-                throw new ArgumentException("The base and quote currency can't be equal!");
+            if (baseCurrency == quoteCurrency && rate != 1M)
+                throw new ArgumentException("When the base and quote currency are equal, the only allowed rate is 1!");
             if (rate < 0)
                 throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
             Value = rate; // value is a ratio
-        }
+    }
 
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
     /// <param name="baseCurrency">The base currency.</param>
