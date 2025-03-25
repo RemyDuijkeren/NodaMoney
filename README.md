@@ -1,4 +1,4 @@
-﻿NodaMoney
+NodaMoney
 =========
 
 About
@@ -277,3 +277,4 @@ For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/No
 [![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
 [![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
 [![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
+[![libs.tech recommends](https://libs.tech/project/27265209/badge.svg)](https://libs.tech/project/27265209/nodamoney)
