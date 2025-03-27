@@ -16,14 +16,14 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, decimal rate)
         : this()
     {
-            if (baseCurrency == quoteCurrency && rate != 1M)
-                throw new ArgumentException("When the base and quote currency are equal, the only allowed rate is 1!");
-            if (rate < 0)
-                throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
+        if (baseCurrency == quoteCurrency && rate != 1M)
+            throw new ArgumentOutOfRangeException("When the base and quote currency are equal, the only allowed rate is 1!");
+        if (rate < 0)
+            throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
 
-            BaseCurrency = baseCurrency;
-            QuoteCurrency = quoteCurrency;
-            Value = rate; // value is a ratio
+        BaseCurrency = baseCurrency;
+        QuoteCurrency = quoteCurrency;
+        Value = rate; // value is a ratio
     }
 
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
@@ -34,7 +34,7 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate, int numberOfDecimals = 6)
         : this(baseCurrency, quoteCurrency, Math.Round((decimal)rate, numberOfDecimals))
     {
-        }
+    }
 
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
     /// <param name="baseCode">The code of the base currency.</param>
@@ -43,7 +43,7 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     public ExchangeRate(string baseCode, string quoteCode, decimal rate)
         : this(CurrencyInfo.FromCode(baseCode), CurrencyInfo.FromCode(quoteCode), rate)
     {
-        }
+    }
 
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
     /// <param name="baseCode">The code of the base currency.</param>
@@ -53,7 +53,7 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     public ExchangeRate(string baseCode, string quoteCode, double rate, int numberOfDecimals = 6)
         : this(CurrencyInfo.FromCode(baseCode), CurrencyInfo.FromCode(quoteCode), rate, numberOfDecimals)
     {
-        }
+    }
 
     /// <summary>Gets the base currency.</summary>
     /// <value>The base currency.</value>
@@ -84,18 +84,26 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     /// <returns>The equivalent to the exchange rate contained in rate.</returns>
     /// <exception cref="System.FormatException">rate is not in the correct format.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="rate"/> is <c>null</c>.</exception>
-    public static ExchangeRate Parse(string rate)
+    public static ExchangeRate Parse(string rate) => Parse(rate, NumberStyles.Currency, CultureInfo.CurrentCulture);
+
+    /// <inheritdoc cref="Parse(string)"/>
+    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to parse the amount</param>
+    public static ExchangeRate Parse(string rate, IFormatProvider? formatProvider) => Parse(rate, NumberStyles.Currency, formatProvider);
+
+    /// <inheritdoc cref="Parse(string, IFormatProvider?)"/>
+    /// <param name="style">A bitwise combination of <see cref="NumberStyles"/> values that indicates the style elements that can be present in the value parameter.</param>
+    public static ExchangeRate Parse(string rate, NumberStyles style, IFormatProvider? formatProvider)
     {
-            if (rate == null)
-                throw new ArgumentNullException(nameof(rate));
+        if (rate == null)
+            throw new ArgumentNullException(nameof(rate));
 
-            if (!TryParse(rate, out ExchangeRate fx))
-            {
-                throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
-            }
-
-            return fx;
+        if (!TryParse(rate, style, formatProvider, out ExchangeRate fx))
+        {
+            throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
         }
+
+        return fx;
+    }
 
     /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent. A return
     /// value indicates whether the conversion succeeded or failed.</summary>
@@ -106,19 +114,28 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     /// valid format, or represents a number less than MinValue
     /// or greater than MaxValue. This parameter is passed uninitialized.</param>
     /// <returns><b>true</b> if rate was converted successfully; otherwise, <b>false</b>.</returns>
-    /// <exception cref="ArgumentNullException">if <see cref="rate"/> is null or whitespace</exception>
-    public static bool TryParse(string rate, out ExchangeRate result)
+    public static bool TryParse(string rate, out ExchangeRate result) => TryParse(rate, NumberStyles.Currency, CultureInfo.CurrentCulture, out result);
+
+    /// <inheritdoc cref="TryParse(string, out ExchangeRate)"/>
+    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to parse the amount</param>
+    public static bool TryParse(string rate, IFormatProvider? formatProvider, out ExchangeRate result) => TryParse(rate, NumberStyles.Currency, formatProvider, out result);
+
+    /// <inheritdoc cref="TryParse(string, IFormatProvider?, out ExchangeRate)"/>
+    /// <param name="style">A bitwise combination of <see cref="NumberStyles"/> values that indicates the style elements that can be present in the value parameter.</param>
+    public static bool TryParse(string rate, NumberStyles style, IFormatProvider? formatProvider, out ExchangeRate result)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(rate))
-                throw new ArgumentNullException(nameof(rate));
-
+            {
+                result = default;
+                return false;
+            }
             rate = rate.Trim();
             var baseCurrency = CurrencyInfo.FromCode(rate.Substring(0, 3));
             int index = rate.Substring(3, 1) == "/" ? 4 : 3;
             var quoteCurrency = CurrencyInfo.FromCode(rate.Substring(index, 3));
-            var value = decimal.Parse(rate.Remove(0, index + 3), NumberFormatInfo.CurrentInfo);
+            var value = decimal.Parse(rate.Remove(0, index + 3),style, formatProvider);
 
             result = new ExchangeRate(baseCurrency, quoteCurrency, value);
             return true;
@@ -185,5 +202,9 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
     /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
     /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
-    public override string ToString() => $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value}";
+    public override string ToString() => ToString(CultureInfo.CurrentCulture);
+
+    /// <inheritdoc cref="ToString()"/>
+    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to format the amount</param>
+    public string ToString(IFormatProvider formatProvider) => $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value.ToString(formatProvider)}";
 }
