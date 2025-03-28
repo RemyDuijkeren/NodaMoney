@@ -1,3 +1,4 @@
+using System.Globalization;
 using NodaMoney.Exchange;
 using NodaMoney.Tests.Helpers;
 
@@ -38,6 +39,24 @@ public class ParseACurrencyPair
         fx2.Value.Should().Be(1.2591M);
     }
 
+    [Fact, UseCulture("en-US")]
+    public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceedWithCultureSpecified()
+    {
+        var fx = ExchangeRate.Parse("EUR/USD 1,2591", CultureInfo.GetCultureInfo("nl-NL"));
+
+        fx.BaseCurrency.Code.Should().Be("EUR");
+        fx.QuoteCurrency.Code.Should().Be("USD");
+        fx.Value.Should().Be(1.2591M);
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenCurrencyPairInNlCulture_ThenParsingShouldFailWithIncompatibleCultureSpecified()
+    {
+        Action action = () => ExchangeRate.Parse("EUR/USD 1,2591", NumberStyles.Currency & ~NumberStyles.AllowThousands, CultureInfo.GetCultureInfo("en-US"));
+
+        action.Should().Throw<FormatException>();
+    }
+
     [Fact]
     public void WhenCurrencyPairIsNotANumber_ThenThrowException()
     {
@@ -47,7 +66,17 @@ public class ParseACurrencyPair
     }
 
     [Fact, UseCulture("en-US")]
-    public void WhenCurrencyPairHasSameCurrencies_ThenThrowException()
+    public void WhenCurrencyPairHasSameCurrenciesAndValueEqualTo1_ThenParsingShouldSucceed()
+    {
+        var fx1 = ExchangeRate.Parse("EUR/EUR 1");
+
+        fx1.BaseCurrency.Code.Should().Be("EUR");
+        fx1.QuoteCurrency.Code.Should().Be("EUR");
+        fx1.Value.Should().Be(1M);
+    }
+
+    [Fact, UseCulture("en-US")]
+    public void WhenCurrencyPairHasSameCurrenciesAndValueNotEqualTo1_ThenThrowException()
     {
         Action action = () => ExchangeRate.Parse("EUR/EUR 1.2591");
 

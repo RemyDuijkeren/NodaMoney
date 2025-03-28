@@ -1,3 +1,4 @@
+using System.Globalization;
 using NodaMoney.Exchange;
 using NodaMoney.Tests.Helpers;
 
@@ -18,5 +19,18 @@ public class ConvertExchangeRateToString
     public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithComma()
     {
         fx.ToString().Should().Be("EUR/USD 1,2524");
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenShowingExchangeRateInNetherlands_ThenReturnCurrencyPairWithDotWhenInvariantCultureIsSpecified()
+    {
+        fx.ToString(CultureInfo.InvariantCulture).Should().Be("EUR/USD 1.2524");
+    }
+
+    [Fact]
+    public void WhenShowingExchangeRateWithSpecifiedCulture_ThenReturnCurrencyAccordingly()
+    {
+        fx.ToString(CultureInfo.GetCultureInfo("en-US")).Should().Be("EUR/USD 1.2524");
+        fx.ToString(CultureInfo.GetCultureInfo("nl-NL")).Should().Be("EUR/USD 1,2524");
     }
 }
