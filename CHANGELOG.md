@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
+-
+
+### Changed
+- Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
+- Removed NumberStyle param for Parse and TryParse methods (Breaking Change)
+
+### Removed
+-
+
+## [2.1.1]
+
+### Added
 - Allow creating Money using 'with' expression
 - Add format N, Number format (e.g., "2,765.43")
 - Add format F, Fixed point format (e.g., "2765,43")

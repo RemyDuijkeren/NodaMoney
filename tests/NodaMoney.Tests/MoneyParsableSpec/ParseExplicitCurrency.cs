@@ -111,20 +111,4 @@ public class ParseExplicitCurrency
 
         action.Should().Throw<FormatException>().WithMessage("*not in a correct format*");
     }
-
-    [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsNullWithOverrideMethod_ThenThrowException()
-    {
-        Action action = () => Money.Parse((string)null, NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
-
-        action.Should().Throw<ArgumentNullException>();
-    }
-
-    [Fact, UseCulture("nl-NL")]
-    public void WhenValueIsEmptyWithOverrideMethod_ThenThrowFormatException()
-    {
-        Action action = () => Money.Parse("", NumberStyles.Currency, CurrencyInfo.FromCode("EUR"));
-
-        action.Should().Throw<FormatException>().WithMessage("*not in a correct format*");
-    }
 }

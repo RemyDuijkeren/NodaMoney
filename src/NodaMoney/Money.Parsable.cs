@@ -12,79 +12,44 @@ public partial struct Money
      : ISpanParsable<Money>, IUtf8SpanParsable<Money>
 #endif
 {
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The string representation of the number to convert.</param>
-    /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-    /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
-    /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
-    /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s) => Parse(s, NumberStyles.Currency, provider: null);
+    /// <summary>Parse a string to <see cref="Money"/>.</summary>
+    /// <param name="s">The string to parse.</param>
+    /// <returns>The result of parsing <paramref name="s"/> to a <see cref="Money"/> instance.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="s"/> is <b>null</b>.</exception>
+    /// <exception cref="System.FormatException"><paramref name="s"/> is not in the correct format.</exception>
+    /// <exception cref="System.OverflowException"><paramref name="s"/> is not representable by <see cref="Money"/>.</exception>
+    public static Money Parse(string s) => Parse(s, provider: null);
 
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The string representation of the number to convert.</param>
-    /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-    /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
-    /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
-    /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s, IFormatProvider? provider) => Parse(s, NumberStyles.Currency, provider);
+    /// <inheritdoc cref="Parse(string)"/>
+    /// <param name="provider">An object that supplies culture-specific parsing information about <paramref name="s"/>, like <see cref="CurrencyInfo"/>.</param>
+    [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
+    public static Money Parse(string s, IFormatProvider? provider) =>
+        s == null ? throw new ArgumentNullException(nameof(s)) : Parse(s.AsSpan(), provider);
 
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The string representation of the number to convert.</param>
-    /// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of value. A typical value to specify is <see cref="NumberStyles.Currency"/>.</param>
-    /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <returns>The equivalent to the money amount contained in <i>value</i>.</returns>
-    /// <exception cref="System.ArgumentNullException"><i>value</i> is <b>null</b> or empty.</exception>
-    /// <exception cref="System.FormatException"><i>value</i> is not in the correct format or the currency sign matches with multiple known currencies.</exception>
-    /// <exception cref="System.OverflowException"><i>value</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(string s, NumberStyles style, IFormatProvider? provider = null)
+    /// <inheritdoc cref="Parse(string, IFormatProvider)"/>
+    /// <summary>Parse span of characters into <see cref="Money"/>.</summary>
+    public static Money Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
-        if (s == null)
-        {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
 
-        return Parse(s.AsSpan(), style, provider);
-    }
-
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The string representation of the money value to convert.</param>
-    /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <returns>The equivalent <see cref="Money"/> object represented by the input string.</returns>
-    /// <exception cref="System.ArgumentNullException"><i>s</i> is <b>null</b> or empty.</exception>
-    /// <exception cref="System.FormatException"><i>s</i> is not in a valid format or the currency sign matches with multiple known currencies.</exception>
-    /// <exception cref="System.OverflowException"><i>s</i> represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s, NumberStyles.Currency, provider);
-
-    /// <summary>Converts the specified read-only span of characters representing a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The read-only span of characters representing the money value to parse.</param>
-    /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be present in the string.</param>
-    /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <returns>The <see cref="Money"/> equivalent of the parsed value.</returns>
-    /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="provider"/> is null and no currency information can be inferred from the input.</exception>
-    /// <exception cref="System.FormatException">Thrown when <paramref name="s"/> is not in a recognized format.</exception>
-    /// <exception cref="System.OverflowException">Thrown when the numeric value represented by <paramref name="s"/> is less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>.</exception>
-    public static Money Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider)
-    {
-        ReadOnlySpan<char> currencyChars = ParseSymbol(s);
-
-        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencyChars, ci) : ParseCurrencyInfo(currencyChars);
+        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencySymbol, ci) : ParseCurrencyInfo(currencySymbol);
         provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
-        ReadOnlySpan<char> numericInput = RemoveCurrencyChars(s, currencyChars);
+        ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
+        const NumberStyles numberStyle = NumberStyles.Currency & ~NumberStyles.AllowCurrencySymbol;
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        decimal amount = decimal.Parse(numericInput, style, provider);
+        decimal amount = decimal.Parse(numericInput, numberStyle, provider);
 #else
-        decimal amount = decimal.Parse(numericInput.ToString(), style, provider);
+        decimal amount = decimal.Parse(numericInput.ToString(), numberStyle, provider);
 #endif
 
         return new Money(amount, currencyInfo);
     }
 
 #if NET7_0_OR_GREATER
-    /// <summary>Parses the UTF-8 encoded text representation of a monetary value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="utf8Text">The UTF-8 encoded text representation of the monetary value.</param>
+    /// <summary>Parse the UTF-8 encoded text to <see cref="Money"/>.</summary>
+    /// <param name="utf8Text">The UTF-8 encoded text to parse.</param>
     /// <param name="provider">An object that provides culture-specific formatting information, or <c>null</c> to use the current culture.</param>
     /// <returns>The equivalent monetary value represented by the provided text.</returns>
     /// <exception cref="System.FormatException">The input is not a valid UTF-8 encoded text or cannot be parsed as a monetary value.</exception>
@@ -102,47 +67,26 @@ public partial struct Money
         ReadOnlySpan<char> charSpan = charBuffer[..charsWritten];
 
         // Delegate work to the existing ReadOnlySpan<char>-based Parse
-        return Parse(charSpan, NumberStyles.Currency, provider);
+        return Parse(charSpan, provider);
     }
 #endif
 
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
-    /// <param name="s">The string representation of the money to convert.</param>
+    /// <summary>Tries to parse a string into a <see cref="Money"/>.</summary>
+    /// <param name="s">The string to parse.</param>
     /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
-    /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
-    /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="string.Empty"/>, is not a number
+    /// value contained in <paramref name="s"/>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
+    /// conversion failed. The conversion fails if the <paramref name="s"/> parameter is <b>null</b> or <see cref="string.Empty"/>, is not a number
     /// in a valid format, or represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>. This parameter is passed
     /// uninitialized; any <i>value</i> originally supplied in result will be overwritten.</param>
-    /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
+    /// <returns><b>true</b> if <paramref name="s"/> parsed successfully; otherwise, <b>false</b>.</returns>
     /// <remarks>See <see cref="decimal.TryParse(string, out decimal)"/> for more info and remarks.</remarks>
     public static bool TryParse([NotNullWhen(true)] string? s, out Money result) =>
-        TryParse(s, NumberStyles.Currency, provider: null, out result);
+        TryParse(s, provider: null, out result);
 
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
-    /// <param name="s">The string representation of the money to convert.</param>
+    /// <inheritdoc cref="TryParse(string, out Money)"/>
     /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
-    /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
-    /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="string.Empty"/>, is not a number
-    /// in a valid format, or represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>. This parameter is passed
-    /// uninitialized; any <i>value</i> originally supplied in result will be overwritten.</param>
-    /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
-    /// <remarks>See <see cref="decimal.TryParse(string, NumberStyles, IFormatProvider, out decimal)"/> for more info and remarks.</remarks>
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Money result) =>
-        TryParse(s, NumberStyles.Currency, provider, out result);
-
-    /// <summary>Converts the string representation of a money value to its <see cref="Money"/> equivalent. A return value indicates whether the conversion succeeded or failed.</summary>
-    /// <param name="s">The string representation of the money to convert.</param>
-    /// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of value. A typical value to specify is <see cref="NumberStyles.Currency"/>.</param>
-    /// <param name="provider">An object that supplies culture-specific parsing information about <i>value</i>, like <see cref="CurrencyInfo"/>.</param>
-    /// <param name="result">When this method returns, contains the <see cref="Money"/> value that is equivalent to the money
-    /// value contained in <i>value</i>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
-    /// conversion failed. The conversion fails if the <i>value</i> parameter is <b>null</b> or <see cref="string.Empty"/>, is not a number
-    /// in a valid format, or represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>. This parameter is passed
-    /// uninitialized; any <i>value</i> originally supplied in result will be overwritten.</param>
-    /// <returns><b>true</b> if <i>value</i> was converted successfully; otherwise, <b>false</b>.</returns>
-    /// <remarks>See <see cref="decimal.TryParse(string, NumberStyles, IFormatProvider, out decimal)"/> for more info and remarks.</remarks>
-    public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, out Money result)
+    [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Money result)
     {
         if (s is null)
         {
@@ -150,24 +94,12 @@ public partial struct Money
             return false;
         }
 
-        return TryParse(s.AsSpan(), style, provider, out result);
+        return TryParse(s.AsSpan(), provider, out result);
     }
 
-    /// <summary>Tries to parse the specified span of characters into its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">The span of characters containing the money value to convert.</param>
-    /// <param name="provider">An object that provides culture-specific formatting information.</param>
-    /// <param name="result">When this method returns, contains the <see cref="Money"/> value equivalent to the money amount in <paramref name="s"/>, if the conversion succeeded, or the default value of <see cref="Money"/> if the conversion failed.</param>
-    /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result) =>
-        TryParse(s, NumberStyles.Currency, provider, out result);
-
-    /// <summary>Attempts to convert the span representation of a money value to its <see cref="Money"/> equivalent.</summary>
-    /// <param name="s">A span containing the representation of the money value to convert.</param>
-    /// <param name="style">A bitwise combination of <see cref="NumberStyles"/> values that indicates the style elements that can be present in the value parameter.</param>
-    /// <param name="provider">An <see cref="IFormatProvider"/> that provides culture-specific formatting information about the value.</param>
-    /// <param name="result">When this method returns, contains the <see cref="Money"/> equivalent of the value contained in the input span if the conversion succeeded, or a default <see cref="Money"/> value if the conversion failed. This parameter is passed uninitialized.</param>
-    /// <returns><c>true</c> if the value was converted successfully; otherwise, <c>false</c>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out Money result)
+    /// <inheritdoc cref="TryParse(string?, IFormatProvider?, out Money)"/>
+    /// <summary>Tries to parse span of characters into a <see cref="Money"/>.</summary>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result)
     {
         try
         {
@@ -177,19 +109,20 @@ public partial struct Money
                 return false;
             }
 
-            ReadOnlySpan<char> currencyChars = ParseSymbol(s);
+            ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
 
-            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencyChars, ci) : ParseCurrencyInfo(currencyChars);
+            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencySymbol, ci) : ParseCurrencyInfo(currencySymbol);
             provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
-            ReadOnlySpan<char> numericInput = RemoveCurrencyChars(s, currencyChars);
+            ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
+            const NumberStyles numberStyle = NumberStyles.Currency & ~NumberStyles.AllowCurrencySymbol;
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsingSuccessful = decimal.TryParse(numericInput, style, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput, numberStyle, provider, out decimal amount);
 #else
-            bool isParsingSuccessful = decimal.TryParse(numericInput.ToString(), style, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput.ToString(), numberStyle, provider, out decimal amount);
 #endif
-            if (isParsingSuccessful)
+            if (isParsed)
             {
                 result = new Money(amount, currencyInfo);
                 return true;
@@ -206,8 +139,8 @@ public partial struct Money
     }
 
 #if NET7_0_OR_GREATER
-    /// <summary>Attempts to parse the specified UTF-8 encoded text into its <see cref="Money"/> equivalent.</summary>
-    /// <param name="utf8Text">The UTF-8 encoded text representing the monetary value to parse.</param>
+    /// <summary>Tries to parse the UTF-8 encoded text into a <see cref="Money"/>.</summary>
+    /// <param name="utf8Text">The UTF-8 encoded text to parse.</param>
     /// <param name="provider">An object that provides culture-specific formatting information.</param>
     /// <param name="result">When this method returns, contains the parsed <see cref="Money"/> value if the conversion succeeded, or the default value if it failed.</param>
     /// <returns><c>true</c> if the text was successfully parsed; otherwise, <c>false</c>.</returns>
@@ -226,7 +159,7 @@ public partial struct Money
         ReadOnlySpan<char> charSpan = charBuffer[..charsWritten];
 
         // Delegate to the TryParse(charSpan, ...) API
-        return TryParse(charSpan, NumberStyles.Currency, provider, out result);
+        return TryParse(charSpan, provider, out result);
     }
 #endif
 
@@ -272,7 +205,7 @@ public partial struct Money
         }
     }
 
-    private static ReadOnlySpan<char> RemoveCurrencyChars(ReadOnlySpan<char> s, ReadOnlySpan<char> currencyChars)
+    private static ReadOnlySpan<char> RemoveCurrencySymbol(ReadOnlySpan<char> s, ReadOnlySpan<char> currencyChars)
     {
         // Find the first occurrence of the matched currency characters in the input
         int matchStartIndex = s.IndexOf(currencyChars, StringComparison.Ordinal);
@@ -323,7 +256,7 @@ public partial struct Money
         return s;
     }
 
-    private static ReadOnlySpan<char> ParseSymbol(ReadOnlySpan<char> s)
+    private static ReadOnlySpan<char> ParseCurrencySymbol(ReadOnlySpan<char> s)
     {
         // Return immediately if the input is empty or whitespace
         if (s.IsEmpty || s.IsWhiteSpace())
