@@ -12,6 +12,8 @@ public partial struct Money
      : ISpanParsable<Money>, IUtf8SpanParsable<Money>
 #endif
 {
+    private const NumberStyles ParseNumberStyle = NumberStyles.Currency & ~NumberStyles.AllowCurrencySymbol;
+
     /// <summary>Parse a string to <see cref="Money"/>.</summary>
     /// <param name="s">The string to parse.</param>
     /// <returns>The result of parsing <paramref name="s"/> to a <see cref="Money"/> instance.</returns>
@@ -36,12 +38,11 @@ public partial struct Money
         provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
         ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
-        const NumberStyles numberStyle = NumberStyles.Currency & ~NumberStyles.AllowCurrencySymbol;
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        decimal amount = decimal.Parse(numericInput, numberStyle, provider);
+        decimal amount = decimal.Parse(numericInput, ParseNumberStyle, provider);
 #else
-        decimal amount = decimal.Parse(numericInput.ToString(), numberStyle, provider);
+        decimal amount = decimal.Parse(numericInput.ToString(), ParseNumberStyle, provider);
 #endif
 
         return new Money(amount, currencyInfo);
@@ -115,12 +116,11 @@ public partial struct Money
             provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
 
             ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
-            const NumberStyles numberStyle = NumberStyles.Currency & ~NumberStyles.AllowCurrencySymbol;
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsed = decimal.TryParse(numericInput, numberStyle, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, provider, out decimal amount);
 #else
-            bool isParsed = decimal.TryParse(numericInput.ToString(), numberStyle, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, provider, out decimal amount);
 #endif
             if (isParsed)
             {

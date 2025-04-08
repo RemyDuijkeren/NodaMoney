@@ -55,6 +55,17 @@ public class TryParseCurrencyPair
     }
 
     [Fact]
+    public void WhenDecimalSeparatorIsInvalidForCulture_ThenParsingShouldFail()
+    {
+        var succeeded = ExchangeRate.TryParse("EUR/USD 1,2591", CultureInfo.GetCultureInfo("en-US"), out ExchangeRate fx);
+
+        succeeded.Should().BeFalse();
+        fx.BaseCurrency.Code.Should().Be("XXX");
+        fx.QuoteCurrency.Code.Should().Be("XXX");
+        fx.Value.Should().Be(0M);
+    }
+
+    [Fact]
     public void WhenIsNotANumber_ThenParsingFails()
     {
         var succeeded = ExchangeRate.TryParse("EUR/USD 1,ABC", out ExchangeRate fx);

@@ -10,6 +10,8 @@ public readonly record struct ExchangeRate
     : ISpanParsable<ExchangeRate>//, IUtf8SpanParsable<ExchangeRate>
 #endif
 {
+    private const NumberStyles ParseNumberStyle = NumberStyles.Number & ~NumberStyles.AllowThousands;
+
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
     /// <param name="baseCurrency">The base currency.</param>
     /// <param name="quoteCurrency">The quote currency.</param>
@@ -113,9 +115,9 @@ public readonly record struct ExchangeRate
             ParseNumericInput(s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan);
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        decimal rate = decimal.Parse(numericInput, NumberStyles.Currency, provider);
+        decimal rate = decimal.Parse(numericInput, ParseNumberStyle, provider);
 #else
-        decimal rate = decimal.Parse(numericInput.ToString(), NumberStyles.Currency, provider);
+        decimal rate = decimal.Parse(numericInput.ToString(), ParseNumberStyle, provider);
 #endif
 
         return new ExchangeRate(CurrencyInfo.FromCode(baseCurrencySpan.ToString()), CurrencyInfo.FromCode(quoteCurrencySpan.ToString()), rate);
@@ -162,9 +164,9 @@ public readonly record struct ExchangeRate
                 ParseNumericInput(s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan);
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsed = decimal.TryParse(numericInput, NumberStyles.Currency, provider, out decimal rate);
+            bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, provider, out decimal rate);
 #else
-            bool isParsed = decimal.TryParse(numericInput.ToString(), NumberStyles.Currency, provider, out decimal rate);
+            bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, provider, out decimal rate);
 #endif
             if (isParsed)
             {

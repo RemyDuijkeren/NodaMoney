@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
 - Removed NumberStyle param for Parse and TryParse methods (Breaking Change)
+- No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency.
 
 ### Removed
 -

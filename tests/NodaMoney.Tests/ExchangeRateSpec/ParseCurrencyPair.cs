@@ -50,6 +50,14 @@ public class ParseCurrencyPair
     }
 
     [Fact]
+    public void WhenDecimalSeparatorIsInvalidForCulture_ThenThrowException()
+    {
+        Action action = () => ExchangeRate.Parse("EUR/USD 1,2591", CultureInfo.GetCultureInfo("en-US"));
+
+        action.Should().Throw<FormatException>();
+    }
+
+    [Fact]
     public void WhenIsNotANumber_ThenThrowException()
     {
         Action action = () => ExchangeRate.Parse("EUR/USD 1,ABC");

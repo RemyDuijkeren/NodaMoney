@@ -44,6 +44,6 @@ public class MoneyImplicit
         var money = new FastMoney(_decimalValue);
 
         money.Currency.Should().Be(default(Currency));
-        money.Amount.Should().Be(1235m);
+        money.Amount.Should().Be(1234.567m, because: "no rounding");
     }
 }
