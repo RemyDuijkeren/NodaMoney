@@ -32,7 +32,10 @@ public class CompareNodaMoneyWithIso4127 : IClassFixture<Iso4127ListFixture>
                         //.Where(c => c.IsActiveOn(_iso4127List.PublishDate))
                         .Where(c => c.IsHistoric == false)
                         .Where(c => !string.IsNullOrEmpty(c.NumericCode))
-                        .Where(c => _iso4127List.Currencies.All(a => a.Currency != c.Code)).ToList();
+                        .Where(c => _iso4127List.Currencies.All(a => a.Currency != c.Code))
+                        .Where(c => c.ExpiredOn is null ||
+                                    (c.ExpiredOn is not null && c.ExpiredOn <= DateTime.UtcNow))
+                        .ToList();
 
         notDefinedCurrencies.Should().HaveCount(0, $"did not expect currencies to contain {string.Join(", ", notDefinedCurrencies.Select(a => a.Code))}");
     }

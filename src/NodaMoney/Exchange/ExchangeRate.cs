@@ -200,6 +200,15 @@ public readonly record struct ExchangeRate
 
     private static ReadOnlySpan<char> ParseNumericInput(ReadOnlySpan<char> s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan)
     {
+        baseCurrencySpan = ReadOnlySpan<char>.Empty;
+        quoteCurrencySpan = ReadOnlySpan<char>.Empty;
+
+        // The format is: ABCDEF1, ABC/DEF1, ABCDEF 1 or ABC/DEF 1
+        if (s.Length < 7)
+        {
+            return ReadOnlySpan<char>.Empty;
+        }
+
         s = s.Trim();
         baseCurrencySpan = s.Slice(0, 3);
         int separatorIndex = s[3] == '/' ? 4 : 3;
