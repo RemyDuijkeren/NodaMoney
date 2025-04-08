@@ -1,10 +1,14 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace NodaMoney.Exchange;
 
 /// <summary>A conversion of money of one currency into money of another currency.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>
-public readonly struct ExchangeRate : IEquatable<ExchangeRate>
+public readonly record struct ExchangeRate
+#if NET7_0_OR_GREATER
+    : ISpanParsable<ExchangeRate>//, IUtf8SpanParsable<ExchangeRate>
+#endif
 {
     /// <summary>Initializes a new instance of the <see cref="ExchangeRate"/> struct.</summary>
     /// <param name="baseCurrency">The base currency.</param>
@@ -17,7 +21,7 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
         : this()
     {
         if (baseCurrency == quoteCurrency && rate != 1M)
-            throw new ArgumentOutOfRangeException("When the base and quote currency are equal, the only allowed rate is 1!");
+            throw new ArgumentOutOfRangeException(nameof(rate), "When the base and quote currency are equal, the only allowed rate is 1!");
         if (rate < 0)
             throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
 
@@ -55,6 +59,17 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     {
     }
 
+    /// <summary>Deconstruct the current instance into its components.</summary>
+    /// <param name="baseCurrency">The base currency.</param>
+    /// <param name="quoteCurrency">The quote currency.</param>
+    /// <param name="rate">The rate of the exchange.</param>
+    public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
+    {
+        baseCurrency = BaseCurrency;
+        quoteCurrency = QuoteCurrency;
+        rate = Value;
+    }
+
     /// <summary>Gets the base currency.</summary>
     /// <value>The base currency.</value>
     public Currency BaseCurrency { get; }
@@ -67,95 +82,104 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     /// <value>The value of the exchange rate.</value>
     public decimal Value { get; }
 
-    /// <summary>Implements the operator ==.</summary>
-    /// <param name="left">The left ExchangeRate.</param>
-    /// <param name="right">The right ExchangeRate.</param>
-    /// <returns>The result of the operator.</returns>
-    public static bool operator ==(ExchangeRate left, ExchangeRate right) => left.Equals(right);
+    /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
+    /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
+    /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
+    public override string ToString() => ToString(CultureInfo.CurrentCulture);
 
-    /// <summary>Implements the operator !=.</summary>
-    /// <param name="left">The left ExchangeRate.</param>
-    /// <param name="right">The right ExchangeRate.</param>
-    /// <returns>The result of the operator.</returns>
-    public static bool operator !=(ExchangeRate left, ExchangeRate right) => !(left == right);
+    /// <inheritdoc cref="ToString()"/>
+    /// <param name="provider">The <see cref="IFormatProvider"/> used to format the amount</param>
+    public string ToString(IFormatProvider provider) => $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value.ToString(provider)}";
 
-    /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent.</summary>
-    /// <param name="rate">The string representation of the exchange rate to convert.</param>
-    /// <returns>The equivalent to the exchange rate contained in rate.</returns>
-    /// <exception cref="System.FormatException">rate is not in the correct format.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="rate"/> is <c>null</c>.</exception>
-    public static ExchangeRate Parse(string rate) => Parse(rate, NumberStyles.Currency, CultureInfo.CurrentCulture);
+    /// <summary>Parse a string into a <see cref="ExchangeRate"/>.</summary>
+    /// <param name="s">The string to parse.</param>
+    /// <returns>The result of parsing <paramref name="s"/> to a <see cref="ExchangeRate"/> instance.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="s"/>  is <b>null</b>.</exception>
+    /// <exception cref="System.FormatException"><paramref name="s"/> is not in the correct format.</exception>
+    /// <exception cref="System.OverflowException"><paramref name="s"/> is not representable by <see cref="ExchangeRate"/>.</exception>
+    public static ExchangeRate Parse(string s) => Parse(s, CultureInfo.CurrentCulture);
 
     /// <inheritdoc cref="Parse(string)"/>
-    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to parse the amount</param>
-    public static ExchangeRate Parse(string rate, IFormatProvider? formatProvider) => Parse(rate, NumberStyles.Currency, formatProvider);
+    /// <param name="provider">The <see cref="IFormatProvider"/> used to parse numeric part of <paramref name="s"/></param>
+    [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
+    public static ExchangeRate Parse(string s, IFormatProvider? provider) =>
+        s == null ? throw new ArgumentNullException(nameof(s)) : Parse(s.AsSpan(), provider);
 
-    /// <inheritdoc cref="Parse(string, IFormatProvider?)"/>
-    /// <param name="style">A bitwise combination of <see cref="NumberStyles"/> values that indicates the style elements that can be present in the value parameter.</param>
-    public static ExchangeRate Parse(string rate, NumberStyles style, IFormatProvider? formatProvider)
+    /// <inheritdoc cref="Parse(string, IFormatProvider)"/>
+    /// <summary>Parse span of characters into <see cref="ExchangeRate"/>.</summary>
+    public static ExchangeRate Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
-        if (rate == null)
-            throw new ArgumentNullException(nameof(rate));
+        ReadOnlySpan<char> numericInput =
+            ParseNumericInput(s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan);
 
-        if (!TryParse(rate, style, formatProvider, out ExchangeRate fx))
-        {
-            throw new FormatException("rate is not in the correct format! Currencies are the same or the rate is not a number.");
-        }
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        decimal rate = decimal.Parse(numericInput, NumberStyles.Currency, provider);
+#else
+        decimal rate = decimal.Parse(numericInput.ToString(), NumberStyles.Currency, provider);
+#endif
 
-        return fx;
+        return new ExchangeRate(CurrencyInfo.FromCode(baseCurrencySpan.ToString()), CurrencyInfo.FromCode(quoteCurrencySpan.ToString()), rate);
     }
 
-    /// <summary>Converts the string representation of an exchange rate to its <see cref="ExchangeRate"/> equivalent. A return
-    /// value indicates whether the conversion succeeded or failed.</summary>
-    /// <param name="rate">The string representation of the exchange rate to convert.</param>
+    /// <summary>Tries to parse a string into a <see cref="ExchangeRate"/>.</summary>
+    /// <param name="s">The string to parse.</param>
     /// <param name="result">When this method returns, contains the <see cref="ExchangeRate"/> that is equivalent to the exchange rate contained in
     /// rate, if the conversion succeeded,
-    /// or is zero if the conversion failed. The conversion fails if the rate parameter is null, is not a exchange rate in a
+    /// or is zero if the conversion failed. The conversion fails if the rate parameter is null, is not an exchange rate in a
     /// valid format, or represents a number less than MinValue
     /// or greater than MaxValue. This parameter is passed uninitialized.</param>
-    /// <returns><b>true</b> if rate was converted successfully; otherwise, <b>false</b>.</returns>
-    public static bool TryParse(string rate, out ExchangeRate result) => TryParse(rate, NumberStyles.Currency, CultureInfo.CurrentCulture, out result);
+    /// <returns><b>true</b> if <paramref name="s"/> parsed successfully; otherwise, <b>false</b>.</returns>
+    public static bool TryParse([NotNullWhen(true)] string? s, out ExchangeRate result) =>
+        TryParse(s, CultureInfo.CurrentCulture, out result);
 
     /// <inheritdoc cref="TryParse(string, out ExchangeRate)"/>
-    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to parse the amount</param>
-    public static bool TryParse(string rate, IFormatProvider? formatProvider, out ExchangeRate result) => TryParse(rate, NumberStyles.Currency, formatProvider, out result);
-
-    /// <inheritdoc cref="TryParse(string, IFormatProvider?, out ExchangeRate)"/>
-    /// <param name="style">A bitwise combination of <see cref="NumberStyles"/> values that indicates the style elements that can be present in the value parameter.</param>
-    public static bool TryParse(string rate, NumberStyles style, IFormatProvider? formatProvider, out ExchangeRate result)
+    /// <param name="provider">The <see cref="IFormatProvider"/> used to parse <paramref name="s"/></param>
+    [SuppressMessage("ReSharper", "InvalidXmlDocComment")]
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out ExchangeRate result)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(rate))
-            {
-                result = default;
-                return false;
-            }
-            rate = rate.Trim();
-            var baseCurrency = CurrencyInfo.FromCode(rate.Substring(0, 3));
-            int index = rate.Substring(3, 1) == "/" ? 4 : 3;
-            var quoteCurrency = CurrencyInfo.FromCode(rate.Substring(index, 3));
-            var value = decimal.Parse(rate.Remove(0, index + 3),style, formatProvider);
-
-            result = new ExchangeRate(baseCurrency, quoteCurrency, value);
-            return true;
-        }
-        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
+        if (s is null)
         {
             result = default;
             return false;
         }
+
+        return TryParse(s.AsSpan(), provider, out result);
     }
 
-    /// <summary>Deconstruct the current instance into its components.</summary>
-    /// <param name="baseCurrency">The base currency.</param>
-    /// <param name="quoteCurrency">The quote currency.</param>
-    /// <param name="rate">The rate of the exchange.</param>
-    public void Deconstruct(out Currency baseCurrency, out Currency quoteCurrency, out decimal rate)
+    /// <inheritdoc cref="TryParse(string?, IFormatProvider?, out ExchangeRate)"/>
+    /// <summary>Tries to parse span of characters into a <see cref="ExchangeRate"/>.</summary>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out ExchangeRate result)
     {
-        baseCurrency = BaseCurrency;
-        quoteCurrency = QuoteCurrency;
-        rate = Value;
+        try
+        {
+            if (s.IsEmpty || s.IsWhiteSpace())
+            {
+                result = default;
+                return false;
+            }
+
+            ReadOnlySpan<char> numericInput =
+                ParseNumericInput(s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan);
+
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            bool isParsed = decimal.TryParse(numericInput, NumberStyles.Currency, provider, out decimal rate);
+#else
+            bool isParsed = decimal.TryParse(numericInput.ToString(), NumberStyles.Currency, provider, out decimal rate);
+#endif
+            if (isParsed)
+            {
+                result = new ExchangeRate(CurrencyInfo.FromCode(baseCurrencySpan.ToString()), CurrencyInfo.FromCode(quoteCurrencySpan.ToString()), rate);
+                return true;
+            }
+
+            result = default;
+            return false;
+        }
+        catch (Exception ex) when (ex is FormatException or ArgumentOutOfRangeException)
+        {
+            result = default;
+            return false;
+        }
     }
 
     /// <summary>Converts the specified money.</summary>
@@ -166,9 +190,7 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
     {
         if (money.Currency != BaseCurrency && money.Currency != QuoteCurrency)
         {
-            throw new ArgumentException(
-                "Money should have the same currency as the base currency or the quote currency!",
-                nameof(money));
+            throw new ArgumentException("Money should have the same currency as the base currency or the quote currency!", nameof(money));
         }
 
         return money.Currency == BaseCurrency
@@ -176,35 +198,13 @@ public readonly struct ExchangeRate : IEquatable<ExchangeRate>
             : new Money(money.Amount / Value, BaseCurrency);
     }
 
-    /// <summary>Returns the hash code for this instance.</summary>
-    /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-    public override int GetHashCode()
+    private static ReadOnlySpan<char> ParseNumericInput(ReadOnlySpan<char> s, out ReadOnlySpan<char> baseCurrencySpan, out ReadOnlySpan<char> quoteCurrencySpan)
     {
-        unchecked
-        {
-            return Value.GetHashCode() + (397 * BaseCurrency.GetHashCode()) + (397 * QuoteCurrency.GetHashCode());
-        }
+        s = s.Trim();
+        baseCurrencySpan = s.Slice(0, 3);
+        int separatorIndex = s[3] == '/' ? 4 : 3;
+        quoteCurrencySpan = s.Slice(separatorIndex, 3);
+
+        return s.Slice(separatorIndex + 3);
     }
-
-    /// <summary>Indicates whether this instance and a specified <see cref="ExchangeRate"/> are equal.</summary>
-    /// <param name="other">Another object to compare to.</param>
-    /// <returns>true if <paramref name="other"/> and this instance are the same type and represent the same value; otherwise,
-    /// false.</returns>
-    public bool Equals(ExchangeRate other)
-        => Value == other.Value && BaseCurrency == other.BaseCurrency && QuoteCurrency == other.QuoteCurrency;
-
-    /// <summary>Indicates whether this instance and a specified object are equal.</summary>
-    /// <param name="obj">Another object to compare to.</param>
-    /// <returns>true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise,
-    /// false.</returns>
-    public override bool Equals(object? obj) => obj is ExchangeRate fx && this.Equals(fx);
-
-    /// <summary>Converts this <see cref="ExchangeRate"/> instance to its equivalent <see cref="string"/> representation.</summary>
-    /// <returns>A string that represents this <see cref="ExchangeRate"/> instance.</returns>
-    /// <remarks>See http://en.wikipedia.org/wiki/Currency_Pair for more info about how an ExchangeRate can be presented.</remarks>
-    public override string ToString() => ToString(CultureInfo.CurrentCulture);
-
-    /// <inheritdoc cref="ToString()"/>
-    /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to format the amount</param>
-    public string ToString(IFormatProvider formatProvider) => $"{BaseCurrency.Code}/{QuoteCurrency.Code} {Value.ToString(formatProvider)}";
 }

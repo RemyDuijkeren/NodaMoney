@@ -5,10 +5,10 @@ using NodaMoney.Tests.Helpers;
 namespace NodaMoney.Tests.ExchangeRateSpec;
 
 [Collection(nameof(NoParallelization))]
-public class TryParseACurrencyPair
+public class TryParseCurrencyPair
 {
     [Fact, UseCulture("en-US")]
-    public void WhenCurrencyPairInUsCulture_ThenParsingShouldSucceed()
+    public void WhenInUsCulture_ThenParsingShouldSucceed()
     {
         var succeeded1 = ExchangeRate.TryParse("EUR/USD 1.2591", out ExchangeRate fx1);
 
@@ -26,7 +26,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact, UseCulture("nl-NL")]
-    public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceed()
+    public void WhenInNlCulture_ThenParsingShouldSucceed()
     {
         var succeeded1 = ExchangeRate.TryParse("EUR/USD 1,2591", out ExchangeRate fx1);
 
@@ -44,7 +44,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact, UseCulture("en-US")]
-    public void WhenCurrencyPairInNlCulture_ThenParsingShouldSucceedWithCultureSpecified()
+    public void WhenInNlCulture_ThenParsingShouldSucceedWithCultureSpecified()
     {
         var succeeded = ExchangeRate.TryParse("EUR/USD 1,2591", CultureInfo.GetCultureInfo("nl-NL"), out ExchangeRate fx);
 
@@ -54,19 +54,8 @@ public class TryParseACurrencyPair
         fx.Value.Should().Be(1.2591M);
     }
 
-    [Fact, UseCulture("nl-NL")]
-    public void WhenCurrencyPairInNlCulture_ThenParsingShouldFailWithIncompatibleCultureSpecified()
-    {
-        var succeeded = ExchangeRate.TryParse("EUR/USD 1,2591", NumberStyles.Currency & ~NumberStyles.AllowThousands, CultureInfo.GetCultureInfo("en-US"), out ExchangeRate fx);
-
-        succeeded.Should().BeFalse();
-        fx.BaseCurrency.Code.Should().Be("XXX");
-        fx.QuoteCurrency.Code.Should().Be("XXX");
-        fx.Value.Should().Be(0M);
-    }
-
     [Fact]
-    public void WhenCurrencyPairIsNotANumber_ThenParsingFails()
+    public void WhenIsNotANumber_ThenParsingFails()
     {
         var succeeded = ExchangeRate.TryParse("EUR/USD 1,ABC", out ExchangeRate fx);
 
@@ -79,7 +68,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact, UseCulture("en-US")]
-    public void WhenCurrencyPairHasSameCurrenciesAndValueEqualTo1_ThenParsingShouldSucceed()
+    public void WhenHasSameCurrenciesAndValueEqualTo1_ThenParsingShouldSucceed()
     {
         var succeeded = ExchangeRate.TryParse("EUR/EUR 1", out ExchangeRate fx);
 
@@ -90,7 +79,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact, UseCulture("en-US")]
-    public void WhenCurrencyPairHasSameCurrenciesAndValueNotEqualTo1_ThenParsingFails()
+    public void WhenHasSameCurrenciesAndValueNotEqualTo1_ThenParsingFails()
     {
         var succeeded = ExchangeRate.TryParse("EUR/EUR 1.2591", out ExchangeRate fx);
 
@@ -103,7 +92,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact]
-    public void WhenCurrencyPairIsNull_ThenParsingFails()
+    public void WhenIsNull_ThenParsingFails()
     {
         var succeeded = ExchangeRate.TryParse(null, out ExchangeRate fx);
 
@@ -116,7 +105,7 @@ public class TryParseACurrencyPair
     }
 
     [Fact]
-    public void WhenCurrencyPairIsEmpty_ThenParsingFails()
+    public void WhenIsEmpty_ThenParsingFails()
     {
         var succeeded = ExchangeRate.TryParse("", out ExchangeRate fx);
 

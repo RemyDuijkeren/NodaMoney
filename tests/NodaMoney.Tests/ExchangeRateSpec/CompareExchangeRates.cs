@@ -32,4 +32,19 @@ public class CompareExchangeRates
         (fx1 == fx2).Should().Be(areEqual); //using Equality operators
         (fx1 != fx2).Should().Be(!areEqual); //using Equality operators
     }
+
+    [Fact]
+    public void WhenDefault_ThenNoCurrencyAndZero()
+    {
+        // Arrange
+
+        // Act
+        ExchangeRate fx = default;
+
+        // Assert
+        fx.BaseCurrency.Should().Be(Currency.NoCurrency);
+        fx.QuoteCurrency.Should().Be(Currency.NoCurrency);
+        fx.Value.Should().Be(0);
+    }
+
 }
