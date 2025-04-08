@@ -217,6 +217,12 @@ public readonly partial struct Money : IEquatable<Money>
 
     internal static decimal Round(in decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding)
     {
+        if (currencyInfo.MinorUnit == MinorUnit.NotApplicable)
+        {
+            // no rounding
+            return amount;
+        }
+
         if (!currencyInfo.MinorUnitIsDecimalBased)
         {
             // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
