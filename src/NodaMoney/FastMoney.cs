@@ -13,12 +13,12 @@ namespace NodaMoney;
 /// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
 /// See also OLE Automation Currency and SQL Currency type.
 /// </remarks>
-[StructLayout(LayoutKind.Sequential)]
+//[StructLayout(LayoutKind.Sequential)]
 internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using interface will cause boxing!
 {
     /// <summary>Stored as an integer scaled by 10,000</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
+    private long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
 
     public FastMoney(Money money) : this(money.Amount, money.Currency) { }
 
@@ -46,14 +46,13 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     {
         if (amount < MinValue || amount > MaxValue)
         {
-            throw new ArgumentException("Amount is outside the allowable range for FastMoney.", nameof(amount));
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
         }
 
         CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
         if (ci.DecimalDigits > 4)
         {
-            throw new ArgumentException("Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.",
-                nameof(currency));
+            throw new ArgumentOutOfRangeException(nameof(currency), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
         }
 
         OACurrencyAmount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));

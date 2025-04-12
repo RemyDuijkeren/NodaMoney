@@ -52,7 +52,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
-        this.Currency = currency;
+        Currency = currency;
         Amount = Round(amount, currency, rounding);
     }
 

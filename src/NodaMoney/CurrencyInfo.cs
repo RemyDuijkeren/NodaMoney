@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace NodaMoney;
 
-// TODO: Add support for the following properties?
+// TODO: Add support for the following properties? Use MoneyContext for this?
 // Thread.CurrentThread.CurrentCulture = new CurrentInfo("")
 // Thread.CurrentThread.CurrentCurrency = new CurrencyInfo(""); // extension property not possible
 //
@@ -16,6 +16,8 @@ namespace NodaMoney;
 
 // TODO: Should we use internal sealed class CurrencyData to store the data? CultureInfo has a similar structure called
 // CultureData. https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Globalization/CultureData.cs
+
+// TODO: add Country/Region info? The default country in which the currency is used. Allows localization by region.
 
 /// <summary>A unit of exchange of value, a currency of <see cref="Money" />.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Currency and
@@ -31,6 +33,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     readonly string? _internationalSymbol;
 
+    // TODO: use MoneyContext for this?
     // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
     //
     // static CurrencyInfo()
@@ -131,6 +134,14 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>Gets the date when the currency is introduced on (list 1 Active).</summary>
     /// <value>The introduction date when the currency is valid.</value>
     public DateTime? IntroducedOn { get; init; }
+
+    // // Additional metadata storage
+    // private readonly MetadataProvider _metadataProvider = new();
+    // /// <summary>Access metadata for this currency.</summary>
+    // public MetadataProvider Metadata => _metadataProvider;
+    // public IRoundingStrategy? StandardRoundingStrategy { get; init; }
+    // // PhysicalRoundingStrategy ,DenominationRoundingStrategy, PointOfSaleRoundingStrategy
+    // public IRoundingStrategy? CashRoundingStrategy { get; init; }
 
     /// <summary>Gets the (ISO-4217) three-digit code number of the currency.</summary>
     public string NumericCode => Number.ToString("D3", CultureInfo.InvariantCulture);

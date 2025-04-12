@@ -1,7 +1,34 @@
+using System.Runtime.InteropServices;
+using Xunit.Abstractions;
+
 namespace NodaMoney.Tests.MoneySpec;
 
 public class CreateMoney
 {
+    readonly ITestOutputHelper _testOutputHelper;
+
+    public CreateMoney(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
+    [Fact]
+    public void SizeInMemory()
+    {
+        // Arrange
+
+
+        // Act
+        _testOutputHelper.WriteLine($"Size of Money: {Marshal.SizeOf<Money>()}");
+        _testOutputHelper.WriteLine($"Size of FastMoney: {Marshal.SizeOf<FastMoney>()}");
+        _testOutputHelper.WriteLine($"Size of ExactMoney: {Marshal.SizeOf<ExactMoney>()}");
+        _testOutputHelper.WriteLine($"Size of Currency: {Marshal.SizeOf<Currency>()}");
+
+
+        // Assert
+    }
+
+
     [Fact]
      public void WhenMaxValue()
      {
