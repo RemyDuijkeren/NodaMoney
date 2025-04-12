@@ -1,6 +1,11 @@
 ﻿NodaMoney
 =========
 
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
+[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
+[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
+
 About
 ----
 NodaMoney provides a library that treats Money as a first class citizen in .NET and handles all the ugly bits like currencies
@@ -262,7 +267,9 @@ CurrencyInfo.Register(newEuro);
 var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```
 
-## Support
+## Releases
+
+This library uses [Semantic Versioning](https://semver.org/) to give meaning to the version numbers.
 
 You can get the latest stable release or prerelease from the [official Nuget.org feed](https://www.nuget.org/packages/NodaMoney) or from our
 [GitHub releases page](https://github.com/remyvd/NodaMoney/releases).
@@ -270,10 +277,36 @@ You can get the latest stable release or prerelease from the [official Nuget.org
 If you'd like to work with the bleeding edge, you can use our [GitHub Nuget feed](https://github.com/RemyDuijkeren/NodaMoney/pkgs/nuget/NodaMoney).
 Packages on this feed are alpha and beta and, while they've passed all our tests, are not yet ready for production.
 
-For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues). Please see our
-[guidelines](CONTRIBUTING.md) for contributing to the NodaMoney.
+## Support
 
-[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![NuGet](https://img.shields.io/nuget/v/NodaMoney.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney)
-[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
-[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
+For support, bugs and new ideas use [GitHub issues](https://github.com/remyvd/NodaMoney/issues).
+
+For supporting the project:
+* [Sponsor me](https://github.com/sponsors/RemyDuijkeren)
+* [Tip Me](https://bunq.me/RemyDuijkeren)
+
+## Contributing
+
+Your contributions are always welcome! Please have a look at the [contribution guidelines](CONTRIBUTING.md) first.
+
+Previous contributors include:
+
+<a href="https://github.com/RemyDuijkeren/NodaMoney/graphs/contributors">
+  <img src="https://contrib.rocks/image?max=5&repo=RemyDuijkeren/NodaMoney" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
+
+## Credits
+
+This library wouldn't have been possible without the following tools, packages and companies:
+
+* [xUnit](https://xunit.net/) - Unit testing
+* [MinVer](https://github.com/adamralph/minver) - Minimalistic versioning using Git tags by [Adam Ralph](https://github.com/adamralph)
+* [Test Reporter](https://github.com/dorny/test-reporter/tree/v1#readme) - Displays test results directly in GitHub by [Michal Dorner](https://github.com/dorny)
+* [Roslynator](https://github.com/dotnet/roslynator) - A set of code analysis tools for C# by [Josef Pihrt](https://github.com/josefpihrt)
+* [FluentAssertions](https://github.com/dotnet/roslynator) - A set of extension methods to specify the expected outcome of unit tests by [Dennis Doomen](https://github.com/dennisdoomen)
+* [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) - Powerful .NET library for benchmarking
+
+## License
+This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
