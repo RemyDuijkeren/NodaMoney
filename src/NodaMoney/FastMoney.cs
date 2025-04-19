@@ -32,7 +32,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount, string code) : this(amount, new Currency(code)) { }
+    public FastMoney(decimal amount, string code) : this(amount, CurrencyInfo.FromCode(code)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -40,7 +40,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    public FastMoney(decimal amount, string code, MidpointRounding rounding) : this(amount, new Currency(code), rounding) { }
+    public FastMoney(decimal amount, string code, MidpointRounding rounding) : this(amount, CurrencyInfo.FromCode(code), rounding) { }
 
     public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
