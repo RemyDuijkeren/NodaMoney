@@ -46,7 +46,6 @@ namespace NodaMoney.Rounding;
 //   - Cash rounding (e.g., rounding to the nearest coin denomination).
 // - Rounding can be configured globally, per-currency, or even per-transaction.
 
-
 // IMonetaryRounding?
 internal interface IRoundingStrategy
 {
@@ -79,7 +78,7 @@ internal record DefaultRounding(MidpointRounding Rounding = MidpointRounding.ToE
 
         if (!currencyInfo.MinorUnitIsDecimalBased)
         {
-            // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
+            // If the minor unit system is not Decimal-based (e.g., a currency with irregular subunit divisions such
             // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
             // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
             // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
@@ -124,6 +123,24 @@ internal record HalfUpRounding() : DefaultRounding(MidpointRounding.AwayFromZero
 internal record NoRoundingStrategy : IRoundingStrategy
 {
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimalDigits) => amount;
+}
+
+internal record CashDenominationRounding : IRoundingStrategy
+{
+    public CashDenominationRounding(decimal @decimal)
+    {
+        throw new NotImplementedException();
+    }
+
+    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimalDigits) => throw new NotImplementedException();
+}
+
+internal record WholeNumberRounding : IRoundingStrategy
+{
+    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimalDigits)
+    {
+        return Math.Round(amount, 0, MidpointRounding.ToEven);
+    }
 }
 
 internal record CustomRoundingStrategy : IRoundingStrategy

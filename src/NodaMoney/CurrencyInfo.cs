@@ -100,7 +100,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
     public MinorUnit MinorUnit { get; init; }
 
-    /// <summary>The english name of the currency</summary>
+    /// <summary>The English name of the currency</summary>
     public string EnglishName { get; init; } = string.Empty;
 
     /// <summary>The (local) currency symbol.</summary>
@@ -135,6 +135,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <value>The introduction date when the currency is valid.</value>
     public DateTime? IntroducedOn { get; init; }
 
+    /// <summary>Gets the smallest denomination of cash available for the currency.</summary>
+    /// <remarks>
+    /// This property represents the lowest physical cash unit (e.g., the smallest coin or note) that exists within
+    /// the currency system and is used for cash transactions.
+    /// </remarks>
+    internal decimal? SmallestCashDenomination { get; init; }
+
     // // Additional metadata storage
     // private readonly MetadataProvider _metadataProvider = new();
     // /// <summary>Access metadata for this currency.</summary>
@@ -168,29 +175,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>
     public decimal MinimalAmount => MinorUnit == 0 ? 1m : (decimal)(1.0 / Math.Pow(10, MinorUnitAsExponentOfBase10));
-
-    /// <summary>Gets the minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
-    /// <para>
-    /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so the exponent 2 will be returned.
-    /// </para>
-    /// <para>
-    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5), which is
-    /// 10^log10(5) = 10^0.698970004, so the exponent 0.698970004 will be returned.
-    /// </para>
-    public double MinorUnitAsExponentOfBase10
-    {
-        get
-        {
-            // https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
-            // unit of recorded value (i.e. as recorded by banks) which is a division of the respective unit of currency or fund
-            return MinorUnit switch
-            {
-                MinorUnit.NotApplicable => 0,
-                MinorUnit.OneFifth => Math.Log10(5),
-                _ => (double)MinorUnit,
-            };
-        }
-    }
 
     /// <summary>Gets a value indicating whether the minor unit of the currency is based on the decimal system.</summary>
     /// <value><c>true</c> if minor unit is decimal based; otherwise, <c>false</c>.</value>
@@ -599,6 +583,29 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
             'C'
             : '\0';
+    }
+
+    /// <summary>Gets the minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
+    /// <para>
+    /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so the exponent 2 will be returned.
+    /// </para>
+    /// <para>
+    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5), which is
+    /// 10^log10(5) = 10^0.698970004, so the exponent 0.698970004 will be returned.
+    /// </para>
+    private double MinorUnitAsExponentOfBase10
+    {
+        get
+        {
+            // https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
+            // unit of recorded value (i.e. as recorded by banks) which is a division of the respective unit of currency or fund
+            return MinorUnit switch
+            {
+                MinorUnit.NotApplicable => 0,
+                MinorUnit.OneFifth => Math.Log10(5),
+                _ => (double)MinorUnit,
+            };
+        }
     }
 
     private static void ValidateCurrencyCode(string code)

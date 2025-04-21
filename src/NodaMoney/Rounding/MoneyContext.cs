@@ -1,119 +1,201 @@
 namespace NodaMoney.Rounding;
 
-// MonetaryContext (or RoundingContext), MonetaryConfiguration (or MoneyRules, MonetaryRules)
+// TODO: Or MonetaryContext (or RoundingContext), MonetaryConfiguration (or MoneyRules, MonetaryRules)?
+
+/// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 internal record MoneyContext
 {
-    // Static dictionary to hold all active contexts and enforce deduplication
-    private static readonly Dictionary<byte, MoneyContext> s_activeContexts = new();
-    private static readonly AsyncLocal<byte?> s_threadLocalContext = new(); // Thread-local index
-    private static byte s_lastIndex = 0;
+    private static byte s_lastIndex;
+    private static readonly ReaderWriterLockSlim s_contextLock = new();
+    private static readonly Dictionary<byte, MoneyContext> s_activeContexts = [];
 
-    // Default global MoneyContext (fallback context)
+    /// <summary>Thread-local index</summary>
+    private static readonly AsyncLocal<byte?> s_threadLocalContext = new();
+
+    /// <summary>Default global MoneyContext (fallback context)</summary>
     private static MoneyContext s_defaultGlobalContext = new(new DefaultRounding());
 
-    // Configuration properties (set via private constructor)
-    public IRoundingStrategy RoundingStrategy { get; }
-    // public IRoundingStrategy StandardRoundingStrategy { get; }
-    // public IRoundingStrategy CashRoundingStrategy { get; }
-    public int Precision { get; }
-    public int MaxScale { get; }
+    /// <summary>Get the rounding strategy used for rounding monetary values in the context.</summary>
+    /// <remarks>
+    /// The rounding strategy determines how monetary values are rounded during operations, such as financial
+    /// calculations, tax computations, or price adjustments. Examples of rounding strategies include Half-Up,
+    /// Half-Even (Bankers' Rounding), or custom-defined strategies. It encapsulates the rules and logic for applying
+    /// rounding, which may vary based on business context, regulatory requirements, or currency-specific needs.
+    /// </remarks>
+    public IRoundingStrategy RoundingStrategy { get; } // or StandardRoundingStrategy and CashRoundingStrategy?
 
-    // attach metadata to rounding operations. This could include:
-    // - Details like maximum/minimum allowed scale.
-    // - Reasons for rounding (e.g., legal rules, financial calculations).
-    // - Region- or jurisdiction-specific adjustments.
-    public Dictionary<string, string> Attributes { get; }
-    public bool CashRounding { get; }
-    // or
-    // Access metadata for the context
+    /// <summary>Get the total number of significant digits available for numerical values in the context.</summary>
+    public int Precision { get; }
+
+    /// <summary>Get the maximum number of decimal places allowed for rounding operations within the monetary context.</summary>
+    /// <remarks>This property overrides the scale in <see cref="CurrencyInfo"/>.</remarks>
+    public int? MaxScale { get; }
+
+    /// <summary>Indicates whether cash rounding is applied in the monetary context.</summary>
+    /// <remarks>This property reflects if rounding rules are tailored for cash handling, typically used to accommodate for physical currency denominations.</remarks>
+    public bool CashRounding { get; } // TODO: CashRoundingStrategy? Or store in Metadata?
+
+    /// <summary>Get the metadata properties associated with the monetary context.</summary>
     public MetadataProvider Metadata { get; } = new();
 
-    // Private constructor to prevent direct instantiation
-    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int maxScale = 2)
+    /// <summary>Efficient lookup index (1-byte reference)</summary>
+    internal byte Index { get; }
+
+    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, bool cashRounding = false)
     {
         RoundingStrategy = roundingStrategy;
         Precision = precision;
         MaxScale = maxScale;
+        CashRounding = cashRounding;
 
         // Automatically register this context
-        _index = RegisterContext(this);
+        Index = RegisterContext(this);
     }
 
-    // Efficient lookup index (1-byte reference)
-    private readonly byte _index;
-
-    internal byte Index => _index;
-
-    // Factory method to enforce deduplication and controlled creation
-    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int maxScale = 2)
+    /// <summary>
+    /// Creates a new instance of the <see cref="MoneyContext"/> class or retrieves an existing instance if an
+    /// equivalent context is already registered.
+    /// </summary>
+    /// <param name="roundingStrategy">The rounding strategy to be applied in monetary calculations.</param>
+    /// <param name="precision">The total number of significant digits for monetary values. Defaults to 28.</param>
+    /// <param name="maxScale">The maximum number of digits to the right of the decimal point. Overrides the scale in <see cref="CurrencyInfo"/></param>
+    /// <param name="cashRounding">Indicates whether cash rounding is applied in the monetary context.</param>
+    /// <returns>A <see cref="MoneyContext"/> instance that matches the specified parameters.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the precision is less than or equal to zero, or when the maxScale is negative.</exception>
+    /// <exception cref="ArgumentException">Thrown when the maxScale is greater than the precision.</exception>
+    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, bool cashRounding = false)
     {
-        // Look for an equivalent context in the dictionary
-        foreach (var kvp in s_activeContexts)
+        if (precision <= 0) throw new ArgumentOutOfRangeException(nameof(precision), "Precision must be positive");
+        if (maxScale < 0) throw new ArgumentOutOfRangeException(nameof(maxScale), "MaxScale cannot be negative");
+        if (maxScale > precision) throw new ArgumentException("MaxScale cannot be greater than precision");
+
+        s_contextLock.EnterReadLock();
+        try
         {
-            if (kvp.Value.RoundingStrategy == roundingStrategy &&
-                kvp.Value.Precision == precision &&
-                kvp.Value.MaxScale == maxScale)
+            // Look for an equivalent context in the dictionary
+            foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                return kvp.Value; // Return existing equivalent context
+                if (ctx.RoundingStrategy == roundingStrategy &&
+                    ctx.Precision == precision &&
+                    ctx.MaxScale == maxScale &&
+                    ctx.CashRounding == cashRounding)
+                {
+                    return ctx; // Return existing equivalent context
+                }
             }
+        }
+        finally
+        {
+            s_contextLock.ExitReadLock();
         }
 
         // Create and register a new context if no match is found
         return new MoneyContext(roundingStrategy, precision, maxScale);
     }
 
-    // Retrieve MoneyContext by its 1-byte index
-    internal static MoneyContext Get(byte index)
-    {
-        if (!s_activeContexts.TryGetValue(index, out var context))
-        {
-            throw new ArgumentException($"Invalid MoneyContext index: {index}");
-        }
-
-        return context;
-    }
-
-    private static byte RegisterContext(MoneyContext context)
-    {
-        // Ensure we don't exceed the 1-byte index limit (256 contexts)
-        if (s_lastIndex == 255)
-        {
-            throw new InvalidOperationException("Maximum number of MoneyContexts (256) reached.");
-        }
-
-        var newIndex = ++s_lastIndex;
-        s_activeContexts[newIndex] = context;
-        return newIndex;
-    }
-
-    // Global Default Context Getter/Setter
+    /// <summary>Gets or sets the default global <see cref="MoneyContext"/> instance that acts as a fallback context.</summary>
+    /// <remarks>
+    /// This property holds a global default monetary configuration context, used when no thread-local or specific context
+    /// is defined. It can be customized by assigning a new <see cref="MoneyContext"/> instance or retrieved to use its
+    /// predefined configuration. Setting this property to null will throw an <see cref="ArgumentNullException"/>.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">Thrown when the provided value is null.</exception>
     public static MoneyContext DefaultGlobal
     {
         get => s_defaultGlobalContext;
         set => s_defaultGlobalContext = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    // Thread-local Context Getter/Setter
+    /// <summary>Gets or sets the thread-local <see cref="MoneyContext"/> for the current execution thread.</summary>
+    /// <remarks>
+    /// This property allows for the configuration of a specific <see cref="MoneyContext"/> to apply
+    /// within a localized scope of execution, typically for operations that require specialized monetary
+    /// processing or rounding rules. If not explicitly set, the <see cref="DefaultGlobal"/> context is used.
+    /// </remarks>
     public static MoneyContext? ThreadContext
     {
         get => s_threadLocalContext.Value.HasValue ? Get(s_threadLocalContext.Value.Value) : null;
-        set => s_threadLocalContext.Value = value?._index;
+        set => s_threadLocalContext.Value = value?.Index;
     }
 
+    /// <summary>
+    /// Gets the current monetary context used for financial and rounding operations,
+    /// defaulting to a thread-local context if set, or otherwise to the global default context.
+    /// </summary>
     public static MoneyContext Current => ThreadContext ?? DefaultGlobal;
+
+    /// <summary>Retrieves an existing <see cref="MoneyContext"/> instance based on the specified index.</summary>
+    /// <param name="index">The unique index identifying the desired <see cref="MoneyContext"/> instance.</param>
+    /// <returns>The <see cref="MoneyContext"/> instance corresponding to the specified index.</returns>
+    /// <exception cref="ArgumentException">Thrown when the provided index does not correspond to a valid or existing <see cref="MoneyContext"/> instance.</exception>
+    internal static MoneyContext Get(byte index)
+    {
+        s_contextLock.EnterReadLock(); // Allow parallel reads
+        try
+        {
+            if (!s_activeContexts.TryGetValue(index, out var context))
+            {
+                throw new ArgumentException($"Invalid MoneyContext index: {index}");
+            }
+            return context;
+        }
+        finally
+        {
+            s_contextLock.ExitReadLock();
+        }
+    }
+
+    private static byte RegisterContext(MoneyContext context)
+    {
+        s_contextLock.EnterWriteLock(); // Ensure write exclusivity
+        try
+        {
+            // Ensure we don't exceed the 1-byte index limit (256 contexts)
+            if (s_lastIndex == 255)
+            {
+                throw new InvalidOperationException("Maximum number of MoneyContexts (256) reached.");
+            }
+
+            var newIndex = ++s_lastIndex;
+            s_activeContexts[newIndex] = context;
+            return newIndex;
+        }
+        finally
+        {
+            s_contextLock.ExitWriteLock();
+        }
+    }
 
     // Specific factory methods for common configurations
     public static MoneyContext CreateDefault() => Create(new DefaultRounding());
     public static MoneyContext CreateNoRounding() => Create(new NoRoundingStrategy());
     public static MoneyContext CreateRetail() => Create(new HalfUpRounding(), maxScale: 2);
     public static MoneyContext CreateAccounting() => Create(new HalfEvenRounding(), maxScale: 4);
+
+    /// <summary>
+    /// Temporarily sets the thread-local monetary context to the specified <see cref="MoneyContext"/> and restores
+    /// the previous context when disposed.
+    /// </summary>
+    /// <param name="context">The <see cref="MoneyContext"/> to use as the thread-local context.</param>
+    /// <returns>An <see cref="IDisposable"/> instance that restores the previous thread-local monetary context upon disposal.</returns>
+    public static IDisposable UseContext(MoneyContext context)
+    {
+        MoneyContext? previous = ThreadContext;
+        ThreadContext = context;
+        return new ContextScope(() => ThreadContext = previous);
+    }
+
+    private class ContextScope(Action onDispose) : IDisposable
+    {
+        public void Dispose() => onDispose();
+    }
 }
 
 internal readonly struct MoneyV2
 {
     public decimal Amount { get; }
     public CurrencyInfo Currency { get; }
-    private readonly byte _moneyContextIndex; // 1-byte reference to MoneyContext
+    private readonly byte _moneyContextIndex;
 
     public MoneyV2(decimal amount, CurrencyInfo currency, MoneyContext? context = null)
     {
@@ -143,7 +225,6 @@ internal readonly struct MoneyV2
         }
 
         return roundedValue;
-
     }
 
     public override string ToString()
@@ -183,5 +264,12 @@ internal readonly struct MoneyV2
     {
         return Amount.ToString().Replace(".", "").Length <= Context.Precision &&
                decimal.GetBits(Amount)[3] >> 16 <= Context.MaxScale;
+    }
+
+    public void MethodX()
+    {
+        using var context = MoneyContext.UseContext(MoneyContext.CreateAccounting());
+
+        // TODO: ...
     }
 }
