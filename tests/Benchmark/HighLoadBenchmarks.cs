@@ -6,13 +6,15 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class HighLoadBenchmarks
 {
-    [Benchmark]
-    public Currency[] CreatingOneMillionCurrency()
-    {
-        int max = 1_000_000;
-        Currency[] currencies = new Currency[max];
+    //[Params(1, 100, 1_000, 100_000, 1_000_000)]
+    public int Count { get; set; } = 1_000_000;
 
-        for (int i = 0; i < max; i++)
+    [Benchmark]
+    public Currency[] Create1MCurrency()
+    {
+        Currency[] currencies = new Currency[Count];
+
+        for (int i = 0; i < Count; i++)
         {
             if (i % 3 == 0)
                 currencies[i] = CurrencyInfo.FromCode("EUR");
@@ -26,12 +28,11 @@ public class HighLoadBenchmarks
     }
 
     [Benchmark]
-    public Money[] CreatingOneMillionMoney()
+    public Money[] Create1MMoney()
     {
-        int max = 1_000_000;
-        Money[] money = new Money[max];
+        Money[] money = new Money[Count];
 
-        for (int i = 0; i < max; i++)
+        for (int i = 0; i < Count; i++)
         {
             if (i % 3 == 0)
                 money[i] = new Money(10M, "EUR");
@@ -44,22 +45,21 @@ public class HighLoadBenchmarks
         return money;
     }
 
-    // [Benchmark]
-    // public FastMoney[] CreatingOneMillionMoneyFastMoney()
-    // {
-    //     int max = 1_000_000;
-    //     FastMoney[] money = new FastMoney[max];
-    //
-    //     for (int i = 0; i < max; i++)
-    //     {
-    //         if (i % 3 == 0)
-    //             money[i] = new FastMoney(10M, "EUR");
-    //         else if (i % 2 == 0)
-    //             money[i] = new FastMoney(10M, "USD");
-    //         else
-    //             money[i] = new FastMoney(10M, "JPY");
-    //     }
-    //
-    //     return money;
-    // }
+    [Benchmark]
+    public decimal Create1MFastMoney()
+    {
+        FastMoney[] money = new FastMoney[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                money[i] = new FastMoney(10M, "EUR");
+            else if (i % 2 == 0)
+                money[i] = new FastMoney(10M, "USD");
+            else
+                money[i] = new FastMoney(10M, "JPY");
+        }
+
+        return money[0].Amount;
+    }
 }

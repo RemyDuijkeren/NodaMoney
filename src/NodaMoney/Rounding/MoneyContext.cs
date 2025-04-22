@@ -2,6 +2,11 @@ namespace NodaMoney.Rounding;
 
 // TODO: Or MonetaryContext (or RoundingContext), MonetaryConfiguration (or MoneyRules, MonetaryRules)?
 
+// TODO: Handling of Ambiguous Currency Symbols when formatting/parsing?
+// Add configurable policy enforcement to explicitly fail or resolve using a context-driven priority list.
+// use sort order override?
+
+
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 internal record MoneyContext
 {
