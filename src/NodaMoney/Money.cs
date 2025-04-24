@@ -11,6 +11,18 @@ namespace NodaMoney;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Money : IEquatable<Money>
 {
+    // Masks for the Flags field
+    private const int CurrencyMask = 0b_1111_1111_1111_1111;    // Bits 0–15, for Currency (16 bits)
+    private const int ScaleMask = 0xFF_00_00;                   // Bits 16-23 for the Decimal scale
+    private const int IndexMask = 0b_0111_1111 << 24;           // Bits 24–30, for Index (7 bits)
+    private const int SignMask = unchecked((int)0x80_00_00_00); // Bit 31 for the Decimal sign bit (negative)
+
+    // Fields for storing the components of the decimal representation
+    private readonly int _low;
+    private readonly int _mid;
+    private readonly int _high;
+    private readonly int _flags;
+
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
@@ -50,11 +62,51 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
+    // public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
+    // {
+    //     Currency = currency;
+    //     Amount = Round(amount, currency, rounding);
+    // }
+
     public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
     {
-        Currency = currency;
-        Amount = Round(amount, currency, rounding);
+        //MoneyValue = new PackedDecimal(Round(amount, currency, rounding), currency);
+
+        const int index = 0;
+        amount = Round(amount, currency, rounding);
+
+        // Extract the 4 integers from the decimal amount.
+#if NET5_0_OR_GREATER
+        Span<int> bits = stackalloc int[4];
+        decimal.GetBits(amount, bits);
+#else
+        int[] bits = decimal.GetBits(amount);
+#endif
+
+        _low = bits[0];
+        _mid = bits[1];
+        _high = bits[2];
+        _flags = (bits[3] & ~(CurrencyMask | IndexMask))  // Clear existing Currency and Index bits
+                 | (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
+                 | ((index << 24) & IndexMask)            // Store Index in bits 24–30
+                 | (bits[3] & (ScaleMask | SignMask));    // Preserve Scale Factor (16–23) and Sign (31)
     }
+
+    // public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven)
+    //     : this(amount, currency, MoneyContext.Create(new DefaultRounding(rounding))) { }
+
+    // internal Money(decimal amount, Currency currency, MoneyContext? context)
+    // {
+    //     // Use either provided context or current (global/thread-local)
+    //     var currentContext = context ?? MoneyContext.CurrentContext;
+    //
+    //     // Store its index
+    //     amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.FromCode(currency.Code), null);
+    //     //Currency = currency;
+    //     MoneyValue = new PackedDecimal(amount, currency, currentContext.Index);
+    // }
+
+    // internal PackedDecimal MoneyValue { get; init; }
 
     // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
 
@@ -160,10 +212,58 @@ public readonly partial struct Money : IEquatable<Money>
     public Money(ulong amount, Currency currency) : this((decimal)amount, currency) { }
 
     /// <summary>Gets the amount of money.</summary>
-    public decimal Amount { get; init; }
+    //public decimal Amount { get; init; }
+
+    public decimal Amount
+    {
+        get
+        {
+            // Extract scale (bits 16-23) and sign (bit 31) from Flags
+            byte scale = (byte)((_flags & ScaleMask) >> 16); // Extract scale (shift bits 16-23)
+            bool isNegative = (_flags & SignMask) != 0; // Is negative if SignMask bit is set
+
+            // Reconstruct the decimal with the correct `Flags` value (index removed)
+            return new decimal(_low, _mid, _high, isNegative, scale);
+        }
+        //init => MoneyValue = new PackedDecimal(value, MoneyValue.Currency, MoneyValue.Index);
+        init
+        {
+            // Separate the Decimal bits during initialization
+#if NET5_0_OR_GREATER
+            Span<int> bits = stackalloc int[4];
+            decimal.GetBits(value, bits);
+#else
+            int[] bits = decimal.GetBits(value);
+#endif
+            _low = bits[0];
+            _mid = bits[1];
+            _high = bits[2];
+
+            // Only preserve the Scale and Sign bits during initialization
+            _flags = (_flags & ~(ScaleMask | SignMask)) | (bits[3] & (ScaleMask | SignMask));
+        }
+    }
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-    public Currency Currency { get; init; }
+    //public Currency Currency { get; init; }
+    public Currency Currency
+    {
+        get => new((ushort)(_flags & CurrencyMask)); // Extract Currency (bits 0–15)
+        //init => MoneyValue = new PackedDecimal(MoneyValue.Decimal, value, MoneyValue.Index);
+        init => _flags = (_flags & ~CurrencyMask) | (value.EncodedValue & CurrencyMask); // Set Currency (bits 0–15)
+    }
+
+    public byte Scale => (byte)((_flags & ScaleMask) >> 16); // Extract Scale (bits 16-23)
+    public byte Index
+    {
+        get => (byte)((_flags & IndexMask) >> 24); // Extract Index (bits 24–30)
+        init
+        {
+            // Process Index initialization
+            if (value > 127) throw new ArgumentOutOfRangeException(nameof(value), "Index must be within 0 to 127.");
+            _flags = (_flags & ~IndexMask) | ((value << 24) & IndexMask); // Set Index (bits 24–30)
+        }
+    }
 
     /// <summary>Returns a value indicating whether two instances of <see cref="Money"/> are equal.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>

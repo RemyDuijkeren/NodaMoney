@@ -8,7 +8,7 @@ public class ConvertMoney
 
     private readonly Currency _dollar = Currency.FromCode("USD");
 
-    private ExchangeRate _exchangeRate = new ExchangeRate(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591);
+    private ExchangeRate _exchangeRate = new(Currency.FromCode("EUR"), Currency.FromCode("USD"), 1.2591);
     // EUR/USD 1.2591
 
     [Fact]

@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
+using NodaMoney.Rounding;
 
 namespace Benchmark;
 
@@ -37,9 +38,9 @@ public class HighLoadBenchmarks
             if (i % 3 == 0)
                 money[i] = new Money(10M, "EUR");
             else if (i % 2 == 0)
-                money[i] = new Money(10M, "USD");
+                money[i] = new Money(20M, "USD");
             else
-                money[i] = new Money(10M, "JPY");
+                money[i] = new Money(30M, "JPY");
         }
 
         return money;
@@ -55,11 +56,47 @@ public class HighLoadBenchmarks
             if (i % 3 == 0)
                 money[i] = new FastMoney(10M, "EUR");
             else if (i % 2 == 0)
-                money[i] = new FastMoney(10M, "USD");
+                money[i] = new FastMoney(20M, "USD");
             else
-                money[i] = new FastMoney(10M, "JPY");
+                money[i] = new FastMoney(30M, "JPY");
         }
 
         return money[0].Amount;
+    }
+
+    [Benchmark(Baseline = true)]
+    public decimal Create1MDecimal()
+    {
+        decimal[] decimals = new decimal[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                decimals[i] = 10M;
+            else if (i % 2 == 0)
+                decimals[i] = 20M;
+            else
+                decimals[i] = 30M;
+        }
+
+        return decimals[0];
+    }
+
+    [Benchmark]
+    public decimal Create1MPackedDecimal()
+    {
+        PackedDecimal[] indexedDecimals = new PackedDecimal[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                indexedDecimals[i] = new PackedDecimal(10M, index: 1);
+            else if (i % 2 == 0)
+                indexedDecimals[i] = new PackedDecimal(20M, index: 2);
+            else
+                indexedDecimals[i] = new PackedDecimal(30M, index: 3);
+        }
+
+        return indexedDecimals[0].Decimal;
     }
 }

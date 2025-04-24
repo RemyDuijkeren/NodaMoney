@@ -1,11 +1,7 @@
 namespace NodaMoney.Rounding;
 
-// TODO: Or MonetaryContext (or RoundingContext), MonetaryConfiguration (or MoneyRules, MonetaryRules)?
-
-// TODO: Handling of Ambiguous Currency Symbols when formatting/parsing?
-// Add configurable policy enforcement to explicitly fail or resolve using a context-driven priority list.
-// use sort order override?
-
+// TODO: Handling of Ambiguous Currency Symbols when formatting/parsing? Add configurable policy enforcement to
+// explicitly fail or resolve using a context-driven priority list.
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 internal record MoneyContext
@@ -18,7 +14,7 @@ internal record MoneyContext
     private static readonly AsyncLocal<byte?> s_threadLocalContext = new();
 
     /// <summary>Default global MoneyContext (fallback context)</summary>
-    private static MoneyContext s_defaultGlobalContext = new(new DefaultRounding());
+    private static MoneyContext s_defaultThreadContext = new(new DefaultRounding());
 
     /// <summary>Get the rounding strategy used for rounding monetary values in the context.</summary>
     /// <remarks>
@@ -44,7 +40,7 @@ internal record MoneyContext
     public MetadataProvider Metadata { get; } = new();
 
     /// <summary>Efficient lookup index (1-byte reference)</summary>
-    internal byte Index { get; }
+    internal byte Index { get; private set; }
 
     private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, bool cashRounding = false)
     {
@@ -80,10 +76,10 @@ internal record MoneyContext
             // Look for an equivalent context in the dictionary
             foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                if (ctx.RoundingStrategy == roundingStrategy &&
-                    ctx.Precision == precision &&
-                    ctx.MaxScale == maxScale &&
-                    ctx.CashRounding == cashRounding)
+                 if (ctx.RoundingStrategy.Equals(roundingStrategy)
+                    && ctx.Precision == precision
+                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault()
+                    && ctx.CashRounding == cashRounding)
                 {
                     return ctx; // Return existing equivalent context
                 }
@@ -105,17 +101,17 @@ internal record MoneyContext
     /// predefined configuration. Setting this property to null will throw an <see cref="ArgumentNullException"/>.
     /// </remarks>
     /// <exception cref="ArgumentNullException">Thrown when the provided value is null.</exception>
-    public static MoneyContext DefaultGlobal
+    public static MoneyContext DefaultThreadContext
     {
-        get => s_defaultGlobalContext;
-        set => s_defaultGlobalContext = value ?? throw new ArgumentNullException(nameof(value));
+        get => s_defaultThreadContext;
+        set => s_defaultThreadContext = value ?? throw new ArgumentNullException(nameof(value));
     }
 
     /// <summary>Gets or sets the thread-local <see cref="MoneyContext"/> for the current execution thread.</summary>
     /// <remarks>
     /// This property allows for the configuration of a specific <see cref="MoneyContext"/> to apply
     /// within a localized scope of execution, typically for operations that require specialized monetary
-    /// processing or rounding rules. If not explicitly set, the <see cref="DefaultGlobal"/> context is used.
+    /// processing or rounding rules. If not explicitly set, the <see cref="DefaultThreadContext"/> context is used.
     /// </remarks>
     public static MoneyContext? ThreadContext
     {
@@ -127,7 +123,7 @@ internal record MoneyContext
     /// Gets the current monetary context used for financial and rounding operations,
     /// defaulting to a thread-local context if set, or otherwise to the global default context.
     /// </summary>
-    public static MoneyContext Current => ThreadContext ?? DefaultGlobal;
+    public static MoneyContext CurrentContext => ThreadContext ?? DefaultThreadContext;
 
     /// <summary>Retrieves an existing <see cref="MoneyContext"/> instance based on the specified index.</summary>
     /// <param name="index">The unique index identifying the desired <see cref="MoneyContext"/> instance.</param>
@@ -155,10 +151,18 @@ internal record MoneyContext
         s_contextLock.EnterWriteLock(); // Ensure write exclusivity
         try
         {
-            // Ensure we don't exceed the 1-byte index limit (256 contexts)
-            if (s_lastIndex == 255)
+            foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                throw new InvalidOperationException("Maximum number of MoneyContexts (256) reached.");
+                if (ctx.RoundingStrategy.Equals(context.RoundingStrategy))
+                {
+                    return ctx.Index; // Return existing equivalent context index
+                }
+            }
+
+            // Ensure we don't exceed the 7-bits index limit (128 contexts)
+            if (s_lastIndex == 127)
+            {
+                throw new InvalidOperationException("Maximum number of MoneyContexts (128) reached.");
             }
 
             var newIndex = ++s_lastIndex;
@@ -173,17 +177,30 @@ internal record MoneyContext
 
     // Specific factory methods for common configurations
     public static MoneyContext CreateDefault() => Create(new DefaultRounding());
-    public static MoneyContext CreateNoRounding() => Create(new NoRoundingStrategy());
+    public static MoneyContext CreateNoRounding() => Create(new NoRounding());
     public static MoneyContext CreateRetail() => Create(new HalfUpRounding(), maxScale: 2);
     public static MoneyContext CreateAccounting() => Create(new HalfEvenRounding(), maxScale: 4);
 
     /// <summary>
-    /// Temporarily sets the thread-local monetary context to the specified <see cref="MoneyContext"/> and restores
-    /// the previous context when disposed.
+    /// Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.
     /// </summary>
-    /// <param name="context">The <see cref="MoneyContext"/> to use as the thread-local context.</param>
-    /// <returns>An <see cref="IDisposable"/> instance that restores the previous thread-local monetary context upon disposal.</returns>
-    public static IDisposable UseContext(MoneyContext context)
+    /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>
+    /// <param name="precision">The total number of significant digits for monetary calculations. Defaults to 28.</param>
+    /// <param name="maxScale">The maximum number of decimal places allowed. If not specified, the default behavior is applied.</param>
+    /// <param name="cashRounding">Indicates whether cash rounding rules should be applied in the context.</param>
+    /// <returns>A disposable object that manages the lifetime of the monetary context scope.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if precision is less than or equal to zero, or if maxScale is negative.</exception>
+    /// <exception cref="ArgumentException">Thrown if maxScale is greater than precision.</exception>
+    public static IDisposable CreateScope(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null,
+        bool cashRounding = false) => CreateScope(Create(roundingStrategy, precision, maxScale, cashRounding));
+
+    /// <summary>
+    /// Creates a scoped context for monetary operations with the specified configuration. When the context
+    /// is disposed, the previous context is restored.
+    /// </summary>
+    /// <param name="context">The <see cref="MoneyContext"/> instance representing the financial and rounding configuration to be used within the scope.</param>
+    /// <returns>An <see cref="IDisposable"/> object that manages the lifecycle of the scoped context, automatically restoring the previous context upon disposal.</returns>
+    public static IDisposable CreateScope(MoneyContext context)
     {
         MoneyContext? previous = ThreadContext;
         ThreadContext = context;
@@ -193,88 +210,5 @@ internal record MoneyContext
     private class ContextScope(Action onDispose) : IDisposable
     {
         public void Dispose() => onDispose();
-    }
-}
-
-internal readonly struct MoneyV2
-{
-    public decimal Amount { get; }
-    public CurrencyInfo Currency { get; }
-    private readonly byte _moneyContextIndex;
-
-    public MoneyV2(decimal amount, CurrencyInfo currency, MoneyContext? context = null)
-    {
-        Amount = amount;
-        Currency = currency;
-
-        // Use either provided context or current (global/thread-local)
-        var effectiveContext = context ?? MoneyContext.Current;
-
-        // Store its index
-        _moneyContextIndex = effectiveContext.Index;
-    }
-
-    // Access the associated MoneyContext
-    public MoneyContext Context => MoneyContext.Get(_moneyContextIndex);
-
-    // Round based on the context rules
-    public decimal Round()
-    {
-        // Use the rounding strategy from the context
-        var roundedValue = Context.RoundingStrategy.Round(Amount, Currency, Context.MaxScale);
-
-        // Validate precision as well (no value can exceed the Context's Precision)
-        if (roundedValue.ToString().Replace(".", "").Length > Context.Precision)
-        {
-            throw new InvalidOperationException($"Rounded value exceeds precision defined by the context ({Context.Precision}).");
-        }
-
-        return roundedValue;
-    }
-
-    public override string ToString()
-    {
-        return $"{Currency.Symbol}{Amount}";
-    }
-
-    // Validate and adjust precision and scale based on this context's rules
-    public MoneyV2 ApplyPrecisionAndScale()
-    {
-        var maxPrecision = Context.Precision;
-        var maxScale = Context.MaxScale;
-
-        if (decimal.GetBits(Amount)[3] >> 16 > maxScale) // Check scale
-        {
-            throw new InvalidOperationException($"Amount exceeds allowed scale of {maxScale}.");
-        }
-
-        if (Amount.ToString().Replace(".", "").Length > maxPrecision) // Check precision
-        {
-            throw new InvalidOperationException($"Amount exceeds allowed precision of {maxPrecision}.");
-        }
-
-        return this;
-    }
-
-    // **MonetaryOperator/Adjuster**:
-    // Just like JavaMoney uses `MonetaryOperator` for adjustments, allow custom operations to be applied to `Money`. For example, an operator to scale or convert currencies.
-    public MoneyV2 Apply(Func<decimal, decimal> adjustment)
-    {
-        return new MoneyV2(adjustment(Amount), Currency, Context);
-    }
-
-    // **Queryable Money**:
-    // Allow querying context or metadata about `Money` objects, e.g.,:
-    public bool IsWithinPrecisionScale()
-    {
-        return Amount.ToString().Replace(".", "").Length <= Context.Precision &&
-               decimal.GetBits(Amount)[3] >> 16 <= Context.MaxScale;
-    }
-
-    public void MethodX()
-    {
-        using var context = MoneyContext.UseContext(MoneyContext.CreateAccounting());
-
-        // TODO: ...
     }
 }

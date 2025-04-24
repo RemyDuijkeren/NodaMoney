@@ -120,7 +120,7 @@ internal record HalfUpRounding() : DefaultRounding(MidpointRounding.AwayFromZero
 /// or where rounding would lead to incorrect results in downstream processes.
 /// </remarks>
 /// <seealso cref="IRoundingStrategy"/>
-internal record NoRoundingStrategy : IRoundingStrategy
+internal record NoRounding : IRoundingStrategy
 {
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimalDigits) => amount;
 }

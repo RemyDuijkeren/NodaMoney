@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- MoneyContext
+- PackedDecimal stores Amount, MoneyContextIndex and Currency in 16 bytes. This makes Money 16 bytes instead of 18 bytes.
 
 ### Changed
+- Money is now the same size as Decimal (16 bytes). Was 18 bytes or padded 24 bytes.
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
 - Removed NumberStyle param for Parse and TryParse methods (Breaking Change)
 - No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency.

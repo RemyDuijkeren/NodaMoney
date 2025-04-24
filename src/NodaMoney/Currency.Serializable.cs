@@ -28,19 +28,17 @@ public readonly partial record struct Currency : IXmlSerializable, ISerializable
         var currency = reader.GetAttribute("Currency");
         if (currency is not null)
         {
+            // v1 format: <Money Amount="765.43" Currency="USD;CUSTOM" />
             string[] v = currency.Split([';']);
             if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
             {
                 Unsafe.AsRef(in this) = new Currency(v[0]);
             }
-            else // ony 2nd part is not empty and not "ISO-4217" is a custom currency
+            else // Only if the 2nd part is not empty and not "ISO-4217", it is a custom currency
             {
                 Unsafe.AsRef(in this) = new Currency(v[0]) { IsIso4217 = false };
             }
         }
-
-        // var code = reader.GetAttribute("Currency");
-        // Unsafe.AsRef(this) = FromCode(code);
     }
 
     /// <inheritdoc cref="IXmlSerializable.WriteXml"/>

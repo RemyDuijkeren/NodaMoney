@@ -16,6 +16,9 @@ public readonly partial record struct Currency
     /// <summary>ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.</summary>
     readonly ushort _encodedValue;
 
+    internal ushort EncodedValue => _encodedValue;
+    internal Currency(ushort encodedValue) => _encodedValue = encodedValue;
+
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
     /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace NodaMoney;
 
-// TODO: Add support for the following properties? Use MoneyContext for this?
+// TODO: Add support for the following properties? Or use MoneyContext for this?
 // Thread.CurrentThread.CurrentCulture = new CurrentInfo("")
 // Thread.CurrentThread.CurrentCurrency = new CurrencyInfo(""); // extension property not possible
 //
