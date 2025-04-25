@@ -28,42 +28,6 @@ public class HighLoadBenchmarks
         return currencies;
     }
 
-    [Benchmark]
-    public Money[] Create1MMoney()
-    {
-        Money[] money = new Money[Count];
-
-        for (int i = 0; i < Count; i++)
-        {
-            if (i % 3 == 0)
-                money[i] = new Money(10M, "EUR");
-            else if (i % 2 == 0)
-                money[i] = new Money(20M, "USD");
-            else
-                money[i] = new Money(30M, "JPY");
-        }
-
-        return money;
-    }
-
-    [Benchmark]
-    public decimal Create1MFastMoney()
-    {
-        FastMoney[] money = new FastMoney[Count];
-
-        for (int i = 0; i < Count; i++)
-        {
-            if (i % 3 == 0)
-                money[i] = new FastMoney(10M, "EUR");
-            else if (i % 2 == 0)
-                money[i] = new FastMoney(20M, "USD");
-            else
-                money[i] = new FastMoney(30M, "JPY");
-        }
-
-        return money[0].Amount;
-    }
-
     [Benchmark(Baseline = true)]
     public decimal Create1MDecimal()
     {
@@ -98,5 +62,41 @@ public class HighLoadBenchmarks
         }
 
         return indexedDecimals[0].Decimal;
+    }
+
+    [Benchmark]
+    public Money[] Create1MMoney()
+    {
+        Money[] money = new Money[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                money[i] = new Money(10M, "EUR");
+            else if (i % 2 == 0)
+                money[i] = new Money(20M, "USD");
+            else
+                money[i] = new Money(30M, "JPY");
+        }
+
+        return money;
+    }
+
+    [Benchmark]
+    public decimal Create1MFastMoney()
+    {
+        FastMoney[] money = new FastMoney[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                money[i] = new FastMoney(10M, "EUR");
+            else if (i % 2 == 0)
+                money[i] = new FastMoney(20M, "USD");
+            else
+                money[i] = new FastMoney(30M, "JPY");
+        }
+
+        return money[0].Amount;
     }
 }

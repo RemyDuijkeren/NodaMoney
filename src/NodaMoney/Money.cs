@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using NodaMoney.Rounding;
 
 namespace NodaMoney;
 
@@ -49,11 +50,11 @@ public readonly partial struct Money : IEquatable<Money>
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, MidpointRounding rounding) : this(amount, CurrencyInfo.CurrentCurrency, rounding) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
     /// <param name="rounding">The rounding mode.</param>
-    /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
+    /// <remarks>The amount will be rounded to the number of decimals for the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, string code, MidpointRounding rounding) : this(amount, CurrencyInfo.FromCode(code), rounding) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
@@ -62,18 +63,16 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="rounding">The rounding mode.</param>
     /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    // public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
-    // {
-    //     Currency = currency;
-    //     Amount = Round(amount, currency, rounding);
-    // }
+    public Money(decimal amount, Currency currency, MidpointRounding rounding)
+        : this(amount, currency, MoneyContext.Create(new DefaultRounding(rounding))) { }
 
-    public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
+    public Money(decimal amount, Currency currency, MoneyContext? context = null)
     {
-        //MoneyValue = new PackedDecimal(Round(amount, currency, rounding), currency);
+        // Use either provided context or current (global/thread-local)
+        var currentContext = context ?? MoneyContext.CurrentContext;
 
-        const int index = 0;
-        amount = Round(amount, currency, rounding);
+        int index = currentContext.Index;
+        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), null);
 
         // Extract the 4 integers from the decimal amount.
 #if NET5_0_OR_GREATER
@@ -91,22 +90,6 @@ public readonly partial struct Money : IEquatable<Money>
                  | ((index << 24) & IndexMask)            // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask));    // Preserve Scale Factor (16–23) and Sign (31)
     }
-
-    // public Money(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven)
-    //     : this(amount, currency, MoneyContext.Create(new DefaultRounding(rounding))) { }
-
-    // internal Money(decimal amount, Currency currency, MoneyContext? context)
-    // {
-    //     // Use either provided context or current (global/thread-local)
-    //     var currentContext = context ?? MoneyContext.CurrentContext;
-    //
-    //     // Store its index
-    //     amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.FromCode(currency.Code), null);
-    //     //Currency = currency;
-    //     MoneyValue = new PackedDecimal(amount, currency, currentContext.Index);
-    // }
-
-    // internal PackedDecimal MoneyValue { get; init; }
 
     // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
 
@@ -225,7 +208,6 @@ public readonly partial struct Money : IEquatable<Money>
             // Reconstruct the decimal with the correct `Flags` value (index removed)
             return new decimal(_low, _mid, _high, isNegative, scale);
         }
-        //init => MoneyValue = new PackedDecimal(value, MoneyValue.Currency, MoneyValue.Index);
         init
         {
             // Separate the Decimal bits during initialization
@@ -254,7 +236,10 @@ public readonly partial struct Money : IEquatable<Money>
     }
 
     public byte Scale => (byte)((_flags & ScaleMask) >> 16); // Extract Scale (bits 16-23)
-    public byte Index
+
+    public MoneyContext MoneyContext => MoneyContext.Get(Index);
+
+    internal byte Index
     {
         get => (byte)((_flags & IndexMask) >> 24); // Extract Index (bits 24–30)
         init

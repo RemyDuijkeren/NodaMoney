@@ -48,4 +48,54 @@ public class NumericOperations
         // Assert
         result.Should().Be(startValue);
     }
+
+    [Fact]
+    public void MinValue_ShouldInitializeCorrectly_WhenAccessed()
+    {
+        // Act
+        var result = Money.MinValue;
+
+        // Assert
+        result.Amount.Should().Be(decimal.MinValue);
+        result.Currency.Should().Be(Currency.NoCurrency);
+    }
+
+    [Fact]
+    public void MinValueWithEur_ShouldInitializeCorrectly_WhenAccessed()
+    {
+        // Arrange
+        Currency eur = CurrencyInfo.FromCode("EUR");
+
+        // Act
+        var result = Money.MinValue with { Currency = eur };
+
+        // Assert
+        result.Amount.Should().Be(decimal.MinValue);
+        result.Currency.Should().Be(eur);
+    }
+
+    [Fact]
+    public void MaxValue_ShouldInitializeCorrectly_WhenAccessed()
+    {
+        // Act
+        var result = Money.MaxValue;
+
+        // Assert
+        result.Amount.Should().Be(decimal.MaxValue);
+        result.Currency.Should().Be(Currency.NoCurrency);
+    }
+
+    [Fact]
+    public void MaxValueWithEur_ShouldInitializeCorrectly_WhenAccessed()
+    {
+        // Arrange
+        Currency eur = CurrencyInfo.FromCode("EUR");
+
+        // Act
+        var result = Money.MaxValue with { Currency = eur };
+
+        // Assert
+        result.Amount.Should().Be(decimal.MaxValue);
+        result.Currency.Should().Be(eur);
+    }
 }

@@ -1,13 +1,13 @@
 using NodaMoney.Rounding;
 using Xunit.Abstractions;
 
-namespace NodaMoney.Tests.IndexedDecimalSpec;
+namespace NodaMoney.Tests.PackedDecimalSpec;
 
-public class CreateIndexDecimal
+public class CreatePackedDecimal
 {
     readonly ITestOutputHelper _testOutputHelper;
 
-    public CreateIndexDecimal(ITestOutputHelper testOutputHelper)
+    public CreatePackedDecimal(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
@@ -167,11 +167,10 @@ public class CreateIndexDecimal
         var roundedAmount = Math.Round(amount, 2); // Rounded to 2 decimal places
 
         // Assert
-        #if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER
         _testOutputHelper.WriteLine(amount.Scale.ToString());
         _testOutputHelper.WriteLine(roundedAmount.Scale.ToString());
-        #endif
+#endif
         _testOutputHelper.WriteLine(roundedAmount.ToString());
     }
-
 }

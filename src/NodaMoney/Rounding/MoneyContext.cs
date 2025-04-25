@@ -4,7 +4,7 @@ namespace NodaMoney.Rounding;
 // explicitly fail or resolve using a context-driven priority list.
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
-internal record MoneyContext
+public record MoneyContext
 {
     private static byte s_lastIndex;
     private static readonly ReaderWriterLockSlim s_contextLock = new();
@@ -176,10 +176,10 @@ internal record MoneyContext
     }
 
     // Specific factory methods for common configurations
-    public static MoneyContext CreateDefault() => Create(new DefaultRounding());
+    public static MoneyContext CreateDefault() => Create(DefaultRounding.HalfEvenRounding());
     public static MoneyContext CreateNoRounding() => Create(new NoRounding());
-    public static MoneyContext CreateRetail() => Create(new HalfUpRounding(), maxScale: 2);
-    public static MoneyContext CreateAccounting() => Create(new HalfEvenRounding(), maxScale: 4);
+    public static MoneyContext CreateRetail() => Create(DefaultRounding.HalfUpRounding(), maxScale: 2);
+    public static MoneyContext CreateAccounting() => Create(DefaultRounding.HalfEvenRounding(), maxScale: 4);
 
     /// <summary>
     /// Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.
