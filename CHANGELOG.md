@@ -7,19 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
-- MoneyContext
-- PackedDecimal stores Amount, MoneyContextIndex and Currency in 16 bytes. This makes Money 16 bytes instead of 18 bytes.
+- Add MoneyContext to configure money behavior like rounding, scale and precision. This can be specified globally,
+  per thread or by money instance. This should solve much of the discussion in issue #27 about internal rounding.
+- Add extra constructors on Money to create with a given MoneyContext, instead of MidpointRounding.
+- Add MoneyContext property on Money.
+- Add Scale property on Money.
 
 ### Changed
-- Money is now the same size as Decimal (16 bytes). Was 18 bytes or padded 24 bytes.
+- Optimized Money struct size. This was 18 bytes (padded 24 bytes), but is now 16 bytes, the same as Decimal struct!
+- Updated System.Text.Json dependency to allow versions from 4.7.2 and up for better backwards compatibility.
+- No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency (breaking-change).
+- CurrencyInfo.MinorUnitAsExponentOfBase10 changed from public to internal (breaking-change)
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
-- Removed NumberStyle param for Parse and TryParse methods (Breaking Change)
-- No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency.
-- Updated System.Text.Json dependency to allow versions from 4.7.2 and up for better compatibility and flexibility.
-- CurrencyInfo.MinorUnitAsExponentOfBase10 changed to internal
 
 ### Removed
--
+- Removed NumberStyle param for Parse- and TryParse-methods (breaking-change). Money expects to parse a Currency number.
+  Pre-parse with Decimal.Parse() if more fine-grained control is needed.
 
 ## [2.1.1]
 

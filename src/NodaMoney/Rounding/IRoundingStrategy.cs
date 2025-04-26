@@ -46,77 +46,24 @@ namespace NodaMoney.Rounding;
 //   - Cash rounding (e.g., rounding to the nearest coin denomination).
 // - Rounding can be configured globally, per-currency, or even per-transaction.
 
-// IMonetaryRounding?
+/// <summary>Defines a strategy for rounding monetary amounts based on specific rules or contexts.</summary>
+/// <remarks>
+/// This interface provides a mechanism to implement various rounding strategies that are applicable
+/// in financial and accounting systems. The rounding behavior is influenced by business requirements,
+/// accounting standards, or currency-specific practices (such as cash rounding for coin denominations).
+/// Implementations may include strategies like WholeNumberRounding, CashDenominationRounding, or
+/// other custom rounding behaviors tailored to specific scenarios.
+/// </remarks>
+/// <seealso cref="StandardRounding"/>
+/// <seealso cref="CashDenominationRounding"/>
 public interface IRoundingStrategy
 {
+    /// <summary>Rounds the specified monetary amount according to the defined rounding strategy.</summary>
+    /// <param name="amount">The monetary amount to be rounded.</param>
+    /// <param name="currencyInfo">The associated currency information used to guide rounding rules, such as denomination or rounding increments.</param>
+    /// <param name="decimals">An optional parameter specifying the number of decimal places to round to. If null, the default for the currency will be used.</param>
+    /// <returns>The rounded monetary value as a decimal.</returns>
     decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals);
-}
-
-/// <summary>Represents the default rounding strategy for monetary calculations.</summary>
-/// <param name="mode">Specifies the strategy that mathematical rounding methods should use to round a number.</param>
-/// <remarks>
-/// This class provides a rounding strategy that uses a specified midpoint rounding method,
-/// defaulting to <see cref="MidpointRounding.ToEven"/> (Bankers' rounding). It is commonly
-/// used in financial and accounting systems to reduce rounding bias over multiple calculations.
-/// </remarks>
-/// <example>
-/// Can be extended or used as a base class for more specific rounding strategies like
-/// <c>HalfEvenRounding</c> or <c>HalfUpRounding</c>.
-/// </example>
-/// <seealso cref="IRoundingStrategy"/>
-internal record DefaultRounding(MidpointRounding mode = MidpointRounding.ToEven) : IRoundingStrategy
-{
-    /// <summary>Represents a specific rounding strategy utilizing the "Half to Even" method, also known as Bankers' Rounding.</summary>
-    /// <remarks>
-    /// This class extends from <c>DefaultRounding</c> and enforces the <see cref="MidpointRounding.ToEven"/> strategy.
-    /// It is particularly suited for reducing rounding bias in repeated financial calculations and is widely applied
-    /// in accounting systems and regulatory settings where even distributions are required.
-    /// </remarks>
-    public static DefaultRounding HalfEvenRounding() => new(MidpointRounding.ToEven);
-
-    /// <summary>Represents a rounding strategy that rounds halves away from zero.</summary>
-    /// <remarks>
-    /// This class implements a rounding strategy where values are rounded towards the nearest neighbor,
-    /// and in case of a tie, they are rounded away from zero. This approach is commonly used in financial
-    /// and business calculations, like retail and Point-of-Sale (POS), to avoid underestimating values.
-    /// </remarks>
-    public static DefaultRounding HalfUpRounding() => new(MidpointRounding.AwayFromZero);
-
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals)
-    {
-        if (currencyInfo.MinorUnit == MinorUnit.NotApplicable)
-        {
-            // no rounding
-            return amount;
-        }
-
-        if (!currencyInfo.MinorUnitIsDecimalBased)
-        {
-            // If the minor unit system is not Decimal-based (e.g., a currency with irregular subunit divisions such
-            // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
-            // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
-            // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
-            // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
-            return Math.Round(amount / currencyInfo.MinimalAmount, 0, mode) * currencyInfo.MinimalAmount;
-        }
-
-        // If the minor unit of the currency is decimal-based, the rounding is straightforward. The code rounds
-        // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
-        return Math.Round(amount, currencyInfo.DecimalDigits, mode);
-    }
-}
-
-/// <summary>Represents a no-rounding strategy for monetary calculations.</summary>
-/// <remarks>
-/// This class is used when no rounding is required in monetary operations.
-/// It returns the amount without applying any rounding logic. This can be
-/// useful in calculations where precision must be preserved exactly as provided
-/// or where rounding would lead to incorrect results in downstream processes.
-/// </remarks>
-/// <seealso cref="IRoundingStrategy"/>
-internal record NoRounding : IRoundingStrategy
-{
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => amount;
 }
 
 internal record CashDenominationRounding : IRoundingStrategy
@@ -127,27 +74,4 @@ internal record CashDenominationRounding : IRoundingStrategy
     }
 
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => throw new NotImplementedException();
-}
-
-internal record WholeNumberRounding : IRoundingStrategy
-{
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals)
-    {
-        return Math.Round(amount, 0, MidpointRounding.ToEven);
-    }
-}
-
-internal record CustomRoundingStrategy : IRoundingStrategy
-{
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals)
-    {
-        // Example: Always round up, ignoring decimal-based or fractional minor units
-        if (!currencyInfo.MinorUnitIsDecimalBased)
-        {
-            return Math.Ceiling(amount / currencyInfo.MinimalAmount) * currencyInfo.MinimalAmount;
-        }
-
-        return Math.Ceiling(amount * (decimal)Math.Pow(10, currencyInfo.DecimalDigits)) /
-               (decimal)Math.Pow(10, currencyInfo.DecimalDigits);
-    }
 }

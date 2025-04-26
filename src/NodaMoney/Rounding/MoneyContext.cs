@@ -14,7 +14,7 @@ public record MoneyContext
     private static readonly AsyncLocal<byte?> s_threadLocalContext = new();
 
     /// <summary>Default global MoneyContext (fallback context)</summary>
-    private static MoneyContext s_defaultThreadContext = new(new DefaultRounding());
+    private static MoneyContext s_defaultThreadContext = new(new StandardRounding());
 
     /// <summary>Get the rounding strategy used for rounding monetary values in the context.</summary>
     /// <remarks>
@@ -176,10 +176,10 @@ public record MoneyContext
     }
 
     // Specific factory methods for common configurations
-    public static MoneyContext CreateDefault() => Create(DefaultRounding.HalfEvenRounding());
+    public static MoneyContext CreateDefault() => Create(new StandardRounding());
     public static MoneyContext CreateNoRounding() => Create(new NoRounding());
-    public static MoneyContext CreateRetail() => Create(DefaultRounding.HalfUpRounding(), maxScale: 2);
-    public static MoneyContext CreateAccounting() => Create(DefaultRounding.HalfEvenRounding(), maxScale: 4);
+    public static MoneyContext CreateRetail() => Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 2);
+    public static MoneyContext CreateAccounting() => Create(new StandardRounding(), maxScale: 4);
 
     /// <summary>
     /// Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.
