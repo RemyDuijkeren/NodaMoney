@@ -1,3 +1,5 @@
+namespace NodaMoney.Context;
+
 /// <summary>
 /// Provides the ability to associate and lookup metadata for various monetary entities like currencies or amounts.
 /// </summary>

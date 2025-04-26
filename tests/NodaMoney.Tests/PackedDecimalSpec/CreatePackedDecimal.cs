@@ -1,4 +1,4 @@
-using NodaMoney.Rounding;
+using NodaMoney.Context;
 using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.PackedDecimalSpec;

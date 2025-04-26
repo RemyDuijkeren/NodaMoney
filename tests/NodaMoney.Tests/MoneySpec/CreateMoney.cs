@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using NodaMoney.Rounding;
+using NodaMoney.Context;
 using Xunit.Abstractions;
 
 namespace NodaMoney.Tests.MoneySpec;

@@ -1,4 +1,4 @@
-namespace NodaMoney.Rounding;
+namespace NodaMoney.Context;
 
 // Rounding modes, such as Half-Up or Half-Even (Bankers' Rounding), are primarily determined by business context and
 // accounting standards, rather than being inherently tied to specific currencies. While certain currencies have unique

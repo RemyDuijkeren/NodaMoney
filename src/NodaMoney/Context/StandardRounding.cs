@@ -1,4 +1,4 @@
-namespace NodaMoney.Rounding;
+namespace NodaMoney.Context;
 
 /// <summary>Represents the standard rounding strategy for monetary calculations.</summary>
 /// <param name="Mode">Specifies the strategy that mathematical rounding methods should use to round a number.</param>

@@ -1,4 +1,4 @@
-namespace NodaMoney.Rounding;
+namespace NodaMoney.Context;
 
 internal readonly struct MoneyWithMoneyContext
 {

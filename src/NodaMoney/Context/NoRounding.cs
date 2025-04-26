@@ -1,4 +1,4 @@
-namespace NodaMoney.Rounding;
+namespace NodaMoney.Context;
 
 /// <summary>Represents a no-rounding strategy for monetary calculations.</summary>
 /// <remarks>

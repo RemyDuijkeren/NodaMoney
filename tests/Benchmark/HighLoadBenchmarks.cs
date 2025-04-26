@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
-using NodaMoney.Rounding;
+using NodaMoney.Context;
 
 namespace Benchmark;
 
