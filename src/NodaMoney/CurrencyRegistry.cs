@@ -397,6 +397,7 @@ static class CurrencyRegistry
             new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2021, 04, 01) }, // replaces SLL/694
             new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "ZiG") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
+            new ("XAD", 396, MinorUnit.Two, "Arab Accounting Dinar") { IntroducedOn = new DateTime(2025, 05, 12) }, // Amendment 179, add new currency for the Finance Department Arab Monetary Fund (AMF)
 
             // Still Active list one: will move to Historic (list three) in the future
             new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 07, 01) }, // Amendment 176, replaced by XCG/532
