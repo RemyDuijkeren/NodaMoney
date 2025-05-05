@@ -333,7 +333,7 @@ public readonly partial struct Money : IEquatable<Money>
 
         if (!currencyInfo.MinorUnitIsDecimalBased)
         {
-            // If the minor unit system is not decimal based (e.g., a currency with irregular subunit divisions such
+            // If the minor unit system is not decimal-based (e.g., a currency with irregular subunit divisions such
             // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
             // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
             // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
@@ -341,7 +341,7 @@ public readonly partial struct Money : IEquatable<Money>
             return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
         }
 
-        // If the minor unit of the currency is decimal based, the rounding is straightforward. The code rounds
+        // If the minor unit of the currency is decimal-based, the rounding is straightforward. The code rounds
         // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
         return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
     }

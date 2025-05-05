@@ -192,10 +192,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <summary>Gets the number of minor units by which the currency unit can be divided in.</summary>
     /// <para>
-    /// The US dollar can be divided into 100 cents (1/100) so the 100 will be returned.
+    /// The US dollar can be divided into 100 cents (1/100), so the 100 will be returned.
     /// </para>
     /// <para>
-    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5),
+    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided in 5 khoums (1/5),
     /// so 5 will be returned.
     /// </para>
     public double MinorUnits => Math.Pow(10, MinorUnitAsExponentOfBase10);
