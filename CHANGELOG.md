@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- ISO 4217 AMENDMENT NUMBER 179, add new currency XAD for the Finance Department Arab Monetary Fund (AMF)
 
 ### Changed
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
