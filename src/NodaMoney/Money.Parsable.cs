@@ -179,7 +179,7 @@ public partial struct Money
         switch (matchedCurrencies.Count)
         {
             case 0:
-                throw new FormatException($"{currencyChars.ToString()} is an unknown currency symbol or code!");
+                throw new FormatException($"Currency symbol {currencyChars.ToString()} is an unknown currency symbol or code!");
             case 1:
                 if (specifiedCurrency is not null && matchedCurrencies[0] != specifiedCurrency)
                     throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with {matchedCurrencies[0].Code}, but doesn't match the specified {specifiedCurrency.Code}!");
@@ -199,7 +199,7 @@ public partial struct Money
                     throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies! Specify currency or culture explicitly.");
                 }
 
-                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but doesn't match specified {specifiedCurrency.Code}!");
+                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but none match with specified {specifiedCurrency.Code}!");
             default:
                 throw new IndexOutOfRangeException($"MatchedCurrencies.Count {matchedCurrencies.Count} has to be 0, 1 or > 1!"); // Should never happen
         }

@@ -13,10 +13,10 @@ namespace NodaMoney;
 public readonly partial struct Money : IEquatable<Money>
 {
     // Masks for the Flags field
-    private const int CurrencyMask = 0b_1111_1111_1111_1111;    // Bits 0–15, for Currency (16 bits)
-    private const int ScaleMask = 0xFF_00_00;                   // Bits 16-23 for the Decimal scale
-    private const int IndexMask = 0b_0111_1111 << 24;           // Bits 24–30, for Index (7 bits)
-    private const int SignMask = unchecked((int)0x80_00_00_00); // Bit 31 for the Decimal sign bit (negative)
+    private const int CurrencyMask = 0b_1111_1111_1111_1111;     // Bits 0–15, for Currency (16 bits)
+    private const int ScaleMask = 0x_FF_00_00;                   // Bits 16-23 for the Decimal scale
+    private const int IndexMask = 0b_0111_1111 << 24;            // Bits 24–30, for Index (7 bits)
+    private const int SignMask = unchecked((int)0x_80_00_00_00); // Bit 31 for the Decimal sign bit (negative)
 
     // Fields for storing the components of the decimal representation
     private readonly int _low;
@@ -45,33 +45,33 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="mode">The rounding mode.</param>
+    /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, MidpointRounding mode) : this(amount, CurrencyInfo.CurrentCurrency, mode) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance.</param>
+    /// <param name="context">The <see cref="Context"/> to apply to this instance.</param>
     public Money(decimal amount, MoneyContext context) : this(amount, CurrencyInfo.CurrentCurrency, context) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
-    /// <param name="mode">The rounding mode.</param>
+    /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, string code, MidpointRounding mode) : this(amount, CurrencyInfo.FromCode(code), mode) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance.</param>
+    /// <param name="context">The <see cref="Context"/> to apply to this instance.</param>
     public Money(decimal amount, string code, MoneyContext context) : this(amount, CurrencyInfo.FromCode(code), context) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
-    /// <param name="mode">The rounding mode.</param>
+    /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, Currency currency, MidpointRounding mode)
@@ -80,8 +80,8 @@ public readonly partial struct Money : IEquatable<Money>
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="currency">The Currency of the money.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
-    /// current <see cref="MoneyContext"/> will be used.</param>
+    /// <param name="context">The <see cref="Context"/> to apply to this instance. If <value>null</value> the
+    /// current <see cref="Context"/> will be used.</param>
     public Money(decimal amount, Currency currency, MoneyContext? context = null)
     {
         // Use either provided context or the current global/thread-local context.
@@ -101,13 +101,12 @@ public readonly partial struct Money : IEquatable<Money>
         _low = bits[0];
         _mid = bits[1];
         _high = bits[2];
-        _flags = (bits[3] & ~(CurrencyMask | IndexMask))  // Clear existing Currency and Index bits
-                 | (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((index << 24) & IndexMask)            // Store Index in bits 24–30
-                 | (bits[3] & (ScaleMask | SignMask));    // Preserve Scale Factor (16–23) and Sign (31)
+        _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
+                 | ((index << 24) & IndexMask)          // Store Index in bits 24–30
+                 | (bits[3] & (ScaleMask | SignMask));  // Preserve Scale Factor (16–23) and Sign (31)
     }
 
-    // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so not needed
+    // int, uint ([CLSCompliant(false)]) // auto-casting to decimal so no need for explicit constructors
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
@@ -162,8 +161,8 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
     /// cast to double).</param>
     /// <param name="currency">The Currency of the money.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
-    /// current <see cref="MoneyContext"/> will be used.</param>
+    /// <param name="context">The <see cref="Context"/> to apply to this instance. If <value>null</value> the
+    /// current <see cref="Context"/> will be used.</param>
     public Money(double amount, Currency currency, MoneyContext context) : this((decimal)amount, currency, context) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
@@ -259,10 +258,11 @@ public readonly partial struct Money : IEquatable<Money>
     public byte Scale => (byte)((_flags & ScaleMask) >> 16); // Extract Scale (bits 16-23)
 
     /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
-    public MoneyContext MoneyContext => MoneyContext.Get(MoneyContextIndex);
+    public MoneyContext Context => MoneyContext.Get(ContextIndex);
 
-    /// <summary>Gets the index of the <see cref="MoneyContext"/>.</summary>
-    internal byte MoneyContextIndex
+    /// <summary>Gets the index of the <see cref="Context"/>.</summary>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the provided index value is outside the allowed range of 0 to 127.</exception>
+    internal byte ContextIndex
     {
         get => (byte)((_flags & IndexMask) >> 24); // Extract Index (bits 24–30)
         init
@@ -318,32 +318,6 @@ public readonly partial struct Money : IEquatable<Money>
     {
         amount = Amount;
         currency = Currency;
-    }
-
-    internal static decimal Round(in decimal amount, Currency currency, MidpointRounding rounding) =>
-        Round(amount, CurrencyInfo.GetInstance(currency), rounding);
-
-    internal static decimal Round(in decimal amount, CurrencyInfo currencyInfo, MidpointRounding rounding)
-    {
-        if (currencyInfo.MinorUnit == MinorUnit.NotApplicable)
-        {
-            // no rounding
-            return amount;
-        }
-
-        if (!currencyInfo.MinorUnitIsDecimalBased)
-        {
-            // If the minor unit system is not decimal-based (e.g., a currency with irregular subunit divisions such
-            // as thirds or other fractions), the logic modifies the `amount` before rounding. Here’s what happens:
-            // 1. Divide `amount` by `currencyInfo.MinimalAmount` (to normalize it to whole "units" of the minor division).
-            // 2. Round the result to 0 decimal places (i.e., round to the nearest integer).
-            // 3. Multiply it back by `currencyInfo.MinimalAmount` to return the rounded value in its proper scale.
-            return Math.Round(amount / currencyInfo.MinimalAmount, 0, rounding) * currencyInfo.MinimalAmount;
-        }
-
-        // If the minor unit of the currency is decimal-based, the rounding is straightforward. The code rounds
-        // `amount` to `currencyInfo.DecimalDigits` decimal places using the provided `rounding` mode.
-        return Math.Round(amount, currencyInfo.DecimalDigits, rounding);
     }
 
     private static void EnsureSameCurrency(in Money left, in Money right)

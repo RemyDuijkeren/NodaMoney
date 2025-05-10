@@ -6,6 +6,7 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using NodaMoney.Context;
 using NodaMoney.Serialization;
 
 namespace NodaMoney;
@@ -67,7 +68,11 @@ public partial struct Money : IXmlSerializable, ISerializable
         // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
         CurrencyTypeConverter currencyTypeConverter = new();
         Currency = (Currency)(currencyTypeConverter.ConvertFromString(currency) ?? new SerializationException("Member 'Currency' could not be converted from string to Currency."));
-        Amount = Round(amount, Currency, MidpointRounding.ToEven);
+
+        // Use the current global/thread-local context to round the amount. TODO: should we not round it and trust the serialized amount?
+        MoneyContext currentContext = MoneyContext.CurrentContext;
+        Amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(Currency), null);
+        ContextIndex = currentContext.Index;
     }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
 

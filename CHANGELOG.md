@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
-- ISO 4217 AMENDMENT NUMBER 179, add new currency XAD for the Finance Department Arab Monetary Fund (AMF)
 - Add MoneyContext to configure money behavior like rounding, scale and precision. This can be specified globally,
   per thread or by money instance. This should solve much of the discussion in issue #27 about internal rounding.
 - Add extra constructors on Money to create with a given MoneyContext, instead of MidpointRounding.
@@ -15,15 +14,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Scale property on Money.
 
 ### Changed
-- Optimized Money struct size. This was 18 bytes (padded 24 bytes), but is now 16 bytes, the same as Decimal struct!
+- Optimized Money struct size. This was 18 bytes (padded 24 bytes), but is now 16 bytes (33% less), the same as Decimal struct!
+
+### Removed
+-
+
+## [2.2]
+
+### Added
+- ISO 4217 AMENDMENT NUMBER 179, add new currency XAD for the Finance Department Arab Monetary Fund (AMF)
+
+### Changed
 - Updated System.Text.Json dependency to allow versions from 4.7.2 and up for better backwards compatibility.
 - No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency (breaking-change).
-- CurrencyInfo.MinorUnitAsExponentOfBase10 changed from public to internal (breaking-change)
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
 
 ### Removed
 - Removed NumberStyle param for Parse- and TryParse-methods (breaking-change). Money expects to parse a Currency number.
   Pre-parse with Decimal.Parse() if more fine-grained control is needed.
+- CurrencyInfo.MinorUnitAsExponentOfBase10 changed from public to internal (breaking-change)
 
 ## [2.1.1]
 

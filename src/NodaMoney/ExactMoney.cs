@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace NodaMoney;
 
 // name of type: UnroundedMoney (focus on what it doesnt do), IntermediateMoney, RawMoney, ExactMoney, PreciseMoney?
-// this type is relatble to BigMoney in JodaMoney https://www.joda.org/joda-money/userguide.html
+// this type is relatable to BigMoney in JodaMoney https://www.joda.org/joda-money/userguide.html
 // TODO add interface IMoney or IMonetary or IMonetaryAmount?
 // TODO: instead of this type, add IRoundingStrategy as injected behavior for Money?
 
@@ -13,7 +13,7 @@ namespace NodaMoney;
 /// <remarks>
 /// This class encapsulates an unrounded monetary amount and its currency, ensuring precise financial calculations
 /// without applying rounding logic. It is useful in scenarios where exact decimal precision is required.
-/// Formatting and Parsing is not possible with this type (convert to Money to do this)!
+/// Formatting and Parsing are not possible with this type (convert to Money to do this)!
 /// </remarks>
 /// <example>
 /// Instances of this class are typically used to represent intermediate monetary calculations

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using NodaMoney.Context;
 
 namespace NodaMoney;
 
@@ -12,6 +13,8 @@ namespace NodaMoney;
 /// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
 /// See also OLE Automation Currency and SQL Currency type.
 /// </remarks>
+/// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
+/// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
 //[StructLayout(LayoutKind.Sequential)]
 internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using interface will cause boxing!
 {
@@ -19,29 +22,58 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     private long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
 
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct based on the provided <see cref="Money"/> instance.</summary>
+    /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
+    /// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
+    /// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
     public FastMoney(Money money) : this(money.Amount, money.Currency) { }
 
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on the current culture.</summary>
+    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+    /// <remarks>The amount will be rounded to the number of decimals for the specified currency
+    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
+    /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
+    /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
+    /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public FastMoney(decimal amount) : this(amount, CurrencyInfo.CurrentCurrency) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
-    /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
+    /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
     public FastMoney(decimal amount, string code) : this(amount, CurrencyInfo.FromCode(code)) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
-    /// <param name="rounding">The rounding mode.</param>
-    /// <remarks>The amount will be rounded to the number of decimal digits of the specified currency
-    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    public FastMoney(decimal amount, string code, MidpointRounding rounding) : this(amount, CurrencyInfo.FromCode(code), rounding) { }
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
+    /// <remarks>The amount will be rounded to the number of decimals for the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
+    public FastMoney(decimal amount, string code, MidpointRounding mode) : this(amount, CurrencyInfo.FromCode(code), mode) { }
 
-    public FastMoney(decimal amount, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) : this()
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
+    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance.</param>
+    public FastMoney(decimal amount, string code, MoneyContext context) : this(amount, CurrencyInfo.FromCode(code), context) { }
+
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
+    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+    /// <param name="currency">The Currency of the money.</param>
+    /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
+    /// <remarks>The amount will be rounded to the number of decimals for the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
+    public FastMoney(decimal amount, Currency currency, MidpointRounding mode)
+        : this(amount, currency, MoneyContext.Create(new StandardRounding(mode))) { }
+
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
+    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+    /// <param name="currency">The Currency of the money.</param>
+    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
+    /// current <see cref="MoneyContext"/> will be used.</param>
+    public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this()
     {
         if (amount < MinValue || amount > MaxValue)
         {
@@ -54,7 +86,14 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
             throw new ArgumentOutOfRangeException(nameof(currency), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
         }
 
-        OACurrencyAmount = decimal.ToOACurrency(Money.Round(amount, currency, rounding));
+        // Use either provided context or the current global/thread-local context.
+        var currentContext = context ?? MoneyContext.CurrentContext;
+
+        int index = currentContext.Index;
+        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), null);
+
+        // TODO: How to store index?
+        OACurrencyAmount = decimal.ToOACurrency(amount);
         Currency = currency;
     }
 

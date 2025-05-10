@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyParsableSpec;
 
+[Collection(nameof(NoParallelization))]
 public class ParseAllCurrencySymbolsAndCodes
 {
     [Fact]

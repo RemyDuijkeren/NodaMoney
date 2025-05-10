@@ -112,10 +112,10 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
-        result.MoneyContextIndex.Should().Be(index);
+        result.ContextIndex.Should().Be(index);
     }
 
     [Theory]
@@ -132,7 +132,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
         result.Amount.Should().Be(input);
@@ -152,7 +152,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
         result.Currency.Should().Be(_euro);
@@ -172,7 +172,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
         result.Amount.Should().Be(input);
@@ -192,7 +192,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
         result.Amount.Should().Be(Decimal.MaxValue);
@@ -212,7 +212,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        var result = money with { MoneyContextIndex = index };
+        var result = money with { ContextIndex = index };
 
         // Assert
         result.Amount.Should().Be(Decimal.MinValue);
@@ -227,7 +227,7 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        Action act = () => { var _ = money with { MoneyContextIndex = invalidIndex }; };
+        Action act = () => { var _ = money with { ContextIndex = invalidIndex }; };
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
