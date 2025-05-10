@@ -24,23 +24,19 @@ public class CreateMoney
         int sizeOfCurrency = Marshal.SizeOf<Currency>();
         int sizeOfMoney = Marshal.SizeOf<Money>();
         int sizeOfFastMoney = Marshal.SizeOf<FastMoney>();
-        int sizeOfExactMoney = Marshal.SizeOf<ExactMoney>();
 
         int sizeOfCurrencyUnsafe = Unsafe.SizeOf<Currency>();
         int sizeOfMoneyUnsafe = Unsafe.SizeOf<Money>();
-        int sizeOfFastMoneyUnsafe = Unsafe.SizeOf<FastMoney>();
-        int sizeOfExactMoneyUnsafe = Unsafe.SizeOf<ExactMoney>();
+        int sizeOfFastMoneyUnsafe = Unsafe.SizeOf<FastMoney>(); ;
 
         // Assert
         _testOutputHelper.WriteLine($"Size of Currency: {sizeOfCurrency} ({sizeOfCurrencyUnsafe})");
         _testOutputHelper.WriteLine($"Size of Money: {sizeOfMoney} ({sizeOfMoneyUnsafe})");
         _testOutputHelper.WriteLine($"Size of FastMoney: {sizeOfFastMoney} ({sizeOfFastMoneyUnsafe})");
-        _testOutputHelper.WriteLine($"Size of ExactMoney: {sizeOfExactMoney} ({sizeOfExactMoneyUnsafe})");
 
         sizeOfCurrency.Should().Be(2);
         sizeOfMoney.Should().Be(16); // was 24, but now it's 16!
         sizeOfFastMoney.Should().Be(16);
-        sizeOfExactMoney.Should().Be(24);
     }
 
     [Fact]
