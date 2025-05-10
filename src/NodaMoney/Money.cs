@@ -3,15 +3,15 @@ using NodaMoney.Context;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
+/// <summary>Represents money, an amount defined in a specific <see cref="Currency"/>.</summary>
 /// <remarks>
 /// The <see cref="Money"/> structure allows development of applications that handle
 /// various types of Currency. Money will hold the <see cref="Currency"/> and Amount of money,
 /// and ensure that two different currencies cannot be added or subtracted to each other.
 /// </remarks>
-[StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Money : IEquatable<Money>
 {
+#pragma warning disable RCS1181
     // Masks for the Flags field
     private const int CurrencyMask = 0b_1111_1111_1111_1111;     // Bits 0–15, for Currency (16 bits)
     private const int ScaleMask = 0x_FF_00_00;                   // Bits 16-23 for the Decimal scale
@@ -23,6 +23,7 @@ public readonly partial struct Money : IEquatable<Money>
     private readonly int _mid;
     private readonly int _high;
     private readonly int _flags;
+#pragma warning restore RCS1181
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

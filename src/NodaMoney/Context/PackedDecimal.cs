@@ -1,5 +1,7 @@
 namespace NodaMoney.Context;
 
+#pragma warning disable RCS1181
+
 internal readonly struct PackedDecimal
 {
     // Masks for the Flags field

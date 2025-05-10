@@ -175,15 +175,18 @@ public record MoneyContext
         }
     }
 
-    // Specific factory methods for common configurations
+    /// <summary>Creates a new default instance of the <see cref="MoneyContext"/> class using standard rounding with the default settings.</summary>
+    /// <returns>A new instance of <see cref="MoneyContext"/> configured with standard rounding and default precision.</returns>
     public static MoneyContext CreateDefault() => Create(new StandardRounding());
-    public static MoneyContext CreateNoRounding() => Create(new NoRounding());
-    public static MoneyContext CreateRetail() => Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 2);
-    public static MoneyContext CreateAccounting() => Create(new StandardRounding(), maxScale: 4);
 
-    /// <summary>
-    /// Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.
-    /// </summary>
+    /// <summary>Creates a new instance of the <see cref="MoneyContext"/> class without applying any rounding strategy.</summary>
+    /// <returns>A <see cref="MoneyContext"/> instance configured with no rounding.</returns>
+    public static MoneyContext CreateNoRounding() => Create(new NoRounding());
+
+    internal static MoneyContext CreateRetail() => Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 2);
+    internal static MoneyContext CreateAccounting() => Create(new StandardRounding(), maxScale: 4);
+
+    /// <summary>Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.</summary>
     /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>
     /// <param name="precision">The total number of significant digits for monetary calculations. Defaults to 28.</param>
     /// <param name="maxScale">The maximum number of decimal places allowed. If not specified, the default behavior is applied.</param>
@@ -194,10 +197,7 @@ public record MoneyContext
     public static IDisposable CreateScope(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null,
         bool cashRounding = false) => CreateScope(Create(roundingStrategy, precision, maxScale, cashRounding));
 
-    /// <summary>
-    /// Creates a scoped context for monetary operations with the specified configuration. When the context
-    /// is disposed, the previous context is restored.
-    /// </summary>
+    /// <summary>Creates a scoped context for monetary operations with the specified configuration. When the context is disposed of, the previous context is restored.</summary>
     /// <param name="context">The <see cref="MoneyContext"/> instance representing the financial and rounding configuration to be used within the scope.</param>
     /// <returns>An <see cref="IDisposable"/> object that manages the lifecycle of the scoped context, automatically restoring the previous context upon disposal.</returns>
     public static IDisposable CreateScope(MoneyContext context)

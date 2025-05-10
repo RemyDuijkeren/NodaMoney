@@ -5,18 +5,17 @@ namespace NodaMoney;
 
 // Internal Currency type https://referencesource.microsoft.com/#mscorlib/system/currency.cs
 
-/// <summary>Represents a fast money value with a currency unit. Scaled integer (default scale of 4)</summary>
-/// <remarks>Size from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 of the minor unit (like cents)</remarks>
-/// <remarks>https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type
-/// Currency variables are stored as 64-bit (8-byte) numbers in an integer format, scaled by 10,000 to give a fixed-point number with 15 digits to the left of the decimal point and 4 digits to the right.
-/// This representation provides a range of -922,337,203,685,477.5808 to 922,337,203,685,477.5807.
-/// The Currency data type is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
-/// See also OLE Automation Currency and SQL Currency type.
+/// <summary>Represents money, an amount defined in a specific <see cref="Currency"/>.</summary>
+/// <remarks>
+/// <para>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
+/// in contrast to the 128 bits (16 bytes) used by the <see cref="Money"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</para>
+/// <para>Instead of storing the amount as <see cref="decimal"/> is stored as 64-bit (8-byte) number in an integer format, scaled by 10,000
+/// to give a fixed-point number with 15 digits to the left of the decimal point and 4 digits to the right.</para>
+/// <para>This representation provides a range of -922,337,203,685,477.5808 to 922,337,203,685,477.5807.</para>
+/// <para>The <see cref="FastMoney"/> struct is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
+/// See also OLE Automation Currency, SQL Currency type and https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type.</para>
 /// </remarks>
-/// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
-/// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
-//[StructLayout(LayoutKind.Sequential)]
-internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using interface will cause boxing!
+internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
     /// <summary>Stored as an integer scaled by 10,000</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]

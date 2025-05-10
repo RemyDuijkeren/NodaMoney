@@ -48,7 +48,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <param name="code">The (ISO-4217) three-character code of the currency.</param>
     /// <param name="number">The (ISO-4217) number of the currency.</param>
     /// <param name="minorUnit">The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</param>
-    /// <param name="englishName">The english name of the currency</param>
+    /// <param name="englishName">The English name of the currency</param>
     /// <param name="symbol">The currency symbol.</param>
     internal CurrencyInfo(string code, short number, MinorUnit minorUnit, string englishName = "", string symbol = GenericCurrencySign)
     {
@@ -162,7 +162,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <para>
     /// Mauritania does not use a decimal division of units, setting 1 ouguiya (UM) equal to 5 khoums, and Madagascar has 1 ariary =
     /// 5 iraimbilanja. The coins display "1/5" on their face and are referred to as a "fifth". These are not used in practice, but when
-    /// written out, a single significant digit is used (E.g. 1.2 UM), so 1 is returned.
+    /// written out, a single significant digit is used (E.g., 1.2 UM), so 1 is returned.
     /// </para>
     /// </remarks>
     public int DecimalDigits =>
@@ -177,7 +177,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public decimal MinimalAmount => MinorUnit == 0 ? 1m : (decimal)(1.0 / Math.Pow(10, MinorUnitAsExponentOfBase10));
 
     /// <summary>Gets a value indicating whether the minor unit of the currency is based on the decimal system.</summary>
-    /// <value><c>true</c> if minor unit is decimal based; otherwise, <c>false</c>.</value>
+    /// <value><c>true</c> if minor unit is based on decimal; otherwise, <c>false</c>.</value>
     /// <remarks>
     /// This property evaluates if the minor unit represents decimal-base minor units (e.g., USD, where 1 unit = 100 minor units).
     /// Certain currencies might use non-decimal-based minor units (e.g., MRU, where 1 unit = 5 minor units).
@@ -206,7 +206,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     // public string SingularUnitName { get; init; } = "dollar";
     // public string PluralUnitName { get; init; } = "dollars";
 
-    /// <summary>Gets a value indicating whether currency is historic.</summary>
+    /// <summary>Gets a value indicating whether the currency is historic.</summary>
     /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
     public bool IsHistoric => !IsActiveOn(DateTime.Today);
 
@@ -245,7 +245,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>Unregisters the specified currency code from the current AppDomain and returns it.</summary>
     /// <param name="code">The name of the currency to unregister.</param>
     /// <returns>An instance of the type <see cref="CurrencyInfo"/>.</returns>
-    /// <exception cref="ArgumentException">code specifies a currency that is not found in the register.</exception>
+    /// <exception cref="ArgumentException">code specifies a currency not found in the register.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="code" /> is <see langword="null" /> or empty.</exception>
     /// <exception cref="InvalidCurrencyException"> when currency is not registered.</exception>
     public static CurrencyInfo Unregister(string code)
@@ -260,7 +260,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         throw new InvalidCurrencyException($"Can't unregister the currency {code} because it is not registered!");
     }
 
-    /// <summary>Check a value indication whether currency is valid on a given date.</summary>
+    /// <summary>Check a value indication whether the currency is valid on a given date.</summary>
     /// <param name="date">The date on which the Currency should be valid.</param>
     /// <returns><c>true</c> when the date is within the valid range of this currency; otherwise <c>false</c>.</returns>
     public bool IsActiveOn(DateTime date) =>
@@ -271,13 +271,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies() => CurrencyRegistry.GetAllCurrencies();
 
-    /// <summary>Get all currencies that matches the given Currency Code or Symbol.</summary>
+    /// <summary>Get all currencies that match the given Currency Code or Symbol.</summary>
     /// <param name="currencyChars">The Currency Code or Symbol to match.</param>
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all currencies that matches.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => CurrencyRegistry.GetAllCurrencies(currencyChars);
 
-    /// <summary>Create an instance of the <see cref="CurrencyInfo"/> based on a ISO 4217 currency code.</summary>
-    /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
+    /// <summary>Create an instance of the <see cref="CurrencyInfo"/> based on the ISO 4217 currency code.</summary>
+    /// <param name="code">The ISO 4217 currency code, like EUR or USD.</param>
     /// <returns>An instance of the type <see cref="CurrencyInfo"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
@@ -290,7 +290,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// </param>
     /// <returns>A <see cref="CurrencyInfo"/> instance based on the provided format provider or the current currency if no suitable provider is found.</returns>
     /// <exception cref="ArgumentNullException">The value of 'formatProvider' cannot be null.</exception>
-    /// <exception cref="NotSupportedException">Can't create instance from unknown IFormatProvider.</exception>
+    /// <exception cref="NotSupportedException">Can't create an instance from an unknown IFormatProvider.</exception>
     public static CurrencyInfo GetInstance(IFormatProvider formatProvider) =>
         formatProvider switch
         {
@@ -347,7 +347,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
         // ?: Accounting ($23.002,43) for negative numbers
 
-        // If argument is not a Money, fallback to default formatting
+        // If the argument is not a Money, fallback to default formatting
         if (arg is not Money money)
         {
             return arg is IFormattable formattable
@@ -516,7 +516,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             if ((uint)((c | 0x20) - 'a') <= 'z' - 'a')
 #endif
             {
-                // Fast path for sole symbol, e.g. "D"
+                // Fast path for a sole symbol, e.g. "D"
                 if (format.Length == 1)
                 {
                     digits = -1;
@@ -544,8 +544,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                     }
                 }
 
-                // Fallback for symbol and any length digits.  The digits value must be >= 0 && <= 999_999_999,
-                // but it can begin with any number of 0s, and thus we may need to check more than 9
+                // Fallback for symbol and any length digits.  The digit value must be >= 0 && <= 999_999_999,
+                // but it can begin with any number of 0's, and thus we may need to check more than 9
                 // digits.  Further, for compat, we need to stop when we hit a null char.
                 int n = 0;
                 int i = 1;
@@ -577,7 +577,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             }
         }
 
-        // Default empty format to be "C"; custom format is signified with '\0'.
+        // The default empty format to be "C"; the custom format is signified with '\0'.
         digits = -1;
         return format.Length == 0 || c == '\0'
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
@@ -587,10 +587,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <summary>Gets the minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
     /// <para>
-    /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so the exponent 2 will be returned.
+    /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so exponent 2 will be returned.
     /// </para>
     /// <para>
-    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided int 5 khoums (1/5), which is
+    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided into 5 khoums (1/5), which is
     /// 10^log10(5) = 10^0.698970004, so the exponent 0.698970004 will be returned.
     /// </para>
     private double MinorUnitAsExponentOfBase10
@@ -598,7 +598,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         get
         {
             // https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
-            // unit of recorded value (i.e. as recorded by banks) which is a division of the respective unit of currency or fund
+            // unit of recorded value (i.e., as recorded by banks) which is a division of the respective unit of currency or fund
             return MinorUnit switch
             {
                 MinorUnit.NotApplicable => 0,
