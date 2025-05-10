@@ -12,16 +12,23 @@ public class CurrencyJsonConverter : JsonConverter<Currency>
     /// <inheritdoc />
     public override Currency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            var code = reader.GetString();
-            if (string.IsNullOrWhiteSpace(code))
-                throw new JsonException("Invalid currency code.");
+        if (reader.TokenType != JsonTokenType.String)
+            throw new JsonException("Currency code is not a string! Expected a string like 'EUR' or 'USD'.");
 
-            return CurrencyInfo.FromCode(code!);
+        var code = reader.GetString();
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new JsonException("Currency code is null or empty! Expected a string like 'EUR' or 'USD'.");
         }
 
-        throw new JsonException("Invalid currency code.");
+        try
+        {
+            return CurrencyInfo.FromCode(code);
+        }
+        catch (Exception ex) when (ex is ArgumentException or KeyNotFoundException)
+        {
+            throw new JsonException($"Currency code '{code}' is not a known currency!", ex);
+        }
     }
 
     /// <inheritdoc />
