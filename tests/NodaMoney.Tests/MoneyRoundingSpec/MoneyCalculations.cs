@@ -1,17 +1,33 @@
-﻿namespace NodaMoney.Tests.MoneyCalculationsSpec;
+﻿namespace NodaMoney.Tests.MoneyRoundingSpec;
 
 public class MoneyCalculations
 {
     [Theory]
     [InlineData(1000, "XXX", 150)]
     [InlineData(1000, "EUR", 150)]
-    public void RepeatedMultiplyDivide(decimal amount, string currency, decimal expectedResult)
+    public void RepeatedMultiplyDivideOneStep(decimal amount, string currency, decimal expectedResult)
     {
         // Arrange
         Money subject = new(amount, currency);
 
         // Act
         var result = subject * 15 / 100;
+
+        // Assert
+        result.Amount.Should().Be(expectedResult); // Test that 1000 * 15 / 100 == 150
+    }
+
+    [Theory]
+    [InlineData(1000, "XXX", 150)]
+    [InlineData(1000, "EUR", 150)]
+    public void RepeatedMultiplyDivideTwoStep(decimal amount, string currency, decimal expectedResult)
+    {
+        // Arrange
+        Money subject = new(amount, currency);
+
+        // Act
+        var intermediate = subject * 15;
+        var result = intermediate / 100;
 
         // Assert
         result.Amount.Should().Be(expectedResult); // Test that 1000 * 15 / 100 == 150

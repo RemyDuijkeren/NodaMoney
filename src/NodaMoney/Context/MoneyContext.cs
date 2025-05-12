@@ -32,9 +32,9 @@ public record MoneyContext
     /// <remarks>This property overrides the scale in <see cref="CurrencyInfo"/>.</remarks>
     public int? MaxScale { get; }
 
-    /// <summary>Indicates whether cash rounding is applied in the monetary context.</summary>
-    /// <remarks>This property reflects if rounding rules are tailored for cash handling, typically used to accommodate for physical currency denominations.</remarks>
-    public bool CashRounding { get; } // TODO: CashRoundingStrategy? Or store in Metadata?
+    // /// <summary>Indicates whether cash rounding is applied in the monetary context.</summary>
+    // /// <remarks>This property reflects if rounding rules are tailored for cash handling, typically used to accommodate for physical currency denominations.</remarks>
+    // public bool CashRounding { get; } // TODO: CashRoundingStrategy? Or store in Metadata?
 
     /// <summary>Get the metadata properties associated with the monetary context.</summary>
     public MetadataProvider Metadata { get; } = new();
@@ -42,12 +42,11 @@ public record MoneyContext
     /// <summary>Efficient lookup index (1-byte reference)</summary>
     internal byte Index { get; private set; }
 
-    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, bool cashRounding = false)
+    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
     {
         RoundingStrategy = roundingStrategy;
         Precision = precision;
         MaxScale = maxScale;
-        CashRounding = cashRounding;
 
         // Automatically register this context
         Index = RegisterContext(this);
@@ -60,11 +59,10 @@ public record MoneyContext
     /// <param name="roundingStrategy">The rounding strategy to be applied in monetary calculations.</param>
     /// <param name="precision">The total number of significant digits for monetary values. Defaults to 28.</param>
     /// <param name="maxScale">The maximum number of digits to the right of the decimal point. Overrides the scale in <see cref="CurrencyInfo"/></param>
-    /// <param name="cashRounding">Indicates whether cash rounding is applied in the monetary context.</param>
     /// <returns>A <see cref="MoneyContext"/> instance that matches the specified parameters.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the precision is less than or equal to zero, or when the maxScale is negative.</exception>
     /// <exception cref="ArgumentException">Thrown when the maxScale is greater than the precision.</exception>
-    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, bool cashRounding = false)
+    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
     {
         if (precision <= 0) throw new ArgumentOutOfRangeException(nameof(precision), "Precision must be positive");
         if (maxScale < 0) throw new ArgumentOutOfRangeException(nameof(maxScale), "MaxScale cannot be negative");
@@ -78,8 +76,7 @@ public record MoneyContext
             {
                  if (ctx.RoundingStrategy.Equals(roundingStrategy)
                     && ctx.Precision == precision
-                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault()
-                    && ctx.CashRounding == cashRounding)
+                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault())
                 {
                     return ctx; // Return existing equivalent context
                 }
@@ -153,7 +150,9 @@ public record MoneyContext
         {
             foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                if (ctx.RoundingStrategy.Equals(context.RoundingStrategy))
+                if (ctx.RoundingStrategy.Equals(context.RoundingStrategy)
+                    && ctx.Precision == context.Precision
+                    && ctx.MaxScale.GetValueOrDefault() == context.MaxScale.GetValueOrDefault())
                 {
                     return ctx.Index; // Return existing equivalent context index
                 }
@@ -190,12 +189,11 @@ public record MoneyContext
     /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>
     /// <param name="precision">The total number of significant digits for monetary calculations. Defaults to 28.</param>
     /// <param name="maxScale">The maximum number of decimal places allowed. If not specified, the default behavior is applied.</param>
-    /// <param name="cashRounding">Indicates whether cash rounding rules should be applied in the context.</param>
     /// <returns>A disposable object that manages the lifetime of the monetary context scope.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if precision is less than or equal to zero, or if maxScale is negative.</exception>
     /// <exception cref="ArgumentException">Thrown if maxScale is greater than precision.</exception>
-    public static IDisposable CreateScope(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null,
-        bool cashRounding = false) => CreateScope(Create(roundingStrategy, precision, maxScale, cashRounding));
+    public static IDisposable CreateScope(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
+        => CreateScope(Create(roundingStrategy, precision, maxScale));
 
     /// <summary>Creates a scoped context for monetary operations with the specified configuration. When the context is disposed of, the previous context is restored.</summary>
     /// <param name="context">The <see cref="MoneyContext"/> instance representing the financial and rounding configuration to be used within the scope.</param>

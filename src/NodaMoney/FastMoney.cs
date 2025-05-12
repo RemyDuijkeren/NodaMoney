@@ -1,7 +1,39 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using NodaMoney.Context;
 
 namespace NodaMoney;
+
+// ## Performance Benefits of Using Long vs Decimal
+// The more significant advantage of `FastMoney` is using `long` for calculations instead of `decimal`:
+// 1. **Faster Arithmetic Operations**: Integer operations on `long` are much faster than `decimal` operations:
+// - Addition/subtraction with `long` is typically 3-10x faster than with `decimal`
+// - Multiplication/division with `long` is typically 5-20x faster than with `decimal`
+//
+// 2. **Simpler CPU Instructions**: `long` operations use native CPU instructions, while `decimal` requires complex emulation as it's not directly supported by CPUs.
+//
+// 3. **SIMD Potential**: Operations on `long` values can potentially be vectorized with SIMD instructions, which isn't possible with `decimal`.
+//
+// 4. **Reduced Method Call Overhead**: Your `Add` method in `FastMoney` directly manipulates the `long` value without converting to `decimal` and back:
+//     ``` csharp
+// public FastMoney Add(FastMoney other)
+// {
+//     EnsureSameCurrency(this, other);
+//     long totalAmount = checked(OACurrencyAmount + other.OACurrencyAmount);
+//     return this with { OACurrencyAmount = totalAmount };
+// }
+// ```
+// This is much more efficient than the equivalent operation with `decimal`.
+//
+// ## Trade-offs and Limitations
+// 1. **Precision**: `FastMoney` is limited to 4 decimal places (scaled by 10,000), while `Money` can support up to 28 decimal places.
+// 2. **Range**: `FastMoney` has a smaller range (-922,337,203,685,477.5808 to 922,337,203,685,477.5807) compared to `decimal`.
+// 3. **Memory Alignment**: A 12-byte structure isn't optimally aligned for 64-bit systems, but the calculation benefits likely outweigh this.
+//
+// ## Recommendation
+// 1. **Keep the 12-byte Size**: The performance benefits of using `long` for calculations are significant enough to justify using `FastMoney`, even if it's only 4 bytes smaller than `Money`.
+//
+// TODO: Benchmark if this all is really true!
 
 // Internal Currency type https://referencesource.microsoft.com/#mscorlib/system/currency.cs
 
@@ -15,17 +47,15 @@ namespace NodaMoney;
 /// <para>The <see cref="FastMoney"/> struct is useful for calculations involving money and for fixed-point calculations in which accuracy is particularly important.
 /// See also OLE Automation Currency, SQL Currency type and https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type.</para>
 /// </remarks>
+//[StructLayout(LayoutKind.Sequential, Pack = 4)]
+[StructLayout(LayoutKind.Explicit, Size = 12)]
 internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
-    /// <summary>Stored as an integer scaled by 10,000</summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    private long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
-
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct based on the provided <see cref="Money"/> instance.</summary>
     /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
     /// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
     /// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
-    public FastMoney(Money money) : this(money.Amount, money.Currency) { }
+    public FastMoney(Money money) : this(money.Amount, money.Currency, money.Context) { }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -86,14 +116,14 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
         }
 
         // Use either provided context or the current global/thread-local context.
-        var currentContext = context ?? MoneyContext.CurrentContext;
+        MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
 
-        int index = currentContext.Index;
-        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), null);
+        ContextIndex = currentContext.Index;
+        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale);
 
-        // TODO: How to store index?
         OACurrencyAmount = decimal.ToOACurrency(amount);
         Currency = currency;
+        Scale = 4; // Fixed on 4 (10_000) for now, but can be made flexible in the future
     }
 
     public FastMoney(double amount) : this((decimal)amount) { }
@@ -117,11 +147,40 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     [CLSCompliant(false)]
     public FastMoney(ulong amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
 
+    /// <summary>Stored as an integer scaled by 10,000</summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [field: FieldOffset(0)]
+    private long OACurrencyAmount { get; init; } // 8 bytes (64 bits) vs decimal 16 bytes (128 bits)
+
     /// <summary>Gets the amount of money.</summary>
-    public decimal Amount => decimal.FromOACurrency(OACurrencyAmount);
+    public decimal Amount => Scale == 4
+        ? decimal.FromOACurrency(OACurrencyAmount)
+        : (decimal)OACurrencyAmount / ScaleFactor(Scale); // for future use, if we allow flexible scale
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
+    [field: FieldOffset(8)]
     public Currency Currency { get; }
+
+    [field: FieldOffset(10)]
+    private byte ContextIndex { get; init; }
+
+    /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
+    public MoneyContext Context => MoneyContext.Get(ContextIndex);
+
+    [field: FieldOffset(11)]
+    private byte Scale { get; init; }
+
+    private static long ScaleFactor(byte scale) =>
+        scale switch
+        {
+            0 => 1,
+            1 => 10,
+            2 => 100,
+            3 => 1_000,
+            4 => 10_000, // Current fixed scale
+            _ => (long)Math.Pow(10, scale)
+        };
+
 
     public void Deconstruct(out decimal amount, out Currency currency)
     {
@@ -133,8 +192,12 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     public static long ToOACurrency(FastMoney money) => money.OACurrencyAmount;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static FastMoney FromOACurrency(long cy, Currency currency, MidpointRounding rounding = MidpointRounding.ToEven) =>
-        new(decimal.FromOACurrency(cy), currency, rounding);
+    public static FastMoney FromOACurrency(long cy, Currency currency, MidpointRounding mode = MidpointRounding.ToEven) =>
+        new(decimal.FromOACurrency(cy), currency, mode);
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
+        new(decimal.FromOACurrency(cy), currency, context);
 
     public FastMoney Add(FastMoney other)
     {

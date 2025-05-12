@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using NodaMoney.Context;
 
 namespace NodaMoney.Tests.Serialization.NewtonsoftJsonSerializerSpec;
 
@@ -46,7 +47,7 @@ public class DeserializeMoney
     {
         // Arrange
         string json = "\"EUR 123.456\"";
-        var expected = new Money(123.456m, CurrencyInfo.FromCode("EUR"));
+        var expected = new Money(123.456m, CurrencyInfo.FromCode("EUR"), MoneyContext.CreateNoRounding());
 
         // Act
         var clone = JsonConvert.DeserializeObject<Money>(json);

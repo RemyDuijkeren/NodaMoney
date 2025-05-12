@@ -23,6 +23,7 @@ namespace NodaMoney;
 /// <remarks>See http://en.wikipedia.org/wiki/Currency and
 /// https://en.wikipedia.org/wiki/List_of_circulating_currencies and
 /// https://www.six-group.com/en/products-services/financial-information/data-standards.html#scrollTo=isin</remarks>
+/// https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
 public record CurrencyInfo : IFormatProvider, ICustomFormatter
 {
     /// <summary>Gets the currency sign (¤), a character used to denote the generic currency sign, when no currency sign is available.</summary>
@@ -97,9 +98,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>The (ISO-4217) number of the currency.</summary>
     public short Number { get; init; } = -1;
 
-    /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
-    public MinorUnit MinorUnit { get; init; }
-
     /// <summary>The English name of the currency</summary>
     public string EnglishName { get; init; } = string.Empty;
 
@@ -142,16 +140,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// </remarks>
     internal decimal? SmallestCashDenomination { get; init; }
 
-    // // Additional metadata storage
-    // private readonly MetadataProvider _metadataProvider = new();
-    // /// <summary>Access metadata for this currency.</summary>
-    // public MetadataProvider Metadata => _metadataProvider;
-    // public IRoundingStrategy? StandardRoundingStrategy { get; init; }
-    // // PhysicalRoundingStrategy ,DenominationRoundingStrategy, PointOfSaleRoundingStrategy
-    // public IRoundingStrategy? CashRoundingStrategy { get; init; }
-
     /// <summary>Gets the (ISO-4217) three-digit code number of the currency.</summary>
     public string NumericCode => Number.ToString("D3", CultureInfo.InvariantCulture);
+
+    /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
+    public MinorUnit MinorUnit { get; init; }
 
     /// <summary>Gets the number of digits after the decimal separator.</summary>
     /// <remarks>
@@ -164,6 +157,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// 5 iraimbilanja. The coins display "1/5" on their face and are referred to as a "fifth". These are not used in practice, but when
     /// written out, a single significant digit is used (E.g., 1.2 UM), so 1 is returned.
     /// </para>
+    /// <para><see cref="DecimalDigits"/> is an alias for <see cref="Scale"/>.</para>
     /// </remarks>
     public int DecimalDigits =>
         MinorUnit switch
@@ -173,14 +167,38 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             _ => (int)MinorUnit,
         };
 
+    /// <summary>Alias for <see cref="DecimalDigits"/></summary>
+    internal byte Scale => (byte)DecimalDigits;
+
+    /// <summary>Gets the scale factor for the currency unit.</summary>
+    /// <remarks>ScaleFactor is essentially the inverse of and represents the factor by which you scale to convert fractional currencies
+    /// to integers. For example, if `MinimalAmount = 0.01`, then `ScaleFactor = 100`.</remarks>
+    internal long ScaleFactor =>
+        MinorUnit switch
+        {
+            // For performance and special cases we hard-coded the values for some
+            MinorUnit.NotApplicable => 1,
+            MinorUnit.Zero     => 1,
+            MinorUnit.OneFifth => 5, // Math.Log10(5)
+            MinorUnit.One      => 10,
+            MinorUnit.Two      => 100,
+            MinorUnit.Three    => 1_000,
+            MinorUnit.Four     => 10_000,
+            MinorUnit.Five     => 100_000,
+            MinorUnit.Six      => 1_000_000,
+            MinorUnit.Seven    => 10_000_000,
+            MinorUnit.Eight    => 100_000_000, // Bitcoin
+            _ => (long)Math.Pow(10, (double)MinorUnit)
+        };
+
     /// <summary>Gets the smallest amount of the currency unit.</summary>
-    public decimal MinimalAmount => MinorUnit == 0 ? 1m : (decimal)(1.0 / Math.Pow(10, MinorUnitAsExponentOfBase10));
+    public decimal MinimalAmount => ScaleFactor > 1 ? 1m / ScaleFactor : 1m;
 
     /// <summary>Gets a value indicating whether the minor unit of the currency is based on the decimal system.</summary>
-    /// <value><c>true</c> if minor unit is based on decimal; otherwise, <c>false</c>.</value>
+    /// <value><c>true</c> if a minor unit is based on decimal;otherwise, <c>false</c>.</value>
     /// <remarks>
     /// This property evaluates if the minor unit represents decimal-base minor units (e.g., USD, where 1 unit = 100 minor units).
-    /// Certain currencies might use non-decimal-based minor units (e.g., MRU, where 1 unit = 5 minor units).
+    /// Certain currencies use non-decimal-based minor units (e.g., MRU, where 1 unit = 5 minor units).
     /// </remarks>
     public bool MinorUnitIsDecimalBased =>
         MinorUnit switch
@@ -190,15 +208,24 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             _ => true,
         };
 
-    /// <summary>Gets the number of minor units by which the currency unit can be divided in.</summary>
+    /// <summary>Gets the number of minor units (subunits) per major unit of the currency unit.</summary>
     /// <para>
-    /// The US dollar can be divided into 100 cents (1/100), so the 100 will be returned.
+    /// The US dollar can be divided into 100 cents (1/100), so 100 will be returned.
     /// </para>
+    /// <para>Then Yen doesn't have any minor units, so zero will be returned.</para>
     /// <para>
     /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided in 5 khoums (1/5),
     /// so 5 will be returned.
     /// </para>
-    public double MinorUnits => Math.Pow(10, MinorUnitAsExponentOfBase10);
+    public long MinorUnits => ScaleFactor > 1 ? ScaleFactor : 0;
+
+    // // Additional metadata storage
+    // private readonly MetadataProvider _metadataProvider = new();
+    // /// <summary>Access metadata for this currency.</summary>
+    // public MetadataProvider Metadata => _metadataProvider;
+    // public IRoundingStrategy? StandardRoundingStrategy { get; init; }
+    // // PhysicalRoundingStrategy ,DenominationRoundingStrategy, PointOfSaleRoundingStrategy
+    // public IRoundingStrategy? CashRoundingStrategy { get; init; }
 
     // public string NativeName { get; init; } = EnglishName;
     // public string FractionalSingularUnitName { get; init; } = "cent";
@@ -583,29 +610,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
             'C'
             : '\0';
-    }
-
-    /// <summary>Gets the minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
-    /// <para>
-    /// The US dollar can be divided into 100 cents (1/100), which is 10^2, so exponent 2 will be returned.
-    /// </para>
-    /// <para>
-    /// Mauritania does not use a decimal division of units, but has 1 ouguiya (UM) which can be divided into 5 khoums (1/5), which is
-    /// 10^log10(5) = 10^0.698970004, so the exponent 0.698970004 will be returned.
-    /// </para>
-    private double MinorUnitAsExponentOfBase10
-    {
-        get
-        {
-            // https://www.iso.org/obp/ui/#iso:std:iso:4217:ed-8:v1:en
-            // unit of recorded value (i.e., as recorded by banks) which is a division of the respective unit of currency or fund
-            return MinorUnit switch
-            {
-                MinorUnit.NotApplicable => 0,
-                MinorUnit.OneFifth => Math.Log10(5),
-                _ => (double)MinorUnit,
-            };
-        }
     }
 
     private static void ValidateCurrencyCode(string code)

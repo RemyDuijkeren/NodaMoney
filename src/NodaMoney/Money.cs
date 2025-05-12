@@ -85,11 +85,25 @@ public readonly partial struct Money : IEquatable<Money>
     /// current <see cref="Context"/> will be used.</param>
     public Money(decimal amount, Currency currency, MoneyContext? context = null)
     {
-        // Use either provided context or the current global/thread-local context.
-        var currentContext = context ?? MoneyContext.CurrentContext;
+        // Fast path when the amount is zero (common in financial calculations)
+        if (amount == 0m)
+        {
+            _low = 0;
+            _mid = 0;
+            _high = 0;
 
-        int index = currentContext.Index;
-        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), null);
+            int index = (context ?? MoneyContext.CurrentContext).Index;
+            _flags = (currency.EncodedValue & CurrencyMask)
+                     | ((index << 24) & IndexMask);
+            return;
+        }
+
+        // Use either provided context or the current global/thread-local context.
+        MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
+        int contextIndex = currentContext.Index;
+
+        // TODO: Inline Common Cases for Rounding?
+        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale);
 
         // Extract the 4 integers from the decimal amount.
 #if NET5_0_OR_GREATER
@@ -103,7 +117,7 @@ public readonly partial struct Money : IEquatable<Money>
         _mid = bits[1];
         _high = bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((index << 24) & IndexMask)          // Store Index in bits 24–30
+                 | ((contextIndex << 24) & IndexMask)          // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask));  // Preserve Scale Factor (16–23) and Sign (31)
     }
 

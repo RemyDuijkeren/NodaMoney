@@ -5,14 +5,16 @@ namespace NodaMoney;
 /// when representing fractional amounts of a currency. Each value of the MinorUnit enum corresponds to a specific number
 /// of decimal places, ranging from 0 to 13.
 /// </summary>
-/// <remarks>store minor unit in 4 bits (0-15). // Power of 10, Math.Log10(2);</remarks>
+/// <remarks>store minor unit in 4 bits (0-15). we can use 5 bits (0-31) // Power of 10, Math.Log10(2);</remarks>
+/// <remarks>Max scale of <see cref="Decimal"/> is 28.</remarks>
 public enum MinorUnit : byte
 {
-    Zero = 0,
-    One = 1,
-    Two = 2,
-    Three = 3,
-    Four = 4,
+#pragma warning disable RCS1181
+    Zero = 0,   // 10^0 = 0 minor units
+    One = 1,    // 10^1 = 10 minor units
+    Two = 2,    // 10^2 = 100 minor units
+    Three = 3,  // 10^3 = 1.000 minor units
+    Four = 4,   // 10^4 = 10.000 minor units
     Five = 5,
     Six = 6,
     Seven = 7,
@@ -22,15 +24,27 @@ public enum MinorUnit : byte
     Eleven = 11,
     Twelve = 12,
     Thirteen = 13,
-    NotApplicable = 14,
+    Fourteen = 14,
+    Fifteen = 15,
+    Sixteen = 16,
+    Seventeen = 17,
+    Eighteen = 18,
+    Nineteen = 19,
+    Twenty = 20,
+    TwentyOne = 21,
+    TwentyTwo = 22,
+    TwentyThree = 23,
+    TwentyFour = 24,
+    TwentyFive = 25,
+    TwentySix = 26,
+    TwentySeven = 27,
+    TwentyEight = 28,
     /// <summary>
     /// Mauritania does not use a decimal division of units, setting 1 ouguiya (UM) equal to 5 khoums, and Madagascar has 1 ariary =
     /// 5 iraimbilanja. The coins display "1/5" on their face and are referred to as a "fifth". These are not used in practice, but when
-    /// written out, a single significant digit is used. E.g. 1.2 UM.
+    /// written out, a single significant digit is used. E.g., 1.2 UM.
     /// </summary>
-    OneFifth = 15, // Z07 = 0.69897000433601880478626110527551; // Math.Log10(5);
-
-    // TODO: 0-13 is enough for ISO-4217 and most crypto, but Ethereum (ETH) has 18 decimal places (wei)
-    // If now fits in 4bits, but if we need more, we can use 5 bits (0-31) or 6 bits (0-63) for minor unit
-
+    OneFifth = 254, // 1/5 = 10^log10(5) = 10^0.698970004
+    NotApplicable = 255, // For N.A. we use 10^0 = 0 minor units
+#pragma warning restore RCS1181
 }

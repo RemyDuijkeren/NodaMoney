@@ -55,6 +55,7 @@ namespace NodaMoney.Context;
 /// other custom rounding behaviors tailored to specific scenarios.
 /// </remarks>
 /// <seealso cref="StandardRounding"/>
+/// <seealso cref="NoRounding"/>
 /// <seealso cref="CashDenominationRounding"/>
 public interface IRoundingStrategy
 {
@@ -64,14 +65,4 @@ public interface IRoundingStrategy
     /// <param name="decimals">An optional parameter specifying the number of decimal places to round to. If null, the default for the currency will be used.</param>
     /// <returns>The rounded monetary value as a decimal.</returns>
     decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals);
-}
-
-internal record CashDenominationRounding : IRoundingStrategy
-{
-    public CashDenominationRounding(decimal decimals)
-    {
-        throw new NotImplementedException();
-    }
-
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => throw new NotImplementedException();
 }

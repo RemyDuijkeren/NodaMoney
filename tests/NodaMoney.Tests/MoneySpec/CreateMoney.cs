@@ -27,7 +27,7 @@ public class CreateMoney
 
         int sizeOfCurrencyUnsafe = Unsafe.SizeOf<Currency>();
         int sizeOfMoneyUnsafe = Unsafe.SizeOf<Money>();
-        int sizeOfFastMoneyUnsafe = Unsafe.SizeOf<FastMoney>(); ;
+        int sizeOfFastMoneyUnsafe = Unsafe.SizeOf<FastMoney>();
 
         // Assert
         _testOutputHelper.WriteLine($"Size of Currency: {sizeOfCurrency} ({sizeOfCurrencyUnsafe})");
@@ -36,7 +36,7 @@ public class CreateMoney
 
         sizeOfCurrency.Should().Be(2);
         sizeOfMoney.Should().Be(16); // was 24, but now it's 16!
-        sizeOfFastMoney.Should().Be(16);
+        sizeOfFastMoney.Should().Be(12); // was 16, but now it's 12!
     }
 
     [Fact]
