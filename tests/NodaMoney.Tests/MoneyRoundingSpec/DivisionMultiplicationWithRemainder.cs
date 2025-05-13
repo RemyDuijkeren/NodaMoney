@@ -6,7 +6,7 @@ public class DivisionMultiplicationWithRemainder
 {
     [Theory]
     [InlineData(100, "XXX", 100)] // XXX does not do rounding
-    [InlineData(100, "EUR", 99.99)] // expect 100, fail!
+    [InlineData(100, "EUR", 100)] // expect 100, fail!
     public void WhenMoney(decimal amount, string currency, decimal expectedResult)
     {
         // Arrange

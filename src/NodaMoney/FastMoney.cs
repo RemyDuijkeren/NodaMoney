@@ -33,7 +33,7 @@ namespace NodaMoney;
 // ## Recommendation
 // 1. **Keep the 12-byte Size**: The performance benefits of using `long` for calculations are significant enough to justify using `FastMoney`, even if it's only 4 bytes smaller than `Money`.
 //
-// TODO: Benchmark if this all is really true!
+// TODO: Benchmark if this all is really true! => Yes, Add/Subtract is 16x faster!
 
 // Internal Currency type https://referencesource.microsoft.com/#mscorlib/system/currency.cs
 
@@ -49,7 +49,7 @@ namespace NodaMoney;
 /// </remarks>
 //[StructLayout(LayoutKind.Sequential, Pack = 4)]
 [StructLayout(LayoutKind.Explicit, Size = 12)]
-internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
+public readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct based on the provided <see cref="Money"/> instance.</summary>
     /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
@@ -102,27 +102,37 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     /// <param name="currency">The Currency of the money.</param>
     /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
     /// current <see cref="MoneyContext"/> will be used.</param>
-    public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this()
+    public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this(amount, CurrencyInfo.GetInstance(currency), context) { }
+
+    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
+    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
+    /// <param name="currencyInfo">The Currency of the money.</param>
+    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
+    /// current <see cref="MoneyContext"/> will be used.</param>
+    public FastMoney(decimal amount, CurrencyInfo currencyInfo, MoneyContext? context = null) : this()
     {
         if (amount < MinValue || amount > MaxValue)
         {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
         }
 
-        CurrencyInfo ci = CurrencyInfo.GetInstance(currency);
-        if (ci.DecimalDigits > 4)
+        if (currencyInfo.DecimalDigits > 4)
         {
-            throw new ArgumentOutOfRangeException(nameof(currency), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
+            throw new ArgumentOutOfRangeException(nameof(currencyInfo), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
         }
 
         // Use either provided context or the current global/thread-local context.
         MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
+        if (currentContext.MaxScale is > 4) // also checks for null
+        {
+            throw new ArgumentOutOfRangeException(nameof(context), "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
+        }
 
         ContextIndex = currentContext.Index;
-        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale);
+        amount = currentContext.RoundingStrategy.Round(amount, currencyInfo, currentContext.MaxScale);
 
         OACurrencyAmount = decimal.ToOACurrency(amount);
-        Currency = currency;
+        Currency = currencyInfo;
         Scale = 4; // Fixed on 4 (10_000) for now, but can be made flexible in the future
     }
 
@@ -167,6 +177,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
     public MoneyContext Context => MoneyContext.Get(ContextIndex);
 
+    /// <summary>Gets the scale of the money.</summary>
     [field: FieldOffset(11)]
     private byte Scale { get; init; }
 
@@ -180,7 +191,6 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
             4 => 10_000, // Current fixed scale
             _ => (long)Math.Pow(10, scale)
         };
-
 
     public void Deconstruct(out decimal amount, out Currency currency)
     {
@@ -199,12 +209,20 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
         new(decimal.FromOACurrency(cy), currency, context);
 
-    public FastMoney Add(FastMoney other)
+    public static FastMoney Add(FastMoney money1, FastMoney money2)
     {
-        EnsureSameCurrency(this, other); // Ensure currencies match
-        long totalAmount = checked(OACurrencyAmount + other.OACurrencyAmount); // Use checked for overflow
+        EnsureSameCurrency(money1, money2); // Ensure currencies match
+        long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
 
-        return this with { OACurrencyAmount = totalAmount };
+        return money1 with { OACurrencyAmount = totalAmount };
+    }
+
+    public static FastMoney Subtract(FastMoney money1, FastMoney money2)
+    {
+        EnsureSameCurrency(money1, money2); // Ensure currencies match
+        long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow
+
+        return money1 with { OACurrencyAmount = totalAmount };
     }
 
     /// <summary>Constants for range</summary>

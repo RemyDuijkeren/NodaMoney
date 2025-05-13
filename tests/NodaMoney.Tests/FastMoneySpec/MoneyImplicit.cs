@@ -33,6 +33,7 @@ public class MoneyImplicit
     {
         var money = new FastMoney(_decimalValue);
 
+        money.Context.MaxScale.Should().BeNull();
         money.Currency.Should().Be(Currency.FromCode("JPY"));
         money.Amount.Should().Be(1235m);
     }

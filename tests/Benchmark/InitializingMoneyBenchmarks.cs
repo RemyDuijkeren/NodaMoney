@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
+using NodaMoney.Context;
 
 namespace Benchmark;
 
@@ -22,6 +23,12 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
+    public Money ExplicitCurrencyCodeAndContext()
+    {
+        return new Money(765.425m, "EUR", MoneyContext.CreateDefault());
+    }
+
+    [Benchmark]
     public Money ExplicitCurrencyFromCode()
     {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -36,7 +43,7 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
-    public Money ExtensionMethod()
+    public Money ExtensionMethodEuro()
     {
         return Money.Euro(6.54m);
     }

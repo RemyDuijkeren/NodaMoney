@@ -74,7 +74,7 @@ public class CreateContext
     }
 
     [Fact]
-    public void UseScope()
+    public void UseScopeWithGivenContext()
     {
         // Arrange
         var amount = 1234.56789m;
@@ -84,13 +84,35 @@ public class CreateContext
         Money money;
         using (MoneyContext.CreateScope(context))
         {
+            MoneyContext.DefaultThreadContext.Should().NotBe(context);
+            MoneyContext.ThreadContext.Should().Be(context, because: "Context is set before scope");
             money = new Money(amount, "EUR");
         }
 
         // Assert
         MoneyContext.DefaultThreadContext.Should().NotBe(context);
-        MoneyContext.ThreadContext.Should().NotBe(context);
+        MoneyContext.ThreadContext.Should().NotBe(context, because: "Context is reset after scope");
         money.Context.Should().Be(context);
+        money.Scale.Should().Be(4, because: "MaxScale set to 4 in MoneyContext");
+        money.Amount.Should().Be(1234.5679m, because: "Rounding to 4 decimals");
+    }
+
+    [Fact]
+    public void UseScopeWithAutoCreateContext()
+    {
+        // Arrange
+        var amount = 1234.56789m;
+
+        // Act
+        Money money;
+        using (MoneyContext.CreateScope(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4))
+        {
+            money = new Money(amount, "EUR");
+        }
+
+        // Assert
+        money.Context.RoundingStrategy.Should().BeOfType<StandardRounding>().Subject.Mode.Should().Be(MidpointRounding.AwayFromZero);
+        money.Context.MaxScale.Should().Be(4);
         money.Scale.Should().Be(4, because: "MaxScale set to 4 in MoneyContext");
         money.Amount.Should().Be(1234.5679m, because: "Rounding to 4 decimals");
     }

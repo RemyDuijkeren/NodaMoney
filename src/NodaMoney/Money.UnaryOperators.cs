@@ -31,12 +31,12 @@ public partial struct Money
     /// <summary>Pluses the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Plus(in Money money) => new(+money.Amount, money.Currency);
+    public static Money Plus(in Money money) => money with { Amount = +money.Amount};
 
     /// <summary>Negates the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Negate(in Money money) => new(-money.Amount, money.Currency);
+    public static Money Negate(in Money money) => money with { Amount = -money.Amount};
 
     /// <summary>Increments the specified money.</summary>
     /// <param name="money">The money.</param>

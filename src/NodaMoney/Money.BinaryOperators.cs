@@ -32,25 +32,25 @@ public partial struct Money
     /// <summary>Subtracts two specified <see cref="Money"/> values.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
     /// <param name="right">A <see cref="Money"/> object on the right side.</param>
-    /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
+    /// <returns>The <see cref="Money"/> result of subtracting right from the left.</returns>
     public static Money operator -(Money left, Money right) => Subtract(left, right);
 
     /// <summary>Subtracts <see cref="Money"/> value with the given value.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
     /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
-    /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
+    /// <returns>The <see cref="Money"/> result of subtracting right from the left.</returns>
     public static Money operator -(Money left, decimal right) => Subtract(left, right);
 
     /// <summary>Subtracts <see cref="Money"/> value with the given value.</summary>
     /// <param name="left">A <see cref="decimal"/> object on the left side.</param>
     /// <param name="right">A <see cref="Money"/> object on the right side.</param>
-    /// <returns>The <see cref="Money"/> result of subtracting right from left.</returns>
+    /// <returns>The <see cref="Money"/> result of subtracting right from the left.</returns>
     public static Money operator -(decimal left, Money right) => Subtract(right, left);
 
     /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
     /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
-    /// <returns>The <see cref="Money"/> result of multiplying right with left.</returns>
+    /// <returns>The <see cref="Money"/> result of multiplying right with the left.</returns>
     public static Money operator *(Money left, decimal right) => Multiply(left, right);
 
     /// <summary>Multiplies the <see cref="Money"/> value by the given value.</summary>
@@ -86,15 +86,16 @@ public partial struct Money
     public static Money Add(in Money money1, in Money money2)
     {
         // If one of the amounts is zero, then no need to check currency: Just return input value.
-        if (money1.Amount == 0m)
+        if (money1.Amount == decimal.Zero)
             return money2;
-        if (money2.Amount == 0m)
+        if (money2.Amount == decimal.Zero)
             return money1;
 
         EnsureSameCurrency(money1, money2);
         try
         {
-            return new Money(decimal.Add(money1.Amount, money2.Amount), money1.Currency);
+            decimal totalAmount = decimal.Add(money1.Amount, money2.Amount);
+            return money1 with { Amount = totalAmount };
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -104,13 +105,15 @@ public partial struct Money
 
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
-    /// <param name="money2">The second <see cref="decimal"/> object.</param>
+    /// <param name="decimal2">The second <see cref="decimal"/> object.</param>
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="decimal"/> objects added.</returns>
-    public static Money Add(in Money money1, in decimal money2)
+    public static Money Add(in Money money1, in decimal decimal2)
     {
-        if (money2 == decimal.Zero) return money1;
-        if (money1.Amount == decimal.Zero) return new Money(money2, money1.Currency);
-        return new Money(decimal.Add(money1.Amount, money2), money1.Currency);
+        if (decimal2 == decimal.Zero) return money1;
+        if (money1.Amount == decimal.Zero) return money1 with { Amount = decimal2 };
+
+        decimal totalAmount = decimal.Add(money1.Amount, decimal2);
+        return money1 with { Amount = totalAmount };
     }
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
@@ -119,16 +122,17 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
     public static Money Subtract(in Money money1, in Money money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Just return input value.
-        if (money1.Amount == 0m)
+        // If one of the amounts is zero, then no need to check currency: Just return the input value.
+        if (money1.Amount == decimal.Zero)
             return money2;
-        if (money2.Amount == 0m)
+        if (money2.Amount == decimal.Zero)
             return money1;
 
         EnsureSameCurrency(money1, money2);
         try
         {
-            return new Money(decimal.Subtract(money1.Amount, money2.Amount), money1.Currency);
+            decimal totalAmount = decimal.Subtract(money1.Amount, money2.Amount);
+            return money1 with { Amount = totalAmount };
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -138,13 +142,15 @@ public partial struct Money
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
     /// <param name="money1">The first <see cref="Money"/> object.</param>
-    /// <param name="money2">The second <see cref="decimal"/> object.</param>
+    /// <param name="decimal2">The second <see cref="decimal"/> object.</param>
     /// <returns>A <see cref="Money"/> object where the second <see cref="decimal"/> object is subtracted from the first.</returns>
-    public static Money Subtract(in Money money1, in decimal money2)
+    public static Money Subtract(in Money money1, in decimal decimal2)
     {
-        if (money2 == decimal.Zero) return money1;
-        if (money1.Amount == decimal.Zero) return new Money(-money2, money1.Currency);
-        return new Money(decimal.Subtract(money1.Amount, money2), money1.Currency);
+        if (decimal2 == decimal.Zero) return money1;
+        if (money1.Amount == decimal.Zero) return money1 with { Amount = -decimal2 };
+
+        decimal totalAmount = decimal.Subtract(money1.Amount, decimal2);
+        return money1 with { Amount = totalAmount };
     }
 
     /// <summary>Multiplies the specified money.</summary>
@@ -156,7 +162,8 @@ public partial struct Money
         if (multiplier == MultiplicativeIdentity) return money;
         try
         {
-            return new Money(decimal.Multiply(money.Amount, multiplier), money.Currency);
+            decimal totalAmount = decimal.Multiply(money.Amount, multiplier);
+            return money with { Amount = totalAmount };
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -172,7 +179,9 @@ public partial struct Money
     public static Money Divide(in Money money, in decimal divisor)
     {
         if (divisor == MultiplicativeIdentity) return money;
-        return new Money(decimal.Divide(money.Amount, divisor), money.Currency);
+
+        decimal totalAmount = decimal.Divide(money.Amount, divisor);
+        return money with { Amount = totalAmount };
     }
 
     /// <summary>Divides the specified money.</summary>
@@ -193,6 +202,7 @@ public partial struct Money
     public static Money Remainder(in Money money1, in Money money2)
     {
         EnsureSameCurrency(money1, money2);
-        return new Money(decimal.Remainder(money1.Amount, money2.Amount), money1.Currency);
+        decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
+        return money1 with { Amount = remainder };
     }
 }
