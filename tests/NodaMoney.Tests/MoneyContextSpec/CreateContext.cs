@@ -116,4 +116,24 @@ public class CreateContext
         money.Scale.Should().Be(4, because: "MaxScale set to 4 in MoneyContext");
         money.Amount.Should().Be(1234.5679m, because: "Rounding to 4 decimals");
     }
+
+    [Fact]
+    public void SetDefaultCurrency()
+    {
+        // Arrange
+        var amount = 1234.56789m;
+        var context = MoneyContext.Create(new StandardRounding(), defaultCurrency: CurrencyInfo.FromCode("MGA"));
+
+        // Act
+        Money money;
+        using (MoneyContext.CreateScope(context))
+        {
+            money = new Money(amount);
+        }
+
+        // Assert
+        money.Context.Should().Be(context);
+        money.Amount.Should().Be(1234.6m);
+        money.Currency.Should().Be(Currency.FromCode("MGA"));
+    }
 }

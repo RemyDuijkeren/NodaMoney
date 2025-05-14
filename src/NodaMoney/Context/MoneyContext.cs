@@ -32,17 +32,22 @@ public record MoneyContext
     /// <remarks>This property overrides the scale in <see cref="CurrencyInfo"/>.</remarks>
     public int? MaxScale { get; }
 
+    /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
+    /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
+    public CurrencyInfo? DefaultDefaultCurrency { get; }
+
     /// <summary>Get the metadata properties associated with the monetary context.</summary>
     public MetadataProvider Metadata { get; } = new();
 
     /// <summary>Efficient lookup index (1-byte reference)</summary>
     internal byte Index { get; private set; }
 
-    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
+    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null)
     {
         RoundingStrategy = roundingStrategy;
         Precision = precision;
         MaxScale = maxScale;
+        DefaultDefaultCurrency = defaultCurrency;
 
         // Automatically register this context
         Index = RegisterContext(this);
@@ -55,10 +60,11 @@ public record MoneyContext
     /// <param name="roundingStrategy">The rounding strategy to be applied in monetary calculations.</param>
     /// <param name="precision">The total number of significant digits for monetary values. Defaults to 28.</param>
     /// <param name="maxScale">The maximum number of digits to the right of the decimal point. Overrides the scale in <see cref="CurrencyInfo"/></param>
+    /// <param name="defaultCurrency">The default currency to use when none is specified for monetary operations.</param>
     /// <returns>A <see cref="MoneyContext"/> instance that matches the specified parameters.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the precision is less than or equal to zero, or when the maxScale is negative.</exception>
     /// <exception cref="ArgumentException">Thrown when the maxScale is greater than the precision.</exception>
-    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
+    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null)
     {
         if (precision <= 0) throw new ArgumentOutOfRangeException(nameof(precision), "Precision must be positive");
         if (maxScale < 0) throw new ArgumentOutOfRangeException(nameof(maxScale), "MaxScale cannot be negative");
@@ -72,7 +78,8 @@ public record MoneyContext
             {
                  if (ctx.RoundingStrategy.Equals(roundingStrategy)
                     && ctx.Precision == precision
-                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault())
+                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault()
+                    && ctx.DefaultDefaultCurrency == defaultCurrency)
                 {
                     return ctx; // Return existing equivalent context
                 }
@@ -84,7 +91,7 @@ public record MoneyContext
         }
 
         // Create and register a new context if no match is found
-        return new MoneyContext(roundingStrategy, precision, maxScale);
+        return new MoneyContext(roundingStrategy, precision, maxScale, defaultCurrency);
     }
 
     /// <summary>Gets or sets the default global <see cref="MoneyContext"/> instance that acts as a fallback context.</summary>
@@ -148,7 +155,8 @@ public record MoneyContext
             {
                 if (ctx.RoundingStrategy.Equals(context.RoundingStrategy)
                     && ctx.Precision == context.Precision
-                    && ctx.MaxScale.GetValueOrDefault() == context.MaxScale.GetValueOrDefault())
+                    && ctx.MaxScale.GetValueOrDefault() == context.MaxScale.GetValueOrDefault()
+                    && ctx.DefaultDefaultCurrency == context.DefaultDefaultCurrency)
                 {
                     return ctx.Index; // Return existing equivalent context index
                 }

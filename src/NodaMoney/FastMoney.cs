@@ -94,7 +94,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount) : this(amount, CurrencyInfo.CurrentCurrency) { }
+    public FastMoney(decimal amount) : this(amount, MoneyContext.CurrentContext.DefaultDefaultCurrency ?? CurrencyInfo.CurrentCurrency) { }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

@@ -33,7 +33,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public Money(decimal amount) : this(amount, CurrencyInfo.CurrentCurrency) { }
+    public Money(decimal amount) : this(amount, MoneyContext.CurrentContext.DefaultDefaultCurrency ?? CurrencyInfo.CurrentCurrency) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -50,12 +50,14 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    public Money(decimal amount, MidpointRounding mode) : this(amount, CurrencyInfo.CurrentCurrency, mode) { }
+    public Money(decimal amount, MidpointRounding mode) :
+        this(amount, MoneyContext.CurrentContext.DefaultDefaultCurrency ?? CurrencyInfo.CurrentCurrency, mode) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
     /// <param name="context">The <see cref="Context"/> to apply to this instance.</param>
-    public Money(decimal amount, MoneyContext context) : this(amount, CurrencyInfo.CurrentCurrency, context) { }
+    public Money(decimal amount, MoneyContext context) :
+        this(amount, MoneyContext.CurrentContext.DefaultDefaultCurrency ?? CurrencyInfo.CurrentCurrency, context) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
