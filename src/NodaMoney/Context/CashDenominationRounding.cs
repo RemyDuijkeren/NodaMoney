@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace NodaMoney.Context;
 
 internal record CashDenominationRounding : IRoundingStrategy
@@ -7,5 +9,6 @@ internal record CashDenominationRounding : IRoundingStrategy
         throw new NotImplementedException();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => throw new NotImplementedException();
 }

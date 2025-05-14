@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using NodaMoney.Context;
 
 namespace NodaMoney;
@@ -100,10 +101,16 @@ public readonly partial struct Money : IEquatable<Money>
 
         // Use either provided context or the current global/thread-local context.
         MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
-        int contextIndex = currentContext.Index;
+        Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
+        int contextIndex = currentContext!.Index;
 
-        // TODO: Inline Common Cases for Rounding?
-        amount = currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale);
+        // Round the amount to the correct scale
+        amount = currentContext.RoundingStrategy switch
+        {
+            NoRounding noRounding => noRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
+            StandardRounding standardRounding => standardRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
+            _ => currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale)
+        };
 
         // Extract the 4 integers from the decimal amount.
 #if NET5_0_OR_GREATER
@@ -117,7 +124,7 @@ public readonly partial struct Money : IEquatable<Money>
         _mid = bits[1];
         _high = bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((contextIndex << 24) & IndexMask)          // Store Index in bits 24–30
+                 | ((contextIndex << 24) & IndexMask)   // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask));  // Preserve Scale Factor (16–23) and Sign (31)
     }
 
@@ -269,8 +276,18 @@ public readonly partial struct Money : IEquatable<Money>
         init => _flags = (_flags & ~CurrencyMask) | (value.EncodedValue & CurrencyMask); // Set Currency (bits 0–15)
     }
 
-    /// <summary>Gets the scaling factor of the Money, which is a number from 0 to 28 that represents the number of decimal digits.</summary>
+    /// <summary>Gets the scaling factor of the <see cref="Money"/> amount, which is a number from 0 to 28 that represents the number of decimal digits.</summary>
     public byte Scale => (byte)((_flags & ScaleMask) >> 16); // Extract Scale (bits 16-23)
+
+    /// <summary>Gets the maximum number of digits used to represent the <see cref="Money"/> amount.</summary>
+    internal byte Precision
+    {
+        get
+        {
+            System.Data.SqlTypes.SqlDecimal sqlDecimal = new(Amount);
+            return sqlDecimal.Precision;
+        }
+    }
 
     /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
     public MoneyContext Context => MoneyContext.Get(ContextIndex);
@@ -335,6 +352,7 @@ public readonly partial struct Money : IEquatable<Money>
         currency = Currency;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EnsureSameCurrency(in Money left, in Money right)
     {
         if (left.Currency != right.Currency)

@@ -49,7 +49,6 @@ public class CreateMoney
 
         // Assert
         money.Amount.Should().Be(decimal.MaxValue);
-
     }
 
     [Fact]
@@ -228,19 +227,6 @@ public class CreateMoney
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
            .WithMessage("Index must be within 0 to 127*");
-    }
-
-    [Fact]
-    public void ReturnsZero_WhenNoIndexAddedToDecimal()
-    {
-        // Arrange
-        decimal value = 100m;
-
-        // Act
-        var result = new PackedDecimal(value, index: 0);
-
-        // Assert
-        result.Index.Should().Be(0);
     }
 
     [Fact]

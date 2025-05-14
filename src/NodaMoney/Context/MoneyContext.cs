@@ -23,7 +23,7 @@ public record MoneyContext
     /// Half-Even (Bankers' Rounding), or custom-defined strategies. It encapsulates the rules and logic for applying
     /// rounding, which may vary based on business context, regulatory requirements, or currency-specific needs.
     /// </remarks>
-    public IRoundingStrategy RoundingStrategy { get; } // or StandardRoundingStrategy and CashRoundingStrategy?
+    public IRoundingStrategy RoundingStrategy { get; }
 
     /// <summary>Get the total number of significant digits available for numerical values in the context.</summary>
     public int Precision { get; }
@@ -31,10 +31,6 @@ public record MoneyContext
     /// <summary>Get the maximum number of decimal places allowed for rounding operations within the monetary context.</summary>
     /// <remarks>This property overrides the scale in <see cref="CurrencyInfo"/>.</remarks>
     public int? MaxScale { get; }
-
-    // /// <summary>Indicates whether cash rounding is applied in the monetary context.</summary>
-    // /// <remarks>This property reflects if rounding rules are tailored for cash handling, typically used to accommodate for physical currency denominations.</remarks>
-    // public bool CashRounding { get; } // TODO: CashRoundingStrategy? Or store in Metadata?
 
     /// <summary>Get the metadata properties associated with the monetary context.</summary>
     public MetadataProvider Metadata { get; } = new();
@@ -174,16 +170,9 @@ public record MoneyContext
         }
     }
 
-    /// <summary>Creates a new default instance of the <see cref="MoneyContext"/> class using standard rounding with the default settings.</summary>
-    /// <returns>A new instance of <see cref="MoneyContext"/> configured with standard rounding and default precision.</returns>
-    public static MoneyContext CreateDefault() => Create(new StandardRounding());
-
     /// <summary>Creates a new instance of the <see cref="MoneyContext"/> class without applying any rounding strategy.</summary>
     /// <returns>A <see cref="MoneyContext"/> instance configured with no rounding.</returns>
-    public static MoneyContext CreateNoRounding() => Create(new NoRounding());
-
-    internal static MoneyContext CreateRetail() => Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 2);
-    internal static MoneyContext CreateAccounting() => Create(new StandardRounding(), maxScale: 4);
+    internal static MoneyContext CreateNoRounding() => Create(new NoRounding());
 
     /// <summary>Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.</summary>
     /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>

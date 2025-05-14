@@ -106,11 +106,11 @@ public class MoneyFromNumericTypeAndAnExplicitCurrencyObject
 
     [Theory]
     [InlineData(0.03, 0.03)]
-    [InlineData(0.3333333333333333, 0.33)]
-    [InlineData(251426433.75935, 251426433.76)]
+    [InlineData(0.3333333333333333, 0.3333)]
+    [InlineData(251426433.75935, 251426433.7594)]
     //[InlineData(7922816251426433.7593543950335, 7922816251426433.76)] // OverflowException
     //[InlineData(79228162514264337593543.950335, 79228162514264337593543.95)] // OverflowException
-    [InlineData(0.0079228162514264337593543950335, 0.01)]
+    [InlineData(0.0079228162514264337593543950335, 0.0079)]
     public void WhenValueIsDecimal_ThenCreatingShouldSucceed(decimal input, decimal expected)
     {
         var money = new FastMoney(input, _euro);

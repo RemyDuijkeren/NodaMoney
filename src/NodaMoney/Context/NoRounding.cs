@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace NodaMoney.Context;
 
 /// <summary>Represents a no-rounding strategy for monetary calculations.</summary>
@@ -11,5 +13,6 @@ namespace NodaMoney.Context;
 public record NoRounding : IRoundingStrategy
 {
     /// <inheritdoc cref="IRoundingStrategy.Round"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => amount;
 }

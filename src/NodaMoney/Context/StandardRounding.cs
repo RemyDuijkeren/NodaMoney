@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
 namespace NodaMoney.Context;
 
 /// <summary>Represents the standard rounding strategy for monetary calculations.</summary>
@@ -13,8 +16,11 @@ public record StandardRounding(MidpointRounding Mode = MidpointRounding.ToEven) 
     /// <inheritdoc cref="IRoundingStrategy.Round"/>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="decimals"/> is less than 0
     /// or greater than 28.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals)
     {
+        if (currencyInfo is null) throw new ArgumentNullException(nameof(currencyInfo));
+
         if (currencyInfo.MinorUnit == MinorUnit.NotApplicable)
         {
             return amount; // No rounding needed

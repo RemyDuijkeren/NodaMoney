@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
 using NodaMoney.Context;
@@ -5,6 +6,7 @@ using NodaMoney.Context;
 namespace Benchmark;
 
 [MemoryDiagnoser]
+//[Config(typeof(InProcessConfig))]
 public class HighLoadBenchmarks
 {
     //[Params(1, 100, 1_000, 100_000, 1_000_000)]
@@ -28,7 +30,7 @@ public class HighLoadBenchmarks
         return currencies;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public decimal Create1MDecimal()
     {
         decimal[] decimals = new decimal[Count];
@@ -46,25 +48,7 @@ public class HighLoadBenchmarks
         return decimals[0];
     }
 
-    [Benchmark]
-    public decimal Create1MPackedDecimal()
-    {
-        PackedDecimal[] indexedDecimals = new PackedDecimal[Count];
-
-        for (int i = 0; i < Count; i++)
-        {
-            if (i % 3 == 0)
-                indexedDecimals[i] = new PackedDecimal(10M, index: 1);
-            else if (i % 2 == 0)
-                indexedDecimals[i] = new PackedDecimal(20M, index: 2);
-            else
-                indexedDecimals[i] = new PackedDecimal(30M, index: 3);
-        }
-
-        return indexedDecimals[0].Decimal;
-    }
-
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public Money[] Create1MMoney()
     {
         Money[] money = new Money[Count];
@@ -98,5 +82,23 @@ public class HighLoadBenchmarks
         }
 
         return money[0].Amount;
+    }
+
+    [Benchmark]
+    public SqlMoney Create1MSqlMoney()
+    {
+        SqlMoney[] money = new SqlMoney[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                money[i] = new SqlMoney(10M);
+            else if (i % 2 == 0)
+                money[i] = new SqlMoney(20M);
+            else
+                money[i] = new SqlMoney(30M);
+        }
+
+        return money[0];
     }
 }

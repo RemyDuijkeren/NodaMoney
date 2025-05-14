@@ -25,7 +25,8 @@ public class InitializingMoneyBenchmarks
     [Benchmark]
     public Money ExplicitCurrencyCodeAndContext()
     {
-        return new Money(765.425m, "EUR", MoneyContext.CreateDefault());
+        MoneyContext ctx = MoneyContext.DefaultThreadContext;
+        return new Money(765.425m, "EUR", ctx);
     }
 
     [Benchmark]

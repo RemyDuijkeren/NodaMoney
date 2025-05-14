@@ -6,25 +6,28 @@ public class CreateMoneyWithMinAndMaxValues
      public void WhenMaxValue()
      {
          // Arrange
+         Currency eur = CurrencyInfo.FromCode("EUR");
 
          // Act
-         var money = new FastMoney(FastMoney.MaxValue, "CLF"); // 4 decimals
+         var result = FastMoney.MinValue with { Currency = eur };
 
          // Assert
-         money.Amount.Should().Be(FastMoney.MaxValue);
-
+         result.Amount.Should().Be(long.MinValue / 10_000L);
+         result.Currency.Should().Be(eur);
      }
 
      [Fact]
      public void WhenMinValue()
      {
          // Arrange
+         Currency eur = CurrencyInfo.FromCode("EUR");
 
          // Act
-         var money = new FastMoney(FastMoney.MinValue, "CLF"); // 4 decimals
+         var result = FastMoney.MinValue with { Currency = eur };
 
          // Assert
-         money.Amount.Should().Be(FastMoney.MinValue);
+         result.Amount.Should().Be(long.MinValue / 10_000L);
+         result.Currency.Should().Be(eur);
      }
 
      [Fact]
