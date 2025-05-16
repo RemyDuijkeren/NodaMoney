@@ -20,10 +20,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Example: Register a default global MoneyContext (MidpointRounding.ToEven)
 builder.Services.AddSingleton(MoneyContext.CreateDefault());
 
-// Optional: Register other contexts for specific use cases
-builder.Services.AddSingleton(MoneyContext.CreateRetail());      // Retail rounding
-builder.Services.AddSingleton(MoneyContext.CreateAccounting()); // Accounting precision
-builder.Services.AddSingleton(MoneyContext.CreateNoRounding()); // No rounding context
+builder.Services.AddMoneyContext(options =>
+{
+    options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+    options.MaxScale = 18;
+    options.DefaultCurrency = CurrencyInfo.FromCode("USD");
+});
 
 var app = builder.Build();
 
@@ -43,6 +45,14 @@ In scenarios where the `MoneyContext` is global across all threads and users, yo
 ``` csharp
 // Set global MoneyContext at application startup
 MoneyContext.DefaultGlobal = MoneyContext.Create(MidpointRounding.AwayFromZero, 18, 2);
+
+var context = MoneyContext.Create(opt =>
+{
+    opt.MaxScale = 4;
+    opt.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+    opt.DefaultCurrency = CurrencyInfo.FromCode("USD");
+});
+
 ```
 This ensures that the `DefaultGlobal` `MoneyContext` is used throughout the application for all `Money` calculations unless overridden.
 

@@ -4,7 +4,7 @@ namespace NodaMoney.Context;
 // explicitly fail or resolve using a context-driven priority list.
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
-public record MoneyContext
+public sealed class MoneyContext : IEquatable<MoneyContext>
 {
     private static byte s_lastIndex;
     private static readonly ReaderWriterLockSlim s_contextLock = new();
@@ -14,7 +14,7 @@ public record MoneyContext
     private static readonly AsyncLocal<byte?> s_threadLocalContext = new();
 
     /// <summary>Default global MoneyContext (fallback context)</summary>
-    private static MoneyContext s_defaultThreadContext = new(new StandardRounding());
+    private static MoneyContext s_defaultThreadContext = new(new MoneyContextOptions());
 
     /// <summary>Get the rounding strategy used for rounding monetary values in the context.</summary>
     /// <remarks>
@@ -34,23 +34,57 @@ public record MoneyContext
 
     /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
     /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
-    public CurrencyInfo? DefaultDefaultCurrency { get; }
-
-    /// <summary>Get the metadata properties associated with the monetary context.</summary>
-    public MetadataProvider Metadata { get; } = new();
+    public CurrencyInfo? DefaultCurrency { get; }
 
     /// <summary>Efficient lookup index (1-byte reference)</summary>
     internal byte Index { get; private set; }
 
-    private MoneyContext(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null)
+    private MoneyContext(MoneyContextOptions options)
     {
-        RoundingStrategy = roundingStrategy;
-        Precision = precision;
-        MaxScale = maxScale;
-        DefaultDefaultCurrency = defaultCurrency;
+        RoundingStrategy = options.RoundingStrategy;
+        Precision = options.Precision;
+        MaxScale = options.MaxScale;
+        DefaultCurrency = options.DefaultCurrency;
 
         // Automatically register this context
         Index = RegisterContext(this);
+    }
+
+    public static MoneyContext Create(Action<MoneyContextOptions> configure)
+    {
+        var options = new MoneyContextOptions();
+        configure(options);
+        return Create(options);
+    }
+
+    public static MoneyContext Create(MoneyContextOptions options)
+    {
+        if (options.Precision <= 0) throw new ArgumentOutOfRangeException(nameof(options.Precision), "Precision must be positive");
+        if (options.MaxScale < 0) throw new ArgumentOutOfRangeException(nameof(options.MaxScale), "MaxScale cannot be negative");
+        if (options.MaxScale > options.Precision) throw new ArgumentException("MaxScale cannot be greater than precision");
+
+        s_contextLock.EnterReadLock();
+        try
+        {
+            // Look for an equivalent context in the dictionary
+            foreach (MoneyContext ctx in s_activeContexts.Values)
+            {
+                if (ctx.RoundingStrategy.Equals(options.RoundingStrategy)
+                    && ctx.Precision == options.Precision
+                    && ctx.MaxScale.GetValueOrDefault() == options.MaxScale.GetValueOrDefault()
+                    && ctx.DefaultCurrency == options.DefaultCurrency)
+                {
+                    return ctx; // Return existing equivalent context
+                }
+            }
+        }
+        finally
+        {
+            s_contextLock.ExitReadLock();
+        }
+
+        // Create and register a new context if no match is found
+        return new MoneyContext(options);
     }
 
     /// <summary>
@@ -64,34 +98,20 @@ public record MoneyContext
     /// <returns>A <see cref="MoneyContext"/> instance that matches the specified parameters.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the precision is less than or equal to zero, or when the maxScale is negative.</exception>
     /// <exception cref="ArgumentException">Thrown when the maxScale is greater than the precision.</exception>
-    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null)
+    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null) =>
+        Create(new MoneyContextOptions
+        {
+            RoundingStrategy = roundingStrategy,
+            Precision = precision,
+            MaxScale = maxScale,
+            DefaultCurrency = defaultCurrency
+        });
+
+    public static MoneyContext CreateAndSetDefault(MoneyContextOptions options)
     {
-        if (precision <= 0) throw new ArgumentOutOfRangeException(nameof(precision), "Precision must be positive");
-        if (maxScale < 0) throw new ArgumentOutOfRangeException(nameof(maxScale), "MaxScale cannot be negative");
-        if (maxScale > precision) throw new ArgumentException("MaxScale cannot be greater than precision");
-
-        s_contextLock.EnterReadLock();
-        try
-        {
-            // Look for an equivalent context in the dictionary
-            foreach (MoneyContext ctx in s_activeContexts.Values)
-            {
-                 if (ctx.RoundingStrategy.Equals(roundingStrategy)
-                    && ctx.Precision == precision
-                    && ctx.MaxScale.GetValueOrDefault() == maxScale.GetValueOrDefault()
-                    && ctx.DefaultDefaultCurrency == defaultCurrency)
-                {
-                    return ctx; // Return existing equivalent context
-                }
-            }
-        }
-        finally
-        {
-            s_contextLock.ExitReadLock();
-        }
-
-        // Create and register a new context if no match is found
-        return new MoneyContext(roundingStrategy, precision, maxScale, defaultCurrency);
+        MoneyContext context = Create(options);
+        DefaultThreadContext = context;
+        return context;
     }
 
     /// <summary>Gets or sets the default global <see cref="MoneyContext"/> instance that acts as a fallback context.</summary>
@@ -156,7 +176,7 @@ public record MoneyContext
                 if (ctx.RoundingStrategy.Equals(context.RoundingStrategy)
                     && ctx.Precision == context.Precision
                     && ctx.MaxScale.GetValueOrDefault() == context.MaxScale.GetValueOrDefault()
-                    && ctx.DefaultDefaultCurrency == context.DefaultDefaultCurrency)
+                    && ctx.DefaultCurrency == context.DefaultCurrency)
                 {
                     return ctx.Index; // Return existing equivalent context index
                 }
@@ -206,4 +226,36 @@ public record MoneyContext
     {
         public void Dispose() => onDispose();
     }
+
+    public bool Equals(MoneyContext? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return RoundingStrategy.Equals(other.RoundingStrategy) && Precision == other.Precision && MaxScale == other.MaxScale &&
+               Equals(DefaultCurrency, other.DefaultCurrency);
+    }
+
+    public override bool Equals(object? obj) => ReferenceEquals(this, obj) || (obj is MoneyContext other && Equals(other));
+
+    public override int GetHashCode()
+    {
+        // return HashCode.Combine(
+        //     RoundingStrategy,
+        //     Precision,
+        //     MaxScale.GetValueOrDefault(),
+        //     DefaultCurrency
+        // );
+        unchecked
+        {
+            var hashCode = RoundingStrategy.GetHashCode();
+            hashCode = (hashCode * 397) ^ Precision;
+            hashCode = (hashCode * 397) ^ MaxScale.GetHashCode();
+            hashCode = (hashCode * 397) ^ ((DefaultCurrency?.GetHashCode()) ?? 0);
+            return hashCode;
+        }
+    }
+
+    public static bool operator ==(MoneyContext? left, MoneyContext? right) => Equals(left, right);
+
+    public static bool operator !=(MoneyContext? left, MoneyContext? right) => !Equals(left, right);
 }

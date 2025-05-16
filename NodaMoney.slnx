@@ -8,7 +8,8 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/NodaMoney/NodaMoney.csproj"/>
+    <Project Path="src/NodaMoney/NodaMoney.csproj" />
+    <Project Path="src\NodaMoney.DependencyInjection\NodaMoney.DependencyInjection.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Benchmark/Benchmark.csproj" />

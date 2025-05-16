@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace NodaMoney;
 
@@ -219,13 +220,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// </para>
     public long MinorUnits => ScaleFactor > 1 ? ScaleFactor : 0;
 
-    // // Additional metadata storage
-    // private readonly MetadataProvider _metadataProvider = new();
     // /// <summary>Access metadata for this currency.</summary>
     // public MetadataProvider Metadata => _metadataProvider;
-    // public IRoundingStrategy? StandardRoundingStrategy { get; init; }
-    // // PhysicalRoundingStrategy ,DenominationRoundingStrategy, PointOfSaleRoundingStrategy
-    // public IRoundingStrategy? CashRoundingStrategy { get; init; }
 
     // public string NativeName { get; init; } = EnglishName;
     // public string FractionalSingularUnitName { get; init; } = "cent";
