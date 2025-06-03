@@ -73,7 +73,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     public Currency Currency { get; init; }
 
     [field: FieldOffset(10)]
-    private byte ContextIndex { get; init; }
+    private MoneyContextIndex ContextIndex { get; init; }
 
     /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
     public MoneyContext Context => MoneyContext.Get(ContextIndex);

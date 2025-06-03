@@ -100,7 +100,7 @@ public class CreateMoney
     [InlineData(-98765.4321, 15)]
     [InlineData(0.00000123, 5)]
     [InlineData(-0.00000123, 10)]
-    public void WhenMoneyContextIndex_AddsIndexProperly(decimal input, byte index)
+    public void WhenMoneyContextIndex_AddsIndexProperly(decimal input, MoneyContextIndex index)
     {
         // Arrange
         var value = input;
@@ -120,7 +120,7 @@ public class CreateMoney
     [InlineData(-98765.4321, 15)]
     [InlineData(0.00000123, 5)]
     [InlineData(-0.00000123, 10)]
-    public void WhenDecimalWithMoneyContextIndex_AddsDecimalProperly(decimal input, byte index)
+    public void WhenDecimalWithMoneyContextIndex_AddsDecimalProperly(decimal input, MoneyContextIndex index)
     {
         // Arrange
         var value = input;
@@ -140,7 +140,7 @@ public class CreateMoney
     [InlineData(-98765.4321, 15)]
     [InlineData(0.00000123, 5)]
     [InlineData(-0.00000123, 10)]
-    public void WhenCurrencyWithMoneyContextIndex_AddsCurrencyProperly(decimal input, byte index)
+    public void WhenCurrencyWithMoneyContextIndex_AddsCurrencyProperly(decimal input, MoneyContextIndex index)
     {
         // Arrange
         var value = input;
@@ -160,7 +160,7 @@ public class CreateMoney
     [InlineData(-98765.4321, 15)]
     [InlineData(0.00000123, 5)]
     [InlineData(-0.00000123, 10)]
-    public void WhenCurrencyWithMoneyContextIndex_AddsCDecimalProperly(decimal input, byte index)
+    public void WhenCurrencyWithMoneyContextIndex_AddsCDecimalProperly(decimal input, MoneyContextIndex index)
     {
         // Arrange
         var value = input;
@@ -180,7 +180,7 @@ public class CreateMoney
     [InlineData(15)]
     [InlineData(5)]
     [InlineData(10)]
-    public void DecimalSameAsInput_WhenMaxValue(byte index)
+    public void DecimalSameAsInput_WhenMaxValue(MoneyContextIndex index)
     {
         // Arrange
         var value = Decimal.MaxValue;
@@ -200,7 +200,7 @@ public class CreateMoney
     [InlineData(15)]
     [InlineData(5)]
     [InlineData(10)]
-    public void DecimalSameAsInput_WhenMinValue(byte index)
+    public void DecimalSameAsInput_WhenMinValue(MoneyContextIndex index)
     {
         // Arrange
         var value = Decimal.MinValue;
@@ -222,11 +222,11 @@ public class CreateMoney
         Money money = new(value, _euro, MoneyContext.CreateNoRounding());
 
         // Act
-        Action act = () => { var _ = money with { ContextIndex = invalidIndex }; };
+        Action act = () => { var _ = money with { ContextIndex = (MoneyContextIndex)invalidIndex }; };
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
-           .WithMessage("Index must be within 0 to 127*");
+           .WithMessage("MoneyContextIndex must be between 0 and 127*");
     }
 
     [Fact]

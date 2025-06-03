@@ -43,7 +43,7 @@ public class DeserializeMoney
     }
 
     [Fact]
-    public void WhenDesirializingV2_ShouldBeOk()
+    public void WhenDeserializingV2_ShouldBeOk()
     {
         // Arrange
         string json = "\"EUR 123.456\"";

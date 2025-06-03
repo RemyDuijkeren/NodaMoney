@@ -104,7 +104,7 @@ public readonly partial struct Money : IEquatable<Money>
         // Use either provided context or the current global/thread-local context.
         MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
-        int contextIndex = currentContext!.Index;
+        int contextIndex = currentContext.Index;
 
         // Round the amount to the correct scale
         amount = currentContext.RoundingStrategy switch
@@ -144,10 +144,10 @@ public readonly partial struct Money : IEquatable<Money>
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
     public Money(double amount) : this((decimal)amount) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
     /// cast to double).</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>This constructor will first convert to decimal by rounding the value to 15 significant digits using rounding
     /// to nearest. This is done even if the number has more than 15 digits and the less significant digits are zero.
     /// <para>The amount will be rounded to the number of decimals for the specified currency
@@ -196,9 +196,9 @@ public readonly partial struct Money : IEquatable<Money>
     /// <c>Money money = new Money(10, "EUR");</c></remarks>
     public Money(long amount) : this((decimal)amount) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <c>Money money = new Money(10, "EUR");</c></remarks>
@@ -221,10 +221,10 @@ public readonly partial struct Money : IEquatable<Money>
     [CLSCompliant(false)]
     public Money(ulong amount) : this((decimal)amount) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on a ISO 4217 Currency code.</summary>
+    /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="ulong"/>, <see langword="uint"/>, <see langword="ushort"/>
     /// or <see cref="byte"/>.</param>
-    /// <param name="code">A ISO 4217 Currency code, like EUR or USD.</param>
+    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
     /// <remarks>The integral types are implicitly converted to long and the result evaluates to decimal. Therefore, you can
     /// initialize a Money object using an integer literal, without the suffix, as follows:
     /// <c>Money money = new Money(10, "EUR");</c></remarks>
@@ -296,9 +296,9 @@ public readonly partial struct Money : IEquatable<Money>
 
     /// <summary>Gets the index of the <see cref="Context"/>.</summary>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the provided index value is outside the allowed range of 0 to 127.</exception>
-    internal byte ContextIndex
+    internal MoneyContextIndex ContextIndex
     {
-        get => (byte)((_flags & IndexMask) >> 24); // Extract Index (bits 24–30)
+        get => (MoneyContextIndex)((_flags & IndexMask) >> 24); // Extract Index (bits 24–30)
         init
         {
             // Process Index initialization

@@ -11,26 +11,26 @@ public class InitializingMoneyBenchmarks
     readonly Money _money = new Money(10m, "EUR");
 
     [Benchmark(Baseline = true)]
-    public Money ExplicitCurrencyCodeDefaultRounding()
+    public Money CurrencyCodeDefaultRounding()
     {
         return new Money(6.54m, "EUR");
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyCodeAndRounding()
+    public Money CurrencyCodeAndRounding()
     {
         return new Money(765.425m, "EUR", MidpointRounding.AwayFromZero);
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyCodeAndContext()
+    public Money CurrencyCodeAndContext()
     {
         MoneyContext ctx = MoneyContext.DefaultThreadContext;
         return new Money(765.425m, "EUR", ctx);
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyFromCode()
+    public Money CurrencyFromCode()
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         return new Money(6.54m, Currency.FromCode("EUR"));
@@ -38,7 +38,7 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyInfoFromCode()
+    public Money CurrencyInfoFromCode()
     {
         return new Money(6.54m, CurrencyInfo.FromCode("EUR"));
     }

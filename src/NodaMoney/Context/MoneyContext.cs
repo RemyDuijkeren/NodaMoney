@@ -4,17 +4,17 @@ namespace NodaMoney.Context;
 // explicitly fail or resolve using a context-driven priority list.
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
-public sealed class MoneyContext : IEquatable<MoneyContext>
+public sealed class MoneyContext
 {
-    private static byte s_lastIndex;
     private static readonly ReaderWriterLockSlim s_contextLock = new();
-    private static readonly Dictionary<byte, MoneyContext> s_activeContexts = [];
-
-    /// <summary>Thread-local index</summary>
-    private static readonly AsyncLocal<byte?> s_threadLocalContext = new();
-
-    /// <summary>Default global MoneyContext (fallback context)</summary>
+    private static readonly Dictionary<MoneyContextIndex, MoneyContext> s_activeContexts = [];
+    private static readonly AsyncLocal<MoneyContextIndex?> s_threadLocalContext = new();
     private static MoneyContext s_defaultThreadContext = new(new MoneyContextOptions());
+
+    private MoneyContextOptions Options { get; }
+
+    /// <summary>Efficient lookup index (1-byte reference)</summary>
+    internal MoneyContextIndex Index { get; }
 
     /// <summary>Get the rounding strategy used for rounding monetary values in the context.</summary>
     /// <remarks>
@@ -23,28 +23,22 @@ public sealed class MoneyContext : IEquatable<MoneyContext>
     /// Half-Even (Bankers' Rounding), or custom-defined strategies. It encapsulates the rules and logic for applying
     /// rounding, which may vary based on business context, regulatory requirements, or currency-specific needs.
     /// </remarks>
-    public IRoundingStrategy RoundingStrategy { get; }
+    public IRoundingStrategy RoundingStrategy => Options.RoundingStrategy;
 
     /// <summary>Get the total number of significant digits available for numerical values in the context.</summary>
-    public int Precision { get; }
+    public int Precision => Options.Precision;
 
     /// <summary>Get the maximum number of decimal places allowed for rounding operations within the monetary context.</summary>
     /// <remarks>This property overrides the scale in <see cref="CurrencyInfo"/>.</remarks>
-    public int? MaxScale { get; }
+    public int? MaxScale => Options.MaxScale;
 
     /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
     /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
-    public CurrencyInfo? DefaultCurrency { get; }
-
-    /// <summary>Efficient lookup index (1-byte reference)</summary>
-    internal byte Index { get; private set; }
+    public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
 
     private MoneyContext(MoneyContextOptions options)
     {
-        RoundingStrategy = options.RoundingStrategy;
-        Precision = options.Precision;
-        MaxScale = options.MaxScale;
-        DefaultCurrency = options.DefaultCurrency;
+        Options = options ?? throw new ArgumentNullException(nameof(options));
 
         // Automatically register this context
         Index = RegisterContext(this);
@@ -69,10 +63,7 @@ public sealed class MoneyContext : IEquatable<MoneyContext>
             // Look for an equivalent context in the dictionary
             foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                if (ctx.RoundingStrategy.Equals(options.RoundingStrategy)
-                    && ctx.Precision == options.Precision
-                    && ctx.MaxScale.GetValueOrDefault() == options.MaxScale.GetValueOrDefault()
-                    && ctx.DefaultCurrency == options.DefaultCurrency)
+                if (ctx.Options.Equals(options))
                 {
                     return ctx; // Return existing equivalent context
                 }
@@ -149,7 +140,7 @@ public sealed class MoneyContext : IEquatable<MoneyContext>
     /// <param name="index">The unique index identifying the desired <see cref="MoneyContext"/> instance.</param>
     /// <returns>The <see cref="MoneyContext"/> instance corresponding to the specified index.</returns>
     /// <exception cref="ArgumentException">Thrown when the provided index does not correspond to a valid or existing <see cref="MoneyContext"/> instance.</exception>
-    internal static MoneyContext Get(byte index)
+    internal static MoneyContext Get(MoneyContextIndex index)
     {
         s_contextLock.EnterReadLock(); // Allow parallel reads
         try
@@ -166,29 +157,22 @@ public sealed class MoneyContext : IEquatable<MoneyContext>
         }
     }
 
-    private static byte RegisterContext(MoneyContext context)
+    private static MoneyContextIndex RegisterContext(MoneyContext context)
     {
         s_contextLock.EnterWriteLock(); // Ensure write exclusivity
         try
         {
             foreach (MoneyContext ctx in s_activeContexts.Values)
             {
-                if (ctx.RoundingStrategy.Equals(context.RoundingStrategy)
-                    && ctx.Precision == context.Precision
-                    && ctx.MaxScale.GetValueOrDefault() == context.MaxScale.GetValueOrDefault()
-                    && ctx.DefaultCurrency == context.DefaultCurrency)
+                if (ctx.Options.Equals(context.Options))
                 {
                     return ctx.Index; // Return existing equivalent context index
                 }
             }
 
             // Ensure we don't exceed the 7-bits index limit (128 contexts)
-            if (s_lastIndex == 127)
-            {
-                throw new InvalidOperationException("Maximum number of MoneyContexts (128) reached.");
-            }
 
-            var newIndex = ++s_lastIndex;
+            var newIndex = MoneyContextIndex.New();
             s_activeContexts[newIndex] = context;
             return newIndex;
         }
@@ -226,36 +210,4 @@ public sealed class MoneyContext : IEquatable<MoneyContext>
     {
         public void Dispose() => onDispose();
     }
-
-    public bool Equals(MoneyContext? other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return RoundingStrategy.Equals(other.RoundingStrategy) && Precision == other.Precision && MaxScale == other.MaxScale &&
-               Equals(DefaultCurrency, other.DefaultCurrency);
-    }
-
-    public override bool Equals(object? obj) => ReferenceEquals(this, obj) || (obj is MoneyContext other && Equals(other));
-
-    public override int GetHashCode()
-    {
-        // return HashCode.Combine(
-        //     RoundingStrategy,
-        //     Precision,
-        //     MaxScale.GetValueOrDefault(),
-        //     DefaultCurrency
-        // );
-        unchecked
-        {
-            var hashCode = RoundingStrategy.GetHashCode();
-            hashCode = (hashCode * 397) ^ Precision;
-            hashCode = (hashCode * 397) ^ MaxScale.GetHashCode();
-            hashCode = (hashCode * 397) ^ ((DefaultCurrency?.GetHashCode()) ?? 0);
-            return hashCode;
-        }
-    }
-
-    public static bool operator ==(MoneyContext? left, MoneyContext? right) => Equals(left, right);
-
-    public static bool operator !=(MoneyContext? left, MoneyContext? right) => !Equals(left, right);
 }
