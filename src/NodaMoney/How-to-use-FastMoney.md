@@ -10,7 +10,7 @@ Let me compare `SqlMoney` with both `Decimal` and `SqlDecimal`:
   - `Money`: 16 bytes (uses decimal internally)
 
 3. **Performance**:
-  - `FastMoney` is fastest (uses native CPU integer operations)
+  - `FastMoney` is fastest (uses native CPU integer operations), so far we see 3x faster adding/subtracting
   - `Money` is second
   - `SqlDecimal` is slowest due to its internal complexity
 

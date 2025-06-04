@@ -219,7 +219,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
     {
-        if (left.Currency != right.Currency)
-            throw new InvalidCurrencyException(left.Currency, right.Currency);
+        if (left.Currency == right.Currency) return;
+        throw new InvalidCurrencyException(left.Currency, right.Currency);
     }
 }

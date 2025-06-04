@@ -1,16 +1,9 @@
-﻿using BenchmarkDotNet.Running;
+﻿using Benchmark;
+using BenchmarkDotNet.Running;
 
-namespace Benchmark;
-
-static class Program
-{
-    static void Main(string[] args)
-    {
-        BenchmarkRunner.Run<HighLoadBenchmarks>();
-        // BenchmarkRunner.Run<InitializingCurrencyBenchmarks>();
-        // BenchmarkRunner.Run<InitializingMoneyBenchmarks>();
-        BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
-        // BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
-        // BenchmarkRunner.Run<MoneyParsingBenchmarks>();
-    }
-}
+BenchmarkRunner.Run<HighLoadBenchmarks>();
+BenchmarkRunner.Run<InitializingCurrencyBenchmarks>();
+BenchmarkRunner.Run<InitializingMoneyBenchmarks>();
+BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
+BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
+BenchmarkRunner.Run<MoneyParsingBenchmarks>();
