@@ -2,11 +2,23 @@
 
 ## Test Frameworks and libraries
 
-As test framework we use [xUnit](https://xunit.net/). For mocking we use [NSubstitute](https://nsubstitute.github.io/) and [Fake Xrm Easy](https://github.com/DynamicsValue/fake-xrm-easy).
+As our test framework, we use [xUnit](https://xunit.net/). For mocking we use [NSubstitute](https://nsubstitute.github.io/) and [Fake Xrm Easy](https://github.com/DynamicsValue/fake-xrm-easy).
 
 We use [AutoBogus](https://github.com/nickdodd79/AutoBogus), which uses [Bogus](https://github.com/bchavez/Bogus)
 to generate fake data. To use AutoBogus, we only need to reference [AutoBogus.NSubstitute](https://www.nuget.org/packages/AutoBogus.NSubstitute),
 the NSubtitute binding for AutoBogus.
+
+## Test Targets
+
+Our test targets are:
+1. `net9.0` - Tests the most recent .NET version
+2. `net8.0` - Tests against .NET 8
+3. `net6.0` - To test functionality for netstandard2.1 compatibility
+4. `net48`  - To test functionality for netstandard2.0 compatibility
+
+This approach provides coverage for both the modern .NET versions and the compatibility scenarios:
+- .NET Framework 4.8 implements netstandard2.0
+- .NET 6.0 implements netstandard2.1
 
 ## Test structure
 
