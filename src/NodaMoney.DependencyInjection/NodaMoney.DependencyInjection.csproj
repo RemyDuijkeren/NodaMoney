@@ -26,7 +26,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/RemyDuijkeren/NodaMoney.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Noda Money Currency ExchangeRate</PackageTags>
+    <PackageTags>Noda Money Currency ExchangeRate DependencyInjection</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
@@ -42,19 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../docs/logo_nodamoney.png" Pack="true" PackagePath="\" Visible="false"/>
-    <None Include="../../README.md" Pack="true" PackagePath="\" Visible="false"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MinVer" Version="6.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Roslynator.Analyzers" Version="4.13.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="MinVer" PrivateAssets="all" Version="6.0.0" />  
+    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" Version="4.13.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +51,16 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[2.0.0,10.0.0)" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="[2.0.0,10.0.0)" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[2.0.0,10.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Add InternalsVisibleTo to src projects to enable testing internal methods https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm -->
+    <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_nodamoney.png" Pack="true" PackagePath="\" Visible="false"/>
+    <None Include="../../README.md" Pack="true" PackagePath="\" Visible="false"/>
   </ItemGroup>
 
 </Project>

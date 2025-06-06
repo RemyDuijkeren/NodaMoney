@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;net8.0;net48;net6.0</TargetFrameworks>
-    <AssemblyName>NodaMoney.Tests</AssemblyName>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- <Nullable>enable</Nullable> -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit"/>
     <Using Include="FluentAssertions"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
   </ItemGroup>
 
   <ItemGroup>

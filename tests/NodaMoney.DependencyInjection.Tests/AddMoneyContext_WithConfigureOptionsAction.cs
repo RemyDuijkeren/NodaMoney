@@ -10,27 +10,26 @@ public class AddMoneyContext_WithConfigureOptionsAction
     public void ThrowArgumentNullException_When_ServicesIsNull()
     {
         // Arrange
-        IServiceCollection services = null;
+        IServiceCollection? services = null;
         Action<MoneyContextOptions> configureOptions = _ => { };
 
         // Act
-        Action act = () => services.AddMoneyContext(configureOptions);
+        Action act = () => services!.AddMoneyContext(configureOptions);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
            .WithParameterName("services");
     }
 
-
     [Fact]
     public void ThrowArgumentNullException_When_ConfigureOptionsIsNull()
     {
         // Arrange
         var services = new ServiceCollection();
-        Action<MoneyContextOptions> configureOptions = null;
+        Action<MoneyContextOptions>? configureOptions = null;
 
         // Act
-        Action act = () => services.AddMoneyContext(configureOptions);
+        Action act = () => services.AddMoneyContext(configureOptions!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
