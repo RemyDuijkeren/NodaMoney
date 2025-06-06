@@ -9,11 +9,12 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/NodaMoney/NodaMoney.csproj" />
-    <Project Path="src\NodaMoney.DependencyInjection\NodaMoney.DependencyInjection.csproj" Type="Classic C#" />
+    <Project Path="src/NodaMoney.DependencyInjection/NodaMoney.DependencyInjection.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Benchmark/Benchmark.csproj" />
     <Project Path="tests/NodaMoney.Tests/NodaMoney.Tests.csproj" />
+    <Project Path="tests/NodaMoney.DependencyInjection.Tests/NodaMoney.DependencyInjection.Tests.csproj" />
   </Folder>
   <Folder Name="/workflows/">
     <File Path=".github/workflows/ci.yml" />

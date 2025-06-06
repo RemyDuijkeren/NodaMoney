@@ -40,12 +40,13 @@ public class DefaultFormat
     [UseCulture("en-US")]
     public void WhenCurrentCultureUS_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureUS()
     {
+        // The US default negative pattern for .NET4.8 is Pattern 0 `($n)`, where >.NET6.0 uses Pattern 1 `-$n`
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-        _yen.ToString().Should().Be("-¥98,765");
-        _euro.ToString().Should().Be("-€98,765.43");
-        _dollar.ToString().Should().Be("-$98,765.43");
-        _dinar.ToString().Should().Be("-BD98,765.432");
-        _swissFranc.ToString().Should().Be("-Fr.98,765.43");
+        _yen.ToString().Should().BeOneOf("-¥98,765", "(¥98,765)");
+        _euro.ToString().Should().BeOneOf("-€98,765.43", "(€98,765.43)");
+        _dollar.ToString().Should().BeOneOf("-$98,765.43", "($98,765.43)");
+        _dinar.ToString().Should().BeOneOf("-BD98,765.432", "(BD98,765.432)");
+        _swissFranc.ToString().Should().BeOneOf("-Fr.98,765.43", "(Fr.98,765.43)");
     }
 
     [Fact]

@@ -26,7 +26,12 @@ public class XmlSerializationHelper
         using var writer = XmlWriter.Create(stream, settings);
 
         var xmlSerializer = new XmlSerializer(source.GetType());
-        xmlSerializer.Serialize(writer, source);
+
+        // Suppress namespace declarations
+        var emptyNamespaces = new XmlSerializerNamespaces();
+        emptyNamespaces.Add("", "");
+
+        xmlSerializer.Serialize(writer, source, emptyNamespaces);
 
         return stream.ToString();
     }

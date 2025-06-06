@@ -104,7 +104,7 @@ public readonly partial struct Money : IEquatable<Money>
         // Use either provided context or the current global/thread-local context.
         MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
-        int contextIndex = currentContext.Index;
+        int contextIndex = currentContext!.Index;
 
         // Round the amount to the correct scale
         amount = currentContext.RoundingStrategy switch

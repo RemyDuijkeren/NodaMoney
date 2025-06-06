@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Xml;
 
 namespace NodaMoney.Tests.Serialization.XmlSerializationSpec;
 
@@ -36,10 +37,9 @@ public class SerializeMoney : XmlSerializationHelper
 
         // Act
         var xml = SerializeToXml(order);
-
         // Assert
         string xmlTotal = expectedXml.Replace("Money", "Total"); // replace <Money Currency="USD">765.43</Money> to <Total Currency="USD">765.43</Total>
-        xml.Should().Be($$"""<Order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></Order>""");
+        xml.Should().BeEquivalentTo($$"""<Order><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></Order>""");
     }
 
     [Theory]
@@ -54,7 +54,7 @@ public class SerializeMoney : XmlSerializationHelper
 
         // Assert
         string xmlTotal = expectedXml.Replace("Money", "Total"); // replace <Money Currency="USD">765.43</Money> to <Total Currency="USD">765.43</Total>
-        xml.Should().Be($$"""<NullableOrder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></NullableOrder>""");
+        xml.Should().Be($$"""<NullableOrder><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></NullableOrder>""");
     }
 
     [Fact]
@@ -68,20 +68,20 @@ public class SerializeMoney : XmlSerializationHelper
 
         // Assert
         string xmlTotal = """<Total Currency="XXX">0</Total>""";
-        xml.Should().Be($$"""<Order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></Order>""");
+        xml.Should().Be($$"""<Order><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></Order>""");
     }
 
     [Fact]
     public void WhenObjectWithNestedNullableMoneySetToDefault_ThenTotalShouldBeNull()
     {
         // Arrange
-        var order = new NullableOrder { Id = 123, Total = default, Name = "Foo" };
+        var order = new NullableOrder { Id = 123, Total = null, Name = "Foo" };
 
         // Act
         var xml = SerializeToXml(order);
 
         // Assert
-        string xmlTotal = """<Total xsi:nil="true" />""";
-        xml.Should().Be($$"""<NullableOrder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></NullableOrder>""");
+        string xmlTotal = """<Total p2:nil="true" xmlns:p2="http://www.w3.org/2001/XMLSchema-instance" />""";
+        xml.Should().Be($$"""<NullableOrder><Id>123</Id>{{xmlTotal}}<Name>Foo</Name></NullableOrder>""");
     }
 }
