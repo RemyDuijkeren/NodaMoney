@@ -1,10 +1,15 @@
 namespace NodaMoney.Context;
 
-public class MoneyContextOptions : IEquatable<MoneyContextOptions>
+public sealed class MoneyContextOptions : IEquatable<MoneyContextOptions>
 {
+    public const string ConfigurationSectionName = "MoneyContext";
+
     public IRoundingStrategy RoundingStrategy { get; set; } = new StandardRounding();
+
     public int Precision { get; set; } = 28;
+
     public int? MaxScale { get; set; }
+
     public CurrencyInfo? DefaultCurrency { get; set; }
 
     public bool Equals(MoneyContextOptions? other)

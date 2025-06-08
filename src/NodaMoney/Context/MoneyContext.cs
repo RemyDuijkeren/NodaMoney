@@ -11,6 +11,8 @@ public sealed class MoneyContext
     private static readonly AsyncLocal<MoneyContextIndex?> s_threadLocalContext = new();
     private static MoneyContext s_defaultThreadContext = new(new MoneyContextOptions());
 
+    private static readonly Dictionary<string, MoneyContextIndex> s_namedContexts = new(StringComparer.OrdinalIgnoreCase);
+
     private MoneyContextOptions Options { get; }
 
     /// <summary>Efficient lookup index (1-byte reference)</summary>
@@ -44,14 +46,7 @@ public sealed class MoneyContext
         Index = RegisterContext(this);
     }
 
-    public static MoneyContext Create(Action<MoneyContextOptions> configure)
-    {
-        var options = new MoneyContextOptions();
-        configure(options);
-        return Create(options);
-    }
-
-    public static MoneyContext Create(MoneyContextOptions options)
+    public static MoneyContext Create(MoneyContextOptions options, string? name = null)
     {
         if (options.Precision <= 0) throw new ArgumentOutOfRangeException(nameof(options.Precision), "Precision must be positive");
         if (options.MaxScale < 0) throw new ArgumentOutOfRangeException(nameof(options.MaxScale), "MaxScale cannot be negative");
@@ -65,6 +60,7 @@ public sealed class MoneyContext
             {
                 if (ctx.Options.Equals(options))
                 {
+                    AddNamedContext(ctx);
                     return ctx; // Return existing equivalent context
                 }
             }
@@ -75,7 +71,31 @@ public sealed class MoneyContext
         }
 
         // Create and register a new context if no match is found
-        return new MoneyContext(options);
+        MoneyContext context = new(options);
+        AddNamedContext(context);
+        return context;
+
+        void AddNamedContext(MoneyContext ctx)
+        {
+            if (string.IsNullOrEmpty(name)) return;
+
+            s_contextLock.EnterWriteLock();
+            try
+            {
+                s_namedContexts[name] = ctx.Index;
+            }
+            finally
+            {
+                s_contextLock.ExitWriteLock();
+            }
+        }
+    }
+
+    public static MoneyContext Create(Action<MoneyContextOptions> configureOptions, string? name = null)
+    {
+        var options = new MoneyContextOptions();
+        configureOptions(options);
+        return Create(options, name);
     }
 
     /// <summary>
@@ -98,11 +118,18 @@ public sealed class MoneyContext
             DefaultCurrency = defaultCurrency
         });
 
-    public static MoneyContext CreateAndSetDefault(MoneyContextOptions options)
+    public static MoneyContext CreateAndSetDefault(MoneyContextOptions options, string? name = null)
     {
-        MoneyContext context = Create(options);
+        MoneyContext context = Create(options, name);
         DefaultThreadContext = context;
         return context;
+    }
+
+    public static MoneyContext CreateAndSetDefault(Action<MoneyContextOptions> configureOptions, string? name = null)
+    {
+        var options = new MoneyContextOptions();
+        configureOptions(options);
+        return CreateAndSetDefault(options, name);
     }
 
     /// <summary>Gets or sets the default global <see cref="MoneyContext"/> instance that acts as a fallback context.</summary>
@@ -157,6 +184,28 @@ public sealed class MoneyContext
         }
     }
 
+    /// <summary>Retrieves a <see cref="MoneyContext"/> instance by its registered name, if available.</summary>
+    /// <param name="name">The name of the registered <see cref="MoneyContext"/> to retrieve.</param>
+    /// <returns>The <see cref="MoneyContext"/> instance corresponding to the given name, or null if no matching context is found.</returns>
+    /// <exception cref="ArgumentException">Thrown if the provided name is null or empty.</exception>
+    public static MoneyContext? Get(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("Context name cannot be null or empty", nameof(name));
+
+        s_contextLock.EnterReadLock();
+        try
+        {
+            return s_namedContexts.TryGetValue(name, out var moneyContextIndex)
+                ? Get(moneyContextIndex)
+                : null;
+        }
+        finally
+        {
+            s_contextLock.ExitReadLock();
+        }
+    }
+
     private static MoneyContextIndex RegisterContext(MoneyContext context)
     {
         s_contextLock.EnterWriteLock(); // Ensure write exclusivity
@@ -170,9 +219,7 @@ public sealed class MoneyContext
                 }
             }
 
-            // Ensure we don't exceed the 7-bits index limit (128 contexts)
-
-            var newIndex = MoneyContextIndex.New();
+            var newIndex = MoneyContextIndex.New(); // Max index is 127 (128 contexts)
             s_activeContexts[newIndex] = context;
             return newIndex;
         }
@@ -205,6 +252,15 @@ public sealed class MoneyContext
         ThreadContext = context;
         return new ContextScope(() => ThreadContext = previous);
     }
+
+    public static IDisposable CreateScope(Action<MoneyContextOptions> configureOptions)
+        => CreateScope(Create(configureOptions));
+
+    public static IDisposable CreateScope(MoneyContextOptions options)
+        => CreateScope(Create(options));
+
+    public static IDisposable CreateScope(string name)
+        => CreateScope(Get(name) ?? throw new ArgumentException($"No context with name '{name}' found", nameof(name)));
 
     private class ContextScope(Action onDispose) : IDisposable
     {

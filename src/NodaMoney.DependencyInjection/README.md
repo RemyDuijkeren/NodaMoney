@@ -1,189 +1,131 @@
-# DI Registration Methods: Priority Ranking
+NodaMoney Dependency Injection Extensions
+=========================================
 
-Here's my prioritized ranking of the extension methods for registering `MoneyContext` in DI, from most important to least important:
+[![NuGet](https://img.shields.io/nuget/dt/NodaMoney.DependencyInjection.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney.DependencyInjection)
+[![NuGet](https://img.shields.io/nuget/v/NodaMoney.DependencyInjection.svg?logo=nuget)](https://www.nuget.org/packages/NodaMoney.DependencyInjection)
+[![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney.DependencyInjection)
+[![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
 
-## 1. Action-based Configuration (Highest Priority)
+About
+-----
+This package provides extension methods to easily integrate NodaMoney's MoneyContext with .NET's dependency injection system.
+
+Usage
+-----
+
 ```csharp
-public static IServiceCollection AddDefaultMoneyContext(
-    this IServiceCollection services,
-    Action<MoneyContextOptions> configureOptions)
-```
+// Add default MoneyContext with standard configuration
+services.AddMoneyContext();
 
-
-**Why it's important:**
-- Follows the standard .NET Options pattern that developers are familiar with
-- Highly versatile for most common scenarios
-- Compatible with Microsoft's recommended practices
-- Your test suite already validates this implementation
-- Allows clean, fluent configuration with lambda expressions
-
-**Example use case:** Basic application setup with explicit configuration.
-
-## 2. Configuration-based Setup (High Priority)
-```csharp
-public static IServiceCollection AddDefaultMoneyContext(
-    this IServiceCollection services,
-    IConfiguration configuration,
-    string sectionName = "MoneyContext")
-```
-
-
-**Why it's important:**
-- Seamlessly integrates with ASP.NET Core's configuration system
-- Enables configuration through appsettings.json, environment variables, etc.
-- Very common pattern for modern .NET applications
-- Reduces code needed for basic setup scenarios
-- Allows for deployment-specific configuration without code changes
-
-**Example use case:** Production applications where configuration might change between environments.
-
-## 3. Named Contexts Support (Medium-High Priority)
-```csharp
-public static IServiceCollection AddNamedMoneyContext(
-    this IServiceCollection services,
-    string name,
-    Action<MoneyContextOptions> configureOptions)
-```
-
-
-**Why it's important:**
-- Enables more complex scenarios with multiple contexts
-- Critical for international applications or multi-region financial systems
-- Provides isolation between different financial contexts
-- Follows the pattern of other named configuration in .NET (like named HttpClients)
-
-**Example use case:** Multi-region financial application with different currencies and rounding rules.
-
-## 4. Factory-based Configuration (Medium Priority)
-```csharp
-public static IServiceCollection AddDefaultMoneyContext(
-    this IServiceCollection services,
-    Func<IServiceProvider, MoneyContextOptions> optionsFactory)
-```
-
-
-**Why it's important:**
-- Enables advanced scenarios where options depend on other services
-- Provides maximum flexibility for complex configuration requirements
-- Useful for integrating with legacy systems or external dependencies
-- Allows runtime decisions about configuration
-
-**Example use case:** When context configuration needs to be determined by external services or databases.
-
-## 5. Simplified/Shorthand Configuration (Lower Priority)
-```csharp
-public static IServiceCollection AddDefaultMoneyContext(
-    this IServiceCollection services,
-    string defaultCurrencyCode,
-    int precision = 28,
-    int? maxScale = null)
-```
-
-
-**Why it's less important:**
-- Primarily a convenience method that doesn't add major new functionality
-- Can lead to method proliferation with variations for different parameters
-- The action-based configuration is already quite concise
-- May need to be updated if the options class changes
-
-**Example use case:** Quick configuration for the most common scenario.
-
-## 6. Direct Options Instance Method (Lowest Priority)
-```csharp
-public static IServiceCollection AddDefaultMoneyContext(
-    this IServiceCollection services,
-    MoneyContextOptions options)
-```
-
-
-**Why it's least important:**
-- Very similar to the action-based method with minimal added value
-- Doesn't integrate with the standard Options pattern
-- Pre-configured options can still be passed to the action-based method
-- Less flexible than other approaches for most scenarios
-
-**Example use case:** Unit testing or when options are created programmatically.
-
-## Implementation Recommendation
-
-Based on this prioritization and your performance-focused library, I would recommend implementing:
-
-1. **Action-based Configuration** (already implemented)
-2. **Configuration-based Setup** (implement next)
-3. **Named Contexts Support** (implement if multi-context scenarios are important)
-
-If you can only implement one or two more methods, focus on these as they cover the most common usage patterns while keeping your API surface concise and maintainable.
-
-The factory-based approach and other methods can be added later if users request them or if you identify specific scenarios where they would provide significant value.
-
-## Names Context
-
-### 1. Registering Named Contexts
-``` csharp
-// In Startup.ConfigureServices
-services.AddNamedMoneyContext("US", options =>
+// Access the MoneyContext in your services
+public class PaymentService
 {
-    options.DefaultCurrency = CurrencyInfo.FromCode("USD");
+    private readonly MoneyContext _moneyContext;
+
+    public PaymentService(MoneyContext moneyContext)
+    {
+        _moneyContext = moneyContext;
+    }
+
+    // Use _moneyContext for calculations
+}
+```
+
+Configuration Options
+---------------------
+
+NodaMoney provides several ways to configure the MoneyContext, following Microsoft's recommended patterns for library authors.
+
+### Using Action-based Configuration
+
+```csharp
+services.AddMoneyContext(options => {
+    options.DefaultCurrency = Currency.FromCode("USD");
     options.RoundingStrategy = new HalfUpRounding();
-});
-
-services.AddNamedMoneyContext("EU", options =>
-{
-    options.DefaultCurrency = CurrencyInfo.FromCode("EUR");
-    options.RoundingStrategy = new HalfEvenRounding();
+    options.Precision = 28;
+    options.MaxScale = 2;
 });
 ```
 
-### 2. Using Named Contexts in Services
-``` csharp
-public class InternationalOrderService
+### Using Configuration System
+
+```csharp
+// Option 1: Using pre-scoped configuration section
+var moneyContextSection = Configuration.GetSection("MoneyContext");
+services.AddMoneyContext(moneyContextSection);
+
+// Option 2: Using root configuration with section path
+services.AddMoneyContext(
+    Configuration,
+    "MoneyContext" // or any custom path like "App:Finance:MoneyContext"
+);
+```
+
+Example `appsettings.json`:
+
+```json
+{
+  "MoneyContext": {
+    "DefaultCurrency": "EUR",
+    "Precision": 28,
+    "MaxScale": 2
+  }
+}
+```
+
+### Using Direct Options Instance
+
+```csharp
+var options = new MoneyContextOptions {
+    DefaultCurrency = Currency.FromCode("USD"),
+    RoundingStrategy = new HalfUpRounding()
+};
+services.AddMoneyContext(options);
+```
+
+## Named Contexts
+
+For applications that need to work with multiple currencies or rounding rules:
+
+```csharp
+// Register multiple named contexts
+services.AddMoneyContext(options => {
+    options.DefaultCurrency = Currency.FromCode("USD");
+    options.RoundingStrategy = new HalfUpRounding();
+}, name: "US");
+
+services.AddMoneyContext(options => {
+    options.DefaultCurrency = Currency.FromCode("EUR");
+    options.RoundingStrategy = new HalfEvenRounding();
+}, name: "EU");
+
+// Access named contexts in your services
+public class InternationalPaymentService
 {
     private readonly IMoneyContextResolver _contextResolver;
 
-    public InternationalOrderService(IMoneyContextResolver contextResolver)
+    public InternationalPaymentService(IMoneyContextResolver contextResolver)
     {
         _contextResolver = contextResolver;
     }
 
-    public Money CalculatePrice(string regionCode, decimal amount)
+    public Money CalculatePrice(string region, decimal amount)
     {
-        // Get the appropriate context for the region
-        string contextName = regionCode switch
-        {
-            "US" => "US",
-            "CA" => "US", // Use US context for Canada too
-            "JP" => "JP",
-            _ => "EU"     // Default to EU for other regions
-        };
+        // Get appropriate context based on region
+        var contextName = region == "US" ? "US" : "EU";
+        var context = _contextResolver.GetContext(contextName);
 
-        // Use the context to create a money object
-        using var scope = MoneyContext.CreateScope(_contextResolver.GetContext(contextName));
-        return new Money(amount); // Uses the context's default currency and rounding
-    }
-}
-```
-### 2. Using Named Contexts in Application Code
-``` csharp
-public class InternationalOrderService
-{
-    public Money CalculatePrice(string regionCode, decimal amount)
-    {
-        // Get the appropriate context for the region
-        string contextName = regionCode switch
-        {
-            "US" or "CA" => "US",
-            "JP" => "JP",
-            _ => "EU"
-        };
-
-        // Use the context to create a money object
-        using var scope = MoneyContext.CreateNamedScope(contextName);
-        return new Money(amount); // Uses the context's default currency and rounding
+        // Use context for calculation
+        using var scope = MoneyContext.CreateScope(context);
+        return new Money(amount); // Uses the scoped context
     }
 }
 ```
 
 ## Real-world Scenarios for Named Contexts
+
+Named contexts are particularly useful in scenarios where different parts of an application need to handle money with varying rules, such as different currencies, rounding strategies, or precision settings. Here are some real-world scenarios where named contexts would be beneficial:
+
 1. **Multi-regional Applications**: Applications that operate in multiple countries and need to handle different currencies and rounding rules.
 2. **Financial Services**: Companies that process transactions in multiple currencies with different rounding rules for different types of operations.
 3. **Accounting Systems**: Systems that need to maintain accounts in both local and reporting currencies.
