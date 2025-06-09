@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- <Nullable>enable</Nullable> -->
     <IsPackable>false</IsPackable>
+<!--    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
 
     <PackageReference Include="FluentAssertions" Version="[7.0.0,8.0.0)" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1" />
+    <PackageReference Include="System.Text.Json" Version="[8.0.5,9.0.0)" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 
     <PackageReference Include="RavenDB.TestDriver" Version="7.0.2" Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'" />
