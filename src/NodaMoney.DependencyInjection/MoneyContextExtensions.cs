@@ -170,8 +170,5 @@ public static class MoneyContextExtensions
                 return MoneyContext.Create(options, name);
             });
         }
-
-        // Register IMoneyContextAccessor for application code to use
-        services.TryAddSingleton<IMoneyContextResolver, MoneyContextResolver>();
     }
 }
