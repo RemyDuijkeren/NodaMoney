@@ -45,9 +45,9 @@ jobs:
       - name: 🚦 Test
         id: test
         run: |
-          dotnet test -f net6.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-          dotnet test -f net8.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-          dotnet test -f net9.0 -c Release -l trx --results-directory ./artifacts/ --no-build
+          dotnet test -f net6.0 -c Release -l "trx;LogFileName=net6.0-tests.trx" --results-directory ./artifacts/ --no-build
+          dotnet test -f net8.0 -c Release -l "trx;LogFileName=net8.0-tests.trx" --results-directory ./artifacts/ --no-build
+          dotnet test -f net9.0 -c Release -l "trx;LogFileName=net9.0-tests.trx" --results-directory ./artifacts/ --no-build
 
       - name: 📋 Test reporter
         uses: dorny/test-reporter@v2
@@ -56,6 +56,7 @@ jobs:
           name: unittests
           path: ./artifacts/*.trx
           reporter: dotnet-trx
+          list-tests: 'failed'
 
       - name: 📦 Pack
         run: dotnet pack -c Release -o ./artifacts/ --no-build
