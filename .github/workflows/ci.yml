@@ -56,6 +56,7 @@ jobs:
           name: unittests
           path: ./artifacts/*.trx
           reporter: dotnet-trx
+          list-suites: 'failed'
           list-tests: 'failed'
 
       - name: 📦 Pack

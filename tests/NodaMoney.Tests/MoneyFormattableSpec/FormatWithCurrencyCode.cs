@@ -1,4 +1,5 @@
 using System.Threading;
+using NodaMoney.Context;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyFormattableSpec;
@@ -71,6 +72,7 @@ public class FormatWithCurrencyCode
     public void WhenZeroDecimals_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+        MoneyContext.CurrentContext.Should().Be(MoneyContext.CreateDefault());
         _yen.ToString("G0").Should().Be("JPY -98.765");
         _euro.ToString("G0").Should().Be("EUR -98.765");
         _dollar.ToString("G0").Should().Be("USD -98.765");
@@ -83,6 +85,7 @@ public class FormatWithCurrencyCode
     public void WhenOneDecimals_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+        MoneyContext.CurrentContext.Should().Be(MoneyContext.CreateDefault());
         _yen.ToString("G1").Should().Be("JPY -98.765,0");
         _euro.ToString("G1").Should().Be("EUR -98.765,4");
         _dollar.ToString("G1").Should().Be("USD -98.765,4");
@@ -95,6 +98,7 @@ public class FormatWithCurrencyCode
     public void WhenTwoDecimals_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+        MoneyContext.CurrentContext.Should().Be(MoneyContext.CreateDefault());
         _yen.ToString("G2").Should().Be("JPY -98.765,00");
         _euro.ToString("G2").Should().Be("EUR -98.765,43");
         _dollar.ToString("G2").Should().Be("USD -98.765,43");
@@ -107,6 +111,7 @@ public class FormatWithCurrencyCode
     public void WhenThreeDecimals_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+        MoneyContext.CurrentContext.Should().Be(MoneyContext.CreateDefault());
         _yen.ToString("G3").Should().Be("JPY -98.765,000");
         _euro.ToString("G3").Should().Be("EUR -98.765,430");
         _dollar.ToString("G3").Should().Be("USD -98.765,430");
@@ -119,6 +124,8 @@ public class FormatWithCurrencyCode
     public void WhenFourDecimals_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-NL");
+        MoneyContext.CurrentContext.Should().Be(MoneyContext.CreateDefault());
+
         _yen.ToString("G4").Should().Be("JPY -98.765,0000");
         _euro.ToString("G4").Should().Be("EUR -98.765,4300");
         _dollar.ToString("G4").Should().Be("USD -98.765,4300");

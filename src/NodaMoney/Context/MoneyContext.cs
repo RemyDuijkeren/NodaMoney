@@ -233,6 +233,10 @@ public sealed class MoneyContext
     /// <returns>A <see cref="MoneyContext"/> instance configured with no rounding.</returns>
     internal static MoneyContext CreateNoRounding() => Create(new NoRounding());
 
+    /// <summary>Creates a default instance of the <see cref="MoneyContext"/> class with standard configuration.</summary>
+    /// <returns>A <see cref="MoneyContext"/> instance configured with default options.</returns>
+    internal static MoneyContext CreateDefault() => Create(new MoneyContextOptions());
+
     /// <summary>Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.</summary>
     /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>
     /// <param name="precision">The total number of significant digits for monetary calculations. Defaults to 28.</param>
