@@ -25,6 +25,7 @@ public class CreateContext
     public void SetGlobalContext()
     {
         // Arrange
+        var beforeDefault = MoneyContext.DefaultThreadContext;
         var context = MoneyContext.Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4);
 
         // Act
@@ -36,6 +37,8 @@ public class CreateContext
         money.Context.Should().Be(context);
         money.Scale.Should().Be(4);
         money.Amount.Should().Be(1234.5679m);
+
+        MoneyContext.DefaultThreadContext = beforeDefault; // reset
     }
 
     [Fact]

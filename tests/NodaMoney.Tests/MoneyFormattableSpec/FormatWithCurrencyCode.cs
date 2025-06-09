@@ -1,4 +1,3 @@
-using System.Threading;
 using NodaMoney.Context;
 using NodaMoney.Tests.Helpers;
 
