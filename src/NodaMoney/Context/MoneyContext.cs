@@ -82,7 +82,7 @@ public sealed class MoneyContext
             s_contextLock.EnterWriteLock();
             try
             {
-                s_namedContexts[name] = ctx.Index;
+                s_namedContexts[name!] = ctx.Index;
             }
             finally
             {

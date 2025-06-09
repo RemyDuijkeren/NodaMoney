@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFrameworks>net9.0;net8.0;net48;net6.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -16,15 +16,19 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\NodaMoney.DependencyInjection\NodaMoney.DependencyInjection.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-      <PackageReference Include="xunit" Version="2.9.3" />
-      <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="true" Version="3.1.0" />
-      <PackageReference Include="coverlet.collector" PrivateAssets="true" Version="6.0.4" />
-      <PackageReference Include="FluentAssertions" Version="[7.0.0,8.0.0)" />
 
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" />
+    <ItemGroup>
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" Condition="'$(TargetFramework)' != 'net6.0'" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="'$(TargetFramework)' == 'net6.0'" />
+      <PackageReference Include="xunit" Version="2.9.3" />
+      <PackageReference Include="xunit.analyzers" PrivateAssets="true" Version="1.21.0" />
+      <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0" PrivateAssets="true" Condition="'$(TargetFramework)' != 'net6.0'" />
+      <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="true" Condition="'$(TargetFramework)' == 'net6.0'" />
+      <PackageReference Include="coverlet.collector" PrivateAssets="true" Version="6.0.4" />
+
+      <PackageReference Include="FluentAssertions" Version="[7.0.0,8.0.0)" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" Condition="'$(TargetFramework)' != 'net6.0'" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" Condition="'$(TargetFramework)' == 'net6.0'" />
     </ItemGroup>
 
 </Project>
