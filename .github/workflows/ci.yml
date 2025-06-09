@@ -77,12 +77,18 @@ jobs:
           dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
           dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
 
-      - name: 🗑️ Delete old pre-release packages
+      - name: 🗑️ Delete old pre-release packages NodaMoney
         uses: actions/delete-package-versions@v5
         with:
-          package-name: |
-            NodaMoney
-            NodaMoney.DependencyInjection
+          package-name: NodaMoney
+          package-type: nuget
+          min-versions-to-keep: 10
+          delete-only-pre-release-versions: true
+
+      - name: 🗑️ Delete old pre-release packages NodaMoney.DependencyInjection
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: NodaMoney.DependencyInjection
           package-type: nuget
           min-versions-to-keep: 10
           delete-only-pre-release-versions: true

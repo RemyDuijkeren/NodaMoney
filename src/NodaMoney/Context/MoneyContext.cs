@@ -12,6 +12,7 @@ public sealed class MoneyContext
     private static MoneyContext s_defaultThreadContext = new(new MoneyContextOptions());
 
     private static readonly Dictionary<string, MoneyContextIndex> s_namedContexts = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<MidpointRounding, MoneyContext> s_standardRoundingContexts = new(5);
 
     private MoneyContextOptions Options { get; }
 
@@ -37,6 +38,19 @@ public sealed class MoneyContext
     /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
     /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
     public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
+
+    static MoneyContext()
+    {
+        // Pre-initialize contexts for all standard rounding modes
+        s_standardRoundingContexts[MidpointRounding.ToEven] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
+        s_standardRoundingContexts[MidpointRounding.AwayFromZero] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero) });
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+        // These rounding modes are only available in .NET Core 3.0+ and later
+        s_standardRoundingContexts[MidpointRounding.ToZero] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToZero) });
+        s_standardRoundingContexts[MidpointRounding.ToNegativeInfinity] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToNegativeInfinity) });
+        s_standardRoundingContexts[MidpointRounding.ToPositiveInfinity] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
+#endif
+    }
 
     private MoneyContext(MoneyContextOptions options)
     {
@@ -117,6 +131,21 @@ public sealed class MoneyContext
             MaxScale = maxScale,
             DefaultCurrency = defaultCurrency
         });
+
+    /// <summary>Fast path for creating a new instance of the <see cref="MoneyContext"/> class with a standard rounding mode.</summary>
+    /// <param name="mode">The <see cref="MidpointRounding"/> mode to be applied for monetary calculations.</param>
+    /// <returns>A <see cref="MoneyContext"/> instance corresponding to the specified rounding mode.</returns>
+    internal static MoneyContext Create(MidpointRounding mode)
+    {
+        // This is a fast path that avoids creating a new context for standard rounding modes
+        if (s_standardRoundingContexts.TryGetValue(mode, out var context))
+        {
+            return context;
+        }
+
+        // Fallback for any future rounding modes that might be added
+        return Create(new StandardRounding(mode));
+    }
 
     public static MoneyContext CreateAndSetDefault(MoneyContextOptions options, string? name = null)
     {

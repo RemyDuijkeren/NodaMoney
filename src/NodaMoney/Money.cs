@@ -79,7 +79,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, Currency currency, MidpointRounding mode)
-        : this(amount, currency, MoneyContext.Create(new StandardRounding(mode))) { }
+        : this(amount, currency, MoneyContext.Create(mode)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -104,7 +104,6 @@ public readonly partial struct Money : IEquatable<Money>
         // Use either provided context or the current global/thread-local context.
         MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
-        int contextIndex = currentContext!.Index;
 
         // Round the amount to the correct scale
         amount = currentContext.RoundingStrategy switch
@@ -126,7 +125,7 @@ public readonly partial struct Money : IEquatable<Money>
         _mid = bits[1];
         _high = bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((contextIndex << 24) & IndexMask)   // Store Index in bits 24–30
+                 | ((currentContext.Index << 24) & IndexMask)   // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask));  // Preserve Scale Factor (16–23) and Sign (31)
     }
 

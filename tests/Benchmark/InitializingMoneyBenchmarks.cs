@@ -11,13 +11,13 @@ public class InitializingMoneyBenchmarks
     readonly Money _money = new Money(10m, "EUR");
 
     [Benchmark(Baseline = true)]
-    public Money CurrencyCodeDefaultRounding()
+    public Money CurrencyCode()
     {
         return new Money(6.54m, "EUR");
     }
 
     [Benchmark]
-    public Money CurrencyCodeAndRounding()
+    public Money CurrencyCodeAndRoundingMode()
     {
         return new Money(765.425m, "EUR", MidpointRounding.AwayFromZero);
     }
