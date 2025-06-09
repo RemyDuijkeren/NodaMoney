@@ -7,6 +7,7 @@ on:
       - '**' # all branches but excludes tags
     paths-ignore:
       - docs/**
+  workflow_call:
 
 jobs:
   build:
@@ -49,7 +50,7 @@ jobs:
           dotnet test -f net9.0 -c Release -l trx --results-directory ./artifacts/ --no-build
 
       - name: 📋 Test reporter
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always() && steps.test.outcome != 'skipped'
         with:
           name: unittests
@@ -59,15 +60,27 @@ jobs:
       - name: 📦 Pack
         run: dotnet pack -c Release -o ./artifacts/ --no-build
 
+      - name: 📤 Upload Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: Packages
+          path: |
+            ./artifacts/*.nupkg
+            ./artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 10
+
       - name: 🚀 Push to GitHub
         run: |
-          dotnet nuget add source --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+          dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
 
       - name: 🗑️ Delete old pre-release packages
         uses: actions/delete-package-versions@v5
         with:
-          package-name: NodaMoney
+          package-name: |
+            NodaMoney
+            NodaMoney.DependencyInjection
           package-type: nuget
           min-versions-to-keep: 10
           delete-only-pre-release-versions: true

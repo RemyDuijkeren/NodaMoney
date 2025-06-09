@@ -9,59 +9,28 @@ on:
 
 jobs:
   build:
+    uses: ./.github/workflows/ci.yml
 
+  release:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       checks: write
-      packages: write
+      packages: read
 
     steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          filter: tree:0
-
       - name: 🛠️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            6.0.x
-            8.0.x
-            9.0.x
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          dotnet-version: 9.0.x
 
-      - name: 💾 Restore dependencies
-        run: dotnet restore
-
-      - name: ⚙️ Build
-        run: dotnet build -c Release --no-restore
-
-      - name: 🚦 Test
-        id: test
-        run: |
-          dotnet test -f net6.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-          dotnet test -f net8.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-          dotnet test -f net9.0 -c Release -l trx --results-directory ./artifacts/ --no-build
-
-      - name: 📋 Test reporter
-        uses: dorny/test-reporter@v1
-        if: always() && steps.test.outcome != 'skipped'
+      - name: 📥 Download Packages
+        uses: actions/download-artifact@v4
         with:
-          name: unittests
-          path: ./artifacts/*.trx
-          reporter: dotnet-trx
-
-      - name: 📦 Pack
-        run: dotnet pack -c Release -o ./artifacts/ --no-build
+          name: Packages
+          path: ./pkg/
 
       - name: 🚀 Push to NuGet
-        run: dotnet nuget push **/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-
-      - name: 🚀 Push to GitHub
         run: |
-          dotnet nuget add source --username RemyDuijkeren --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          dotnet nuget push ./pkg/**/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push ./pkg/**/*.snupkg --symbol-api-key ${{secrets.NUGET_API_KEY}} --symbol-source https://api.nuget.org/v3/index.json
