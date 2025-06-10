@@ -104,7 +104,7 @@ public class CreateMoney
     {
         // Arrange
         var value = input;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
 
         // Act
@@ -125,7 +125,7 @@ public class CreateMoney
     {
         // Arrange
         var value = input;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         var result = money with { ContextIndex = (MoneyContextIndex)index };
@@ -145,7 +145,7 @@ public class CreateMoney
     {
         // Arrange
         var value = input;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         var result = money with { ContextIndex = (MoneyContextIndex)index };
@@ -165,7 +165,7 @@ public class CreateMoney
     {
         // Arrange
         var value = input;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         var result = money with { ContextIndex = (MoneyContextIndex)index };
@@ -185,7 +185,7 @@ public class CreateMoney
     {
         // Arrange
         var value = Decimal.MaxValue;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         var result = money with { ContextIndex = (MoneyContextIndex)index };
@@ -205,7 +205,7 @@ public class CreateMoney
     {
         // Arrange
         var value = Decimal.MinValue;
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         var result = money with { ContextIndex = (MoneyContextIndex)index };
@@ -220,7 +220,7 @@ public class CreateMoney
         // Arrange
         var value = 0m;
         byte invalidIndex = 200; // Larger than 127
-        Money money = new(value, _euro, MoneyContext.CreateNoRounding());
+        Money money = new(value, _euro, MoneyContext.NoRounding);
 
         // Act
         Action act = () => { var _ = money with { ContextIndex = (MoneyContextIndex)invalidIndex }; };

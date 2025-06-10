@@ -71,7 +71,7 @@ public partial struct Money : IXmlSerializable, ISerializable
                               new SerializationException("Member 'Currency' could not be converted from string to Currency."));
 
         // No rounding, because we are deserializing the exact state that was serialized.
-        ContextIndex = MoneyContext.CreateNoRounding().Index;
+        ContextIndex = MoneyContext.NoRounding.Index;
         Amount = amount;
     }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.

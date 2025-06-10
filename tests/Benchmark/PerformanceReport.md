@@ -44,6 +44,19 @@
 | ImplicitCurrencyByCasting     | 79.848 ns | 1.5551 ns | 1.3785 ns |  2.33 |    0.07 | 0.0038 |      32 B |          NA |
 | Deconstruct                   |  1.182 ns | 0.0204 ns | 0.0170 ns |  0.03 |    0.00 |      - |         - |          NA |
 
+| Method                        |      Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|-------------------------------|----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+| CurrencyCode                  | 34.854 ns | 0.6081 ns | 0.5390 ns |  1.00 |    0.02 |      - |         - |          NA |
+| CurrencyCodeAndRoundingMode   | 48.996 ns | 0.9924 ns | 0.9747 ns |  1.41 |    0.03 | 0.0057 |      48 B |          NA |
+| CurrencyCodeAndContext        | 39.711 ns | 0.5113 ns | 0.4269 ns |  1.14 |    0.02 |      - |         - |          NA |
+| CurrencyFromCode              | 33.880 ns | 0.1862 ns | 0.1454 ns |  0.97 |    0.01 |      - |         - |          NA |
+| CurrencyInfoFromCode          | 32.192 ns | 0.6746 ns | 0.6311 ns |  0.92 |    0.02 |      - |         - |          NA |
+| ExtensionMethodEuro           | 35.161 ns | 0.4806 ns | 0.4260 ns |  1.01 |    0.02 |      - |         - |          NA |
+| ImplicitCurrencyByConstructor | 82.444 ns | 0.9052 ns | 0.8468 ns |  2.37 |    0.04 | 0.0038 |      32 B |          NA |
+| ImplicitCurrencyByCasting     | 82.892 ns | 0.5695 ns | 0.5048 ns |  2.38 |    0.04 | 0.0038 |      32 B |          NA |
+| Deconstruct                   |  1.048 ns | 0.0195 ns | 0.0173 ns |  0.03 |    0.00 |      - |         - |          NA |
+
+
 ## MoneyOperations
 #### before (v1.x)
 | Method                   |      Mean |    Error |    StdDev | Allocated |

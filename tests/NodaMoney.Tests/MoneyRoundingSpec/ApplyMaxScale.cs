@@ -25,7 +25,7 @@ public class ApplyMaxScale
     {
         // Arrange
         var amount = 1234.56789m;
-        MoneyContext context = MoneyContext.Create(new StandardRounding(), maxScale: 4); // Rounding to 4 decimals
+        MoneyContext context = MoneyContext.Create(options => options.MaxScale = 4);
 
         // Act
         MoneyContext.CreateScope(context);
@@ -42,7 +42,7 @@ public class ApplyMaxScale
     {
         // Arrange
         var amount = 1234.56789m;
-        MoneyContext context = MoneyContext.Create(new StandardRounding(), maxScale: 6); // Rounding to 4 decimals
+        MoneyContext context = MoneyContext.Create(options => options.MaxScale = 6);
 
         // Act
         MoneyContext.CreateScope(context);

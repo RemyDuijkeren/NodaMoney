@@ -1,3 +1,9 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
+
 namespace NodaMoney.Context;
 
 // TODO: Handling of Ambiguous Currency Symbols when formatting/parsing? Add configurable policy enforcement to
@@ -6,14 +12,18 @@ namespace NodaMoney.Context;
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 public sealed class MoneyContext
 {
+#if NET8_0_OR_GREATER // In .NET 8 or higher, we use FrozenDictionary for optimal immutability and performance
+    static readonly object s_lock = new();
+    private static FrozenDictionary<MoneyContextIndex, MoneyContext> s_activeContexts = new Dictionary<MoneyContextIndex, MoneyContext>(6).ToFrozenDictionary();
+    private static FrozenDictionary<string, MoneyContextIndex> s_namedContexts = new Dictionary<string, MoneyContextIndex>(6, StringComparer.OrdinalIgnoreCase).ToFrozenDictionary();
+#else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
     private static readonly ReaderWriterLockSlim s_contextLock = new();
     private static readonly Dictionary<MoneyContextIndex, MoneyContext> s_activeContexts = [];
+    private static readonly Dictionary<string, MoneyContextIndex> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
+#endif
+
     private static readonly AsyncLocal<MoneyContextIndex?> s_threadLocalContext = new();
-    private static MoneyContext s_defaultThreadContext = new(new MoneyContextOptions());
-
-    private static readonly Dictionary<string, MoneyContextIndex> s_namedContexts = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<MidpointRounding, MoneyContext> s_standardRoundingContexts = new(5);
-
+    private static MoneyContext s_defaultThreadContext;
     private MoneyContextOptions Options { get; }
 
     /// <summary>Efficient lookup index (1-byte reference)</summary>
@@ -39,22 +49,37 @@ public sealed class MoneyContext
     /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
     public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
 
+    /// <summary>Provides a predefined <see cref="MoneyContext"/> instance with no rounding strategy applied.</summary>
+    internal static MoneyContext NoRounding => Create(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
+
     static MoneyContext()
     {
-        // Pre-initialize contexts for all standard rounding modes
-        s_standardRoundingContexts[MidpointRounding.ToEven] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
-        s_standardRoundingContexts[MidpointRounding.AwayFromZero] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero) });
+        // Pre-initialize contexts for all standard rounding modes. Create contexts in the exact same order as the
+        // MidpointRounding enum values. This ensures that their indices align with the enum values for fast lookup.
+
+        var toEvenContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
+        Trace.Assert(toEvenContext.Index == (byte)MidpointRounding.ToEven, $"Index of ToEven context should be 0, but is {toEvenContext.Index}");
+        s_defaultThreadContext = toEvenContext; // Set default context to ToEven
+
+        var awayFromZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero) });
+        Trace.Assert(awayFromZeroContext.Index == (byte)MidpointRounding.AwayFromZero, $"Index of AwayFromZero context should be 1, but is {awayFromZeroContext.Index}");
+
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
-        // These rounding modes are only available in .NET Core 3.0+ and later
-        s_standardRoundingContexts[MidpointRounding.ToZero] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToZero) });
-        s_standardRoundingContexts[MidpointRounding.ToNegativeInfinity] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToNegativeInfinity) });
-        s_standardRoundingContexts[MidpointRounding.ToPositiveInfinity] = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
+        var toZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToZero) });
+        Trace.Assert(toZeroContext.Index == (byte)MidpointRounding.ToZero, $"Index of ToZero context should be 2, but is {toZeroContext.Index}");
+
+        var toNegInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToNegativeInfinity) });
+        Trace.Assert(toNegInfContext.Index == (byte)MidpointRounding.ToNegativeInfinity, $"Index of ToNegativeInfinity context should be 3, but is {toNegInfContext.Index}");
+
+        var toPosInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
+        Trace.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
 #endif
     }
 
     private MoneyContext(MoneyContextOptions options)
     {
-        Options = options ?? throw new ArgumentNullException(nameof(options));
+        Trace.Assert(options is not null, $"{nameof(options)} must not be null");
+        Options = options!;
 
         // Automatically register this context
         Index = RegisterContext(this);
@@ -62,10 +87,22 @@ public sealed class MoneyContext
 
     public static MoneyContext Create(MoneyContextOptions options, string? name = null)
     {
+        if (options is null) throw new ArgumentNullException(nameof(options));
         if (options.Precision <= 0) throw new ArgumentOutOfRangeException(nameof(options.Precision), "Precision must be positive");
         if (options.MaxScale < 0) throw new ArgumentOutOfRangeException(nameof(options.MaxScale), "MaxScale cannot be negative");
         if (options.MaxScale > options.Precision) throw new ArgumentException("MaxScale cannot be greater than precision");
 
+#if NET8_0_OR_GREATER
+        // Look for an equivalent context in the dictionary
+        foreach (MoneyContext ctx in s_activeContexts.Values)
+        {
+            if (ctx.Options.Equals(options))
+            {
+                AddNamedContext(ctx);
+                return ctx; // Return existing equivalent context
+            }
+        }
+#else
         s_contextLock.EnterReadLock();
         try
         {
@@ -83,6 +120,7 @@ public sealed class MoneyContext
         {
             s_contextLock.ExitReadLock();
         }
+#endif
 
         // Create and register a new context if no match is found
         MoneyContext context = new(options);
@@ -92,7 +130,14 @@ public sealed class MoneyContext
         void AddNamedContext(MoneyContext ctx)
         {
             if (string.IsNullOrEmpty(name)) return;
-
+#if NET8_0_OR_GREATER
+            lock (s_lock)
+            {
+                var mutableDictionary = s_namedContexts.ToDictionary();
+                mutableDictionary[name] = ctx.Index;
+                s_namedContexts = mutableDictionary.ToFrozenDictionary();
+            }
+#else
             s_contextLock.EnterWriteLock();
             try
             {
@@ -102,6 +147,7 @@ public sealed class MoneyContext
             {
                 s_contextLock.ExitWriteLock();
             }
+#endif
         }
     }
 
@@ -112,39 +158,31 @@ public sealed class MoneyContext
         return Create(options, name);
     }
 
-    /// <summary>
-    /// Creates a new instance of the <see cref="MoneyContext"/> class or retrieves an existing instance if an
-    /// equivalent context is already registered.
-    /// </summary>
-    /// <param name="roundingStrategy">The rounding strategy to be applied in monetary calculations.</param>
-    /// <param name="precision">The total number of significant digits for monetary values. Defaults to 28.</param>
-    /// <param name="maxScale">The maximum number of digits to the right of the decimal point. Overrides the scale in <see cref="CurrencyInfo"/></param>
-    /// <param name="defaultCurrency">The default currency to use when none is specified for monetary operations.</param>
-    /// <returns>A <see cref="MoneyContext"/> instance that matches the specified parameters.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the precision is less than or equal to zero, or when the maxScale is negative.</exception>
-    /// <exception cref="ArgumentException">Thrown when the maxScale is greater than the precision.</exception>
-    public static MoneyContext Create(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null, CurrencyInfo? defaultCurrency = null) =>
-        Create(new MoneyContextOptions
-        {
-            RoundingStrategy = roundingStrategy,
-            Precision = precision,
-            MaxScale = maxScale,
-            DefaultCurrency = defaultCurrency
-        });
-
     /// <summary>Fast path for creating a new instance of the <see cref="MoneyContext"/> class with a standard rounding mode.</summary>
     /// <param name="mode">The <see cref="MidpointRounding"/> mode to be applied for monetary calculations.</param>
     /// <returns>A <see cref="MoneyContext"/> instance corresponding to the specified rounding mode.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static MoneyContext Create(MidpointRounding mode)
     {
+#if NET8_0_OR_GREATER
         // This is a fast path that avoids creating a new context for standard rounding modes
-        if (s_standardRoundingContexts.TryGetValue(mode, out var context))
+        if (s_activeContexts.TryGetValue((MoneyContextIndex)(byte)mode, out var context)) return context;
+        // Fallback for any future rounding modes that might be added in the future.
+        return Create(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
+#else
+        s_contextLock.EnterReadLock(); // Allow parallel reads
+        try
         {
-            return context;
+            // This is a fast path that avoids creating a new context for standard rounding modes
+            if (s_activeContexts.TryGetValue((MoneyContextIndex)(byte)mode, out var context)) return context;
+            // Fallback for any future rounding modes that might be added in the future.
+            return Create(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
         }
-
-        // Fallback for any future rounding modes that might be added
-        return Create(new StandardRounding(mode));
+        finally
+        {
+            s_contextLock.ExitReadLock();
+        }
+#endif
     }
 
     public static MoneyContext CreateAndSetDefault(MoneyContextOptions options, string? name = null)
@@ -196,21 +234,24 @@ public sealed class MoneyContext
     /// <param name="index">The unique index identifying the desired <see cref="MoneyContext"/> instance.</param>
     /// <returns>The <see cref="MoneyContext"/> instance corresponding to the specified index.</returns>
     /// <exception cref="ArgumentException">Thrown when the provided index does not correspond to a valid or existing <see cref="MoneyContext"/> instance.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static MoneyContext Get(MoneyContextIndex index)
     {
+#if NET8_0_OR_GREATER
+        if (s_activeContexts.TryGetValue(index, out var context)) return context;
+        throw new ArgumentException($"Invalid MoneyContext index: {index}");
+#else
         s_contextLock.EnterReadLock(); // Allow parallel reads
         try
         {
-            if (!s_activeContexts.TryGetValue(index, out var context))
-            {
-                throw new ArgumentException($"Invalid MoneyContext index: {index}");
-            }
-            return context;
+            if (s_activeContexts.TryGetValue(index, out var context)) return context;
+            throw new ArgumentException($"Invalid MoneyContext index: {index}");
         }
         finally
         {
             s_contextLock.ExitReadLock();
         }
+#endif
     }
 
     /// <summary>Retrieves a <see cref="MoneyContext"/> instance by its registered name, if available.</summary>
@@ -222,6 +263,11 @@ public sealed class MoneyContext
         if (string.IsNullOrEmpty(name))
             throw new ArgumentException("Context name cannot be null or empty", nameof(name));
 
+#if NET8_0_OR_GREATER
+        return s_namedContexts.TryGetValue(name, out var moneyContextIndex)
+            ? Get(moneyContextIndex)
+            : null;
+#else
         s_contextLock.EnterReadLock();
         try
         {
@@ -233,10 +279,31 @@ public sealed class MoneyContext
         {
             s_contextLock.ExitReadLock();
         }
+#endif
     }
 
     private static MoneyContextIndex RegisterContext(MoneyContext context)
     {
+#if NET8_0_OR_GREATER
+        lock (s_lock)
+        {
+            foreach (MoneyContext ctx in s_activeContexts.Values)
+            {
+                if (ctx.Options.Equals(context.Options))
+                {
+                    return ctx.Index; // Return existing equivalent context index
+                }
+            }
+
+            var newIndex = MoneyContextIndex.New(); // Max index is 127 (128 contexts)
+
+            var mutableDictionary = s_activeContexts.ToDictionary();
+            mutableDictionary[newIndex] = context;
+            s_activeContexts = mutableDictionary.ToFrozenDictionary();
+
+            return newIndex; // Return new index
+        }
+#else
         s_contextLock.EnterWriteLock(); // Ensure write exclusivity
         try
         {
@@ -256,25 +323,8 @@ public sealed class MoneyContext
         {
             s_contextLock.ExitWriteLock();
         }
+#endif
     }
-
-    /// <summary>Creates a new instance of the <see cref="MoneyContext"/> class without applying any rounding strategy.</summary>
-    /// <returns>A <see cref="MoneyContext"/> instance configured with no rounding.</returns>
-    internal static MoneyContext CreateNoRounding() => Create(new NoRounding());
-
-    /// <summary>Creates a default instance of the <see cref="MoneyContext"/> class with standard configuration.</summary>
-    /// <returns>A <see cref="MoneyContext"/> instance configured with default options.</returns>
-    internal static MoneyContext CreateDefault() => Create(new MoneyContextOptions());
-
-    /// <summary>Creates a new scope for the <see cref="MoneyContext"/> based on the specified parameters, or uses an existing context if one matches.</summary>
-    /// <param name="roundingStrategy">The rounding strategy to apply within the monetary context.</param>
-    /// <param name="precision">The total number of significant digits for monetary calculations. Defaults to 28.</param>
-    /// <param name="maxScale">The maximum number of decimal places allowed. If not specified, the default behavior is applied.</param>
-    /// <returns>A disposable object that manages the lifetime of the monetary context scope.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if precision is less than or equal to zero, or if maxScale is negative.</exception>
-    /// <exception cref="ArgumentException">Thrown if maxScale is greater than precision.</exception>
-    public static IDisposable CreateScope(IRoundingStrategy roundingStrategy, int precision = 28, int? maxScale = null)
-        => CreateScope(Create(roundingStrategy, precision, maxScale));
 
     /// <summary>Creates a scoped context for monetary operations with the specified configuration. When the context is disposed of, the previous context is restored.</summary>
     /// <param name="context">The <see cref="MoneyContext"/> instance representing the financial and rounding configuration to be used within the scope.</param>
@@ -286,17 +336,29 @@ public sealed class MoneyContext
         return new ContextScope(() => ThreadContext = previous);
     }
 
+    /// <summary>Creates a new execution scope for a monetary calculation context using the specified configuration options.</summary>
+    /// <param name="configureOptions">An action to configure the <see cref="MoneyContextOptions"/> for the scope.</param>
+    /// <returns>A disposable object that restores the previous context when disposed.</returns>
     public static IDisposable CreateScope(Action<MoneyContextOptions> configureOptions)
         => CreateScope(Create(configureOptions));
 
+    /// <summary>Creates a scope for the specified monetary context options, which temporarily overrides the current thread's monetary context.</summary>
+    /// <param name="options">The <see cref="MoneyContextOptions"/> defining the configuration for the new monetary context within the created scope.</param>
+    /// <returns>An <see cref="IDisposable"/> object that, when disposed, reverts the thread's monetary context to its previous state.</returns>
     public static IDisposable CreateScope(MoneyContextOptions options)
         => CreateScope(Create(options));
 
     public static IDisposable CreateScope(string name)
         => CreateScope(Get(name) ?? throw new ArgumentException($"No context with name '{name}' found", nameof(name)));
 
-    private class ContextScope(Action onDispose) : IDisposable
+    private sealed class ContextScope : IDisposable
     {
-        public void Dispose() => onDispose();
+        private readonly Action _onDispose;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ContextScope(Action onDispose) => _onDispose = onDispose;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose() => _onDispose();
     }
 }

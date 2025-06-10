@@ -46,7 +46,7 @@ public class MoneyTypeConverter : TypeConverter
 #endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
-                return new Money(amount, currencyInfo, MoneyContext.CreateNoRounding());
+                return new Money(amount, currencyInfo, MoneyContext.NoRounding);
             }
 
             // try reverse: 234.25 EUR
@@ -57,7 +57,7 @@ public class MoneyTypeConverter : TypeConverter
 #endif
             {
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
-                return new Money(amount, currencyInfo, MoneyContext.CreateNoRounding());
+                return new Money(amount, currencyInfo, MoneyContext.NoRounding);
             }
 
             throw new SerializationException(InvalidFormatMessage);

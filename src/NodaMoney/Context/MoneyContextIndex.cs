@@ -9,8 +9,8 @@ public readonly struct MoneyContextIndex
     /// <remarks>Limited to 7 bits (0-127) due to storage space in the Money type.</remarks>
     private const byte MaxValue = 127; // 7 bits
 
-    /// <summary>Tracks the last assigned index</summary>
-    private static byte s_lastIndex;
+    /// <summary>Tracks next to be assigned index</summary>
+    private static byte s_nextIndex;
 
     private readonly byte _value;
 
@@ -25,12 +25,12 @@ public readonly struct MoneyContextIndex
     /// <exception cref="InvalidOperationException">The maximum number of MoneyContexts is reached (=128)</exception>
     public static MoneyContextIndex New()
     {
-        if (s_lastIndex == MaxValue)
+        if (s_nextIndex > MaxValue)
         {
             throw new InvalidOperationException($"Maximum number of MoneyContexts ({MaxValue + 1}) reached.");
         }
 
-        return new MoneyContextIndex(++s_lastIndex);
+        return new MoneyContextIndex(s_nextIndex++);
     }
 
     public static implicit operator byte(MoneyContextIndex index) => index._value;

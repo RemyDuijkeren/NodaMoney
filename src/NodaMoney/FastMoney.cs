@@ -192,11 +192,11 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
         new(decimal.FromOACurrency(cy), currency, context);
 
-    public static SqlMoney ToSqlMoney(FastMoney money) => new SqlMoney(money.Amount);
+    public static SqlMoney ToSqlMoney(FastMoney money) => new(money.Amount);
 
     public static FastMoney FromSqlMoney(SqlMoney sqlMoney) => new(sqlMoney.Value); // TODO: what if null?
 
-    public static FastMoney Add(FastMoney money1, FastMoney money2)
+    public static FastMoney Add(in FastMoney money1, in FastMoney money2)
     {
         EnsureSameCurrency(money1, money2); // Ensure currencies match
         long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
@@ -204,7 +204,7 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
         return money1 with { OACurrencyAmount = totalAmount };
     }
 
-    public static FastMoney Subtract(FastMoney money1, FastMoney money2)
+    public static FastMoney Subtract(in FastMoney money1, in FastMoney money2)
     {
         EnsureSameCurrency(money1, money2); // Ensure currencies match
         long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow

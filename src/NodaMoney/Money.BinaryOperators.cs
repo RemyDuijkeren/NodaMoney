@@ -85,7 +85,7 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
     public static Money Add(in Money money1, in Money money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Just return input value.
+        // If one of the amounts is zero, then no need to check currency: Return just the input value.
         if (money1.Amount == decimal.Zero)
             return money2;
         if (money2.Amount == decimal.Zero)
@@ -175,7 +175,7 @@ public partial struct Money
     /// <param name="money">The money.</param>
     /// <param name="divisor">The divider.</param>
     /// <returns>The division as <see cref="Money"/>.</returns>
-    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split"/> to do a safe division.</remarks>
+    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split(Money,int)"/> to do a safe division.</remarks>
     public static Money Divide(in Money money, in decimal divisor)
     {
         if (divisor == MultiplicativeIdentity) return money;
@@ -188,7 +188,7 @@ public partial struct Money
     /// <param name="money1">The money.</param>
     /// <param name="money2">The divider.</param>
     /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
-    /// <remarks>Division of Money by Money, means the unit is lost, so the result will be Decimal.</remarks>
+    /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
     public static decimal Divide(in Money money1, in Money money2)
     {
         EnsureSameCurrency(money1, money2);

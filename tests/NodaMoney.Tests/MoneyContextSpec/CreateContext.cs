@@ -12,7 +12,7 @@ public class CreateContext
         // Arrange
 
         // Act
-        var context = MoneyContext.Create(new StandardRounding());
+        var context = MoneyContext.Create(options => options.RoundingStrategy = new StandardRounding());
 
         // Assert
         context.Should().NotBeNull();
@@ -26,7 +26,11 @@ public class CreateContext
     {
         // Arrange
         var beforeDefault = MoneyContext.DefaultThreadContext;
-        var context = MoneyContext.Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4);
+        var context = MoneyContext.Create(options =>
+        {
+            options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+            options.MaxScale = 4;
+        });
 
         // Act
         MoneyContext.DefaultThreadContext = context;
@@ -46,7 +50,11 @@ public class CreateContext
     {
         // Arrange
         var amount = 1234.56789m;
-        var context = MoneyContext.Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4);
+        var context = MoneyContext.Create(options =>
+        {
+            options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+            options.MaxScale = 4;
+        });
 
         // Act
         MoneyContext.ThreadContext = context;
@@ -64,7 +72,11 @@ public class CreateContext
     public void PassContextToMoney()
     {
         // Arrange
-        var context = MoneyContext.Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4);
+        var context = MoneyContext.Create(options =>
+        {
+            options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+            options.MaxScale = 4;
+        });
 
         // Act
         var money = new Money(1234.56789m, "EUR", context);
@@ -81,7 +93,11 @@ public class CreateContext
     {
         // Arrange
         var amount = 1234.56789m;
-        var context = MoneyContext.Create(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4);
+        var context = MoneyContext.Create(options =>
+        {
+            options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+            options.MaxScale = 4;
+        });
 
         // Act
         Money money;
@@ -105,10 +121,15 @@ public class CreateContext
     {
         // Arrange
         var amount = 1234.56789m;
+        MoneyContextOptions options = new()
+        {
+            RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero),
+            MaxScale = 4
+        };
 
         // Act
         Money money;
-        using (MoneyContext.CreateScope(new StandardRounding(MidpointRounding.AwayFromZero), maxScale: 4))
+        using (MoneyContext.CreateScope(options))
         {
             money = new Money(amount, "EUR");
         }
@@ -125,7 +146,11 @@ public class CreateContext
     {
         // Arrange
         var amount = 1234.56789m;
-        var context = MoneyContext.Create(new StandardRounding(), defaultCurrency: CurrencyInfo.FromCode("MGA"));
+        var context = MoneyContext.Create(options =>
+        {
+            options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+            options.DefaultCurrency = CurrencyInfo.FromCode("MGA");
+        });
 
         // Act
         Money money;

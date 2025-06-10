@@ -73,7 +73,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
             {
                 // No rounding, because we are deserializing the exact state that was serialized.
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(currencySpan.ToString());
-                return new Money(amount, currencyInfo, MoneyContext.CreateNoRounding());
+                return new Money(amount, currencyInfo, MoneyContext.NoRounding);
             }
 
             // Retry using reverse format, like '234.25 EUR'
@@ -85,7 +85,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
             {
                 // No rounding, because we are deserializing the exact state that was serialized.
                 CurrencyInfo currencyInfo = CurrencyInfo.FromCode(amountSpan.ToString());
-                return new Money(amount, currencyInfo, MoneyContext.CreateNoRounding());
+                return new Money(amount, currencyInfo, MoneyContext.NoRounding);
             }
 
             throw new JsonException(InvalidFormatMessage);
@@ -118,7 +118,7 @@ public class MoneyJsonConverter : JsonConverter<Money>
                 case JsonTokenType.EndObject when !hasCurrency:
                     throw new JsonException("Missing property 'Currency'!");
                 case JsonTokenType.EndObject:
-                    return new Money(amount, currency, MoneyContext.CreateNoRounding());
+                    return new Money(amount, currency, MoneyContext.NoRounding);
                 case JsonTokenType.PropertyName:
                     string? propertyName = reader.GetString();
                     reader.Read();
