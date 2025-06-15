@@ -14,12 +14,12 @@ public sealed class MoneyContext
 {
 #if NET8_0_OR_GREATER // In .NET 8 or higher, we use FrozenDictionary for optimal immutability and performance
     static readonly object s_lock = new();
-    private static FrozenDictionary<MoneyContextIndex, MoneyContext> s_activeContexts = new Dictionary<MoneyContextIndex, MoneyContext>(6).ToFrozenDictionary();
-    private static FrozenDictionary<string, MoneyContextIndex> s_namedContexts = new Dictionary<string, MoneyContextIndex>(6, StringComparer.OrdinalIgnoreCase).ToFrozenDictionary();
+    private static FrozenDictionary<byte, MoneyContext> s_activeContexts = new Dictionary<byte, MoneyContext>(6).ToFrozenDictionary();
+    private static FrozenDictionary<string, byte> s_namedContexts = new Dictionary<string, byte>(6, StringComparer.OrdinalIgnoreCase).ToFrozenDictionary();
 #else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
     private static readonly ReaderWriterLockSlim s_contextLock = new();
-    private static readonly Dictionary<MoneyContextIndex, MoneyContext> s_activeContexts = [];
-    private static readonly Dictionary<string, MoneyContextIndex> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<byte, MoneyContext> s_activeContexts = [];
+    private static readonly Dictionary<string, byte> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
 #endif
 
     private static readonly AsyncLocal<MoneyContextIndex?> s_threadLocalContext = new();
@@ -166,7 +166,7 @@ public sealed class MoneyContext
     {
 #if NET8_0_OR_GREATER
         // This is a fast path that avoids creating a new context for standard rounding modes
-        if (s_activeContexts.TryGetValue((MoneyContextIndex)(byte)mode, out var context)) return context;
+        if (s_activeContexts.TryGetValue((byte)mode, out var context)) return context;
         // Fallback for any future rounding modes that might be added in the future.
         return Create(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
 #else
@@ -235,7 +235,7 @@ public sealed class MoneyContext
     /// <returns>The <see cref="MoneyContext"/> instance corresponding to the specified index.</returns>
     /// <exception cref="ArgumentException">Thrown when the provided index does not correspond to a valid or existing <see cref="MoneyContext"/> instance.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static MoneyContext Get(MoneyContextIndex index)
+    internal static MoneyContext Get(byte index)
     {
 #if NET8_0_OR_GREATER
         if (s_activeContexts.TryGetValue(index, out var context)) return context;

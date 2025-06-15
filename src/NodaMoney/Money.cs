@@ -51,7 +51,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency
     /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
     public Money(decimal amount, MidpointRounding mode) :
-        this(amount, MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency, mode) { }
+        this(amount, MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency, MoneyContext.Create(mode)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -64,7 +64,7 @@ public readonly partial struct Money : IEquatable<Money>
     /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
     /// <param name="mode">One of the enumeration values that specify which rounding strategy to use.</param>
     /// <remarks>The amount will be rounded to the number of decimals for the specified currency (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>).</remarks>
-    public Money(decimal amount, string code, MidpointRounding mode) : this(amount, CurrencyInfo.FromCode(code), mode) { }
+    public Money(decimal amount, string code, MidpointRounding mode) : this(amount, CurrencyInfo.FromCode(code), MoneyContext.Create(mode)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -106,7 +106,7 @@ public readonly partial struct Money : IEquatable<Money>
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
 
         // Round the amount to the correct scale
-        amount = currentContext.RoundingStrategy switch
+        amount = currentContext!.RoundingStrategy switch
         {
             NoRounding noRounding => noRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
             StandardRounding standardRounding => standardRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
