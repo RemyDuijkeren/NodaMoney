@@ -5,10 +5,14 @@ namespace NodaMoney;
 /// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
 #if NET7_0_OR_GREATER
-    : IAdditionOperators<Money, Money, Money>, IAdditionOperators<Money, decimal, Money>,
-        ISubtractionOperators<Money, Money, Money>, ISubtractionOperators<Money, decimal, Money>,
-        IMultiplyOperators<Money, decimal, Money>, IDivisionOperators<Money, decimal, Money>,
-        IDivisionOperators<Money, Money, decimal>, IModulusOperators<Money, Money, Money>
+    : IAdditionOperators<Money, Money, Money>,
+        IAdditionOperators<Money, decimal, Money>,
+        ISubtractionOperators<Money, Money, Money>,
+        ISubtractionOperators<Money, decimal, Money>,
+        IMultiplyOperators<Money, decimal, Money>,
+        IDivisionOperators<Money, decimal, Money>,
+        IDivisionOperators<Money, Money, decimal>,
+        IModulusOperators<Money, Money, Money>
 #endif
 {
     /// <summary>Adds two specified <see cref="Money"/> values.</summary>
@@ -63,7 +67,7 @@ public partial struct Money
     /// <param name="left">A <see cref="Money"/> object on the left side.</param>
     /// <param name="right">A <see cref="decimal"/> object on the right side.</param>
     /// <returns>The <see cref="Money"/> result of dividing left with right.</returns>
-    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split()"/> to do a safe division.</remarks>
+    /// <remarks>This division can lose money! Use <see cref="MoneyExtensions.Split(Money, int)"/> to do a safe division.</remarks>
     public static Money operator /(Money left, decimal right) => Divide(left, right);
 
     /// <summary>Divides the <see cref="Money"/> value by the given value.</summary>

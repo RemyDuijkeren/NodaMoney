@@ -53,7 +53,7 @@ namespace NodaMoney;
 /// See also OLE Automation Currency, SQL Currency type and https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type.</para>
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 12)]
-internal readonly record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
+internal readonly partial record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
     private const byte Scale = 4;
     private const long ScaleFactor = 10_000;
@@ -195,26 +195,6 @@ internal readonly record struct FastMoney // or CompactMoney? TODO add interface
     public static SqlMoney ToSqlMoney(FastMoney money) => new(money.Amount);
 
     public static FastMoney FromSqlMoney(SqlMoney sqlMoney) => new(sqlMoney.Value); // TODO: what if null?
-
-    public static FastMoney Add(in FastMoney money1, in FastMoney money2)
-    {
-        EnsureSameCurrency(money1, money2); // Ensure currencies match
-        long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
-
-        return money1 with { OACurrencyAmount = totalAmount };
-    }
-
-    public static FastMoney Subtract(in FastMoney money1, in FastMoney money2)
-    {
-        EnsureSameCurrency(money1, money2); // Ensure currencies match
-        long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow
-
-        return money1 with { OACurrencyAmount = totalAmount };
-    }
-
-    public static readonly FastMoney MinValue = new(MinValueLong, Currency.NoCurrency);
-
-    public static readonly FastMoney MaxValue = new(MaxValueLong, Currency.NoCurrency);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
