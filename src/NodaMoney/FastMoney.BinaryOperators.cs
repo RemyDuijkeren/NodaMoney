@@ -233,6 +233,25 @@ internal readonly partial record struct FastMoney
         }
     }
 
+    /// <summary>Multiplies the specified <see cref="FastMoney"/> value by the given multiplier.</summary>
+    /// <param name="money">The <see cref="FastMoney"/> instance to be multiplied.</param>
+    /// <param name="multiplier">The multiplier used in the operation.</param>
+    /// <returns>A new <see cref="FastMoney"/> instance with the resulting value.</returns>
+    /// <exception cref="OverflowException">Thrown when the operation results in an overflow.</exception>
+    public static FastMoney Multiply(in FastMoney money, in long multiplier)
+    {
+        if (multiplier == MultiplicativeIdentityLong) return money;
+        try
+        {
+            long totalAmount = checked(money.OACurrencyAmount * multiplier);
+            return money with { OACurrencyAmount = totalAmount };
+        }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+        }
+    }
+
     /// <summary>Divides the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <param name="divisor">The divider.</param>
@@ -245,6 +264,26 @@ internal readonly partial record struct FastMoney
         try
         {
             long totalAmount = checked((long)(money.OACurrencyAmount / divisor));
+            return money with { OACurrencyAmount = totalAmount };
+        }
+        catch (OverflowException ex)
+        {
+            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+        }
+    }
+
+    /// <summary>Divides a specified <see cref="FastMoney"/> value by a given divisor.</summary>
+    /// <param name="money">The <see cref="FastMoney"/> value to be divided.</param>
+    /// <param name="divisor">The divisor by which the <see cref="FastMoney"/> value is divided.</param>
+    /// <returns>A new <see cref="FastMoney"/> value representing the result of the division.</returns>
+    /// <exception cref="OverflowException">Thrown when the result of the division exceeds the limits of <see cref="FastMoney"/>.</exception>
+    public static FastMoney Divide(in FastMoney money, in long divisor)
+    {
+        if (divisor == MultiplicativeIdentityLong) return money;
+
+        try
+        {
+            long totalAmount = checked(money.OACurrencyAmount / divisor);
             return money with { OACurrencyAmount = totalAmount };
         }
         catch (OverflowException ex)
@@ -273,44 +312,5 @@ internal readonly partial record struct FastMoney
         EnsureSameCurrency(money1, money2);
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
         return money1 with { OACurrencyAmount = decimal.ToOACurrency(remainder) };
-    }
-
-    /// <summary>Multiplies the specified <see cref="FastMoney"/> value by the given multiplier.</summary>
-    /// <param name="money">The <see cref="FastMoney"/> instance to be multiplied.</param>
-    /// <param name="multiplier">The multiplier used in the operation.</param>
-    /// <returns>A new <see cref="FastMoney"/> instance with the resulting value.</returns>
-    /// <exception cref="OverflowException">Thrown when the operation results in an overflow.</exception>
-    public static FastMoney Multiply(in FastMoney money, in long multiplier)
-    {
-        if (multiplier == MultiplicativeIdentityLong) return money;
-        try
-        {
-            long totalAmount = checked(money.OACurrencyAmount * multiplier);
-            return money with { OACurrencyAmount = totalAmount };
-        }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
-        {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
-        }
-    }
-
-    /// <summary>Divides a specified <see cref="FastMoney"/> value by a given divisor.</summary>
-    /// <param name="money">The <see cref="FastMoney"/> value to be divided.</param>
-    /// <param name="divisor">The divisor by which the <see cref="FastMoney"/> value is divided.</param>
-    /// <returns>A new <see cref="FastMoney"/> value representing the result of the division.</returns>
-    /// <exception cref="OverflowException">Thrown when the result of the division exceeds the limits of <see cref="FastMoney"/>.</exception>
-    public static FastMoney Divide(in FastMoney money, in long divisor)
-    {
-        if (divisor == MultiplicativeIdentityLong) return money;
-
-        try
-        {
-            long totalAmount = checked(money.OACurrencyAmount / divisor);
-            return money with { OACurrencyAmount = totalAmount };
-        }
-        catch (OverflowException ex)
-        {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
-        }
     }
 }

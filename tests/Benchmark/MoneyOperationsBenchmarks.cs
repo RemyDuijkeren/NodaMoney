@@ -17,43 +17,95 @@ public class MoneyOperationsBenchmarks
     readonly SqlMoney _euro20sql = new(20);
 
     [Benchmark(Baseline = true)]
-    public Money Addition()
+    public Money Add()
     {
         return _euro10 + _euro20;
     }
 
     [Benchmark]
-    public decimal AdditionFastMoney()
+    public decimal AddFastMoney()
     {
         var money = FastMoney.Add(_euro10fast, _euro20fast);
         return money.Amount;
     }
 
     [Benchmark]
-    public decimal AdditionSqlMoney()
+    public decimal AddSqlMoney()
     {
         var money = SqlMoney.Add(_euro10sql, _euro20sql);
         return money.Value;
     }
 
     [Benchmark]
-    public Money Subtraction()
+    public Money Subtract()
     {
         return _euro20 - _euro10;
     }
 
     [Benchmark]
-    public decimal SubtractionFastMoney()
+    public long SubtractFastMoney()
     {
         var money =  FastMoney.Subtract(_euro20fast, _euro10fast);
-        return money.Amount;
+        return FastMoney.ToOACurrency(money);
     }
 
     [Benchmark]
-    public decimal SubtractionSqlMoney()
+    public decimal SubtractSqlMoney()
     {
         var money = SqlMoney.Subtract(_euro20sql, _euro10sql);
         return money.Value;
+    }
+
+    [Benchmark]
+    public Money Multiple()
+    {
+        return _euro10 * 2.2m;
+    }
+
+    [Benchmark]
+    public long MultipleFastMoney()
+    {
+        var money = _euro10fast * 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long MultipleFastMoneyLong()
+    {
+        var money = _euro10fast * 2L;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public SqlMoney MultipleSqlMoney()
+    {
+        return SqlMoney.Multiply(_euro20sql, _euro10sql);
+    }
+
+    [Benchmark]
+    public Money Divide()
+    {
+        return _euro10 / 2.2m;
+    }
+
+    [Benchmark]
+    public long DivideFastMoney()
+    {
+        var money = _euro10fast / 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long DivideFastMoneyLong()
+    {
+        var money = _euro10fast / 2L;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public SqlMoney DivideSqlMoney()
+    {
+        return SqlMoney.Divide(_euro20sql, _euro10sql);
     }
 
     [Benchmark]

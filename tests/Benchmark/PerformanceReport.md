@@ -66,19 +66,27 @@
 | Increment                | 86.789 ns | 0.8525 ns | 0.7119 ns | 0.0038 |      32 B |
 | Decrement                | 86.949 ns | 0.5347 ns | 0.5001 ns | 0.0038 |      32 B |
 #### after MoneyContext
-| Method                   |      Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
-|--------------------------|----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
-| Addition                 | 16.595 ns | 0.2804 ns | 0.2341 ns |  1.00 |    0.02 |      - |         - |          NA |
-| AdditionFastMoney        |  5.614 ns | 0.0750 ns | 0.0702 ns |  0.34 |    0.01 |      - |         - |          NA |
-| AdditionSqlMoney         |  4.560 ns | 0.0377 ns | 0.0353 ns |  0.27 |    0.00 |      - |         - |          NA |
-| Subtraction              | 16.106 ns | 0.1150 ns | 0.1076 ns |  0.97 |    0.01 |      - |         - |          NA |
-| SubtractionFastMoney     |  5.353 ns | 0.0852 ns | 0.0755 ns |  0.32 |    0.01 |      - |         - |          NA |
-| SubtractionSqlMoney      |  4.647 ns | 0.0365 ns | 0.0324 ns |  0.28 |    0.00 |      - |         - |          NA |
-| CompareSameCurrency      |  8.384 ns | 0.1779 ns | 0.1577 ns |  0.51 |    0.01 |      - |         - |          NA |
-| CompareDifferentCurrency |  5.206 ns | 0.0218 ns | 0.0193 ns |  0.31 |    0.00 |      - |         - |          NA |
-| CompareAmount            |  8.927 ns | 0.0793 ns | 0.0742 ns |  0.54 |    0.01 |      - |         - |          NA |
-| Increment                | 71.058 ns | 0.2732 ns | 0.2133 ns |  4.28 |    0.06 | 0.0038 |      32 B |          NA |
-| Decrement                | 70.739 ns | 0.3892 ns | 0.3450 ns |  4.26 |    0.06 | 0.0038 |      32 B |          NA |
+| Method                   |      Mean |     Error |    StdDev |    Median | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|--------------------------|----------:|----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+| Add                      | 16.451 ns | 0.2704 ns | 0.2397 ns | 16.419 ns |  1.00 |    0.02 |      - |         - |          NA |
+| AddFastMoney             |  7.131 ns | 0.1593 ns | 0.1490 ns |  7.087 ns |  0.43 |    0.01 |      - |         - |          NA |
+| AddSqlMoney              |  4.574 ns | 0.0355 ns | 0.0332 ns |  4.564 ns |  0.28 |    0.00 |      - |         - |          NA |
+| Subtract                 | 16.421 ns | 0.0755 ns | 0.0670 ns | 16.418 ns |  1.00 |    0.01 |      - |         - |          NA |
+| SubtractFastMoney        |  2.132 ns | 0.0180 ns | 0.0168 ns |  2.126 ns |  0.13 |    0.00 |      - |         - |          NA |
+| SubtractSqlMoney         |  4.566 ns | 0.0248 ns | 0.0232 ns |  4.560 ns |  0.28 |    0.00 |      - |         - |          NA |
+| Multiple                 | 15.175 ns | 0.3222 ns | 0.7403 ns | 14.885 ns |  0.92 |    0.05 |      - |         - |          NA |
+| MultipleFastMoney        | 22.639 ns | 0.1798 ns | 0.1594 ns | 22.571 ns |  1.38 |    0.02 |      - |         - |          NA |
+| MultipleFastMoneyLong    |  2.036 ns | 0.0596 ns | 0.0754 ns |  2.020 ns |  0.12 |    0.00 |      - |         - |          NA |
+| MultipleSqlMoney         |  2.161 ns | 0.0442 ns | 0.0413 ns |  2.148 ns |  0.13 |    0.00 |      - |         - |          NA |
+| Divide                   | 49.521 ns | 0.3784 ns | 0.3354 ns | 49.507 ns |  3.01 |    0.05 |      - |         - |          NA |
+| DivideFastMoney          | 67.046 ns | 1.2046 ns | 1.1268 ns | 66.621 ns |  4.08 |    0.09 |      - |         - |          NA |
+| DivideFastMoneyLong      |  1.885 ns | 0.0330 ns | 0.0275 ns |  1.885 ns |  0.11 |    0.00 |      - |         - |          NA |
+| DivideSqlMoney           | 31.660 ns | 0.2508 ns | 0.2223 ns | 31.634 ns |  1.92 |    0.03 |      - |         - |          NA |
+| CompareSameCurrency      |  9.243 ns | 0.0684 ns | 0.0640 ns |  9.247 ns |  0.56 |    0.01 |      - |         - |          NA |
+| CompareDifferentCurrency |  5.619 ns | 0.1030 ns | 0.0913 ns |  5.628 ns |  0.34 |    0.01 |      - |         - |          NA |
+| CompareAmount            |  9.058 ns | 0.1323 ns | 0.1104 ns |  9.063 ns |  0.55 |    0.01 |      - |         - |          NA |
+| Increment                | 77.621 ns | 0.3897 ns | 0.3645 ns | 77.656 ns |  4.72 |    0.07 | 0.0038 |      32 B |          NA |
+| Decrement                | 71.438 ns | 0.5179 ns | 0.4591 ns | 71.381 ns |  4.34 |    0.07 | 0.0038 |      32 B |          NA |
 
 ## MoneyFormatting
 #### before (v1.x)
