@@ -121,7 +121,7 @@ public partial struct Money
     {
         // If one of the amounts is zero, then no need to check currency: Just return input value.
         if (money1.Amount == 0m)
-            return money2;
+            return -money2;
         if (money2.Amount == 0m)
             return money1;
 
