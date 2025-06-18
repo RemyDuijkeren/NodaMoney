@@ -11,7 +11,6 @@ using NodaMoney.Serialization;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 [Serializable]
 [TypeConverter(typeof(MoneyTypeConverter))] // Used by Newtonsoft.Json to do the serialization.
 [JsonConverter(typeof(MoneyJsonConverter))] // Used by System.Text.Json to do the serialization.

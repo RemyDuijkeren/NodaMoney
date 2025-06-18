@@ -2,7 +2,6 @@
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 internal readonly partial record struct FastMoney
 #if NET7_0_OR_GREATER
     : IMinMaxValue<FastMoney>,
@@ -179,7 +178,7 @@ internal readonly partial record struct FastMoney
     {
         // If one of the amounts is zero, then no need to check currency: Just return the input value.
         if (money1.OACurrencyAmount == 0L)
-            return money2;
+            return -money2;
         if (money2.OACurrencyAmount == 0L)
             return money1;
 

@@ -1,6 +1,5 @@
 ﻿namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
 #if !NETSTANDARD1_3
     // : IConvertible //Newtonsoft.Json ignores TypeConverter if IConvertible is implemented https://github.com/JamesNK/Newtonsoft.Json/issues/676

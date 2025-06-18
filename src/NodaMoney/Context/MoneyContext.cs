@@ -8,6 +8,7 @@ namespace NodaMoney.Context;
 
 // TODO: Handling of Ambiguous Currency Symbols when formatting/parsing? Add configurable policy enforcement to
 // explicitly fail or resolve using a context-driven priority list.
+// Handle zero currency check? Strict vs Relaxed. Make this an option? See also #107
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 public sealed class MoneyContext

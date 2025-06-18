@@ -6,7 +6,6 @@ using System.Text.Unicode;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money
 #if NET7_0_OR_GREATER
      : ISpanParsable<Money>, IUtf8SpanParsable<Money>

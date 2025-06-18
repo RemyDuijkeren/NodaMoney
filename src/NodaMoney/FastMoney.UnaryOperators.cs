@@ -2,51 +2,51 @@
 
 namespace NodaMoney;
 
-public partial struct Money
+internal readonly partial record struct FastMoney
 #if NET7_0_OR_GREATER
-    : IDecrementOperators<Money>,
-        IIncrementOperators<Money>,
-        IUnaryPlusOperators<Money, Money>,
-        IUnaryNegationOperators<Money, Money>
+    : IDecrementOperators<FastMoney>,
+        IIncrementOperators<FastMoney>,
+        IUnaryPlusOperators<FastMoney, FastMoney>,
+        IUnaryNegationOperators<FastMoney, FastMoney>
 #endif
 {
     /// <summary>Implements the operator +.</summary>
     /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator +(Money value) => Plus(value);
+    public static FastMoney operator +(FastMoney value) => Plus(value);
 
     /// <summary>Implements the operator -.</summary>
     /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator -(Money value) => Negate(value);
+    public static FastMoney operator -(FastMoney value) => Negate(value);
 
     /// <summary>Implements the operator ++.</summary>
     /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator ++(Money value) => Increment(value);
+    public static FastMoney operator ++(FastMoney value) => Increment(value);
 
     /// <summary>Implements the operator --.</summary>
     /// <param name="value">The money.</param>
     /// <returns>The result of the operator.</returns>
-    public static Money operator --(Money value) => Decrement(value);
+    public static FastMoney operator --(FastMoney value) => Decrement(value);
 
     /// <summary>Pluses the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Plus(in Money money) => money with { Amount = +money.Amount};
+    public static FastMoney Plus(in FastMoney money) => money with { OACurrencyAmount = +money.OACurrencyAmount };
 
     /// <summary>Negates the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Negate(in Money money) => money with { Amount = -money.Amount};
+    public static FastMoney Negate(in FastMoney money) => money with { OACurrencyAmount = -money.OACurrencyAmount};
 
     /// <summary>Increments the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Increment(in Money money) => Add(money, money.Currency.MinimalAmount);
+    public static FastMoney Increment(in FastMoney money) => Add(money, money.Currency.MinimalAmount);
 
     /// <summary>Decrements the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Decrement(in Money money) => Subtract(money, money.Currency.MinimalAmount);
+    public static FastMoney Decrement(in FastMoney money) => Subtract(money, money.Currency.MinimalAmount);
 }

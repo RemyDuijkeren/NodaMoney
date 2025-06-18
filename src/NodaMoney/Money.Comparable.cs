@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money : IComparable, IComparable<Money>
 #if NET7_0_OR_GREATER
     , IComparisonOperators<Money, Money, bool>
