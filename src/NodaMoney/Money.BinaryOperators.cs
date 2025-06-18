@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace NodaMoney;
 
@@ -128,7 +128,7 @@ public partial struct Money
     {
         // If one of the amounts is zero, then no need to check currency: Just return the input value.
         if (money1.Amount == decimal.Zero)
-            return money2;
+            return -money2;
         if (money2.Amount == decimal.Zero)
             return money1;
 

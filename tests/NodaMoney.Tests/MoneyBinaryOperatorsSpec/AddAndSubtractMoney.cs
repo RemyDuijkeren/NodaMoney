@@ -4,24 +4,68 @@ namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec;
 
 public class AddAndSubtractMoney
 {
+    // Test data to use for:
+    // - Addition    (value1, value2, expected) => value1 + value2 = expected
+    // - Subtraction (expected, value2, value1) => value1 - value2 = expected
     public static IEnumerable<object[]> TestData =>
     [
-        [101m, 99m, 200m], // whole numbers
-        [100m, 0.01m, 100.01m], // fractions
-        [100.999m, 0.9m, 101.899m], // overflow
-        [100.5m, 0.9m, 101.4m], // overflow
-        [100.999m, -0.9m, 100.099m], // negative
-        [-100.999m, -0.9m, -101.899m] // negative
+        // whole numbers
+        [101, 99, 200],
+        [1, 10, 11],
+        [1, -10, -9],
+        [-1, 10, 9],
+        [-1, -10, -11],
+        [-9, 10, 1],
+        [11, -10, 1],
+        [-11, 10, -1],
+        [9, -10, -1],
+        // fractions
+        [100, 0.01, 100.01],
+        [0.01, 10, 10.01],
+        [0.01, -10, -9.99],
+        [-9.99, 10, 0.01],
+        [10.01, -10, 0.01],
+        [100.999, -0.9, 100.099],
+        [-100.999, -0.9, -101.899],
+        // overflow
+        [100.999, 0.9, 101.899],
+        [100.5, 0.9, 101.4],
+        // zero values
+        [0, 0, 0],
+        [0, 10, 10],
+        [0, -10, -10],
+        [-10, 10, 0],
+        [10, -10, 0],
+        [10, 0, 10],
+        [-10, 0, -10]
     ];
+
+    [Theory, MemberData(nameof(TestData))]
+    public void WhenDecimalAdd_ValidateTestData(decimal value1, decimal value2, decimal expected)
+    {
+        var result = value1 + value2;
+        result.Should().Be(expected, "decimal result failed so test data is wrong");
+    }
+
+
+    [Theory, MemberData(nameof(TestData))]
+    public void WhenDecimalSubtract_ValidateTestData(decimal expected, decimal value2, decimal value1)
+    {
+        var result = value1 - value2;
+        result.Should().Be(expected, "decimal result failed so test data is wrong");
+    }
 
     [Theory, MemberData(nameof(TestData))]
     public void WhenAddOperator_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
+        // Arrange
         var money1 = new Money(value1);
         var money2 = new Money(value2);
 
+        // Act
         var result = money1 + money2;
 
+        // Assert
         result.Should().Be(new Money(expected));
         result.Should().NotBeSameAs(money1);
         result.Should().NotBeSameAs(money2);
@@ -30,11 +74,14 @@ public class AddAndSubtractMoney
     [Theory, MemberData(nameof(TestData))]
     public void WhenAddMethod_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
+        // Arrange
         var money1 = new Money(value1);
         var money2 = new Money(value2);
 
+        // Act
         var result = Money.Add(money1, money2);
 
+        // Assert
         result.Should().Be(new Money(expected));
         result.Should().NotBeSameAs(money1);
         result.Should().NotBeSameAs(money2);
@@ -71,11 +118,14 @@ public class AddAndSubtractMoney
     [Theory, MemberData(nameof(TestData))]
     public void WhenSubtractOperator_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
+        // Arrange
         var money1 = new Money(value1);
         var money2 = new Money(value2);
 
+        // Act
         var result = money1 - money2;
 
+        // Assert
         result.Should().Be(new Money(expected));
         result.Should().NotBeSameAs(money1);
         result.Should().NotBeSameAs(money2);
@@ -84,11 +134,14 @@ public class AddAndSubtractMoney
     [Theory, MemberData(nameof(TestData))]
     public void WhenSubtractMethod_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
+        // Arrange
         var money1 = new Money(value1);
         var money2 = new Money(value2);
 
+        // Act
         var result = Money.Subtract(money1, money2);
 
+        // Assert
         result.Should().Be(new Money(expected));
         result.Should().NotBeSameAs(money1);
         result.Should().NotBeSameAs(money2);
@@ -154,48 +207,68 @@ public class AddAndSubtractMoney
         result.Should().NotBeSameAs(zero);
     }
 
-    [Theory, MemberData(nameof(TestData))]
+    [SkippableTheory, MemberData(nameof(TestData))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
     public void AddOperator_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
+        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
+
+        // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
 
+        // Act
         Action action = () => { var result = money1 + money2; };
 
+        // Assert
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [Theory, MemberData(nameof(TestData))]
+    [SkippableTheory, MemberData(nameof(TestData))]
     public void AddMethod_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
     {
+        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
+
+        // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
 
+        // Act
         Action action = () => Money.Add(money1, money2);
 
+        // Arrange
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [Theory, MemberData(nameof(TestData))]
-    public void AddOperator_WhenSubtractWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
+    [SkippableTheory, MemberData(nameof(TestData))]
+    public void SubtractOperator_WhenSubtractWithDifferentCurrency_ThrowException(decimal expected, decimal value2, decimal value1)
     {
+        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
+
+        // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
 
+        // Act
         Action action = () => { var result = money1 - money2; };
 
+        // Assert
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [Theory, MemberData(nameof(TestData))]
-    public void SubtractMethod_WhenSubtractWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
+    [SkippableTheory, MemberData(nameof(TestData))]
+    public void SubtractMethod_WhenSubtractWithDifferentCurrency_ThrowException(decimal expected, decimal value2, decimal value1)
     {
+        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
+
+        // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
 
+        // Act
         Action action = () => Money.Subtract(money1, money2);
 
+        // Assert
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters

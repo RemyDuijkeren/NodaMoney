@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;net8.0;net48;net6.0</TargetFrameworks>
@@ -33,6 +33,7 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net48'" />
     <PackageReference Include="RavenDB.TestDriver" Version="7.0.2" Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'" />
     <PackageReference Include="RavenDB.TestDriver" Version="7.0.0" Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net48'" />
+    <PackageReference Include="Xunit.SkippableFact" Version="1.5.23" />
   </ItemGroup>
 
 </Project>

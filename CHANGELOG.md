@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 -
 
+## [2.2.1]
+
+### Changed
+- Fixed #107 When subtracting from $0, the result is negated
+
 ## [2.2]
 
 ### Added
@@ -39,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.1]
 
 ### Added
-- Allow creating Money using 'with' expression
+- Allow creating Money using the 'with' expression
 - Add format N, Number format (e.g., "2,765.43")
 - Add format F, Fixed point format (e.g., "2765,43")
 - Add compatibility with Native AOT and Trimming
@@ -62,9 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Rename SafeDivide to Split and move in NodaMoney namespace
 - NotNullWhenAttribute is now internal #101
-
-### Removed
--
 
 ## [2.0]
 
