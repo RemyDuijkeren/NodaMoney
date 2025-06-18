@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Numerics;
+using NodaMoney.Context;
 
 namespace NodaMoney;
 
@@ -88,13 +90,28 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
     public static Money Add(in Money money1, in Money money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Return just the input value.
-        if (money1.Amount == decimal.Zero)
-            return money2;
-        if (money2.Amount == decimal.Zero)
-            return money1;
+        EnsureSameContext(money1, money2);
+        if (money1.Context.EnforceZeroCurrencyMatching)
+        {
+            EnsureSameCurrency(money1, money2);
 
-        EnsureSameCurrency(money1, money2);
+            // If one of the amounts is zero, then return fast
+            if (money1.Amount == decimal.Zero)
+                return money2;
+            if (money2.Amount == decimal.Zero)
+                return money1;
+        }
+        else
+        {
+            // If one of the amounts is zero, then return fast
+            if (money1.Amount == decimal.Zero)
+                return money2;
+            if (money2.Amount == decimal.Zero)
+                return money1;
+
+            EnsureSameCurrency(money1, money2);
+        }
+
         try
         {
             decimal totalAmount = decimal.Add(money1.Amount, money2.Amount);
@@ -125,13 +142,29 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
     public static Money Subtract(in Money money1, in Money money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Just return the input value.
-        if (money1.Amount == decimal.Zero)
-            return -money2;
-        if (money2.Amount == decimal.Zero)
-            return money1;
+        EnsureSameContext(money1, money2);
 
-        EnsureSameCurrency(money1, money2);
+        if (money1.Context.EnforceZeroCurrencyMatching)
+        {
+            EnsureSameCurrency(money1, money2);
+
+            // If one of the amounts is zero, then return fast
+            if (money1.Amount == decimal.Zero)
+                return -money2;
+            if (money2.Amount == decimal.Zero)
+                return money1;
+        }
+        else
+        {
+            // If one of the amounts is zero, then return fast
+            if (money1.Amount == decimal.Zero)
+                return -money2;
+            if (money2.Amount == decimal.Zero)
+                return money1;
+
+            EnsureSameCurrency(money1, money2);
+        }
+
         try
         {
             decimal totalAmount = decimal.Subtract(money1.Amount, money2.Amount);
@@ -194,6 +227,7 @@ public partial struct Money
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
     public static decimal Divide(in Money money1, in Money money2)
     {
+        EnsureSameContext(money1, money2);
         EnsureSameCurrency(money1, money2);
         return decimal.Divide(money1.Amount, money2.Amount);
     }
@@ -204,6 +238,7 @@ public partial struct Money
     /// <returns>The <see cref="Money"/> remainder after dividing <see cref="money1"/> by <see cref="money2"/>.</returns>
     public static Money Remainder(in Money money1, in Money money2)
     {
+        EnsureSameContext(money1, money2);
         EnsureSameCurrency(money1, money2);
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
         return money1 with { Amount = remainder };

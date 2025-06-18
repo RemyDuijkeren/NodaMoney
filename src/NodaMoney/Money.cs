@@ -356,7 +356,19 @@ public readonly partial struct Money : IEquatable<Money>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EnsureSameCurrency(in Money left, in Money right)
     {
-        if (left.Currency == right.Currency) return;
+        if (left.Currency == right.Currency)
+            return;
+
         throw new InvalidCurrencyException(left.Currency, right.Currency);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void EnsureSameContext(in Money left, in Money right)
+    {
+        // Use bitwise comparison instead of comparing ContextIndex (left.ContextIndex == right.ContextIndex) for performance
+        if ((left._flags & IndexMask) == (right._flags & IndexMask))
+            return;
+
+        throw new MoneyContextMismatchException(left.Context, right.Context);
     }
 }

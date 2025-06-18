@@ -50,6 +50,14 @@ public sealed class MoneyContext
     /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
     public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
 
+    /// <summary>Gets the value indicating whether zero amounts should require matching currency validation.</summary>
+    /// <remarks>
+    /// When set to <c>true</c>, zero monetary amounts will be subject to currency matching rules, which can enforce stricter validation
+    /// in scenarios where currency consistency is critical, even for zero values. When set to <c>false</c>, zero amounts are exempt from
+    /// currency matching, allowing more relaxed validation for such cases. By default, it is <c>false</c>.
+    /// </remarks>
+    public bool EnforceZeroCurrencyMatching => Options.EnforceZeroCurrencyMatching;
+
     /// <summary>Provides a predefined <see cref="MoneyContext"/> instance with no rounding strategy applied.</summary>
     internal static MoneyContext NoRounding => Create(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
 

@@ -48,6 +48,14 @@ public sealed class MoneyContextOptions : IEquatable<MoneyContextOptions>
     /// </remarks>
     public CurrencyInfo? DefaultCurrency { get; set; }
 
+    /// <summary>Gets or sets a value indicating whether zero amounts should require matching currency validation.</summary>
+    /// <remarks>
+    /// When set to <c>true</c>, zero monetary amounts will be subject to currency matching rules, which can enforce stricter validation
+    /// in scenarios where currency consistency is critical, even for zero values. When set to <c>false</c>, zero amounts are exempt from
+    /// currency matching, allowing more relaxed validation for such cases. By default, it is <c>false</c>.
+    /// </remarks>
+    public bool EnforceZeroCurrencyMatching { get; set; } = false;
+
     /// <inheritdoc />
     public bool Equals(MoneyContextOptions? other)
     {

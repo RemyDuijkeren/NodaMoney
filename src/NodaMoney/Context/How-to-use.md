@@ -195,3 +195,27 @@ Now, you can pass a query parameter like `?roundingPolicy=Retail` or `?roundingP
 
 4. **Dynamic Middleware**:
   - Dynamically assign `MoneyContext` based on client requests (e.g., query parameters or headers).
+
+
+## Operations with MoneyContext
+
+Binary operations (addition, subtraction, etc.) require that both Money instances
+use the same MoneyContext. This is enforced to prevent subtle calculation errors.
+
+```csharp
+// Different contexts example
+var money1 = new Money(10.25m, "USD", MoneyContext.Create(MidpointRounding.ToEven));
+var money2 = new Money(5.75m, "USD", MoneyContext.Create(MidpointRounding.AwayFromZero));
+
+// This will throw an InvalidOperationException:
+var result = money1 + money2;
+
+// Instead, align contexts using the 'with' expression:
+var result = money1 + (money2 with { Context = money1.Context });
+
+// Or make both use a different context:
+var retailContext = MoneyContext.Create(MidpointRounding.AwayFromZero);
+var money1WithRetailContext = money1 with { Context = retailContext };
+var money2WithRetailContext = money2 with { Context = retailContext };
+var result = money1WithRetailContext + money2WithRetailContext;
+```

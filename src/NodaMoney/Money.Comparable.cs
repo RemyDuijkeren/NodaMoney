@@ -88,14 +88,14 @@ public partial struct Money : IComparable, IComparable<Money>
     /// <exception cref="ArgumentException">object is not the same type as this instance.</exception>
     public int CompareTo(object? obj)
     {
-            if (obj == null)
-                return 1;
+        if (obj == null)
+            return 1;
 
-            if (obj is not Money money)
-                throw new ArgumentException("obj is not the same type as this instance", nameof(obj));
+        if (obj is not Money money)
+            throw new ArgumentException("obj is not the same type as this instance", nameof(obj));
 
-            return CompareTo(money);
-        }
+        return CompareTo(money);
+    }
 
     /// <summary>Compares this instance to a specified <see cref="object"/>.</summary>
     /// <param name="other">An <see cref="object"/> or null.</param>
@@ -122,7 +122,8 @@ public partial struct Money : IComparable, IComparable<Money>
     /// </returns>
     public int CompareTo(Money other)
     {
-            EnsureSameCurrency(this, other);
-            return Amount.CompareTo(other.Amount);
-        }
+        EnsureSameContext(this, other);
+        EnsureSameCurrency(this, other);
+        return Amount.CompareTo(other.Amount);
+    }
 }
