@@ -6,8 +6,8 @@ public class DivisionMultiplicationWithRemainder
 {
     [Theory]
     [InlineData(100, "XXX", 100)] // XXX does not do rounding
-    [InlineData(100, "EUR", 100)] // expect 100, fail!
-    public void WhenMoney(decimal amount, string currency, decimal expectedResult)
+    [InlineData(100, "EUR", 99.99)] // EUR does rounding in every step
+    public void ByDefaultEveryOperationDoesRounding(decimal amount, string currency, decimal expectedResult)
     {
         // Arrange
         Money subject = new(amount, currency);
@@ -63,12 +63,7 @@ public class DivisionMultiplicationWithRemainder
     {
         // Arrange
         var subject = new Money(amount, currency);
-
-        Money Fx(Money money)
-        {
-            var result = (money.Amount / 3m) * 3m;
-            return new Money(result, money.Currency);
-        }
+        Money Fx(Money money) => money with { Amount = (money.Amount / 3m) * 3m };
 
         // Act
         var result = Fx(subject);

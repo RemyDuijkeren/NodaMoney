@@ -85,7 +85,7 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
     /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
     /// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
     /// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
-    public FastMoney(Money money) : this(money.Amount, money.Currency, money.Context) { }
+    public FastMoney(Money money) : this(money.Amount, money.Currency) { }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -136,12 +136,17 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
             throw new ArgumentOutOfRangeException(nameof(currencyInfo), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
         }
 
-        // Use either provided context or the current global/thread-local context.
-        MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
+        // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
+        MoneyContext currentContext = context ?? MoneyContext.FastMoney;
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
+
         if (currentContext!.MaxScale is > 4) // also checks for null
         {
             throw new ArgumentOutOfRangeException(nameof(context), "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
+        }
+        if (currentContext!.Precision > 19)
+        {
+            throw new ArgumentOutOfRangeException(nameof(context), "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
         }
 
         // Round the amount to the correct scale TODO: do we want to allow this override or just allow no rounding options?
@@ -199,7 +204,18 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
     {
-        if (left.Currency == right.Currency) return;
+        if (left.Currency == right.Currency)
+            return;
+
         throw new InvalidCurrencyException(left.Currency, right.Currency);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void EnsureSameContext(in FastMoney left, in FastMoney right)
+    {
+        if (left.ContextIndex == right.ContextIndex)
+            return;
+
+        throw new MoneyContextMismatchException(left.Context, right.Context);
     }
 }

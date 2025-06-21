@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NodaMoney.Context;
 
 namespace NodaMoney.Tests.MoneyBinaryOperatorsSpec;
 
@@ -41,7 +42,7 @@ public class AddAndSubtractMoney
     ];
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenDecimalAdd_ValidateTestData(decimal value1, decimal value2, decimal expected)
+    public void DecimalAdd_ValidateTestData(decimal value1, decimal value2, decimal expected)
     {
         var result = value1 + value2;
         result.Should().Be(expected, "decimal result failed so test data is wrong");
@@ -49,14 +50,14 @@ public class AddAndSubtractMoney
 
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenDecimalSubtract_ValidateTestData(decimal expected, decimal value2, decimal value1)
+    public void DecimalSubtract_ValidateTestData(decimal expected, decimal value2, decimal value1)
     {
         var result = value1 - value2;
         result.Should().Be(expected, "decimal result failed so test data is wrong");
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenAddOperator_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
+    public void AddOperator_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         // Arrange
         var money1 = new Money(value1);
@@ -72,7 +73,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenAddMethod_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
+    public void AddMethod_ReturnSumMoney(decimal value1, decimal value2, decimal expected)
     {
         // Arrange
         var money1 = new Money(value1);
@@ -88,7 +89,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void WhenAddIsMoreThenMaxValue_ThrowOverflowException()
+    public void AddIsMoreThenMaxValue_ThrowOverflowException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MaxValue);
@@ -102,7 +103,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void WhenSubtractIsMoreThenMinValue_ThrowOverflowException()
+    public void SubtractIsMoreThenMinValue_ThrowOverflowException()
     {
         // Arrange
         Money maxValueMoney = new(decimal.MinValue);
@@ -116,7 +117,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenSubtractOperator_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
+    public void SubtractOperator_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         // Arrange
         var money1 = new Money(value1);
@@ -132,7 +133,7 @@ public class AddAndSubtractMoney
     }
 
     [Theory, MemberData(nameof(TestData))]
-    public void WhenSubtractMethod_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
+    public void SubtractMethod_ReturnSubtractedMoney(decimal expected, decimal value2, decimal value1)
     {
         // Arrange
         var money1 = new Money(value1);
@@ -148,7 +149,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void AddOperator_WhenAddWithZeroInDifferentCurrency_ReturnSumMoney()
+    public void AddOperator_WithZeroDifferentCurrency_ReturnSumMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -163,7 +164,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void AddMethod_WhenAddWithZeroInDifferentCurrency_ReturnSumMoney()
+    public void AddMethod_WithZeroDifferentCurrency_ReturnSumMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -178,7 +179,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void SubtractOperator_WhenSubtractWithZeroInDifferentCurrency_ReturnSubtractedMoney()
+    public void SubtractOperator_WithZeroDifferentCurrency_ReturnSubtractedMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -193,7 +194,7 @@ public class AddAndSubtractMoney
     }
 
     [Fact]
-    public void SubtractMethod_WhenSubstractWithZeroInDifferentCurrency_ReturnSubtractedMoney()
+    public void SubtractMethod_WithZeroDifferentCurrency_ReturnSubtractedMoney()
     {
         // Arrange
         Money money = new(123.45m, "EUR");
@@ -207,9 +208,69 @@ public class AddAndSubtractMoney
         result.Should().NotBeSameAs(zero);
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Fact]
+    public void AddOperator_WithZeroDifferentCurrencyAndEnforceZeroCurrencyMatching_ThrowInvalidCurrencyException()
+    {
+        // Arrange
+        MoneyContext enforceZeroCurrencyMatchingContext = MoneyContext.Create(options => options.EnforceZeroCurrencyMatching = true);
+        Money money = new(123.45m, "EUR", enforceZeroCurrencyMatchingContext);
+        Money zero = new(0m, "USD", enforceZeroCurrencyMatchingContext);
+
+        // Act
+        Action action = () => { var result = money + zero; };
+
+        // Assert
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
+
+    [Fact]
+    public void AddMethod_WithZeroDifferentCurrencyAndEnforceZeroCurrencyMatching_ThrowInvalidCurrencyException()
+    {
+        // Arrange
+        MoneyContext enforceZeroCurrencyMatchingContext = MoneyContext.Create(options => options.EnforceZeroCurrencyMatching = true);
+        Money money = new(123.45m, "EUR", enforceZeroCurrencyMatchingContext);
+        Money zero = new(0m, "USD", enforceZeroCurrencyMatchingContext);
+
+        // Act
+        Action action = () => Money.Add(money, zero);
+
+        // Assert
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
+
+    [Fact]
+    public void SubtractOperator_WithZeroDifferentCurrencyAndEnforceZeroCurrencyMatching_ThrowInvalidCurrencyException()
+    {
+        // Arrange
+        MoneyContext enforceZeroCurrencyMatchingContext = MoneyContext.Create(options => options.EnforceZeroCurrencyMatching = true);
+        Money money = new(123.45m, "EUR", enforceZeroCurrencyMatchingContext);
+        Money zero = new(0m, "USD", enforceZeroCurrencyMatchingContext);
+
+        // Act
+        Action action = () => { var result = money - zero; };
+
+        // Assert
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
+
+    [Fact]
+    public void SubtractMethod_WithZeroDifferentCurrencyAndEnforceZeroCurrencyMatching_ThrowInvalidCurrencyException()
+    {
+        // Arrange
+        MoneyContext enforceZeroCurrencyMatchingContext = MoneyContext.Create(options => options.EnforceZeroCurrencyMatching = true);
+        Money money = new(123.45m, "EUR", enforceZeroCurrencyMatchingContext);
+        Money zero = new(0m, "USD", enforceZeroCurrencyMatchingContext);
+
+        // Act
+        Action action = () => Money.Subtract(money, zero);
+
+        // Assert
+        action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
+
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
-    public void AddOperator_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
+    [SkippableTheory, MemberData(nameof(TestData))]
+    public void AddOperator_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal value1, decimal value2, decimal expected)
     {
         Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
 
@@ -225,7 +286,7 @@ public class AddAndSubtractMoney
     }
 
     [SkippableTheory, MemberData(nameof(TestData))]
-    public void AddMethod_WhenAddWithDifferentCurrency_ThrowException(decimal value1, decimal value2, decimal expected)
+    public void AddMethod_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal value1, decimal value2, decimal expected)
     {
         Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
 
@@ -241,7 +302,7 @@ public class AddAndSubtractMoney
     }
 
     [SkippableTheory, MemberData(nameof(TestData))]
-    public void SubtractOperator_WhenSubtractWithDifferentCurrency_ThrowException(decimal expected, decimal value2, decimal value1)
+    public void SubtractOperator_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal expected, decimal value2, decimal value1)
     {
         Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
 
@@ -257,7 +318,7 @@ public class AddAndSubtractMoney
     }
 
     [SkippableTheory, MemberData(nameof(TestData))]
-    public void SubtractMethod_WhenSubtractWithDifferentCurrency_ThrowException(decimal expected, decimal value2, decimal value1)
+    public void SubtractMethod_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal expected, decimal value2, decimal value1)
     {
         Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
 
@@ -271,5 +332,89 @@ public class AddAndSubtractMoney
         // Assert
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
+
+    [Theory, MemberData(nameof(TestData))]
+    public void AddOperator_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
+    {
+        // Arrange
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
+
+        // Act
+        Action action = () => { var result = money1 + money2; };
+
+        // Assert
+        action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
+    }
+
+    [Theory, MemberData(nameof(TestData))]
+    public void AddMethod_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
+    {
+        // Arrange
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
+
+        // Act
+        Action action = () => Money.Add(money1, money2);
+
+        // Assert
+        action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
+    }
+
+    [Theory, MemberData(nameof(TestData))]
+    public void SubtractOperator_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
+    {
+        // Arrange
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
+
+        // Act
+        Action action = () => { var result = money1 - money2; };
+
+        // Assert
+        action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
+    }
+
+    [Theory, MemberData(nameof(TestData))]
+    public void SubtractMethod_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
+    {
+        // Arrange
+        var money1 = new Money(value1, "EUR");
+        var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
+
+        // Act
+        Action action = () => Money.Subtract(money1, money2);
+
+        // Assert
+        action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
+    }
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+
+    [Fact]
+    public void AddOperator_WhenAddWithNull_ReturnNull()
+    {
+        // Arrange
+        Money money = new(100m, "EUR");
+        Money? nullMoney = null;
+
+        // Act
+        var result = money + nullMoney;
+
+        // Assert
+        result.Should().BeNull("decimal + null = null");
+    }
+
+    [Fact]
+    public void SubtractOperator_WhenSubtractWithNull_ReturnNull()
+    {
+        // Arrange
+        Money money = new(100m, "EUR");
+        Money? nullMoney = null;
+
+        // Act
+        var result = money - nullMoney;
+
+        // Assert
+        result.Should().BeNull("decimal - null = null");
+    }
 }

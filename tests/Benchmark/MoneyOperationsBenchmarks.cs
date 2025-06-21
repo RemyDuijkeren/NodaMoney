@@ -63,9 +63,16 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public long MultipleFastMoney()
+    public long MultipleFastMoneyDecimal()
     {
         var money = _euro10fast * 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long MultipleFastWholeDecimal()
+    {
+        var money = _euro10fast * 2m;
         return FastMoney.ToOACurrency(money);
     }
 
@@ -89,9 +96,16 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public long DivideFastMoney()
+    public long DivideFastMoneyDecimal()
     {
         var money = _euro10fast / 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long DivideFastMoneyWholeDecimal()
+    {
+        var money = _euro10fast / 2m;
         return FastMoney.ToOACurrency(money);
     }
 

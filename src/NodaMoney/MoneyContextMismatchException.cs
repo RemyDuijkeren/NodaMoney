@@ -27,7 +27,7 @@ public class MoneyContextMismatchException : InvalidOperationException
     /// <param name="expected">The expected currency.</param>
     /// <param name="actual">The actual currency.</param>
     public MoneyContextMismatchException(MoneyContext expected, MoneyContext actual)
-        : this($"MoneyContext mismatch: The requested operation expected the MoneyContext {expected}, but the actual value was the MoneyContext {actual}! Use the 'with' expression to align contexts before operation, e.g.: money2 with {{ Context = money1.Context }}") { }
+        : this($"MoneyContext mismatch: The requested operation expected {expected}, but the actual value was {actual}! Use the 'with' expression to align contexts before operation, e.g.: money2 with {{ Context = money1.Context }}") { }
 
 #if !NETSTANDARD1_3 && !NET6_0_OR_GREATER
     /// <inheritdoc/>

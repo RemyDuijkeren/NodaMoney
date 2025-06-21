@@ -11,7 +11,7 @@ namespace NodaMoney.Context;
 // Handle zero currency check? Strict vs Relaxed. Make this an option? See also #107
 
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
-public sealed class MoneyContext
+public sealed record MoneyContext
 {
 #if NET8_0_OR_GREATER // In .NET 8 or higher, we use FrozenDictionary for optimal immutability and performance
     static readonly object s_lock = new();
@@ -47,7 +47,7 @@ public sealed class MoneyContext
     public int? MaxScale => Options.MaxScale;
 
     /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
-    /// <remarks>If not specified (null) then the current culture will be used to find the currency.</remarks>
+    /// <remarks>If not specified (null), then the current culture will be used to find the currency.</remarks>
     public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
 
     /// <summary>Gets the value indicating whether zero amounts should require matching currency validation.</summary>
@@ -59,7 +59,18 @@ public sealed class MoneyContext
     public bool EnforceZeroCurrencyMatching => Options.EnforceZeroCurrencyMatching;
 
     /// <summary>Provides a predefined <see cref="MoneyContext"/> instance with no rounding strategy applied.</summary>
-    internal static MoneyContext NoRounding => Create(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
+    internal static MoneyContext NoRounding { get; }
+
+    /// <summary>Provides a predefined monetary context for <see cref="FastMoney"/></summary>
+    /// <remarks>
+    /// This context has the following default values:
+    /// <list type="bullet">
+    ///   <item><description><see cref="RoundingStrategy"/> = <see cref="StandardRounding"/> with <see cref="MidpointRounding.ToEven"/></description></item>
+    ///   <item><description><see cref="Precision"/> = 19</description></item>
+    ///   <item><description><see cref="MaxScale"/> = 4</description></item>
+    /// </list>
+    /// </remarks>
+    internal static MoneyContext FastMoney { get; }
 
     static MoneyContext()
     {
@@ -83,6 +94,8 @@ public sealed class MoneyContext
         var toPosInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
         Trace.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
 #endif
+        FastMoney = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(), Precision = 19, MaxScale = 4 });
+        NoRounding = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
     }
 
     private MoneyContext(MoneyContextOptions options)

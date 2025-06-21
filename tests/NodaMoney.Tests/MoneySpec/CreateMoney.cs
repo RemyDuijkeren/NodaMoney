@@ -82,15 +82,33 @@ public class CreateMoney
     public void WithDifferentAmount()
     {
         // Arrange
-        Money money = new Money(123456789.1234567890m, "EUR");
+        Money money = new Money(1m, "EUR");
 
         // Act
-        var newMoney = money with { Amount = 12.34m };
+        var result = money with { Amount = 123456789.1234567890m };
 
         // Assert
-        newMoney.Should().NotBeSameAs(money);
-        newMoney.Currency.Should().Be(money.Currency);
-        newMoney.Amount.Should().Be(12.34m);
+        result.Should().NotBeSameAs(money);
+        result.Currency.Should().Be(money.Currency);
+        result.Amount.Should().Be(123456789.12m, "euro round to 2 decimals");
+        result.Scale.Should().Be(2, "euro is 2 decimals");
+    }
+
+    [Fact]
+    public void WithDifferentAmount_NoRounding()
+    {
+        // Arrange
+        decimal amount = 123456789.1234567890m;
+        Money money = new Money(1m, "EUR", MoneyContext.NoRounding);
+
+        // Act
+        var result = money with { Amount = amount };
+
+        // Assert
+        result.Should().NotBeSameAs(money);
+        result.Currency.Should().Be(money.Currency);
+        result.Amount.Should().Be(amount, "no rounding");
+        result.Scale.Should().Be(10, "no rounding");
     }
 
     [Theory]
@@ -161,7 +179,7 @@ public class CreateMoney
     [InlineData(-98765.4321, 15)]
     [InlineData(0.00000123, 5)]
     [InlineData(-0.00000123, 10)]
-    public void WhenCurrencyWithMoneyContextIndex_AddsCDecimalProperly(decimal input, byte index)
+    public void WhenCurrencyWithMoneyContextIndex_AddsDecimalProperly(decimal input, byte index)
     {
         // Arrange
         var value = input;
@@ -245,5 +263,24 @@ public class CreateMoney
         _testOutputHelper.WriteLine(roundedAmount.Scale.ToString());
 #endif
         _testOutputHelper.WriteLine(roundedAmount.ToString());
+    }
+
+    [Fact]
+    public void ZeroWithScale_MustBeEqual()
+    {
+        // Arrange
+        decimal amount = 0m;
+        decimal amountWithScale = 0.00m;
+
+        // Act
+        Money money = new(amount, "EUR");
+        Money moneyWithScale = new(amountWithScale, "EUR");
+        Money moneyWithScale2 = money with { Amount = 0.00m };
+
+        // Assert
+        amount.Should().Be(amountWithScale);
+        money.Should().Be(moneyWithScale);
+        money.Should().Be(moneyWithScale2);
+        moneyWithScale.Should().Be(moneyWithScale2);
     }
 }

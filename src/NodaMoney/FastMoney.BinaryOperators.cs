@@ -132,13 +132,28 @@ internal readonly partial record struct FastMoney
     /// <returns>A <see cref="FastMoney"/> object with the values of both <see cref="FastMoney"/> objects added.</returns>
     public static FastMoney Add(in FastMoney money1, in FastMoney money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Return just the input value.
-        if (money1.OACurrencyAmount == 0L)
-            return money2;
-        if (money2.OACurrencyAmount == 0L)
-            return money1;
+        EnsureSameContext(money1, money2);
+        if (money1.Context.EnforceZeroCurrencyMatching)
+        {
+            EnsureSameCurrency(money1, money2);
 
-        EnsureSameCurrency(money1, money2);
+            // If one of the amounts is zero, then return fast
+            if (money1.OACurrencyAmount == 0L)
+                return money2;
+            if (money2.OACurrencyAmount == 0L)
+                return money1;
+        }
+        else
+        {
+            // If one of the amounts is zero, then return fast
+            if (money1.OACurrencyAmount == 0L)
+                return money2;
+            if (money2.OACurrencyAmount == 0L)
+                return money1;
+
+            EnsureSameCurrency(money1, money2);
+        }
+
         try
         {
             long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
@@ -176,13 +191,29 @@ internal readonly partial record struct FastMoney
     /// <returns>A <see cref="FastMoney"/> object where the second <see cref="FastMoney"/> object is subtracted from the first.</returns>
     public static FastMoney Subtract(in FastMoney money1, in FastMoney money2)
     {
-        // If one of the amounts is zero, then no need to check currency: Just return the input value.
-        if (money1.OACurrencyAmount == 0L)
-            return -money2;
-        if (money2.OACurrencyAmount == 0L)
-            return money1;
+        EnsureSameContext(money1, money2);
 
-        EnsureSameCurrency(money1, money2);
+        if (money1.Context.EnforceZeroCurrencyMatching)
+        {
+            EnsureSameCurrency(money1, money2);
+
+            // If one of the amounts is zero, then return fast
+            if (money1.OACurrencyAmount == 0L)
+                return -money2;
+            if (money2.OACurrencyAmount == 0L)
+                return money1;
+        }
+        else
+        {
+            // If one of the amounts is zero, then return fast
+            if (money1.OACurrencyAmount == 0L)
+                return -money2;
+            if (money2.OACurrencyAmount == 0L)
+                return money1;
+
+            EnsureSameCurrency(money1, money2);
+        }
+
         try
         {
             long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow
@@ -221,12 +252,28 @@ internal readonly partial record struct FastMoney
     public static FastMoney Multiply(in FastMoney money, in decimal multiplier)
     {
         if (multiplier == MultiplicativeIdentity) return money;
+        if (multiplier == 0m) return money with { OACurrencyAmount = 0 };
+
         try
         {
-            long totalAmount = checked((long)(money.OACurrencyAmount * multiplier));
-            return money with { OACurrencyAmount = totalAmount };
+#if NET7_0_OR_GREATER
+            if (decimal.IsInteger(multiplier))
+#else
+            if (multiplier == (long)multiplier)
+#endif
+            {
+                // Direct cast from decimal * long to long is more efficient than first multiplying as decimal and then casting
+                long totalAmount1 = checked(money.OACurrencyAmount * (long)multiplier);
+                // TODO: cast could throw OverFlowExpection if outside min-max values of long!
+                return money with { OACurrencyAmount = totalAmount1 };
+            }
+
+            // For non-integer multipliers, fall back to decimal multiplication
+            //long totalAmount = checked((long)(money.OACurrencyAmount * multiplier));
+            decimal totalAmount = decimal.Multiply(money.Amount, multiplier);
+            return money with { OACurrencyAmount = decimal.ToOACurrency(totalAmount) }; // ToEven rounding
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
@@ -240,12 +287,14 @@ internal readonly partial record struct FastMoney
     public static FastMoney Multiply(in FastMoney money, in long multiplier)
     {
         if (multiplier == MultiplicativeIdentityLong) return money;
+        if (multiplier == 0L) return money with { OACurrencyAmount = 0 };
+
         try
         {
             long totalAmount = checked(money.OACurrencyAmount * multiplier);
             return money with { OACurrencyAmount = totalAmount };
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
@@ -262,8 +311,20 @@ internal readonly partial record struct FastMoney
 
         try
         {
-            long totalAmount = checked((long)(money.OACurrencyAmount / divisor));
-            return money with { OACurrencyAmount = totalAmount };
+#if NET7_0_OR_GREATER
+            if (decimal.IsInteger(divisor))
+#else
+            if (divisor == (long)divisor)
+#endif
+            {
+                // Direct cast from decimal * long to long is more efficient than first dividing as decimal and then casting
+                long totalAmount1 = checked(money.OACurrencyAmount / (long)divisor);
+                return money with { OACurrencyAmount = totalAmount1 };
+            }
+
+            // For non-integer multipliers, fall back to decimal multiplication
+            decimal totalAmount = decimal.Divide(money.Amount, divisor);
+            return money with { OACurrencyAmount = decimal.ToOACurrency(totalAmount) };
         }
         catch (OverflowException ex)
         {
@@ -298,6 +359,7 @@ internal readonly partial record struct FastMoney
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
     public static decimal Divide(in FastMoney money1, in FastMoney money2)
     {
+        EnsureSameContext(money1, money2);
         EnsureSameCurrency(money1, money2);
         return decimal.Divide(money1.Amount, money2.Amount);
     }
@@ -308,6 +370,7 @@ internal readonly partial record struct FastMoney
     /// <returns>The <see cref="FastMoney"/> remainder after dividing <see cref="money1"/> by <see cref="money2"/>.</returns>
     public static FastMoney Remainder(in FastMoney money1, in FastMoney money2)
     {
+        EnsureSameContext(money1, money2);
         EnsureSameCurrency(money1, money2);
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
         return money1 with { OACurrencyAmount = decimal.ToOACurrency(remainder) };

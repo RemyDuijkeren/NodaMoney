@@ -125,7 +125,7 @@ public readonly partial struct Money : IEquatable<Money>
         _mid = bits[1];
         _high = bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((currentContext.Index << 24) & IndexMask)   // Store Index in bits 24–30
+                 | ((currentContext.Index << 24) & IndexMask) // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask));  // Preserve Scale Factor (16–23) and Sign (31)
     }
 
@@ -254,12 +254,20 @@ public readonly partial struct Money : IEquatable<Money>
         }
         init
         {
+            // Round the amount to the correct scale
+            var amount = Context.RoundingStrategy switch
+            {
+                NoRounding noRounding => noRounding.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale),
+                StandardRounding standardRounding => standardRounding.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale),
+                _ => Context.RoundingStrategy.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale)
+            };
+
             // Separate the Decimal bits during initialization
 #if NET5_0_OR_GREATER
             Span<int> bits = stackalloc int[4];
-            decimal.GetBits(value, bits);
+            decimal.GetBits(amount, bits);
 #else
-            int[] bits = decimal.GetBits(value);
+            int[] bits = decimal.GetBits(amount);
 #endif
             _low = bits[0];
             _mid = bits[1];
