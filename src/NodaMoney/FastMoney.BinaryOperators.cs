@@ -28,9 +28,6 @@ internal readonly partial record struct FastMoney
     /// <inheritdoc cref="IMultiplicativeIdentity{TSelf, TResult}.MultiplicativeIdentity" />
     public static decimal MultiplicativeIdentity => decimal.One;
 
-    /// <inheritdoc cref="IMultiplicativeIdentity{TSelf, TResult}.MultiplicativeIdentity" />
-    private static long MultiplicativeIdentityLong => 1L;
-
     /// <inheritdoc cref="IAdditiveIdentity{TSelf, TResult}.AdditiveIdentity" />
     public static FastMoney AdditiveIdentity => new(0L, Currency.NoCurrency);
 
@@ -286,7 +283,7 @@ internal readonly partial record struct FastMoney
     /// <exception cref="OverflowException">Thrown when the operation results in an overflow.</exception>
     public static FastMoney Multiply(in FastMoney money, in long multiplier)
     {
-        if (multiplier == MultiplicativeIdentityLong) return money;
+        if (multiplier == 1L) return money;
         if (multiplier == 0L) return money with { OACurrencyAmount = 0 };
 
         try
@@ -339,7 +336,7 @@ internal readonly partial record struct FastMoney
     /// <exception cref="OverflowException">Thrown when the result of the division exceeds the limits of <see cref="FastMoney"/>.</exception>
     public static FastMoney Divide(in FastMoney money, in long divisor)
     {
-        if (divisor == MultiplicativeIdentityLong) return money;
+        if (divisor == 1L) return money;
 
         try
         {

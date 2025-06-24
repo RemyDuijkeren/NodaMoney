@@ -1,4 +1,3 @@
-using System.Data.SqlTypes;
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
 
@@ -13,8 +12,6 @@ public class MoneyOperationsBenchmarks
     Money _euro = new Money(765.43m, "EUR");
     readonly FastMoney _euro10fast = new(10, "EUR");
     readonly FastMoney _euro20fast = new(20, "EUR");
-    readonly SqlMoney _euro10sql = new(10);
-    readonly SqlMoney _euro20sql = new(20);
 
     [Benchmark(Baseline = true)]
     public Money Add()
@@ -30,13 +27,6 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public decimal AddSqlMoney()
-    {
-        var money = SqlMoney.Add(_euro10sql, _euro20sql);
-        return money.Value;
-    }
-
-    [Benchmark]
     public Money Subtract()
     {
         return _euro20 - _euro10;
@@ -47,13 +37,6 @@ public class MoneyOperationsBenchmarks
     {
         var money =  FastMoney.Subtract(_euro20fast, _euro10fast);
         return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public decimal SubtractSqlMoney()
-    {
-        var money = SqlMoney.Subtract(_euro20sql, _euro10sql);
-        return money.Value;
     }
 
     [Benchmark]
@@ -84,12 +67,6 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public SqlMoney MultipleSqlMoney()
-    {
-        return SqlMoney.Multiply(_euro20sql, _euro10sql);
-    }
-
-    [Benchmark]
     public Money Divide()
     {
         return _euro10 / 2.2m;
@@ -114,12 +91,6 @@ public class MoneyOperationsBenchmarks
     {
         var money = _euro10fast / 2L;
         return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public SqlMoney DivideSqlMoney()
-    {
-        return SqlMoney.Divide(_euro20sql, _euro10sql);
     }
 
     [Benchmark]
