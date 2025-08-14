@@ -203,6 +203,32 @@ static class CurrencyRegistry
 #endif
     }
 
+    /// <summary>
+    /// Checks if a currency with the specified code exists in the registry.
+    /// </summary>
+    /// <param name="code">A currency code, like EUR or USD.</param>
+    /// <returns>
+    /// <returns><b>true</b> if the currency code exists, otherwise <b>false</b>.</returns>
+    /// </returns>
+    public static bool ContainsCode(string code)
+    {
+        if (code is null) return false;
+
+#if NET8_0_OR_GREATER
+        return s_lookupByCode.ContainsKey(code);
+#else
+        s_lockSlim.EnterReadLock();
+        try
+        {
+            return s_lookupByCode.ContainsKey(code);
+        }
+        finally
+        {
+            s_lockSlim.ExitReadLock();
+        }
+#endif
+    }
+
     static ILookup<string, CurrencyInfo> CreateLookupByCodeAndSymbol() =>
         s_lookupByCode.Values
             .SelectMany(currency =>
