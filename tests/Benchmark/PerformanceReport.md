@@ -48,8 +48,8 @@
 #### before (v1.x)
 | Method                   |      Mean |    Error |    StdDev | Allocated |
 |--------------------------|----------:|---------:|----------:|----------:|
-| Addition                 | 231.00 ns | 4.470 ns |  4.181 ns |         - |
-| Subtraction              | 233.42 ns | 4.665 ns |  4.581 ns |         - |
+| Add                      | 231.00 ns | 4.470 ns |  4.181 ns |         - |
+| Subtract                 | 233.42 ns | 4.665 ns |  4.581 ns |         - |
 | CompareSameCurrency      |  30.09 ns | 0.518 ns |  0.485 ns |         - |
 | CompareDifferentCurrency |  68.83 ns | 0.679 ns |  0.530 ns |         - |
 | CompareAmount            | 212.60 ns | 4.271 ns | 10.558 ns |         - |
@@ -58,8 +58,8 @@
 #### after (v2.x)
 | Method                   |      Mean |     Error |    StdDev |   Gen0 | Allocated |
 |--------------------------|----------:|----------:|----------:|-------:|----------:|
-| Addition                 | 16.219 ns | 0.0810 ns | 0.0718 ns |      - |         - |
-| Subtraction              | 15.777 ns | 0.0662 ns | 0.0587 ns |      - |         - |
+| Add                      | 16.219 ns | 0.0810 ns | 0.0718 ns |      - |         - |
+| Subtract                 | 15.777 ns | 0.0662 ns | 0.0587 ns |      - |         - |
 | CompareSameCurrency      |  3.623 ns | 0.0396 ns | 0.0351 ns |      - |         - |
 | CompareDifferentCurrency |  3.684 ns | 0.0314 ns | 0.0293 ns |      - |         - |
 | CompareAmount            |  3.908 ns | 0.0517 ns | 0.0459 ns |      - |         - |
