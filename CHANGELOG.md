@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 -
 
+## [2.3]
+
+### Added
+- CurrencyInfo.TryFromCode method to get CurrencyInfo from code without throwing an exception.
+
 ## [2.2.1]
 
 ### Changed
