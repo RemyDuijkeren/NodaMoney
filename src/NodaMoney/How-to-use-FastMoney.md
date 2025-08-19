@@ -1,13 +1,13 @@
 Let me compare `SqlMoney` with both `Decimal` and `SqlDecimal`:
 
 1. **Range and Precision**:
-  - `FastMoney`: ±1.0 × 10^-17 to ±9.2 × 10^17 (17 precision) (fixed 4 decimal places), like SqlMoney
-  - `Money`: ±1.0 × 10^-28 to ±7.9 × 10^28 (28 digits precision)
+  - `FastMoney`:  ±1.0 × 10^-17 to ±9.2 × 10^17 (17 digits precision) (fixed 4 decimal places), like SqlMoney
+  - `Money`:      ±1.0 × 10^-28 to ±7.9 × 10^28 (28 digits precision)
   - `SqlDecimal`: ±1.0 × 10^-38 to ±1.0 × 10^38 (38 digits precision)
 
 2. **Storage Size**:
   - `FastMoney`: 12 bytes (uses long internally)
-  - `Money`: 16 bytes (uses decimal internally)
+  - `Money`:    16 bytes (uses decimal internally)
 
 3. **Performance**:
   - `FastMoney` is fastest (uses native CPU integer operations), so far we see 3x faster adding/subtracting

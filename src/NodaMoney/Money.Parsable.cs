@@ -77,7 +77,7 @@ public partial struct Money
     /// value contained in <paramref name="s"/>, if the conversion succeeded, or is Money value of zero with no currency (XXX) if the
     /// conversion failed. The conversion fails if the <paramref name="s"/> parameter is <b>null</b> or <see cref="string.Empty"/>, is not a number
     /// in a valid format, or represents a number less than <see cref="decimal.MinValue"/> or greater than <see cref="decimal.MaxValue"/>. This parameter is passed
-    /// uninitialized; any <i>value</i> originally supplied in result will be overwritten.</param>
+    /// uninitialized; any <i>value</i> originally supplied in the result will be overwritten.</param>
     /// <returns><b>true</b> if <paramref name="s"/> parsed successfully; otherwise, <b>false</b>.</returns>
     /// <remarks>See <see cref="decimal.TryParse(string, out decimal)"/> for more info and remarks.</remarks>
     public static bool TryParse([NotNullWhen(true)] string? s, out Money result) =>
@@ -229,7 +229,7 @@ public partial struct Money
             {
                 return [];
             }
-            else if (matchStartIndex == 0) // Match is at the beginning
+            else if (matchStartIndex == 0) // Match is at the start
             {
                 return s.Slice(matchEndIndex);
             }

@@ -54,5 +54,5 @@ public sealed record MoneyContextOptions
     /// in scenarios where currency consistency is critical, even for zero values. When set to <c>false</c>, zero amounts are exempt from
     /// currency matching, allowing more relaxed validation for such cases. By default, it is <c>false</c>.
     /// </remarks>
-    public bool EnforceZeroCurrencyMatching { get; set; } = false;
+    public bool EnforceZeroCurrencyMatching { get; set; }
 }
