@@ -20,10 +20,10 @@ public class InitializingCurrencyBenchmarks
         return currency;
     }
 
-    // [Benchmark]
-    // public Currency FromCodeBeRef()
-    // {
-    //     ref Currency currency = ref Currency.FromCode("EUR");
-    //     return currency;
-    // }
+    [Benchmark]
+    public CurrencyInfo CurrencyInfoTryFromCode()
+    {
+        bool result = CurrencyInfo.TryFromCode("EUR", out CurrencyInfo currency);
+        return currency;
+    }
 }

@@ -66,25 +66,25 @@
 | Increment                | 86.789 ns | 0.8525 ns | 0.7119 ns | 0.0038 |      32 B |
 | Decrement                | 86.949 ns | 0.5347 ns | 0.5001 ns | 0.0038 |      32 B |
 #### after MoneyContext
-| Method                      |           Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
-|-----------------------------|---------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
-| Add                         |  **40.682 ns** | 0.8362 ns | 0.8213 ns |  1.00 |    0.03 |      - |         - |          NA |
-| AddFastMoney                |      12.074 ns | 0.2581 ns | 0.2869 ns |  0.30 |    0.01 |      - |         - |          NA |
-| Subtract                    |  **41.390 ns** | 0.8617 ns | 1.2630 ns |  1.02 |    0.04 |      - |         - |          NA |
-| SubtractFastMoney           |       6.014 ns | 0.1338 ns | 0.2547 ns |  0.15 |    0.01 |      - |         - |          NA |
-| Multiple                    |      43.001 ns | 0.5586 ns | 0.5487 ns |  1.06 |    0.02 |      - |         - |          NA |
-| MultipleFastMoneyDecimal    |      30.150 ns | 0.6217 ns | 1.0388 ns |  0.74 |    0.03 |      - |         - |          NA |
-| MultipleFastWholeDecimal    |      15.131 ns | 0.3312 ns | 0.4534 ns |  0.37 |    0.01 |      - |         - |          NA |
-| MultipleFastMoneyLong       |       2.120 ns | 0.0515 ns | 0.0457 ns |  0.05 |    0.00 |      - |         - |          NA |
-| Divide                      |      75.664 ns | 0.6646 ns | 0.5891 ns |  1.86 |    0.04 |      - |         - |          NA |
-| DivideFastMoneyDecimal      |      80.678 ns | 0.9934 ns | 0.9292 ns |  1.98 |    0.04 |      - |         - |          NA |
-| DivideFastMoneyWholeDecimal |      13.197 ns | 0.2873 ns | 0.3420 ns |  0.32 |    0.01 |      - |         - |          NA |
-| DivideFastMoneyLong         |       1.892 ns | 0.0584 ns | 0.0488 ns |  0.05 |    0.00 |      - |         - |          NA |
-| CompareSameCurrency         |   **8.707 ns** | 0.1937 ns | 0.1902 ns |  0.21 |    0.01 |      - |         - |          NA |
-| CompareDifferentCurrency    |       5.608 ns | 0.1049 ns | 0.0982 ns |  0.14 |    0.00 |      - |         - |          NA |
-| CompareAmount               |       9.267 ns | 0.0749 ns | 0.0664 ns |  0.23 |    0.00 |      - |         - |          NA |
-| Increment                   | **144.549 ns** | 0.5306 ns | 0.4431 ns |  3.55 |    0.07 | 0.0038 |      32 B |          NA |
-| Decrement                   | **102.890 ns** | 1.9648 ns | 1.9297 ns |  2.53 |    0.07 | 0.0038 |      32 B |          NA |
+| Method                      |          Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|-----------------------------|--------------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+| Add                         | **36.203 ns** | 0.7320 ns | 0.7189 ns |  1.00 |    0.03 |      - |         - |          NA |
+| AddFastMoney                |     12.171 ns | 0.2258 ns | 0.2113 ns |  0.34 |    0.01 |      - |         - |          NA |
+| Subtract                    | **36.230 ns** | 0.7429 ns | 0.7296 ns |  1.00 |    0.03 |      - |         - |          NA |
+| SubtractFastMoney           |      6.199 ns | 0.1351 ns | 0.1264 ns |  0.17 |    0.00 |      - |         - |          NA |
+| Multiple                    |     32.738 ns | 0.6269 ns | 0.6708 ns |  0.90 |    0.02 |      - |         - |          NA |
+| MultipleFastMoneyDecimal    |     30.623 ns | 0.6156 ns | 0.5758 ns |  0.85 |    0.02 |      - |         - |          NA |
+| MultipleFastWholeDecimal    |     15.231 ns | 0.3342 ns | 0.5491 ns |  0.42 |    0.02 |      - |         - |          NA |
+| MultipleFastMoneyLong       |      2.171 ns | 0.0430 ns | 0.0381 ns |  0.06 |    0.00 |      - |         - |          NA |
+| Divide                      |     87.427 ns | 1.4775 ns | 1.3821 ns |  2.42 |    0.06 |      - |         - |          NA |
+| DivideFastMoneyDecimal      |     82.499 ns | 0.6700 ns | 0.5594 ns |  2.28 |    0.05 |      - |         - |          NA |
+| DivideFastMoneyWholeDecimal |     13.493 ns | 0.2865 ns | 0.3066 ns |  0.37 |    0.01 |      - |         - |          NA |
+| DivideFastMoneyLong         |      1.940 ns | 0.0590 ns | 0.0606 ns |  0.05 |    0.00 |      - |         - |          NA |
+| CompareSameCurrency         |  **8.553 ns** | 0.1361 ns | 0.1207 ns |  0.24 |    0.01 |      - |         - |          NA |
+| CompareDifferentCurrency    |      5.458 ns | 0.1357 ns | 0.1393 ns |  0.15 |    0.00 |      - |         - |          NA |
+| CompareAmount               |      9.752 ns | 0.1651 ns | 0.1463 ns |  0.27 |    0.01 |      - |         - |          NA |
+| Increment                   |     90.687 ns | 1.7592 ns | 1.6455 ns |  2.51 |    0.07 | 0.0038 |      32 B |          NA |
+| Decrement                   |     90.750 ns | 0.6998 ns | 0.5844 ns |  2.51 |    0.05 | 0.0038 |      32 B |          NA |
 
 ## MoneyFormatting
 #### before (v1.x)

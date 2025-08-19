@@ -114,8 +114,7 @@ public partial struct Money
 
         try
         {
-            decimal totalAmount = decimal.Add(money1.Amount, money2.Amount);
-            return money1 with { Amount = totalAmount };
+            return new Money(checked(money1.Amount + money2.Amount), money1.Currency, money1.Context);
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -132,8 +131,14 @@ public partial struct Money
         if (decimal2 == decimal.Zero) return money1;
         if (money1.Amount == decimal.Zero) return money1 with { Amount = decimal2 };
 
-        decimal totalAmount = decimal.Add(money1.Amount, decimal2);
-        return money1 with { Amount = totalAmount };
+        try
+        {
+            return new Money(checked(money1.Amount + decimal2), money1.Currency, money1.Context);
+        }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a Money.", ex);
+        }
     }
 
     /// <summary>Subtracts one specified <see cref="Money"/> value from another.</summary>
@@ -167,8 +172,7 @@ public partial struct Money
 
         try
         {
-            decimal totalAmount = decimal.Subtract(money1.Amount, money2.Amount);
-            return money1 with { Amount = totalAmount };
+            return new Money(checked(money1.Amount - money2.Amount), money1.Currency, money1.Context);
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -185,8 +189,14 @@ public partial struct Money
         if (decimal2 == decimal.Zero) return money1;
         if (money1.Amount == decimal.Zero) return money1 with { Amount = -decimal2 };
 
-        decimal totalAmount = decimal.Subtract(money1.Amount, decimal2);
-        return money1 with { Amount = totalAmount };
+        try
+        {
+            return new Money(checked(money1.Amount - decimal2), money1.Currency, money1.Context);
+        }
+        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        {
+            throw new OverflowException("Value was either too large or too small for a Money.", ex);
+        }
     }
 
     /// <summary>Multiplies the specified money.</summary>
@@ -198,8 +208,7 @@ public partial struct Money
         if (multiplier == MultiplicativeIdentity) return money;
         try
         {
-            decimal totalAmount = decimal.Multiply(money.Amount, multiplier);
-            return money with { Amount = totalAmount };
+            return new Money(checked(money.Amount * multiplier), money.Currency, money.Context);
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -216,8 +225,7 @@ public partial struct Money
     {
         if (divisor == MultiplicativeIdentity) return money;
 
-        decimal totalAmount = decimal.Divide(money.Amount, divisor);
-        return money with { Amount = totalAmount };
+        return new Money(checked(money.Amount / divisor), money.Currency, money.Context);
     }
 
     /// <summary>Divides the specified money.</summary>
@@ -225,12 +233,7 @@ public partial struct Money
     /// <param name="money2">The divider.</param>
     /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
-    public static decimal Divide(in Money money1, in Money money2)
-    {
-        EnsureSameContext(money1, money2);
-        EnsureSameCurrency(money1, money2);
-        return decimal.Divide(money1.Amount, money2.Amount);
-    }
+    public static decimal Divide(in Money money1, in Money money2) => checked(money1.Amount / money2.Amount);
 
     /// <summary>Computes the <see cref="Money"/> remainder after dividing two <see cref="Money"/> values.</summary>
     /// <param name="money1">The <see cref="Money"/> dividend.</param>
@@ -241,6 +244,6 @@ public partial struct Money
         EnsureSameContext(money1, money2);
         EnsureSameCurrency(money1, money2);
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
-        return money1 with { Amount = remainder };
+        return new Money(remainder, money1.Currency, money1.Context);
     }
 }

@@ -106,7 +106,7 @@ public readonly partial struct Money : IEquatable<Money>
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
 
         // Round the amount to the correct scale
-        amount = currentContext!.RoundingStrategy switch
+        amount = currentContext.RoundingStrategy switch
         {
             NoRounding noRounding => noRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
             StandardRounding standardRounding => standardRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
