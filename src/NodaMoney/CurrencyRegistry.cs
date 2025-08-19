@@ -1,4 +1,6 @@
-﻿#if NET8_0_OR_GREATER
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+#if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
 
@@ -33,31 +35,52 @@ static class CurrencyRegistry
         s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
     }
 
-    /// <summary>Tries the get <see cref="CurrencyInfo"/> of the given code and namespace.</summary>
-    /// <param name="code">A currency code, like EUR or USD.</param>
-    /// <returns><b>true</b> if <see cref="CurrencyRegistry"/> contains a <see cref="CurrencyInfo"/> with the specified code; otherwise, <b>false</b>.</returns>
-    /// <exception cref="System.ArgumentNullException">The value of 'code' cannot be null or empty.</exception>
-    /// <exception cref="InvalidCurrencyException"> when <see cref="code"/> is unknown currency code.</exception>
+    /// <summary>Gets the <see cref="CurrencyInfo"/> associated with the specified currency code.</summary>
+    /// <param name="code">The currency code to retrieve, such as EUR or USD.</param>
+    /// <returns>The <see cref="CurrencyInfo"/> associated with the specified currency code.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the specified <paramref name="code"/> is null.</exception>
+    /// <exception cref="InvalidCurrencyException">Thrown when no currency is found with the specified <paramref name="code"/>.</exception>
     public static CurrencyInfo Get(string code)
     {
         if (code is null) throw new ArgumentNullException(nameof(code));
 
+        if (TryGet(code, out CurrencyInfo? currencyInfo))
+        {
+            return currencyInfo;
+        }
+
+        throw new InvalidCurrencyException($"{code} is unknown currency code!");
+    }
+
+    /// <summary>Tries to get the <see cref="CurrencyInfo"/> with the specified code.</summary>
+    /// <param name="code">A currency code, like EUR or USD.</param>
+    /// <param name="currencyInfo">When this method returns, contains the currency information that has the specified currency code if the code is found; otherwise, null.</param>
+    /// <returns><b>true</b> if the <see cref="CurrencyRegistry"/> contains a currency with the specified code; otherwise, <b>false</b>.</returns>
+#if NETSTANDARD2_0
+    public static bool TryGet(string code, out CurrencyInfo currencyInfo)
+#else
+    public static bool TryGet(string code, [MaybeNullWhen(false)] out CurrencyInfo currencyInfo)
+#endif
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            currencyInfo = null;
+            return false;
+        }
+
 #if NET8_0_OR_GREATER
-        if (s_lookupByCode.TryGetValue(code, out CurrencyInfo? ci))
-            return ci;
+        return s_lookupByCode.TryGetValue(code, out currencyInfo);
 #else
         s_lockSlim.EnterReadLock();
         try
         {
-            if (s_lookupByCode.TryGetValue(code, out CurrencyInfo? ci))
-                return ci;
+            return s_lookupByCode.TryGetValue(code, out currencyInfo);
         }
         finally
         {
             s_lockSlim.ExitReadLock();
         }
 #endif
-        throw new InvalidCurrencyException($"{code} is unknown currency code!");
     }
 
     /// <summary>Tries the get <see cref="CurrencyInfo"/> of the given <see cref="Currency"/>.</summary>

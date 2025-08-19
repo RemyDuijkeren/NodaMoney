@@ -1,12 +1,14 @@
 namespace NodaMoney.Tests.CurrencyInfoSpec;
 
-public class CurrencyInfoFromIsoCode
+public class CurrencyInfoFromCode
 {
     [Fact]
-    public void WhenIsoCodeIsExisting_ThenCreatingShouldSucceed()
+    public void WhenCodeExists_ReturnCurrencyInfo()
     {
+        // Arrange & Act
         var currency = CurrencyInfo.FromCode("EUR");
 
+        // Assert
         currency.Should().NotBeNull();
         currency.Symbol.Should().Be("€");
         currency.Code.Should().Be("EUR");
@@ -15,26 +17,32 @@ public class CurrencyInfoFromIsoCode
     }
 
     [Fact]
-    public void WhenIsoCodeIsUnknown_ThenCreatingShouldThrow()
+    public void WhenCodeIsUnknown_ThrowInvalidCurrencyException()
     {
+        // Arrange & Act
         Action action = () => CurrencyInfo.FromCode("AAA");
 
+        // Assert
         action.Should().Throw<InvalidCurrencyException>();
     }
 
     [Fact]
-    public void WhenIsoCodeIsNull_ThenCreatingShouldThrow()
+    public void WhenCodeIsNull_ThrowInvalidCurrencyException()
     {
+        // Arrange & Act
         Action action = () => CurrencyInfo.FromCode(null);
 
+        // Assert
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void WhenEstionianKrone_ThenItShouldBeObsolete()
+    public void WhenEstionianKrone_ReturnObsoleteCurrencyInfo()
     {
+        // Arrange & Act
         var currency = CurrencyInfo.FromCode("EEK");
 
+        // Assert
         currency.Should().NotBeNull();
         currency.Symbol.Should().Be("kr");
         currency.IsHistoric.Should().BeTrue();

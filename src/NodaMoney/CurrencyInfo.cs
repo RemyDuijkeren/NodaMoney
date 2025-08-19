@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace NodaMoney;
@@ -276,12 +277,22 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all currencies that matches.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars) => CurrencyRegistry.GetAllCurrencies(currencyChars);
 
-    /// <summary>Create an instance of the <see cref="CurrencyInfo"/> based on a ISO 4217 currency code.</summary>
-    /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
+    /// <summary>Get an instance of the <see cref="CurrencyInfo"/> based on an ISO 4217 currency code.</summary>
+    /// <param name="code">An ISO 4217 currency code, like EUR or USD.</param>
     /// <returns>An instance of the type <see cref="CurrencyInfo"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>
     public static CurrencyInfo FromCode(string code) => CurrencyRegistry.Get(code);
+
+    /// <summary>Tries to get a <see cref="CurrencyInfo"/> instance based on the specified ISO 4217 currency code.</summary>
+    /// <param name="code">An ISO 4217 currency code, like EUR or USD.</param>
+    /// <param name="currencyInfo">When this method returns, contains the currency associated with the specified ISO currency code, if the code is found; otherwise, null.</param>
+    /// <returns>true if the currency was found; otherwise, false.</returns>
+#if NETSTANDARD2_0
+    public static bool TryFromCode(string code, out CurrencyInfo currencyInfo) => CurrencyRegistry.TryGet(code, out currencyInfo);
+#else
+    public static bool TryFromCode(string code, [MaybeNullWhen(false)] out CurrencyInfo currencyInfo) => CurrencyRegistry.TryGet(code, out currencyInfo);
+#endif
 
     /// <summary>Retrieves a <see cref="CurrencyInfo"/> instance based on the provided <see cref="IFormatProvider"/>.</summary>
     /// <param name="formatProvider">
