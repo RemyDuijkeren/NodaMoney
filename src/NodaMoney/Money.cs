@@ -106,11 +106,12 @@ public readonly partial struct Money : IEquatable<Money>
         Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
 
         // Round the amount to the correct scale
+        var currencyInfo = CurrencyInfo.GetInstance(currency);
         amount = currentContext.RoundingStrategy switch
         {
-            NoRounding noRounding => noRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
-            StandardRounding standardRounding => standardRounding.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale),
-            _ => currentContext.RoundingStrategy.Round(amount, CurrencyInfo.GetInstance(currency), currentContext.MaxScale)
+            NoRounding noRounding => noRounding.Round(amount, currencyInfo, currentContext.MaxScale),
+            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, currentContext.MaxScale),
+            _ => currentContext.RoundingStrategy.Round(amount, currencyInfo, currentContext.MaxScale)
         };
 
         // Extract the 4 integers from the decimal amount.
@@ -330,7 +331,24 @@ public readonly partial struct Money : IEquatable<Money>
     /// value.</summary>
     /// <param name="other">A <see cref="Money"/> object.</param>
     /// <returns>true if value is equal to this instance; otherwise, false.</returns>
-    public bool Equals(Money other) => Amount == other.Amount && Currency == other.Currency;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(Money other)
+    {
+        // Fast path: currencies must match
+        if (!EqualCurrency(other)) return false;
+
+        // If both are zero, they are equal regardless of sign/scale
+        int thisLmh = _low | _mid | _high;
+        int otherLmh = other._low | other._mid | other._high;
+        if ((thisLmh | otherLmh) == 0)
+            return true;
+
+        // If none it the low, mid, high are equal (i.e., magnitudes are different), they are not equal
+        if (_low != other._low || _mid != other._mid || _high != other._high) return false;
+
+        // sign must be identical for non-zero values to be equal without further checks
+        return ((_flags ^ other._flags) & SignMask) == 0;
+    }
 
     /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
     /// and value.</summary>
@@ -349,7 +367,19 @@ public readonly partial struct Money : IEquatable<Money>
         }
     }
 #else
-    public override int GetHashCode() => HashCode.Combine(Amount, Currency);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public override int GetHashCode() => HashCode.Combine(_low, _mid, _high, _flags & (CurrencyMask | ScaleMask | SignMask));
+    public override int GetHashCode()
+    {
+        // Normalize zero: ignore sign and scale in hash when magnitude is zero
+        if ((_low | _mid | _high) == 0)
+        {
+            // Only currency contributes (and not sign/scale)
+            return HashCode.Combine(0, new Currency((ushort)(_flags & CurrencyMask)));
+        }
+        // For non-zero, fall back to Amount-based hash for correctness across different scales
+        return HashCode.Combine(Amount, Currency);
+    }
 #endif
 
     /// <summary>Deconstructs the current instance into its components.</summary>
@@ -362,21 +392,26 @@ public readonly partial struct Money : IEquatable<Money>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void EnsureSameCurrency(in Money left, in Money right)
+    private bool EqualCurrency(in Money other) => ((_flags ^ other._flags) & CurrencyMask) == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowIfCurrencyMismatch(in Money other)
     {
-        if (left.Currency == right.Currency)
+        if (EqualCurrency(other))
             return;
 
-        throw new InvalidCurrencyException(left.Currency, right.Currency);
+        throw new InvalidCurrencyException(this.Currency, other.Currency);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void EnsureSameContext(in Money left, in Money right)
+    private bool EqualContext(in Money other) => ((_flags ^ other._flags) & IndexMask) == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowIfContextMismatch(in Money other)
     {
-        // Use bitwise comparison instead of comparing ContextIndex (left.ContextIndex == right.ContextIndex) for performance
-        if ((left._flags & IndexMask) == (right._flags & IndexMask))
+        if (EqualContext(other))
             return;
 
-        throw new MoneyContextMismatchException(left.Context, right.Context);
+        throw new MoneyContextMismatchException(this.Context, other.Context);
     }
 }

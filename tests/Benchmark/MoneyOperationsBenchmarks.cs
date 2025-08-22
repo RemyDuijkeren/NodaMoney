@@ -94,19 +94,26 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public bool CompareSameCurrency()
+    public bool Equal()
     {
         return _euro10 == _euro20; // false
     }
 
     [Benchmark]
-    public bool CompareDifferentCurrency()
+    public bool NotEqualCurrency()
     {
         return _euro10 == _dollar10; // false
     }
 
     [Benchmark]
-    public bool CompareAmount()
+    public bool EqualOrBigger()
+    {
+        return _euro20 >= _euro10; // true
+    }
+
+
+    [Benchmark]
+    public bool Bigger()
     {
         return _euro20 > _euro10; // true
     }

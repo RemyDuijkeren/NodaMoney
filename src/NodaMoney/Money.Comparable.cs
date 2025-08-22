@@ -122,8 +122,33 @@ public partial struct Money : IComparable, IComparable<Money>
     /// </returns>
     public int CompareTo(Money other)
     {
-        EnsureSameContext(this, other);
-        EnsureSameCurrency(this, other);
+        ThrowIfCurrencyMismatch(other);
+
+        // Fast path: handle zeros (sign is not important for zero)
+        int thisMag = _low | _mid | _high;
+        int otherMag = other._low | other._mid | other._high;
+        if ((thisMag | otherMag) == 0)
+            return 0;
+
+        // If signs differ, the negative is less
+        bool thisNeg = (_flags & SignMask) != 0;
+        bool otherNeg = (other._flags & SignMask) != 0;
+        if (thisNeg != otherNeg)
+            return thisNeg ? -1 : 1;
+
+        // If scales are the same, we can compare the 96-bit integers lexicographically
+        byte thisScale = (byte)((_flags & ScaleMask) >> 16);
+        byte otherScale = (byte)((other._flags & ScaleMask) >> 16);
+        if (thisScale == otherScale)
+        {
+            // Compare high, then mid, then low
+            if (_high != other._high) return _high < other._high ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+            if (_mid  != other._mid)  return _mid  < other._mid  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+            if (_low  != other._low)  return _low  < other._low  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+            return 0;
+        }
+
+        // Fallback when scales differ: rely on decimal comparison which aligns scales
         return Amount.CompareTo(other.Amount);
     }
 }
