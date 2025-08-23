@@ -50,7 +50,6 @@
 | ImplicitCurrencyByCasting     | 83.013 ns | 0.8628 ns | 0.7648 ns |  2.20 |    0.04 | 0.0038 |      32 B |          NA |
 | Deconstruct                   |  1.092 ns | 0.0485 ns | 0.0476 ns |  0.03 |    0.00 |      - |         - |          NA |
 
-
 ## MoneyOperations
 #### v1
 | Method           |      Mean |    Error |    StdDev | Allocated |
@@ -135,15 +134,6 @@
 | ExplicitTry       | 431.5 ns | 6.15 ns | 5.46 ns | 0.1173 |     984 B |
 | ExplicitTryAsSpan | 446.3 ns | 5.94 ns | 5.55 ns | 0.1173 |     984 B |
 #### v2.5
-| Method            |     Mean |    Error |   StdDev |   Gen0 | Allocated |
-|-------------------|---------:|---------:|---------:|-------:|----------:|
-| Implicit          | 463.3 ns |  8.00 ns | 15.79 ns | 0.1173 |     984 B |
-| ImplicitTry       | 474.0 ns |  9.33 ns |  9.59 ns | 0.1173 |     984 B |
-| Explicit          | 507.3 ns | 10.01 ns | 22.81 ns | 0.1173 |     984 B |
-| ExplicitAsSpan    | 510.3 ns | 10.05 ns | 15.04 ns | 0.1173 |     984 B |
-| ExplicitTry       | 523.9 ns | 10.17 ns | 14.59 ns | 0.1173 |     984 B |
-| ExplicitTryAsSpan | 493.3 ns |  9.86 ns | 13.50 ns | 0.1173 |     984 B |
-
 | Method            |     Mean |   Error |  StdDev |   Gen0 | Allocated |
 |-------------------|---------:|--------:|--------:|-------:|----------:|
 | Implicit          | 386.3 ns | 6.61 ns | 6.19 ns | 0.0801 |     672 B |

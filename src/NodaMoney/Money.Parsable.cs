@@ -275,17 +275,15 @@ public partial struct Money
         }
 
         var suffixSymbol = match.Groups[1].ValueSpan; // SuffixSymbolGroupIndex
-        var prefixSymbol = match.Groups[2].ValueSpan; // PrefixSymbolGroupIndex
-
         if (!suffixSymbol.IsEmpty)
         {
             return suffixSymbol;
         }
-        else if (!prefixSymbol.IsEmpty)
+        var prefixSymbol = match.Groups[2].ValueSpan; // PrefixSymbolGroupIndex
+        if (!prefixSymbol.IsEmpty)
         {
             return prefixSymbol;
         }
-
 #else
         var match = s_currencySymbolMatcher.Match(s.ToString());
         if (!match.Success)
@@ -294,13 +292,12 @@ public partial struct Money
         }
 
         var suffixSymbol = match.Groups[1].Value; // SuffixSymbolGroupIndex
-        var prefixSymbol = match.Groups[2].Value; // PrefixSymbolGroupIndex
-
         if (!string.IsNullOrEmpty(suffixSymbol))
         {
             return suffixSymbol.AsSpan();
         }
-        else if (!string.IsNullOrEmpty(prefixSymbol))
+        var prefixSymbol = match.Groups[2].Value; // PrefixSymbolGroupIndex
+        if (!string.IsNullOrEmpty(prefixSymbol))
         {
             return prefixSymbol.AsSpan();
         }
