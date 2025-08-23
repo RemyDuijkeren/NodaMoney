@@ -201,6 +201,12 @@ public readonly partial struct Money : IEquatable<Money>
     /// <returns>true if value is equal to this instance; otherwise, false.</returns>
     public override bool Equals(object? obj) => obj is Money money && this.Equals(money);
 
+    /// <summary>Determines whether the specified <see cref="Money"/> instances are equal.</summary>
+    /// <param name="left">The first <see cref="Money"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="Money"/> instance to compare.</param>
+    /// <returns><see langword="true"/> if the specified <see cref="Money"/> instances are equal; otherwise, <see langword="false"/>.</returns>
+    public static bool Equals(Money left, Money right) => left.Equals(right);
+
     /// <summary>Returns the hash code for this instance.</summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
     public override int GetHashCode()
@@ -252,19 +258,23 @@ public readonly partial struct Money : IEquatable<Money>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowIfCurrencyIncompatible(in Money other)
     {
-        // Enforced mode: always require matching currencies, regardless of the amount is zero.
-        if (Context.EnforceZeroCurrencyMatching || other.Context.EnforceZeroCurrencyMatching)
-        {
-            ThrowIfCurrencyMismatch(other);
+        // Fast path: if currencies equal, nothing to do (no Context read needed).
+        if (EqualCurrency(other))
             return;
-        }
 
-        // Relaxed mode: only enforce currency match when both amounts are non-zero.
+        // Fast path: if both amounts are non-zero, enforce the currency match and throw (no Context read needed).
         int thisMag = _low | _mid | _high;
         int otherMag = other._low | other._mid | other._high;
-        if (thisMag != 0 && otherMag != 0)
+        if ((thisMag & otherMag) != 0)
         {
-            ThrowIfCurrencyMismatch(other);
+            throw new InvalidCurrencyException(this.Currency, other.Currency);
+        }
+
+        // At least one side is zero; only now consult the (expensive) Context flag to decide we should throw.
+        if (Context.EnforceZeroCurrencyMatching || other.Context.EnforceZeroCurrencyMatching)
+        {
+            // Enforced mode: always require matching currencies, regardless of the amount is zero.
+            throw new InvalidCurrencyException(this.Currency, other.Currency);
         }
     }
 

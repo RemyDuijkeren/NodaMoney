@@ -9,12 +9,25 @@ public class CompareMoney
     private Money _twentyDollar = new Money(20.00m, "USD");
 
     [Fact]
+    public void CompareProfile()
+    {
+        // Arrange
+
+
+        // Act
+        var result = _tenEuro1.CompareTo(_twentyEuro);
+
+        // Assert
+    }
+
+
+    [Fact]
     public void WhenCurrencyAndValueAreEqual_ThenMoneyShouldBeEqual()
     {
         _tenEuro1.Should().Be(_tenEuro2);
         _tenEuro1.Equals(_tenEuro2).Should().BeTrue(); //using Equal()
-        Money.Equals(_tenEuro1, _tenEuro2).Should()
-             .BeTrue(); //using static Equals()                 (_tenEuro1 == _tenEuro2).Should().BeTrue(); //using Euality operators
+        Money.Equals(_tenEuro1, _tenEuro2).Should().BeTrue(); //using static Equals()
+        (_tenEuro1 == _tenEuro2).Should().BeTrue(); //using Euality operators
         (_tenEuro1 != _tenEuro2).Should().BeFalse(); //using Euality operators
         _tenEuro1.GetHashCode().Should().Be(_tenEuro2.GetHashCode()); //using GetHashCode()
     }
