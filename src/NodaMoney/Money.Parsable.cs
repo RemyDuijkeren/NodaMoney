@@ -33,15 +33,17 @@ public partial struct Money
     {
         ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
 
-        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencySymbol, ci) : ParseCurrencyInfo(currencySymbol);
-        provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
+        CurrencyInfo currencyInfo = (provider is CurrencyInfo ci)
+            ? ParseCurrencyInfo(currencySymbol, ci)
+            : ParseCurrencyInfo(currencySymbol);
 
         ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
+        NumberFormatInfo nfi = GetNumberFormatInfo(provider);
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        decimal amount = decimal.Parse(numericInput, ParseNumberStyle, provider);
+        decimal amount = decimal.Parse(numericInput, ParseNumberStyle, nfi);
 #else
-        decimal amount = decimal.Parse(numericInput.ToString(), ParseNumberStyle, provider);
+        decimal amount = decimal.Parse(numericInput.ToString(), ParseNumberStyle, nfi);
 #endif
 
         return new Money(amount, currencyInfo);
@@ -111,15 +113,17 @@ public partial struct Money
 
             ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
 
-            CurrencyInfo currencyInfo = (provider is CurrencyInfo ci) ? ParseCurrencyInfo(currencySymbol, ci) : ParseCurrencyInfo(currencySymbol);
-            provider ??= (IFormatProvider?)currencyInfo.GetFormat(typeof(NumberFormatInfo));
+            CurrencyInfo currencyInfo = provider is CurrencyInfo ci
+                ? ParseCurrencyInfo(currencySymbol, ci)
+                : ParseCurrencyInfo(currencySymbol);
 
             ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
+            NumberFormatInfo nfi = GetNumberFormatInfo(provider);
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, nfi, out decimal amount);
 #else
-            bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, provider, out decimal amount);
+            bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, nfi, out decimal amount);
 #endif
             if (isParsed)
             {
@@ -304,6 +308,15 @@ public partial struct Money
 
         return [];
     }
+
+    private static NumberFormatInfo GetNumberFormatInfo(IFormatProvider? provider) =>
+        provider switch
+        {
+            CultureInfo ci => ci.NumberFormat,
+            NumberFormatInfo nfi => nfi,
+            CurrencyInfo => CultureInfo.CurrentCulture.NumberFormat,
+            _ => CultureInfo.CurrentCulture.NumberFormat
+        };
 
     // Regex to capture symbol (4 or 5) and amount (6): @"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$"
 #if NET7_0_OR_GREATER

@@ -144,6 +144,15 @@
 | ExplicitTry       | 523.9 ns | 10.17 ns | 14.59 ns | 0.1173 |     984 B |
 | ExplicitTryAsSpan | 493.3 ns |  9.86 ns | 13.50 ns | 0.1173 |     984 B |
 
+| Method            |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|-------------------|---------:|--------:|--------:|-------:|----------:|
+| Implicit          | 386.3 ns | 6.61 ns | 6.19 ns | 0.0801 |     672 B |
+| ImplicitTry       | 361.5 ns | 3.40 ns | 3.18 ns | 0.0801 |     672 B |
+| Explicit          | 376.6 ns | 5.06 ns | 4.48 ns | 0.0801 |     672 B |
+| ExplicitAsSpan    | 379.4 ns | 4.21 ns | 3.94 ns | 0.0801 |     672 B |
+| ExplicitTry       | 389.4 ns | 2.96 ns | 2.62 ns | 0.0801 |     672 B |
+| ExplicitTryAsSpan | 389.6 ns | 5.03 ns | 4.71 ns | 0.0801 |     672 B |
+
 ## HighLoad
 #### v1
 | Method           |     Mean |    Error |   StdDev |      Gen 0 | Allocated |
