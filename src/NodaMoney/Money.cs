@@ -265,7 +265,7 @@ public readonly partial struct Money : IEquatable<Money>
         // Fast path: if both amounts are non-zero, enforce the currency match and throw (no Context read needed).
         int thisMag = _low | _mid | _high;
         int otherMag = other._low | other._mid | other._high;
-        if ((thisMag & otherMag) != 0)
+        if (thisMag != 0 && otherMag != 0)
         {
             throw new InvalidCurrencyException(this.Currency, other.Currency);
         }
