@@ -164,4 +164,18 @@ public class CreateContext
         money.Amount.Should().Be(1234.6m);
         money.Currency.Should().Be(Currency.FromCode("MGA"));
     }
+
+    [Fact]
+    public void CreateContext_ShouldThrow_WhenMaxScaleGreaterThanPrecision()
+    {
+        // Arrange
+        var options = new MoneyContextOptions { Precision = 4, MaxScale = 5 };
+
+        // Act
+        Action act = () => MoneyContext.Create(options);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+           .WithMessage("MaxScale cannot be greater than precision");
+    }
 }

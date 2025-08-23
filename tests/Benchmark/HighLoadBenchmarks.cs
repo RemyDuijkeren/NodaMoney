@@ -30,24 +30,6 @@ public class HighLoadBenchmarks
         return currencies;
     }
 
-    [Benchmark]
-    public decimal Create1MDecimal()
-    {
-        decimal[] decimals = new decimal[Count];
-
-        for (int i = 0; i < Count; i++)
-        {
-            if (i % 3 == 0)
-                decimals[i] = 10M;
-            else if (i % 2 == 0)
-                decimals[i] = 20M;
-            else
-                decimals[i] = 30M;
-        }
-
-        return decimals[0];
-    }
-
     [Benchmark(Baseline = true)]
     public Money[] Create1MMoney()
     {
@@ -100,5 +82,23 @@ public class HighLoadBenchmarks
         }
 
         return money[0];
+    }
+
+    [Benchmark]
+    public decimal Create1MDecimal()
+    {
+        decimal[] decimals = new decimal[Count];
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (i % 3 == 0)
+                decimals[i] = 10M;
+            else if (i % 2 == 0)
+                decimals[i] = 20M;
+            else
+                decimals[i] = 30M;
+        }
+
+        return decimals[0];
     }
 }

@@ -90,16 +90,13 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object with the values of both <see cref="Money"/> objects added.</returns>
     public static Money Add(in Money money1, in Money money2)
     {
-        if (money1.Context.EnforceZeroCurrencyMatching || money2.Context.EnforceZeroCurrencyMatching)
-            money1.ThrowIfCurrencyMismatch(money2);
+        money1.ThrowIfCurrencyIncompatible(money2);
 
-        // If one of the amounts is zero, then return fast
+        // Fast-path: If one of the amounts is zero, then return
         if (IsZero(money1)) return money2;
         if (IsZero(money2)) return money1;
 
-        money1.ThrowIfCurrencyMismatch(money2);
         money1.ThrowIfContextMismatch(money2);
-
         try
         {
             return new Money(checked(money1.Amount + money2.Amount), money1.Currency, money1.Context);
@@ -135,16 +132,13 @@ public partial struct Money
     /// <returns>A <see cref="Money"/> object where the second <see cref="Money"/> object is subtracted from the first.</returns>
     public static Money Subtract(in Money money1, in Money money2)
     {
-        if (money1.Context.EnforceZeroCurrencyMatching || money2.Context.EnforceZeroCurrencyMatching)
-            money1.ThrowIfCurrencyMismatch(money2);
+        money1.ThrowIfCurrencyIncompatible(money2);
 
-        // If one of the amounts is zero, then return fast
+        // Fast-path: If one of the amounts is zero, then return
         if (IsZero(money1)) return -money2;
         if (IsZero(money2)) return money1;
 
-        money1.ThrowIfCurrencyMismatch(money2);
         money1.ThrowIfContextMismatch(money2);
-
         try
         {
             return new Money(checked(money1.Amount - money2.Amount), money1.Currency, money1.Context);

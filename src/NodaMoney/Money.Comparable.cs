@@ -122,7 +122,7 @@ public partial struct Money : IComparable, IComparable<Money>
     /// </returns>
     public int CompareTo(Money other)
     {
-        ThrowIfCurrencyMismatch(other);
+        ThrowIfCurrencyIncompatible(other);
 
         // Fast path: handle zeros (sign is not important for zero)
         int thisMag = _low | _mid | _high;
@@ -130,16 +130,14 @@ public partial struct Money : IComparable, IComparable<Money>
         if ((thisMag | otherMag) == 0)
             return 0;
 
-        // If signs differ, the negative is less
+        // Fast path: If signs differ, the negative is less
         bool thisNeg = (_flags & SignMask) != 0;
         bool otherNeg = (other._flags & SignMask) != 0;
         if (thisNeg != otherNeg)
             return thisNeg ? -1 : 1;
 
-        // If scales are the same, we can compare the 96-bit integers lexicographically
-        byte thisScale = (byte)((_flags & ScaleMask) >> 16);
-        byte otherScale = (byte)((other._flags & ScaleMask) >> 16);
-        if (thisScale == otherScale)
+        // Fast path: If scales are the same, we can compare the 96-bit integers lexicographically
+        if (Scale == other.Scale)
         {
             // Compare high, then mid, then low
             if (_high != other._high) return _high < other._high ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
