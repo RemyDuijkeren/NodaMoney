@@ -32,7 +32,7 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net48'" />
     <PackageReference Include="System.Text.Json" Version="9.0.8" Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'"  />
     <PackageReference Include="RavenDB.TestDriver" Version="7.0.0" Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net48'" />
-    <PackageReference Include="RavenDB.TestDriver" Version="7.1.1" Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'" />
+    <PackageReference Include="RavenDB.TestDriver" Version="7.1.2" Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.5.23" />
   </ItemGroup>
 
