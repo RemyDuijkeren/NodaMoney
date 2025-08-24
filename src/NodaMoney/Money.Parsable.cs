@@ -282,73 +282,63 @@ public partial struct Money
             while (start <= end && char.IsWhiteSpace(s[start])) start++;
         }
 
-        // Suffix detection: look from the end for a run of symbol chars after trimming trailing whitespace and optional ')'
+        // Establish effective right bound, trimming whitespace and optional trailing ')'
         int r = end;
-        // Trim trailing whitespace
         while (r >= start && char.IsWhiteSpace(s[r])) r--;
-        // If there's a trailing ')', allow it only if we had opening '('
         if (r >= start && s[r] == ')' && hasOpeningParen)
         {
             r--;
             while (r >= start && char.IsWhiteSpace(s[r])) r--;
         }
+        if (r < start) return [];
 
-        // Collect a run of symbol chars at the end (suffix)
-        int suffixEnd = r; // inclusive
-        while (r >= start && IsSymbolChar(s[r])) r--;
-        int suffixStart = r + 1; // first symbol char
-        if (suffixStart <= suffixEnd)
+        // Precompute the first and last index of number/sign within [start, r]
+        static bool IsNumOrSign(char c) => c == '+' || c == '-' || char.IsDigit(c);
+
+        int firstNumSign = -1;
+        for (int i = start; i <= r; i++)
         {
-            // Verify there is at least one digit or sign before the symbol (to mimic the regex branch constraints)
-            bool hasNumberOrSignBefore = false;
-            for (int i = start; i < suffixStart; i++)
+            if (IsNumOrSign(s[i]))
             {
-                char c = s[i];
-                if (c == '+' || c == '-' || char.IsDigit(c))
-                {
-                    hasNumberOrSignBefore = true;
-                    break;
-                }
-            }
-
-            if (hasNumberOrSignBefore)
-            {
-                return s.Slice(suffixStart, suffixEnd - suffixStart + 1);
+                firstNumSign = i;
+                break;
             }
         }
 
-        // Prefix detection: look from the start for a run of symbol chars after optional sign and whitespace
+        int lastNumSign = -1;
+        for (int i = r; i >= start; i--)
+        {
+            if (IsNumOrSign(s[i]))
+            {
+                lastNumSign = i;
+                break;
+            }
+        }
+
+        // Suffix detection: contiguous symbol chars at the end
+        int t = r;
+        while (t >= start && IsSymbolChar(s[t])) t--;
+        int suffixStart = t + 1;
+        int suffixEnd = r;
+        if (suffixStart <= suffixEnd && firstNumSign != -1 && firstNumSign < suffixStart)
+        {
+            return s.Slice(suffixStart, suffixEnd - suffixStart + 1);
+        }
+
+        // Prefix detection: optional leading '-' sign, then contiguous symbol chars
         int l = start;
-        // Optional leading '-' sign can precede the prefix symbol (e.g., "-$123" or "-€ 123").
-        if (l <= end && s[l] == '-')
+        if (l <= r && s[l] == '-')
         {
             l++;
-            while (l <= end && char.IsWhiteSpace(s[l])) l++;
+            while (l <= r && char.IsWhiteSpace(s[l])) l++;
         }
 
-        // Collect a run of symbol chars at the start (prefix)
         int prefixStart = l;
-        while (l <= end && IsSymbolChar(s[l])) l++;
-        int prefixEnd = l - 1; // inclusive
-
-        if (prefixStart <= prefixEnd)
+        while (l <= r && IsSymbolChar(s[l])) l++;
+        int prefixEnd = l - 1;
+        if (prefixStart <= prefixEnd && lastNumSign != -1 && lastNumSign > prefixEnd)
         {
-            // Ensure there is at least one digit or sign somewhere after the symbol to match the regex prefix branch
-            bool hasNumberOrSignAfter = false;
-            for (int i = prefixEnd + 1; i <= end; i++)
-            {
-                char c = s[i];
-                if (c == '+' || c == '-' || char.IsDigit(c))
-                {
-                    hasNumberOrSignAfter = true;
-                    break;
-                }
-            }
-
-            if (hasNumberOrSignAfter)
-            {
-                return s.Slice(prefixStart, prefixEnd - prefixStart + 1);
-            }
+            return s.Slice(prefixStart, prefixEnd - prefixStart + 1);
         }
 
         return [];

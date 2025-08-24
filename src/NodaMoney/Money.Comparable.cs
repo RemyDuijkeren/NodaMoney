@@ -140,9 +140,11 @@ public partial struct Money : IComparable, IComparable<Money>
         if (Scale == other.Scale)
         {
             // Compare high, then mid, then low
+#pragma warning disable RCS1238
             if (_high != other._high) return _high < other._high ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
             if (_mid  != other._mid)  return _mid  < other._mid  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
             if (_low  != other._low)  return _low  < other._low  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+#pragma warning restore RCS1238
             return 0;
         }
 

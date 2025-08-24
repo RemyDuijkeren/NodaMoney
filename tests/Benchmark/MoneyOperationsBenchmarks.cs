@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using NodaMoney;
 
 namespace Benchmark;
@@ -12,18 +13,12 @@ public class MoneyOperationsBenchmarks
     Money _euro = new Money(765.43m, "EUR");
     readonly FastMoney _euro10fast = new(10, "EUR");
     readonly FastMoney _euro20fast = new(20, "EUR");
+    readonly FastMoney _dollar10fast = new(10, "USD");
 
     [Benchmark(Baseline = true)]
     public Money Add()
     {
         return _euro10 + _euro20;
-    }
-
-    [Benchmark]
-    public decimal AddFastMoney()
-    {
-        var money = FastMoney.Add(_euro10fast, _euro20fast);
-        return money.Amount;
     }
 
     [Benchmark]
@@ -33,37 +28,9 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public long SubtractFastMoney()
-    {
-        var money =  FastMoney.Subtract(_euro20fast, _euro10fast);
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
     public Money Multiple()
     {
         return _euro10 * 2.2m;
-    }
-
-    [Benchmark]
-    public long MultipleFastMoneyDecimal()
-    {
-        var money = _euro10fast * 2.2m;
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public long MultipleFastWholeDecimal()
-    {
-        var money = _euro10fast * 2m;
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public long MultipleFastMoneyLong()
-    {
-        var money = _euro10fast * 2L;
-        return FastMoney.ToOACurrency(money);
     }
 
     [Benchmark]
@@ -73,28 +40,13 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public long DivideFastMoneyDecimal()
-    {
-        var money = _euro10fast / 2.2m;
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public long DivideFastMoneyWholeDecimal()
-    {
-        var money = _euro10fast / 2m;
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
-    public long DivideFastMoneyLong()
-    {
-        var money = _euro10fast / 2L;
-        return FastMoney.ToOACurrency(money);
-    }
-
-    [Benchmark]
     public bool Equal()
+    {
+        return _euro10 == _euro10; // false
+    }
+
+    [Benchmark]
+    public bool NotEqualValue()
     {
         return _euro10 == _euro20; // false
     }
@@ -110,7 +62,6 @@ public class MoneyOperationsBenchmarks
     {
         return _euro20 >= _euro10; // true
     }
-
 
     [Benchmark]
     public bool Bigger()
@@ -128,5 +79,91 @@ public class MoneyOperationsBenchmarks
     public Money Decrement()
     {
         return --_euro;
+    }
+
+    [Benchmark]
+    public decimal fAdd()
+    {
+        var money = FastMoney.Add(_euro10fast, _euro20fast);
+        return money.Amount;
+    }
+
+    [Benchmark]
+    public long fSubtract()
+    {
+        var money =  FastMoney.Subtract(_euro20fast, _euro10fast);
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fMultiple()
+    {
+        var money = _euro10fast * 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fMultipleWholeNumber()
+    {
+        var money = _euro10fast * 2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fMultipleLong()
+    {
+        var money = _euro10fast * 2L;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fDivide()
+    {
+        var money = _euro10fast / 2.2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fDivideWholeNumber()
+    {
+        var money = _euro10fast / 2m;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public long fDivideLong()
+    {
+        var money = _euro10fast / 2L;
+        return FastMoney.ToOACurrency(money);
+    }
+
+    [Benchmark]
+    public bool fEqual()
+    {
+        return _euro10fast == _euro10fast; // true
+    }
+
+    [Benchmark]
+    public bool fNotEqualValue()
+    {
+        return _euro10fast == _euro20fast; // false
+    }
+
+    [Benchmark]
+    public bool fNotEqualCurrency()
+    {
+        return _euro10fast == _dollar10fast; // false
+    }
+
+    [Benchmark]
+    public bool fEqualOrBigger()
+    {
+        return _euro20fast >= _euro10fast; // true
+    }
+
+    [Benchmark]
+    public bool fBigger()
+    {
+        return _euro20fast > _euro10fast; // true
     }
 }

@@ -192,7 +192,7 @@ public readonly partial struct Money : IEquatable<Money>
 
         // Fallback: compare using reconstructed decimals to be scale-insensitive (e.g., 1.0 == 1.00).
         // Different low/mid/high with a different scale can represent the same numeric amount!
-        return Amount == other.Amount;
+        return EqualityComparer<decimal>.Default.Equals(Amount, other.Amount);
     }
 
     /// <summary>Returns a value indicating whether this instance and a specified <see cref="object"/> represent the same type
@@ -211,27 +211,17 @@ public readonly partial struct Money : IEquatable<Money>
     /// <returns>A 32-bit signed integer hash code.</returns>
     public override int GetHashCode()
     {
-#if NETSTANDARD2_0
         // Fast-path: if zero, compute hash without reconstructing decimal
         if (_low == 0 && _mid == 0 && _high == 0)
         {
             // Canonical zero: sign/scale don't matter for zero; ensure the same hash for any zero representation.
-            unchecked { return (0 * 31) + Currency.GetHashCode(); }
+            return (EqualityComparer<decimal>.Default.GetHashCode(0) * 31) +
+                   EqualityComparer<Currency>.Default.GetHashCode(this.Currency);
         }
 
         // use Amount (scale-insensitive) to keep the contract with Equals.
-        unchecked { return (Amount.GetHashCode() * 31) + Currency.GetHashCode(); }
-#else
-        // Fast-path: if zero, compute hash without reconstructing decimal
-        if (_low == 0 && _mid == 0 && _high == 0)
-        {
-            // Canonical zero: sign/scale don't matter for zero; ensure the same hash for any zero representation.
-            return HashCode.Combine(0, Currency);
-        }
-
-        // use Amount (scale-insensitive) to keep the contract with Equals.
-        return HashCode.Combine(Amount, Currency);
-#endif
+        return (EqualityComparer<decimal>.Default.GetHashCode(this.Amount) * 31) +
+               EqualityComparer<Currency>.Default.GetHashCode(this.Currency);
     }
 
     /// <summary>Deconstructs the current instance into its components.</summary>

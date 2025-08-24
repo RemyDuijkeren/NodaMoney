@@ -2,7 +2,7 @@
 
 namespace NodaMoney;
 
-internal readonly partial record struct FastMoney
+public readonly partial record struct FastMoney
 #if NET7_0_OR_GREATER
     : IDecrementOperators<FastMoney>,
         IIncrementOperators<FastMoney>,

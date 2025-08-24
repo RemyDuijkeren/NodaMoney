@@ -2,7 +2,7 @@
 
 namespace NodaMoney;
 
-internal readonly partial record struct FastMoney
+public readonly partial record struct FastMoney
 #if NET7_0_OR_GREATER
     : IMinMaxValue<FastMoney>,
         IMultiplicativeIdentity<FastMoney, decimal>,
@@ -129,28 +129,14 @@ internal readonly partial record struct FastMoney
     /// <returns>A <see cref="FastMoney"/> object with the values of both <see cref="FastMoney"/> objects added.</returns>
     public static FastMoney Add(in FastMoney money1, in FastMoney money2)
     {
-        EnsureSameContext(money1, money2);
-        if (money1.Context.EnforceZeroCurrencyMatching)
-        {
-            EnsureSameCurrency(money1, money2);
+        money1.ThrowIfCurrencyIncompatible(money2);
 
-            // If one of the amounts is zero, then return fast
-            if (money1.OACurrencyAmount == 0L)
-                return money2;
-            if (money2.OACurrencyAmount == 0L)
-                return money1;
-        }
-        else
-        {
-            // If one of the amounts is zero, then return fast
-            if (money1.OACurrencyAmount == 0L)
-                return money2;
-            if (money2.OACurrencyAmount == 0L)
-                return money1;
+        // If one of the amounts is zero, then return fast
+        if (money1.OACurrencyAmount == 0L) return money2;
+        if (money2.OACurrencyAmount == 0L) return money1;
 
-            EnsureSameCurrency(money1, money2);
-        }
-
+        // TODO: Do we need to check for Context, because we are not rounding
+        money1.ThrowIfContextMismatch(money2);
         try
         {
             long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
@@ -188,29 +174,14 @@ internal readonly partial record struct FastMoney
     /// <returns>A <see cref="FastMoney"/> object where the second <see cref="FastMoney"/> object is subtracted from the first.</returns>
     public static FastMoney Subtract(in FastMoney money1, in FastMoney money2)
     {
-        EnsureSameContext(money1, money2);
+        money1.ThrowIfCurrencyIncompatible(money2);
 
-        if (money1.Context.EnforceZeroCurrencyMatching)
-        {
-            EnsureSameCurrency(money1, money2);
+        // If one of the amounts is zero, then return fast
+        if (money1.OACurrencyAmount == 0L) return -money2;
+        if (money2.OACurrencyAmount == 0L) return money1;
 
-            // If one of the amounts is zero, then return fast
-            if (money1.OACurrencyAmount == 0L)
-                return -money2;
-            if (money2.OACurrencyAmount == 0L)
-                return money1;
-        }
-        else
-        {
-            // If one of the amounts is zero, then return fast
-            if (money1.OACurrencyAmount == 0L)
-                return -money2;
-            if (money2.OACurrencyAmount == 0L)
-                return money1;
-
-            EnsureSameCurrency(money1, money2);
-        }
-
+        // TODO: Do we need to check for Context, because we are not rounding
+        money1.ThrowIfContextMismatch(money2);
         try
         {
             long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow
@@ -354,12 +325,7 @@ internal readonly partial record struct FastMoney
     /// <param name="money2">The divider.</param>
     /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
-    public static decimal Divide(in FastMoney money1, in FastMoney money2)
-    {
-        EnsureSameContext(money1, money2);
-        EnsureSameCurrency(money1, money2);
-        return decimal.Divide(money1.Amount, money2.Amount);
-    }
+    public static decimal Divide(in FastMoney money1, in FastMoney money2) => decimal.Divide(money1.Amount, money2.Amount);
 
     /// <summary>Computes the <see cref="FastMoney"/> remainder after dividing two <see cref="Money"/> values.</summary>
     /// <param name="money1">The <see cref="FastMoney"/> dividend.</param>
@@ -367,8 +333,8 @@ internal readonly partial record struct FastMoney
     /// <returns>The <see cref="FastMoney"/> remainder after dividing <see cref="money1"/> by <see cref="money2"/>.</returns>
     public static FastMoney Remainder(in FastMoney money1, in FastMoney money2)
     {
-        EnsureSameContext(money1, money2);
-        EnsureSameCurrency(money1, money2);
+        money1.ThrowIfCurrencyMismatch(money2);
+        money1.ThrowIfContextMismatch(money2);
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
         return money1 with { OACurrencyAmount = decimal.ToOACurrency(remainder) };
     }

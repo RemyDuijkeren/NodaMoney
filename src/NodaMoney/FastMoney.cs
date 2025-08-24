@@ -53,7 +53,7 @@ namespace NodaMoney;
 /// See also OLE Automation Currency, SQL Currency type and https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type.</para>
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 12)]
-internal readonly partial record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
+public readonly partial record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
     private const byte Scale = 4;
     private const long ScaleFactor = 10_000;
@@ -80,44 +80,6 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
 
     // [field: FieldOffset(11)]
     // private byte UnusedByte { get; init; }
-
-    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct based on the provided <see cref="Money"/> instance.</summary>
-    /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
-    /// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
-    /// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
-    public FastMoney(Money money) : this(money.Amount, money.Currency) { }
-
-    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on the current culture.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <remarks>The amount will be rounded to the number of decimals for the specified currency
-    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
-    /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
-    /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
-    /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount) : this(amount, MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency) { }
-
-    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
-    /// <remarks>The amount will be rounded to the number of decimals for the specified currency
-    /// (<see cref="NodaMoney.CurrencyInfo.DecimalDigits"/>). As rounding mode, MidpointRounding.ToEven is used
-    /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
-    /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
-    /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount, string code) : this(amount, CurrencyInfo.FromCode(code)) { }
-
-    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="code">An ISO 4217 Currency code, like EUR or USD.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance.</param>
-    public FastMoney(decimal amount, string code, MoneyContext context) : this(amount, CurrencyInfo.FromCode(code), context) { }
-
-    /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
-    /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="currency">The Currency of the money.</param>
-    /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
-    /// current <see cref="MoneyContext"/> will be used.</param>
-    public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this(amount, CurrencyInfo.GetInstance(currency), context) { }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
@@ -163,26 +125,11 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
         Currency = currencyInfo;
     }
 
-    public FastMoney(double amount) : this((decimal)amount) { }
+    public bool Equals(FastMoney other) => EqualityComparer<long>.Default.Equals(this.OACurrencyAmount, other.OACurrencyAmount) &&
+                                           EqualityComparer<Currency>.Default.Equals(this.Currency, other.Currency);
 
-    public FastMoney(double amount, Currency currency) : this((decimal)amount, currency) { }
-
-    public FastMoney(double amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
-
-    public FastMoney(long amount) : this((decimal)amount) { }
-
-    public FastMoney(long amount, Currency currency) : this((decimal)amount, currency) { }
-
-    public FastMoney(long amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
-
-    [CLSCompliant(false)]
-    public FastMoney(ulong amount) : this((decimal)amount) { }
-
-    [CLSCompliant(false)]
-    public FastMoney(ulong amount, Currency currency) : this((decimal)amount, currency) { }
-
-    [CLSCompliant(false)]
-    public FastMoney(ulong amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
+    public override int GetHashCode() => (EqualityComparer<long>.Default.GetHashCode(this.OACurrencyAmount) * 31) +
+                                         EqualityComparer<Currency>.Default.GetHashCode(this.Currency);
 
     public void Deconstruct(out decimal amount, out Currency currency)
     {
@@ -199,23 +146,44 @@ internal readonly partial record struct FastMoney // or CompactMoney? TODO add i
 
     public static SqlMoney ToSqlMoney(FastMoney money) => new(money.Amount);
 
-    public static FastMoney FromSqlMoney(SqlMoney sqlMoney) => new(sqlMoney.Value); // TODO: what if null?
+    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void EnsureSameCurrency(in FastMoney left, in FastMoney right)
+    private void ThrowIfCurrencyMismatch(in FastMoney other)
     {
-        if (left.Currency == right.Currency)
+        if (this.Currency == other.Currency)
             return;
 
-        throw new InvalidCurrencyException(left.Currency, right.Currency);
+        throw new InvalidCurrencyException(this.Currency, other.Currency);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void EnsureSameContext(in FastMoney left, in FastMoney right)
+    private void ThrowIfCurrencyIncompatible(in FastMoney other)
     {
-        if (left.ContextIndex == right.ContextIndex)
+        // Fast path: if currencies equal, nothing to do (no Context read needed).
+        if (this.Currency == other.Currency)
             return;
 
-        throw new MoneyContextMismatchException(left.Context, right.Context);
+        // Fast path: if both amounts are non-zero, enforce the currency match and throw (no Context read needed).
+        if (OACurrencyAmount != 0 && other.OACurrencyAmount != 0)
+        {
+            throw new InvalidCurrencyException(this.Currency, other.Currency);
+        }
+
+        // At least one side is zero; only now consult the (expensive) Context flag to decide we should throw.
+        if (Context.EnforceZeroCurrencyMatching || other.Context.EnforceZeroCurrencyMatching)
+        {
+            // Enforced mode: always require matching currencies, regardless of the amount is zero.
+            throw new InvalidCurrencyException(this.Currency, other.Currency);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowIfContextMismatch(in FastMoney other)
+    {
+        if (this.ContextIndex == other.ContextIndex)
+            return;
+
+        throw new MoneyContextMismatchException(this.Context, other.Context);
     }
 }
