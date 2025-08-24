@@ -6,6 +6,7 @@
     <File Path="CONTRIBUTING.md" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path=".junie\guidelines.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/NodaMoney/NodaMoney.csproj" />
