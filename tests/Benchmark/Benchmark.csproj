@@ -16,4 +16,8 @@
       <ProjectReference Include="..\..\src\NodaMoney\NodaMoney.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="BenchmarkDotNet.Artifacts\results\" />
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,7 @@
 ﻿using Benchmark;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -9,7 +11,10 @@ using BenchmarkDotNet.Running;
 var config = ManualConfig.CreateEmpty()
                          .AddJob(Job.Default)
                          .AddLogger(ConsoleLogger.Default)
-                         .AddExporter(MarkdownExporter.GitHub);
+                         .AddExporter(MarkdownExporter.GitHub)
+                         .AddColumnProvider(DefaultColumnProviders.Instance)   // add columns like Mean, Error, StdDev, etc.
+                         .AddColumn(StatisticColumn.OperationsPerSecond)
+                         .AddDiagnoser(MemoryDiagnoser.Default);
                          //.WithArtifactsPath(Path.GetFullPath("artifacts"));
 
 // Run all benchmarks in the assembly; honors command-line args (e.g., --runtimes)
