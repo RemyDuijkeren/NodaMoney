@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
 namespace NodaMoney;
@@ -261,47 +260,96 @@ public partial struct Money
 
     private static ReadOnlySpan<char> ParseCurrencySymbol(ReadOnlySpan<char> s)
     {
-        // Return immediately if the input is empty or whitespace
         if (s.IsEmpty || s.IsWhiteSpace())
         {
             return [];
         }
 
-#if NET7_0_OR_GREATER
-        var match = s_currencySymbolMatcher().Match(s.ToString());
-        if (!match.Success)
+        static bool IsSymbolChar(char c) => !(char.IsWhiteSpace(c) || c == '+' || c == '-' || char.IsDigit(c));
+
+        int start = 0;
+        int end = s.Length - 1;
+
+        // Skip leading whitespace
+        while (start <= end && char.IsWhiteSpace(s[start])) start++;
+        if (start > end) return [];
+
+        // Track if there's a leading '(' to potentially skip a trailing ')'
+        bool hasOpeningParen = s[start] == '(';
+        if (hasOpeningParen)
         {
-            return [];
+            start++;
+            while (start <= end && char.IsWhiteSpace(s[start])) start++;
         }
 
-        var suffixSymbol = match.Groups[1].ValueSpan; // SuffixSymbolGroupIndex
-        if (!suffixSymbol.IsEmpty)
+        // Suffix detection: look from the end for a run of symbol chars after trimming trailing whitespace and optional ')'
+        int r = end;
+        // Trim trailing whitespace
+        while (r >= start && char.IsWhiteSpace(s[r])) r--;
+        // If there's a trailing ')', allow it only if we had opening '('
+        if (r >= start && s[r] == ')' && hasOpeningParen)
         {
-            return suffixSymbol;
-        }
-        var prefixSymbol = match.Groups[2].ValueSpan; // PrefixSymbolGroupIndex
-        if (!prefixSymbol.IsEmpty)
-        {
-            return prefixSymbol;
-        }
-#else
-        var match = s_currencySymbolMatcher.Match(s.ToString());
-        if (!match.Success)
-        {
-            return [];
+            r--;
+            while (r >= start && char.IsWhiteSpace(s[r])) r--;
         }
 
-        var suffixSymbol = match.Groups[1].Value; // SuffixSymbolGroupIndex
-        if (!string.IsNullOrEmpty(suffixSymbol))
+        // Collect a run of symbol chars at the end (suffix)
+        int suffixEnd = r; // inclusive
+        while (r >= start && IsSymbolChar(s[r])) r--;
+        int suffixStart = r + 1; // first symbol char
+        if (suffixStart <= suffixEnd)
         {
-            return suffixSymbol.AsSpan();
+            // Verify there is at least one digit or sign before the symbol (to mimic the regex branch constraints)
+            bool hasNumberOrSignBefore = false;
+            for (int i = start; i < suffixStart; i++)
+            {
+                char c = s[i];
+                if (c == '+' || c == '-' || char.IsDigit(c))
+                {
+                    hasNumberOrSignBefore = true;
+                    break;
+                }
+            }
+
+            if (hasNumberOrSignBefore)
+            {
+                return s.Slice(suffixStart, suffixEnd - suffixStart + 1);
+            }
         }
-        var prefixSymbol = match.Groups[2].Value; // PrefixSymbolGroupIndex
-        if (!string.IsNullOrEmpty(prefixSymbol))
+
+        // Prefix detection: look from the start for a run of symbol chars after optional sign and whitespace
+        int l = start;
+        // Optional leading '-' sign can precede the prefix symbol (e.g., "-$123" or "-€ 123").
+        if (l <= end && s[l] == '-')
         {
-            return prefixSymbol.AsSpan();
+            l++;
+            while (l <= end && char.IsWhiteSpace(s[l])) l++;
         }
-#endif
+
+        // Collect a run of symbol chars at the start (prefix)
+        int prefixStart = l;
+        while (l <= end && IsSymbolChar(s[l])) l++;
+        int prefixEnd = l - 1; // inclusive
+
+        if (prefixStart <= prefixEnd)
+        {
+            // Ensure there is at least one digit or sign somewhere after the symbol to match the regex prefix branch
+            bool hasNumberOrSignAfter = false;
+            for (int i = prefixEnd + 1; i <= end; i++)
+            {
+                char c = s[i];
+                if (c == '+' || c == '-' || char.IsDigit(c))
+                {
+                    hasNumberOrSignAfter = true;
+                    break;
+                }
+            }
+
+            if (hasNumberOrSignAfter)
+            {
+                return s.Slice(prefixStart, prefixEnd - prefixStart + 1);
+            }
+        }
 
         return [];
     }
@@ -315,13 +363,4 @@ public partial struct Money
             _ => CultureInfo.CurrentCulture.NumberFormat
         };
 
-    // Regex to capture symbol (4 or 5) and amount (6): @"^\(?\s*(([-+\d](.*\d)?)\s*([^-+\d\s]+)|([^-+\d\s]+)\s*([-+\d](.*\d)?))\s*\)?$"
-#if NET7_0_OR_GREATER
-    [GeneratedRegex(@"^[-(]?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
-        RegexOptions.CultureInvariant | RegexOptions.Singleline)]
-    private static partial Regex s_currencySymbolMatcher();
-#else
-    private static readonly Regex s_currencySymbolMatcher = new(@"^[-(]?\s*(?:[-+\d].*?\s*([^-+\d\s]+)|([^-+\d\s]+).*?[-+\d])\s*\)?$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
-#endif
 }

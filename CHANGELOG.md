@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Scale property on Money.
 - Add Precision property on Money (= still internal!).
 - Add NodaMoney.DependencyInjection package to register MoneyContext .NET DI.
+- Add the FastMoney struct for a smaller footprint and faster operations (= still internal!).
 
 ### Changed
 - Optimized Money struct size. This was 18 bytes (padded 24 bytes), but is now 16 bytes (padded 16 bytes) (33% less).
   This means Money is the same size as Decimal struct!!!
+- Improved Parsing: memory allocation (75% less) and performance (2x) by removing Regex
 
 ### Removed
 -

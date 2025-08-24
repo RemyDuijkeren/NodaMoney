@@ -8,11 +8,11 @@ AMD Ryzen 7 5800H with Radeon Graphics 3.20GHz, 1 CPU, 16 logical and 8 physical
 
 
 ```
-| Method            | Mean     | Error   | StdDev  | P95      | Op/s        | Gen0   | Allocated |
-|------------------ |---------:|--------:|--------:|---------:|------------:|-------:|----------:|
-| Implicit          | 383.8 ns | 6.06 ns | 5.37 ns | 391.3 ns | 2,605,394.7 | 0.0801 |     672 B |
-| ImplicitTry       | 370.7 ns | 6.75 ns | 6.31 ns | 380.2 ns | 2,697,790.3 | 0.0801 |     672 B |
-| Explicit          | 395.9 ns | 5.53 ns | 4.62 ns | 402.5 ns | 2,525,750.5 | 0.0801 |     672 B |
-| ExplicitAsSpan    | 412.3 ns | 8.10 ns | 7.96 ns | 427.2 ns | 2,425,162.2 | 0.0801 |     672 B |
-| ExplicitTry       | 421.2 ns | 8.38 ns | 8.61 ns | 435.6 ns | 2,374,036.0 | 0.0801 |     672 B |
-| ExplicitTryAsSpan | 391.4 ns | 7.21 ns | 7.08 ns | 403.2 ns | 2,554,645.2 | 0.0801 |     672 B |
+| Method            | Mean     | Error   | StdDev  | Op/s        | Gen0   | Allocated |
+|------------------ |---------:|--------:|--------:|------------:|-------:|----------:|
+| Implicit          | 194.2 ns | 3.86 ns | 8.23 ns | 5,148,875.3 | 0.0191 |     160 B |
+| ImplicitTry       | 179.1 ns | 2.49 ns | 2.08 ns | 5,583,433.4 | 0.0191 |     160 B |
+| Explicit          | 191.2 ns | 3.21 ns | 2.84 ns | 5,229,086.4 | 0.0191 |     160 B |
+| ExplicitAsSpan    | 195.2 ns | 3.78 ns | 3.53 ns | 5,121,650.9 | 0.0191 |     160 B |
+| ExplicitTry       | 201.1 ns | 3.80 ns | 4.07 ns | 4,972,065.3 | 0.0191 |     160 B |
+| ExplicitTryAsSpan | 187.5 ns | 2.05 ns | 1.82 ns | 5,333,879.3 | 0.0191 |     160 B |

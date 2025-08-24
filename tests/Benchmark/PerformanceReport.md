@@ -142,6 +142,15 @@
 | ExplicitAsSpan    | 412.3 ns | 8.10 ns | 7.96 ns | 2,425,162.2 | 0.0801 |     672 B |
 | ExplicitTry       | 421.2 ns | 8.38 ns | 8.61 ns | 2,374,036.0 | 0.0801 |     672 B |
 | ExplicitTryAsSpan | 391.4 ns | 7.21 ns | 7.08 ns | 2,554,645.2 | 0.0801 |     672 B |
+#### v2.5 removed regex
+| Method            |     Mean |   Error |   StdDev |   Median |        Op/s |   Gen0 | Allocated |
+|-------------------|---------:|--------:|---------:|---------:|------------:|-------:|----------:|
+| Implicit          | 185.3 ns | 4.81 ns | 14.11 ns | 180.7 ns | 5,396,363.9 | 0.0191 |     160 B |
+| ImplicitTry       | 174.9 ns | 1.56 ns |  1.30 ns | 174.7 ns | 5,716,060.4 | 0.0191 |     160 B |
+| Explicit          | 183.6 ns | 3.51 ns |  4.04 ns | 182.9 ns | 5,447,702.7 | 0.0191 |     160 B |
+| ExplicitAsSpan    | 186.0 ns | 3.26 ns |  7.36 ns | 183.3 ns | 5,375,386.8 | 0.0191 |     160 B |
+| ExplicitTry       | 192.3 ns | 3.70 ns |  3.63 ns | 191.2 ns | 5,199,342.6 | 0.0191 |     160 B |
+| ExplicitTryAsSpan | 193.3 ns | 3.77 ns |  4.49 ns | 192.6 ns | 5,172,943.0 | 0.0191 |     160 B |
 
 ## HighLoad
 #### v1
