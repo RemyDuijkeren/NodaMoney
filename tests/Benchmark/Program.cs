@@ -1,12 +1,16 @@
 ﻿using Benchmark;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
-// Replace multiple explicit runs with a single switcher that honors command-line args
-BenchmarkSwitcher.FromAssembly(typeof(HighLoadBenchmarks).Assembly).Run(args);
+// Configure BDN to export only GitHub-flavored Markdown
+var config = ManualConfig.CreateEmpty()
+                         .AddJob(Job.Default)
+                         .AddLogger(ConsoleLogger.Default)
+                         .AddExporter(MarkdownExporter.GitHub);
+                         //.WithArtifactsPath(Path.GetFullPath("artifacts"));
 
-// BenchmarkRunner.Run<HighLoadBenchmarks>();
-// BenchmarkRunner.Run<InitializingCurrencyBenchmarks>();
-// BenchmarkRunner.Run<InitializingMoneyBenchmarks>();
-// BenchmarkRunner.Run<MoneyOperationsBenchmarks>();
-// BenchmarkRunner.Run<MoneyFormattingBenchmarks>();
-// BenchmarkRunner.Run<MoneyParsingBenchmarks>();
+// Run all benchmarks in the assembly; honors command-line args (e.g., --runtimes)
+BenchmarkSwitcher.FromAssembly(typeof(HighLoadBenchmarks).Assembly).Run(args, config);
