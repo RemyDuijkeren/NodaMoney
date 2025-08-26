@@ -1,59 +1,30 @@
-﻿namespace NodaMoney;
+using System.Data.SqlTypes;
+using System.Diagnostics.CodeAnalysis;
+using NodaMoney.Context;
 
-public partial struct Money
+namespace NodaMoney;
+
+public readonly partial record struct FastMoney
 {
-    /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator double(Money money) => Convert.ToDouble(money.Amount);
+    public Money ToMoney() => new(Amount, Currency, Context);
+    public static FastMoney FromMoney(Money money) => new(money.Amount, money.Currency, money.Context);
 
-    /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="long"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator long(Money money) => Convert.ToInt64(money.Amount);
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public long ToOACurrency() => OACurrencyAmount;
 
-    /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="decimal"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator decimal(Money money) => money.Amount;
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static FastMoney FromOACurrency(long cy) => new(decimal.FromOACurrency(cy));
 
-    /// <summary>Performs an explicit conversion from <see cref="long"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(long money) => new Money(money);
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
+        new(decimal.FromOACurrency(cy), currency, context);
 
-    /// <summary>Performs an explicit conversion from <see cref="ulong"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(ulong money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="byte"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(byte money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="ushort"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(ushort money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="uint"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(uint money) => new Money(money);
-
-    /// <summary>Performs an implicit conversion from <see cref="double"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(double money) => new Money((decimal)money);
-
-    /// <summary>Performs an explicit conversion from <see cref="decimal"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(decimal money) => new Money(money);
+    public static explicit operator SqlMoney(FastMoney money) => money.ToSqlMoney();
+    public static explicit operator FastMoney?(SqlMoney money) => FromSqlMoney(money);
+    public SqlMoney ToSqlMoney() => new(Amount);
+    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value);
+    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney, Currency currency, MoneyContext? context = null) =>
+        sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value, currency, context);
 
     /// <summary>Converts the value of this instance to an <see cref="float"/>.</summary>
     /// <param name="money">A <see cref="Money"/> value.</param>

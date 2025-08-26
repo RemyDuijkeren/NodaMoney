@@ -22,7 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved Parsing: memory allocation (75% less) and performance (2x)
 
 ### Removed
--
+- IConvertible implementation for Money. IConvertible is largely legacy and not recommended for new types.
+  Methods that don't make sense to convert from and to Money are removed, like ToBoolean, ToDateTime, etc.
+- Removed From-methods on Money where constructors exist or are more appropriate, like FromDecimal, FromInt32, etc.
 
 ## [2.3]
 

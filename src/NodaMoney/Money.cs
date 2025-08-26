@@ -34,8 +34,8 @@ public readonly partial struct Money : IEquatable<Money>
     public Money(decimal amount, Currency currency, MoneyContext? context = null)
     {
         // Use either provided context or the current global/thread-local context.
-        MoneyContext currentContext = context ?? MoneyContext.CurrentContext;
-        Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
+        context ??= MoneyContext.CurrentContext;
+        Trace.Assert(context is not null, "MoneyContext.CurrentContext should not be null");
 
         // Fast-path: when the amount is zero
         if (amount == 0m)
@@ -45,17 +45,17 @@ public readonly partial struct Money : IEquatable<Money>
             _high = 0;
 
             _flags = (currency.EncodedValue & CurrencyMask)
-                     | ((currentContext.Index << 24) & IndexMask);
+                     | ((context!.Index << 24) & IndexMask);
             return;
         }
 
         // Round the amount to the correct scale
         var currencyInfo = CurrencyInfo.GetInstance(currency);
-        amount = currentContext.RoundingStrategy switch
+        amount = context!.RoundingStrategy switch
         {
-            NoRounding noRounding => noRounding.Round(amount, currencyInfo, currentContext.MaxScale),
-            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, currentContext.MaxScale),
-            _ => currentContext.RoundingStrategy.Round(amount, currencyInfo, currentContext.MaxScale)
+            NoRounding noRounding => noRounding.Round(amount, currencyInfo, context.MaxScale),
+            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, context.MaxScale),
+            _ => context.RoundingStrategy.Round(amount, currencyInfo, context.MaxScale)
         };
 
         // Extract the 4 integers from the decimal amount.
@@ -70,7 +70,7 @@ public readonly partial struct Money : IEquatable<Money>
         _mid = bits[1];
         _high = bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
-                 | ((currentContext.Index << 24) & IndexMask) // Store Index in bits 24–30
+                 | ((context.Index << 24) & IndexMask) // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask)); // Preserve Scale Factor (16–23) and Sign (31)
     }
 

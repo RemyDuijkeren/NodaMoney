@@ -7,41 +7,6 @@ using NodaMoney.Context;
 
 namespace NodaMoney;
 
-// ## Performance Benefits of Using Long vs Decimal
-// The more significant advantage of `FastMoney` is using `long` for calculations instead of `decimal`:
-// 1. **Faster Arithmetic Operations**: Integer operations on `long` are much faster than `decimal` operations:
-// - Addition/subtraction with `long` is typically 3-10x faster than with `decimal`
-// - Multiplication/division with `long` is typically 5-20x faster than with `decimal`
-//
-// 2. **Simpler CPU Instructions**: `long` operations use native CPU instructions, while `decimal` requires complex emulation as it's not directly supported by CPUs.
-//
-// 3. **SIMD Potential**: Operations on `long` values can potentially be vectorized with SIMD instructions, which isn't possible with `decimal`.
-//
-// 4. **Reduced Method Call Overhead**: Your `Add` method in `FastMoney` directly manipulates the `long` value without converting to `decimal` and back:
-//     ``` csharp
-// public FastMoney Add(FastMoney other)
-// {
-//     EnsureSameCurrency(this, other);
-//     long totalAmount = checked(OACurrencyAmount + other.OACurrencyAmount);
-//     return this with { OACurrencyAmount = totalAmount };
-// }
-// ```
-// This is much more efficient than the equivalent operation with `decimal`.
-//
-// ## Trade-offs and Limitations
-// 1. **Precision**: `FastMoney` is limited to 4 decimal places (scaled by 10,000), while `Money` can support up to 28 decimal places.
-// 2. **Range**: `FastMoney` has a smaller range (-922,337,203,685,477.5808 to 922,337,203,685,477.5807) compared to `decimal`.
-// 3. **Memory Alignment**: A 12-byte structure isn't optimally aligned for 64-bit systems, but the calculation benefits likely outweigh this.
-// 4. **No Rounding**: FastMoney is not doing any internal rounding. For Display convert it to Money type.
-//
-// ## Recommendation
-// 1. **Keep the 12-byte Size**: The performance benefits of using `long` for calculations are significant enough to justify using `FastMoney`, even if it's only 4 bytes smaller than `Money`.
-//
-// TODO: Benchmark if this all is really true! => Yes, Add/Subtract is 16x faster!
-// FastMoney is very similar as SqlMoney but with the benefit of storing the currency.
-// SqlMoney (8bytes long + 1byte bool = 9 bytes but 16bytes with padding) https://learn.microsoft.com/en-us/dotnet/api/system.data.sqltypes.sqlmoney?view=net-9.0
-// Internal Currency type https://referencesource.microsoft.com/#mscorlib/system/currency.cs
-
 /// <summary>Represents money, an amount defined in a specific <see cref="Currency"/>.</summary>
 /// <remarks>
 /// <para>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
@@ -99,28 +64,36 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
         }
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
-        MoneyContext currentContext = context ?? MoneyContext.FastMoney;
-        Trace.Assert(currentContext is not null, "MoneyContext.CurrentContext should not be null");
+        if (context is not null)
+        {
+            if (context.MaxScale > 4)
+            {
+                throw new ArgumentOutOfRangeException(nameof(context),
+                    "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
+            }
 
-        if (currentContext!.MaxScale is > 4) // also checks for null
-        {
-            throw new ArgumentOutOfRangeException(nameof(context), "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
+            if (context.Precision > 19)
+            {
+                throw new ArgumentOutOfRangeException(nameof(context),
+                    "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
+            }
         }
-        if (currentContext!.Precision > 19)
+        else
         {
-            throw new ArgumentOutOfRangeException(nameof(context), "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
+            context = MoneyContext.FastMoney;
+            Trace.Assert(context is not null, "MoneyContext.FastMoney should not be null");
         }
 
         // Round the amount to the correct scale TODO: do we want to allow this override or just allow no rounding options?
-        amount = currentContext.RoundingStrategy switch
+        amount = context!.RoundingStrategy switch
         {
             NoRounding => amount,
             StandardRounding { Mode: MidpointRounding.ToEven } => amount,
             StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, Scale),
-            _ => currentContext.RoundingStrategy.Round(amount, currencyInfo, Scale)
+            _ => context.RoundingStrategy.Round(amount, currencyInfo, Scale)
         };
 
-        ContextIndex = currentContext.Index;
+        ContextIndex = context.Index;
         OACurrencyAmount = decimal.ToOACurrency(amount); // Rounds to 4 decimals using MidpointRounding.ToEven!
         Currency = currencyInfo;
     }
@@ -136,17 +109,6 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
         amount = Amount;
         currency = Currency;
     }
-
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static long ToOACurrency(FastMoney money) => money.OACurrencyAmount;
-
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
-        new(decimal.FromOACurrency(cy), currency, context);
-
-    public static SqlMoney ToSqlMoney(FastMoney money) => new(money.Amount);
-
-    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowIfCurrencyMismatch(in FastMoney other)

@@ -64,7 +64,7 @@ static class CurrencyRegistry
     {
         if (string.IsNullOrEmpty(code))
         {
-            currencyInfo = null;
+            currencyInfo = null!;
             return false;
         }
 
