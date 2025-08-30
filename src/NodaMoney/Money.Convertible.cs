@@ -3,128 +3,71 @@
 public partial struct Money
 {
     /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator double(Money money) => Convert.ToDouble(money.Amount);
-
-    /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="long"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator long(Money money) => Convert.ToInt64(money.Amount);
+    /// <param name="money">The instance of <see cref="Money"/> to convert.</param>
+    /// <returns>The resulting <see cref="double"/> value.</returns>
+    /// <remarks>This operation may produce round-off errors. Also, the <see cref="Currency"/> information is lost.</remarks>
+    public static explicit operator double(Money money) => money.ToDouble();
 
     /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="decimal"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
+    /// <param name="money">The instance of <see cref="Money"/> to convert.</param>
+    /// <returns>The resulting <see cref="decimal"/> value.</returns>
+    /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
     public static explicit operator decimal(Money money) => money.Amount;
 
+    /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
+    /// <param name="money">The instance of <see cref="Money"/> to convert.</param>
+    /// <returns>The converted <see cref="double"/> value.</returns>
+    /// <remarks>Amount, rounded to the nearest <see cref="long"/>. If Amount is halfway between two whole numbers, the even number is returned;
+    /// that is, 4.5 is converted to 4, and 5.5 is converted to 6. Also, the <see cref="Currency"/> information is lost.</remarks>
+    /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>
+    public static explicit operator long(Money money) => money.ToInt64();
+
     /// <summary>Performs an explicit conversion from <see cref="long"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="amount">The money amount.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(long money) => new Money(money);
+    public static explicit operator Money(long amount) => new(amount);
 
-    /// <summary>Performs an explicit conversion from <see cref="ulong"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
+    /// <summary>Performs an explicit conversion from <see cref="double"/> to <see cref="Money"/>.</summary>
+    /// <param name="amount">The money amount.</param>
     /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(ulong money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="byte"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(byte money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="ushort"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(ushort money) => new Money(money);
-
-    /// <summary>Performs an explicit conversion from <see cref="uint"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    [CLSCompliant(false)]
-    public static explicit operator Money(uint money) => new Money(money);
-
-    /// <summary>Performs an implicit conversion from <see cref="double"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(double money) => new Money((decimal)money);
+    public static explicit operator Money(double amount) => new(amount);
 
     /// <summary>Performs an explicit conversion from <see cref="decimal"/> to <see cref="Money"/>.</summary>
-    /// <param name="money">The money.</param>
+    /// <param name="amount">The money amount.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator Money(decimal money) => new Money(money);
-
-    /// <summary>Converts the value of this instance to an <see cref="float"/>.</summary>
-    /// <param name="money">A <see cref="Money"/> value.</param>
-    /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="float"/>.</returns>
-    /// <remarks>Because a <see cref="float"/> has fewer significant digits than a <see cref="Money"/> value, this operation may
-    /// produce round-off errors. Also, the <see cref="Currency"/> information is lost.</remarks>
-    public float ToSingle() => Convert.ToSingle(Amount);
+    public static explicit operator Money(decimal amount) => new(amount);
 
     /// <summary>Converts the value of this instance to an <see cref="double"/>.</summary>
-    /// <param name="money">A <see cref="Money"/> value.</param>
-    /// <returns>The value of the current instance, converted to a <see cref="double"/>.</returns>
-    /// <remarks>Because a Double has fewer significant digits than a <see cref="Money"/> value, this operation may produce round-off
-    /// errors.</remarks>
+    /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="double"/>.</returns>
+    /// <remarks>This operation may produce round-off errors. Also, the <see cref="Currency"/> information is lost.</remarks>
     public double ToDouble() => Convert.ToDouble(Amount);
 
     /// <summary>Converts the value of this instance to an <see cref="decimal"/>.</summary>
-    /// <param name="money">A <see cref="Money"/> value.</param>
     /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="decimal"/>.</returns>
     /// <remarks>The <see cref="Currency"/> information is lost.</remarks>
     public decimal ToDecimal() => Amount;
 
-    /// <summary>Converts the value of this instance to an equivalent 16-bit signed integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 16-bit signed integer equivalent to the value of this instance.</returns>
-    public short ToInt16() => Convert.ToInt16(Amount);
+    /// <summary>Converts the value of this instance to an <see cref="int"/>.</summary>
+    /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="int"/>.</returns>
+    /// <remarks>Amount, rounded to the nearest <see cref="int"/>. If Amount is halfway between two whole numbers, the even number is returned;
+    /// that is, 4.5 is converted to 4, and 5.5 is converted to 6. Also, the <see cref="Currency"/> information is lost.</remarks>
+    /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="int"/> value.</exception>
+    public int ToInt32()
+    {
+        var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
+        return checked((int)rounded);
 
-    /// <summary>Converts the value of this instance to an equivalent 32-bit signed integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 32-bit signed integer equivalent to the value of this instance.</returns>
-    public int ToInt32() => Convert.ToInt32(Amount);
+    }
 
-    /// <summary>Converts the value of this instance to an equivalent 64-bit signed integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 64-bit signed integer equivalent to the value of this instance.</returns>
-    public long ToInt64() => Convert.ToInt64(Amount);
+    /// <summary>Converts the value of this instance to an <see cref="long"/>.</summary>
+    /// <returns>The value of the <see cref="Money"/> instance, converted to a <see cref="long"/>.</returns>
+    /// <remarks>Amount, rounded to the nearest <see cref="long"/>. If Amount is halfway between two whole numbers, the even number is returned;
+    /// that is, 4.5 is converted to 4, and 5.5 is converted to 6. Also, the <see cref="Currency"/> information is lost.</remarks>
+    /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>
+    public long ToInt64()
+    {
+        var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
+        return checked((long)rounded);
 
-    /// <summary>Converts the value of this instance to an equivalent 8-bit signed integer using the specified culture-specific
-    /// formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 8-bit signed integer equivalent to the value of this instance.</returns>
-    [CLSCompliant(false)]
-    public sbyte ToSByte() => Convert.ToSByte(Amount);
-
-    /// <summary>Converts the value of this instance to an equivalent 16-bit unsigned integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 16-bit unsigned integer equivalent to the value of this instance.</returns>
-    [CLSCompliant(false)]
-    public ushort ToUInt16() => Convert.ToUInt16(Amount);
-
-    /// <summary>Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 32-bit unsigned integer equivalent to the value of this instance.</returns>
-    [CLSCompliant(false)]
-    public uint ToUInt32() => Convert.ToUInt32(Amount);
-
-    /// <summary>Converts the value of this instance to an equivalent 64-bit unsigned integer using the specified
-    /// culture-specific formatting information.</summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies
-    /// culture-specific formatting information.</param>
-    /// <returns>An 64-bit unsigned integer equivalent to the value of this instance.</returns>
-    [CLSCompliant(false)]
-    public ulong ToUInt64() => Convert.ToUInt64(Amount);
+    }
 }

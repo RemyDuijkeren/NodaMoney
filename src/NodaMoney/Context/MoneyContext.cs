@@ -69,6 +69,8 @@ public sealed record MoneyContext
     ///   <item><description><see cref="Precision"/> = 19</description></item>
     ///   <item><description><see cref="MaxScale"/> = 4</description></item>
     /// </list>
+    /// This aligns with the default precision and scale for <see cref="FastMoney"/>, which is 19 digits and 4 decimal places and
+    /// the internal rounding that decimal.ToOACurrency() does.
     /// </remarks>
     internal static MoneyContext FastMoney { get; }
 
@@ -94,7 +96,7 @@ public sealed record MoneyContext
         var toPosInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
         Trace.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
 #endif
-        FastMoney = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(), Precision = 19, MaxScale = 4 });
+        FastMoney = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven), Precision = 19, MaxScale = 4 });
         NoRounding = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
     }
 

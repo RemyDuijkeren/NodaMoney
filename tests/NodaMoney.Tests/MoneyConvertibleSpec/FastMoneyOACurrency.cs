@@ -1,32 +1,30 @@
 namespace NodaMoney.Tests.MoneyConvertibleSpec;
 
-public class MoneyOACurrency
+public class FastMoneyOACurrency
 {
     [Fact]
     public void ToOACurrency_ShouldConvertValidAmountToOACurrency()
     {
         // Arrange
-        var money = new Money(123.4567m, CurrencyInfo.FromCode("USD"));
+        var money = new FastMoney(123.4567m, CurrencyInfo.FromCode("USD"));
 
         // Act
         var oaCurrencyValue = money.ToOACurrency();
 
         // Assert
-        oaCurrencyValue.Should().Be(1234600); // Money type will round 123.4567 to USD 123.46
+        //oaCurrencyValue.Should().Be(1234600); // Money type will round 123.4567 to USD 123.46
+        oaCurrencyValue.Should().Be(1234567L); // Money type will round 123.4567 to USD 123.4567
     }
 
     [Fact]
     public void ToOACurrency_ShouldThrowExceptionForCurrenciesWithMoreThan4DecimalPlaces()
     {
-        // Arrange
-        var money = new Money(0.123456m, CurrencyInfo.FromCode("BTC"));
-
         // Act
-        Action act = () => money.ToOACurrency();
+        Action act = () => _ = new FastMoney(0.123456m, CurrencyInfo.FromCode("BTC"));
 
         // Assert
         act.Should().Throw<InvalidCurrencyException>()
-           .WithMessage("The currency 'BTC' requires more than 4 decimal places, which cannot be represented by OLE Automation Currency.");
+           .WithMessage("The currency 'BTC' requires more than 4 decimal places*");
     }
 
     [Fact]
@@ -37,10 +35,11 @@ public class MoneyOACurrency
         long oaCurrencyValue = 1234567;
 
         // Act
-        var money = Money.FromOACurrency(oaCurrencyValue, currency);
+        var money = FastMoney.FromOACurrency(oaCurrencyValue, currency);
 
         // Assert
-        money.Amount.Should().Be(123.4600m); // Money type will round 123.4567 to USD 123.46
+        //money.Amount.Should().Be(123.4600m); // Money type will round 123.4567 to USD 123.46
+        money.Amount.Should().Be(123.4567m); // Money type will round 123.4567 to USD 123.4567
         money.Currency.Should().Be(currency);
     }
 
@@ -52,11 +51,11 @@ public class MoneyOACurrency
         long oaCurrencyValue = 123456789;
 
         // Act
-        Action act = () => Money.FromOACurrency(oaCurrencyValue, currency);
+        Action act = () => FastMoney.FromOACurrency(oaCurrencyValue, currency);
 
         // Assert
         act.Should().Throw<InvalidCurrencyException>()
-           .WithMessage("The currency 'BTC' requires more than 4 decimal places, which cannot be represented by OLE Automation Currency.");
+           .WithMessage("The currency 'BTC' requires more than 4 decimal places*");
     }
 
     [Fact]
@@ -64,7 +63,7 @@ public class MoneyOACurrency
     {
         // Arrange
         var currency = CurrencyInfo.FromCode("CLF"); // CLF = Unidad de Fomento (funds code) has 4 decimals
-        var money = new Money(123.4567m, currency);
+        var money = new FastMoney(123.4567m, currency);
 
         // Act
         var oaCurrencyValue = money.ToOACurrency();
@@ -81,7 +80,7 @@ public class MoneyOACurrency
         long oaCurrencyValue = 1234567;
 
         // Act
-        var money = Money.FromOACurrency(oaCurrencyValue, currency);
+        var money = FastMoney.FromOACurrency(oaCurrencyValue, currency);
 
         // Assert
         money.Amount.Should().Be(123.4567m);

@@ -60,7 +60,7 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
 
         if (currencyInfo.DecimalDigits > 4)
         {
-            throw new ArgumentOutOfRangeException(nameof(currencyInfo), "Currency decimal digits is more then 4, which is outside the allowable range for FastMoney.");
+            throw new InvalidCurrencyException($"The currency '{currencyInfo.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
         }
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
@@ -84,13 +84,14 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
             Trace.Assert(context is not null, "MoneyContext.FastMoney should not be null");
         }
 
-        // Round the amount to the correct scale TODO: do we want to allow this override or just allow no rounding options?
+        // Round the amount to the correct scale
         amount = context!.RoundingStrategy switch
         {
             NoRounding => amount,
-            StandardRounding { Mode: MidpointRounding.ToEven } => amount,
-            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, Scale),
-            _ => context.RoundingStrategy.Round(amount, currencyInfo, Scale)
+            // Fast path: ToOACurrency() rounds to 4 decimals using MidpointRounding.ToEven! So we can skip the rounding here.
+            StandardRounding { Mode: MidpointRounding.ToEven } when context.MaxScale == 4 => amount,
+            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, context.MaxScale),
+            _ => context.RoundingStrategy.Round(amount, currencyInfo, context.MaxScale)
         };
 
         ContextIndex = context.Index;

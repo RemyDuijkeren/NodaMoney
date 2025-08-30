@@ -1,6 +1,6 @@
 namespace NodaMoney.Tests.FastMoneySpec;
 
-public class CreateMoneyWithMinAndMaxValues
+public class CreateFastMoneyWithMinAndMaxValues
 {
     [Fact]
      public void WhenMaxValue()
@@ -78,6 +78,6 @@ public class CreateMoneyWithMinAndMaxValues
          Action action = () => new FastMoney(1m, bitcoin);
 
          // Assert
-         action.Should().Throw<ArgumentException>();
+         action.Should().Throw<InvalidCurrencyException>();
      }
 }

@@ -82,59 +82,51 @@ public class MoneyOperationsBenchmarks
     }
 
     [Benchmark]
-    public decimal fAdd()
+    public FastMoney fAdd()
     {
-        var money = FastMoney.Add(_euro10fast, _euro20fast);
-        return money.Amount;
+        return FastMoney.Add(_euro10fast, _euro20fast);
     }
 
     [Benchmark]
-    public long fSubtract()
+    public FastMoney fSubtract()
     {
-        var money =  FastMoney.Subtract(_euro20fast, _euro10fast);
-        return FastMoney.ToOACurrency(money);
+        return FastMoney.Subtract(_euro20fast, _euro10fast);
     }
 
     [Benchmark]
-    public long fMultiple()
+    public FastMoney fMultiple()
     {
-        var money = _euro10fast * 2.2m;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast * 2.2m;
     }
 
     [Benchmark]
-    public long fMultipleWholeNumber()
+    public FastMoney fMultipleWholeNumber()
     {
-        var money = _euro10fast * 2m;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast * 2m;
     }
 
     [Benchmark]
-    public long fMultipleLong()
+    public FastMoney fMultipleLong()
     {
-        var money = _euro10fast * 2L;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast * 2L;
     }
 
     [Benchmark]
-    public long fDivide()
+    public FastMoney fDivide()
     {
-        var money = _euro10fast / 2.2m;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast / 2.2m;
     }
 
     [Benchmark]
-    public long fDivideWholeNumber()
+    public FastMoney fDivideWholeNumber()
     {
-        var money = _euro10fast / 2m;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast / 2m;
     }
 
     [Benchmark]
-    public long fDivideLong()
+    public FastMoney fDivideLong()
     {
-        var money = _euro10fast / 2L;
-        return FastMoney.ToOACurrency(money);
+        return _euro10fast / 2L;
     }
 
     [Benchmark]

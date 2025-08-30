@@ -17,6 +17,12 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
+    public FastMoney fCurrencyCode()
+    {
+        return new FastMoney(6.54m, "EUR");
+    }
+
+    [Benchmark]
     public Money CurrencyCodeAndRoundingMode()
     {
         return new Money(765.425m, "EUR", MidpointRounding.AwayFromZero);
