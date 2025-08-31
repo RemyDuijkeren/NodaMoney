@@ -77,6 +77,48 @@ public readonly partial struct Money : IEquatable<Money>
                  | (bits[3] & (ScaleMask | SignMask)); // Preserve Scale Factor (16–23) and Sign (31)
     }
 
+    internal Money(long cy, Currency currency, MoneyContextIndex contextIndex)
+    {
+        ulong absoluteCy; // has to be ulong to accommodate the case where cy == long.MinValue.
+        bool isNegative = false;
+        if (cy < 0)
+        {
+            isNegative = true;
+            absoluteCy = (ulong)(-cy);
+        }
+        else
+        {
+            absoluteCy = (ulong)cy;
+        }
+
+        // In most cases, FromOACurrency() produces a Decimal with Scale set to 4. Unless, that is, some of the trailing digits past
+        // the decimal point are zero, in which case, for compatibility with .NET, we reduce the Scale by the number of zeros.
+        // While the result is still numerically equivalent, the scale does affect the ToString() value. In particular, it prevents
+        // a converted currency value of $12.95 from printing uglily as "12.9500".
+        int scale = 4;
+        if (absoluteCy != 0)  // For compatibility, a currency of 0 emits the Decimal "0.0000" (scale set to 4).
+        {
+            while (scale != 0 && ((absoluteCy % 10) == 0))
+            {
+                scale--;
+                absoluteCy /= 10;
+            }
+        }
+
+        // Use either provided context or the current global/thread-local context.
+        //contextIndex ??= MoneyContext.CurrentContext.Index;
+        //Trace.Assert(contextIndex is not null, "MoneyContextIndex should not be null");
+
+        _low = (uint)absoluteCy;
+        _mid = (uint)(absoluteCy >> 32);
+        _high = 0;
+        _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
+                 | ((scale << 16) & ScaleMask) // Store Scale Factor (16–23)
+                 | ((contextIndex << 24) & IndexMask) // Store Index in bits 24–30
+                 | ((isNegative ? 1 : 0) & SignMask); // Store Sign (31)
+    }
+
+
     /// <summary>Gets the amount of money.</summary>
     public decimal Amount
     {

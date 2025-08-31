@@ -10,7 +10,7 @@ public readonly partial record struct FastMoney
 
     public static explicit operator Money(FastMoney money) => money.ToMoney();
     public static explicit operator FastMoney(Money money) => FromMoney(money);
-    public Money ToMoney() => new(Amount, Currency);
+    public Money ToMoney() => new(OACurrencyAmount, Currency, ContextIndex);
     public static FastMoney FromMoney(Money money) => new(money.Amount, money.Currency);
 
     // FastMoney <-> SqlMoney

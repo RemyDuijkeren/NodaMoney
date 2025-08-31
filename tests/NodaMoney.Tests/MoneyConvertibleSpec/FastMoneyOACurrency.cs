@@ -86,4 +86,19 @@ public class FastMoneyOACurrency
         money.Amount.Should().Be(123.4567m);
         money.Currency.Should().Be(currency);
     }
+
+    [Fact]
+    public void ToMoney()
+    {
+        // Arrange
+        var fastMoney = new FastMoney(123.4567m, CurrencyInfo.FromCode("USD"));
+
+        // Act
+        var money = fastMoney.ToMoney();
+
+        // Assert
+        money.Amount.Should().Be(123.4567m);
+        money.Currency.Should().Be(Currency.FromCode("USD"));
+    }
+
 }
