@@ -45,7 +45,7 @@ public partial struct Money
 
     /// <inheritdoc cref="INumberBase{TSelf}.IsZero(TSelf)" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsZero(in Money value) => (value._low | value._mid | value._high) == 0;
+    public static bool IsZero(in Money value) => (value._low | value._mid | value._high) == 0u;
     //public static bool IsZero(Money value) => (value._low | value._mid | value._high) == 0;
 
     /// <inheritdoc cref="INumberBase{TSelf}.MinMagnitude(TSelf, TSelf)" />

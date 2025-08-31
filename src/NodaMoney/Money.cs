@@ -14,16 +14,20 @@ public readonly partial struct Money : IEquatable<Money>
 {
 #pragma warning disable RCS1181
     // Masks for the Flags field
-    private const int CurrencyMask = 0b_1111_1111_1111_1111; // Bits 0–15, for Currency (16 bits)
-    private const int ScaleMask = 0x_FF_00_00; // Bits 16-23 for the Decimal scale
-    private const int IndexMask = 0b_0111_1111 << 24; // Bits 24–30, for Index (7 bits)
-    private const int SignMask = unchecked((int)0x_80_00_00_00); // Bit 31 for the Decimal sign bit (negative)
+    private const int CurrencyMask = 0b_11111111_11111111; // Bits 0–15, for Currency (16 bits)
+    private const int ScaleMask = 0b_11111111_00000000_00000000; // Bits 16-23 for the Decimal scale
+    private const int IndexMask = 0b_01111111 << 24; // Bits 24–30, for Index (7 bits)
+    private const int SignMask = unchecked((int)0b_10000000_00000000_00000000_00000000); // Bit 31 for the Decimal sign bit (negative)
 
-    // Fields for storing the components of the decimal representation
-    private readonly int _low;
-    private readonly int _mid;
-    private readonly int _high;
+    // Fields for storing the components of the decimal representation where bit layout in _flags is as follows:
+    // bits 00..15: Currency
+    // bits 16..23: Scale
+    // bits 24..30: ContextIndex
+    // bits 31..32: Sign
     private readonly int _flags;
+    private readonly uint _high;
+    private readonly uint _mid;
+    private readonly uint _low;
 #pragma warning restore RCS1181
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
@@ -43,7 +47,6 @@ public readonly partial struct Money : IEquatable<Money>
             _low = 0;
             _mid = 0;
             _high = 0;
-
             _flags = (currency.EncodedValue & CurrencyMask)
                      | ((context!.Index << 24) & IndexMask);
             return;
@@ -66,9 +69,9 @@ public readonly partial struct Money : IEquatable<Money>
         int[] bits = decimal.GetBits(amount);
 #endif
 
-        _low = bits[0];
-        _mid = bits[1];
-        _high = bits[2];
+        _low = (uint)bits[0];
+        _mid = (uint)bits[1];
+        _high = (uint)bits[2];
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
                  | ((context.Index << 24) & IndexMask) // Store Index in bits 24–30
                  | (bits[3] & (ScaleMask | SignMask)); // Preserve Scale Factor (16–23) and Sign (31)
@@ -84,7 +87,7 @@ public readonly partial struct Money : IEquatable<Money>
             bool isNegative = (_flags & SignMask) != 0; // Is negative if SignMask bit is set
 
             // Reconstruct the decimal with the correct `Flags` value (index removed)
-            return new decimal(_low, _mid, _high, isNegative, scale);
+            return new decimal(unchecked((int)_low), unchecked((int)_mid), unchecked((int)_high), isNegative, scale);
         }
         init
         {
@@ -103,9 +106,9 @@ public readonly partial struct Money : IEquatable<Money>
 #else
             int[] bits = decimal.GetBits(amount);
 #endif
-            _low = bits[0];
-            _mid = bits[1];
-            _high = bits[2];
+            _low = (uint)bits[0];
+            _mid = (uint)bits[1];
+            _high = (uint)bits[2];
 
             // Only preserve the Scale and Sign bits during initialization
             _flags = (_flags & ~(ScaleMask | SignMask)) | (bits[3] & (ScaleMask | SignMask));
@@ -173,9 +176,9 @@ public readonly partial struct Money : IEquatable<Money>
         if (!EqualCurrency(other)) return false;
 
         // Fast-path: both zero magnitudes -> equal regardless of scale/sign.
-        int thisMag = _low | _mid | _high;
-        int otherMag = other._low | other._mid | other._high;
-        if ((thisMag | otherMag) == 0)
+        uint thisMag = _low | _mid | _high;
+        uint otherMag = other._low | other._mid | other._high;
+        if ((thisMag | otherMag) == 0u)
             return true;
 
         // Fast path: different signs (with nonzero magnitudes) => not equal
@@ -253,9 +256,9 @@ public readonly partial struct Money : IEquatable<Money>
             return;
 
         // Fast path: if both amounts are non-zero, enforce the currency match and throw (no Context read needed).
-        int thisMag = _low | _mid | _high;
-        int otherMag = other._low | other._mid | other._high;
-        if (thisMag != 0 && otherMag != 0)
+        uint thisMag = _low | _mid | _high;
+        uint otherMag = other._low | other._mid | other._high;
+        if (thisMag != 0u && otherMag != 0u)
         {
             throw new InvalidCurrencyException(this.Currency, other.Currency);
         }

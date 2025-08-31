@@ -125,9 +125,9 @@ public partial struct Money : IComparable, IComparable<Money>
         ThrowIfCurrencyIncompatible(other);
 
         // Fast path: handle zeros (sign is not important for zero)
-        int thisMag = _low | _mid | _high;
-        int otherMag = other._low | other._mid | other._high;
-        if ((thisMag | otherMag) == 0)
+        uint thisMag = _low | _mid | _high;
+        uint otherMag = other._low | other._mid | other._high;
+        if ((thisMag | otherMag) == 0u)
             return 0;
 
         // Fast path: If signs differ, the negative is less
