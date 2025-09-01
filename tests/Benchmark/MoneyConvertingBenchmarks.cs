@@ -37,7 +37,7 @@ public class MoneyConvertingBenchmarks
     [Benchmark]
     public FastMoney ToFastMoney()
     {
-        return FastMoney.FromMoney(_euro);
+        return new FastMoney(_euro);
     }
 
     [Benchmark]

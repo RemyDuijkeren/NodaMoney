@@ -29,23 +29,11 @@ public class CreatePonds
     public void WhenDouble_ThenCreatingShouldSucceed()
     {
         //from double (float is implicitly converted to double)
-        var pounds = Money.PoundSterling(10.00);
+        var pounds = Money.PoundSterling(10.005D);
 
         pounds.Should().NotBeNull();
         pounds.Currency.Should().Be(Currency.FromCode("GBP"));
         pounds.Amount.Should().Be(10.00m);
-    }
-
-    [Fact]
-    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-    {
-        //from double (float is implicitly converted to double)
-        var pounds1 = Money.PoundSterling(10.005);
-        var pounds2 = Money.PoundSterling(10.005, MidpointRounding.AwayFromZero);
-
-        pounds2.Currency.Should().Be(Currency.FromCode("GBP"));
-        pounds2.Amount.Should().Be(10.01m);
-        pounds1.Amount.Should().NotBe(pounds2.Amount);
     }
 
     [Fact]

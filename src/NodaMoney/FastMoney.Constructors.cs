@@ -41,9 +41,11 @@ public readonly partial record struct FastMoney
     /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
     /// current <see cref="MoneyContext"/> will be used.</param>
     public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this(amount, CurrencyInfo.GetInstance(currency), context) { }
+
     public FastMoney(double amount) : this((decimal)amount) { }
     public FastMoney(double amount, Currency currency) : this((decimal)amount, currency) { }
     public FastMoney(double amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
+
     public FastMoney(long amount) : this((decimal)amount) { }
     public FastMoney(long amount, Currency currency) : this((decimal)amount, currency) { }
     public FastMoney(long amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }

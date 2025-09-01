@@ -88,7 +88,7 @@ public class FastMoneyOACurrency
     }
 
     [Fact]
-    public void ToMoney()
+    public void ToMoney_ShouldRoundToCurrencyPrecision()
     {
         // Arrange
         var fastMoney = new FastMoney(123.4567m, CurrencyInfo.FromCode("USD"));
@@ -97,8 +97,7 @@ public class FastMoneyOACurrency
         var money = fastMoney.ToMoney();
 
         // Assert
-        money.Amount.Should().Be(123.4567m);
+        money.Amount.Should().Be(123.46m, "Money type will round 123.4567 to USD 123.46");
         money.Currency.Should().Be(Currency.FromCode("USD"));
     }
-
 }

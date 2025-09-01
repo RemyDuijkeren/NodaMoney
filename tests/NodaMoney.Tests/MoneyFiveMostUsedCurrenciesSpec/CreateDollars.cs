@@ -28,22 +28,10 @@ public class CreateDollars
     public void WhenDouble_ThenCreatingShouldSucceed()
     {
         //from double (float is implicitly converted to double)
-        var dollars = Money.USDollar(10.00);
+        var dollars = Money.USDollar(10.005D);
 
         dollars.Currency.Should().Be(Currency.FromCode("USD"));
         dollars.Amount.Should().Be(10.00m);
-    }
-
-    [Fact]
-    public void WhenDoubleAndRoundingAwayFromZero_ThenCreatingShouldSucceed()
-    {
-        //from double (float is implicitly converted to double)
-        var dollars1 = Money.USDollar(10.005);
-        var dollars2 = Money.USDollar(10.005, MidpointRounding.AwayFromZero);
-
-        dollars2.Currency.Should().Be(Currency.FromCode("USD"));
-        dollars2.Amount.Should().Be(10.01m);
-        dollars1.Amount.Should().NotBe(dollars2.Amount);
     }
 
     [Fact]

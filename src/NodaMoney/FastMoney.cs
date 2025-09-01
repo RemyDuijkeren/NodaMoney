@@ -1,4 +1,3 @@
-using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -54,29 +53,19 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
     public FastMoney(decimal amount, CurrencyInfo currencyInfo, MoneyContext? context = null) : this()
     {
         if (amount is < MinValueLong or > MaxValueLong)
-        {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
-        }
 
         if (currencyInfo.DecimalDigits > 4)
-        {
             throw new InvalidCurrencyException($"The currency '{currencyInfo.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
-        }
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
         if (context is not null)
         {
             if (context.MaxScale > 4)
-            {
-                throw new ArgumentOutOfRangeException(nameof(context),
-                    "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
-            }
+                throw new ArgumentOutOfRangeException(nameof(context), "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
 
             if (context.Precision > 19)
-            {
-                throw new ArgumentOutOfRangeException(nameof(context),
-                    "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
-            }
+                throw new ArgumentOutOfRangeException(nameof(context), "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
         }
         else
         {

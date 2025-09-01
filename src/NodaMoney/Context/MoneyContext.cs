@@ -47,7 +47,6 @@ public sealed record MoneyContext
     public int? MaxScale => Options.MaxScale;
 
     /// <summary>Get the default currency when none is specified for monetary operations within the context.</summary>
-    /// <remarks>If not specified (null), then the current culture will be used to find the currency.</remarks>
     public CurrencyInfo? DefaultCurrency => Options.DefaultCurrency;
 
     /// <summary>Gets the value indicating whether zero amounts should require matching currency validation.</summary>
@@ -77,7 +76,7 @@ public sealed record MoneyContext
     static MoneyContext()
     {
         // Pre-initialize contexts for all standard rounding modes. Create contexts in the exact same order as the
-        // MidpointRounding enum values. This ensures that their indices align with the enum values for fast lookup.
+        // MidpointRounding enum values! This ensures that their indices align with the enum values for fast lookup.
 
         var toEvenContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
         Trace.Assert(toEvenContext.Index == (byte)MidpointRounding.ToEven, $"Index of ToEven context should be 0, but is {toEvenContext.Index}");

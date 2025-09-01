@@ -1,4 +1,5 @@
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using NodaMoney.Context;
 
@@ -9,9 +10,14 @@ public readonly partial record struct FastMoney
     // FastMoney <-> Money
 
     public static explicit operator Money(FastMoney money) => money.ToMoney();
-    public static explicit operator FastMoney(Money money) => FromMoney(money);
-    public Money ToMoney() => new(OACurrencyAmount, Currency, ContextIndex);
-    public static FastMoney FromMoney(Money money) => new(money.Amount, money.Currency);
+    public static explicit operator FastMoney(Money money) => new(money);
+    public Money ToMoney()
+    {
+        // Convert to decimal and delegate to the standard constructor to ensure rounding is applied using
+        // the provided context (strategy and max scale, currency rules).
+        decimal amount = decimal.FromOACurrency(OACurrencyAmount);
+        return new Money(amount, Currency);
+    }
 
     // FastMoney <-> SqlMoney
 
@@ -21,7 +27,6 @@ public readonly partial record struct FastMoney
     public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value);
     public static FastMoney? FromSqlMoney(SqlMoney sqlMoney, Currency currency, MoneyContext? context = null) =>
         sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value, currency, context);
-
 
     // FastMoney <-> OACurrency
 

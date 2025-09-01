@@ -100,10 +100,10 @@ public readonly partial record struct Currency
     public static Currency FromCode(string code) => CurrencyInfo.FromCode(code);
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>
-    public decimal MinimalAmount => CurrencyInfo.FromCode(Code).MinimalAmount;
+    public decimal MinimalAmount => CurrencyInfo.GetInstance(this).MinimalAmount;
 
     /// <summary>Gets the currency symbol.</summary>
-    public string Symbol => CurrencyInfo.FromCode(Code).Symbol;
+    public string Symbol => CurrencyInfo.GetInstance(this).Symbol;
 
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>

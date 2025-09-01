@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Unicode;
+using NodaMoney.Context;
 
 namespace NodaMoney;
 
@@ -174,7 +175,7 @@ public partial struct Money
     internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> currencyChars, CurrencyInfo? specifiedCurrency = null)
     {
         if (currencyChars.IsEmpty)
-            return specifiedCurrency ?? CurrencyInfo.CurrentCurrency;
+            return specifiedCurrency ?? MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency;
 
         // try to find a match
         var matchedCurrencies = CurrencyInfo.GetAllCurrencies(currencyChars);
@@ -195,7 +196,7 @@ public partial struct Money
                 if (specifiedCurrency is null)
                 {
                     // If the current currency matches, prioritize it and return immediately
-                    matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == CurrencyInfo.CurrentCurrency);
+                    matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == MoneyContext.CurrentContext.DefaultCurrency || ci == CurrencyInfo.CurrentCurrency);
                     if (matchedCurrency is not null) return matchedCurrency;
 
                     throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies! Specify currency or culture explicitly.");
