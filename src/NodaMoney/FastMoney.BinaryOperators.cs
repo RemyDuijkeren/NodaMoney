@@ -232,7 +232,7 @@ public readonly partial record struct FastMoney
             {
                 // Direct cast from decimal * long to long is more efficient than first multiplying as decimal and then casting
                 long totalAmount1 = checked(money.OACurrencyAmount * (long)multiplier);
-                // TODO: cast could throw OverFlowExpection if outside min-max values of long!
+                // TODO: cast could throw OverFlowException if outside min-max values of long!
                 return money with { OACurrencyAmount = totalAmount1 };
             }
 
@@ -331,11 +331,17 @@ public readonly partial record struct FastMoney
     /// <param name="money1">The <see cref="FastMoney"/> dividend.</param>
     /// <param name="money2">The <see cref="FastMoney"/> divisor.</param>
     /// <returns>The <see cref="FastMoney"/> remainder after dividing <see cref="money1"/> by <see cref="money2"/>.</returns>
+    /// <exception cref="DivideByZeroException"></exception>
     public static FastMoney Remainder(in FastMoney money1, in FastMoney money2)
     {
         money1.ThrowIfCurrencyMismatch(money2);
         money1.ThrowIfContextMismatch(money2);
-        decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
-        return money1 with { OACurrencyAmount = decimal.ToOACurrency(remainder) };
+
+        // Integer OA remainder is exact and already at 4-decimal scale
+        long rem = money2.OACurrencyAmount == 0
+            ? throw new DivideByZeroException()
+            : money1.OACurrencyAmount % money2.OACurrencyAmount;
+
+        return money1 with { OACurrencyAmount = rem };
     }
 }

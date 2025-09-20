@@ -13,6 +13,7 @@ var config = ManualConfig.CreateEmpty()
                          .AddLogger(ConsoleLogger.Default)
                          .AddExporter(MarkdownExporter.GitHub)
                          .AddColumnProvider(DefaultColumnProviders.Instance)   // add columns like Mean, Error, StdDev, etc.
+                         .HideColumns("StdDev", "Median", "RatioSD")
                          .AddColumn(StatisticColumn.OperationsPerSecond)
                          .AddDiagnoser(MemoryDiagnoser.Default);
                          //.WithArtifactsPath(Path.GetFullPath("artifacts"));
