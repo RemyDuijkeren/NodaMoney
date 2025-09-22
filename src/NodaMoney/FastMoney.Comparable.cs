@@ -128,7 +128,10 @@ public readonly partial record struct FastMoney : IComparable, IComparable<FastM
         if (OACurrencyAmount == 0 && other.OACurrencyAmount == 0)
             return 0;
 
+        // Fast path: if scales are the same (is fixed to 4 now), we can compare the 96-bit integers directly
+        return OACurrencyAmount.CompareTo(other.OACurrencyAmount);
+
         // Fallback when scales differ: rely on decimal comparison which aligns scales
-        return Amount.CompareTo(other.Amount);
+        //return Amount.CompareTo(other.Amount);
     }
 }
