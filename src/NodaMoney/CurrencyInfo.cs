@@ -80,6 +80,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             // In >= .NET5 when CurrentCulture is Invariant, then RegionInfo.CurrentRegion is retrieved from
             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
+            // See also use of ICU libs https://learn.microsoft.com/en-us/dotnet/core/compatibility/globalization/5.0/icu-globalization-api#currency-symbol
             var currentCulture = CultureInfo.CurrentCulture;
             if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
             {
@@ -380,6 +381,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // l: Native name, like 23.002,43 dólar
         // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
         // ?: Accounting ($23.002,43) for negative numbers
+        // ?: Compact/abbreviated notation, for example in dashboards showing USD 1.2K, €3.4M.
 
         // If the argument is not a Money, fallback to default formatting
         if (arg is not Money money)

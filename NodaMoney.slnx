@@ -7,15 +7,16 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path=".junie\guidelines.md" />
+    <File Path="PossibleFeatures.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/NodaMoney/NodaMoney.csproj" />
     <Project Path="src/NodaMoney.DependencyInjection/NodaMoney.DependencyInjection.csproj" />
+    <Project Path="src/NodaMoney/NodaMoney.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Benchmark/Benchmark.csproj" />
-    <Project Path="tests/NodaMoney.Tests/NodaMoney.Tests.csproj" />
     <Project Path="tests/NodaMoney.DependencyInjection.Tests/NodaMoney.DependencyInjection.Tests.csproj" />
+    <Project Path="tests/NodaMoney.Tests/NodaMoney.Tests.csproj" />
   </Folder>
   <Folder Name="/workflows/">
     <File Path=".github/workflows/ci.yml" />

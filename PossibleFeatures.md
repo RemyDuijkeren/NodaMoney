@@ -1060,3 +1060,178 @@ public class MoneySplitSpec
 - Mirror Joda-Money semantics while staying idiomatic to .NET and your library’s naming and context model.
 
 This design will give your users a clear and powerful `Split(...)` API set that covers most real-world proration/allocation needs and matches or exceeds Joda-Money’s feature parity.
+
+
+## Formatting and Parsing
+
+You’re right: NodaMoney already has a capable formatting stack via `CurrencyInfo` as an `IFormatProvider`/`ICustomFormatter` and multiple format specifiers (`G`, `C`, `R`, `N`, `L`, `l`, etc., including numeric precision like `C:1`). And the parsing APIs (`Parse`/`TryParse`) already accept an `IFormatProvider` and handle currency-before/after and several input variants.
+
+My earlier “polish” remark was not meant to dismiss what’s there, but to point out a few areas that production apps often ask for, which go beyond single-letter format specifiers. Below I’m very specific about potential gaps or optional enhancements. If some of these are already implemented behind the specifiers, great — then the improvement would be documentation or exposing them as explicit options so callers can control them without memorizing format strings.
+
+---
+
+### Formatting: what may be missing or could be made more explicit
+These are independent, opt‑in enhancements. If you already cover some via format strings, consider surfacing them as named options/presets for discoverability.
+
+1) Accounting negatives and sign styles
+- Use case: finance reports that require `(USD 1,234.56)` instead of `-USD 1,234.56`.
+- Potential API surface:
+  - New specifier (e.g., `A`), or an option like `NegativeStyle = Parentheses`.
+  - Support alternate patterns like trailing minus (`1 234,56-`) used in some locales.
+
+2) Space policy and Unicode spaces
+- Use case: CLDR recommends non‑breaking or narrow non‑breaking spaces between number and symbol in some locales (e.g., French).
+- Potential API:
+  - `SpaceBetween = None | Normal | NonBreaking | NarrowNonBreaking`.
+  - Ensure `CurrencyInfo` formatter emits the correct space type for given culture preset.
+
+3) Trailing zeros and min/max decimals (independent of currency minor unit)
+- Use case: display fixed decimals in invoices (e.g., always 2 for EUR), but allow more decimals for FX or crypto while preserving zeros.
+- Potential API:
+  - `MinDecimals`, `MaxDecimals`, and `PreserveTrailingZeros` separate from calculation scale.
+  - Distinguish “quantize to currency minor units” vs “display with specific decimals”.
+
+4) Cash‑display rounding toggle
+- Use case: cash receipts in CHF must show increments of 0.05, while electronic invoices show 0.01.
+- Potential API:
+  - `CashDisplay = true|false` that uses `CashDenominationRounding` for formatting only (doesn’t alter stored amount).
+  - Or route through `MoneyContext` when `IsCashTransaction` is set.
+
+5) Explicit ISO vs symbol placement presets
+- Use case: normalize branding across the app: `USD 1,234.56` everywhere, or `1 234,56 €` everywhere.
+- Potential API:
+  - Named presets: `MoneyFormatOptions.IsoBefore(culture)`, `SymbolAfter(culture)`, etc.
+  - If `L`/`l` already map to these, provide documentation that lists which specifier yields which pattern per culture.
+
+6) Disambiguation of multi‑symbol currencies
+- Use case: pick `$` variant consistently (plain `$`, `US$`, `CA$`, narrow symbol) based on culture/policy.
+- Potential API:
+  - `CurrencySymbolVariant = Default | Narrow | ExplicitWithCountry`.
+
+7) Compact/abbreviated notation (optional)
+- Use case: dashboards showing `USD 1.2K`, `€3.4M`.
+- Potential API:
+  - Specifier like `K` or option `Compact = Thousand|Million|Auto`.
+
+8) Locale‑aware patterns sourced from CLDR (optional)
+- Use case: fully align with ICU/CLDR currency patterns for symbol placement and spacing.
+- Potential API:
+  - A formatter preset that follows CLDR exactly; your existing specifiers could map to it.
+
+9) Display name and pluralization (optional)
+- Use case: “1 US dollar”, “2 US dollars” vs symbol/ISO code.
+- Potential API:
+  - `UseDisplayName = true` with pluralization rules if you bring in CLDR data.
+
+10) Documented map of specifier behavior
+- Even without adding new features, a matrix mapping `G/C/R/N/L/l` (and `:<precision>` suffix) to exact outcomes per culture would reduce guesswork and raise perceived polish.
+
+---
+
+### Parsing: what may be missing or could be more robust
+Again, several of these may already work — the suggestions are about explicit policies and hard cases often seen in imports.
+
+1) Negative patterns and parentheses
+- Ensure `"(USD 1,234.56)"` and `"(1 234,56 €)"` parse as negative.
+- Also handle trailing minus: `"1 234,56-"` and leading `"-1 234,56"` across cultures.
+
+2) Wide set of thousands/decimal separators
+- Accept apostrophe groupings (`"CHF 1'234.50"`), thin space, narrow non‑breaking space, non‑breaking space, normal space.
+- Normalize Unicode minus (U+2212) and hyphen variants.
+
+3) Ambiguous symbol resolution policy
+- Acknowledge your TODO in `MoneyContext`: when parsing `"$1,234.56"`, choose currency via:
+  - `DefaultCurrency` from context, or
+  - `PreferredCurrencies` priority list, or
+  - culture region (en-CA → CAD, en-AU → AUD, en-US → USD), else fail.
+- Make this explicit via `MoneyParseOptions.SymbolResolutionPolicy = Fail | CultureBased | PreferList` and `PreferredCurrencies`.
+
+4) Strictness knobs
+- `Strict = true` could enforce:
+  - thousands separators must match culture
+  - no extraneous text
+  - currency must be present and unambiguous
+- `Strict = false` (lenient) accepts more variants and fixes common mistakes.
+
+5) Zero‑currency policy
+- Connect to your `MoneyContext.EnforceZeroCurrencyMatching`:
+  - `ZeroCurrencyPolicy = Ignore | RequireMatch | InferDefault`.
+- Governs cases like `"0.00"` without currency.
+
+6) Localized digits (optional)
+- Parse Arabic‑Indic digits, etc., when culture demands: `"ر.س ١٢٣٫٤٥"`.
+
+7) Code glued to number
+- Accept `"USD1,234.56"` and `"1,234.56USD"` (no space) where cultures commonly omit a space.
+
+8) Alternative currency tokens
+- Recognize `US$`, `CA$`, `A$` and map per region/policy.
+
+9) Cash‑specific parsing (optional)
+- If `CashDisplay = true` while parsing, permit inputs like `"CHF 12.35"` to round/quantize to 0.05 automatically.
+
+10) Diagnostics on failure
+- When `TryParse` fails, optionally expose a reason code (unexpected symbol, ambiguous symbol, bad separator) to aid UX.
+
+---
+
+### Concrete, minimal additions that fit NodaMoney’s design
+- Keep your current format specifiers and provider model.
+- Add optional, explicit option objects and a tiny set of presets to make advanced scenarios obvious:
+
+```csharp
+public sealed record MoneyFormatOptions
+{
+    public IFormatProvider? Culture { get; init; }
+    public bool UseIsoCode { get; init; }
+    public bool UseSymbol { get; init; } // both can be true (e.g., "USD $1,234.56")
+    public SymbolPlacement SymbolPlacement { get; init; } // Before|After
+    public SpacePolicy SpaceBetween { get; init; } // None|Normal|NonBreaking|NarrowNonBreaking
+    public NegativeStyle NegativeStyle { get; init; } // Minus|Parentheses|TrailingMinus
+    public int? MinDecimals { get; init; }
+    public int? MaxDecimals { get; init; }
+    public bool PreserveTrailingZeros { get; init; }
+    public bool QuantizeToCurrencyMinorUnits { get; init; } = true;
+    public bool CashDisplay { get; init; }
+}
+
+public sealed record MoneyParseOptions
+{
+    public IFormatProvider? Culture { get; init; }
+    public CurrencyInfo? DefaultCurrency { get; init; }
+    public bool Strict { get; init; }
+    public SymbolResolutionPolicy SymbolResolution { get; init; } // Fail|CultureBased|PreferList
+    public IReadOnlyList<string>? PreferredCurrencies { get; init; } // ISO codes
+    public ZeroCurrencyPolicy ZeroCurrencyPolicy { get; init; } // Ignore|RequireMatch|InferDefault
+}
+```
+
+- Provide a couple of presets (static methods) that map closely to your existing letter specifiers, so users can either keep format strings or opt into options for finer control.
+- Hook `MoneyParseOptions` into your existing `Parse`/`TryParse` overloads that already accept an `IFormatProvider`, using the provider for culture defaults plus the policy knobs above.
+- For ambiguous symbol parsing, consult `MoneyContext.DefaultCurrency` and an optional context `SymbolPriorityList` before failing.
+
+---
+
+### Why this matters even if most variants already work
+- The experience gap is often not capability but discoverability and controllability. Single-letter format strings are powerful but opaque; option objects and presets make the behavior obvious, testable, and DI‑friendly.
+- A documented map of what `G/C/R/N/L/l` do per culture, plus the policy flags above (with examples), would likely address the “polish” perception completely while keeping your current design intact.
+
+---
+
+### Quick test matrix you can add to docs/tests
+- Formatting
+  - `Accounting (Parentheses)`: `(€ 1,234.56)`, `(1 234,56 €)`, `(USD 1,234.56)`.
+  - `Spaces`: `NonBreaking` vs `NarrowNonBreaking` in `fr-FR` and `fr-CA`.
+  - `PreserveTrailingZeros`: `JPY 12` vs `JPY 12.00` with `MinDecimals=2`.
+  - `CashDisplay`: `CHF 1.23` → `CHF 1.25` display.
+- Parsing
+  - `"(USD 1,234.56)"`, `"1 234,56-"`, `"-1 234,56 €"`.
+  - `"CHF 1'234.50"`, `"1 234,56 €"` (narrow NBSP), `"$1,234.56"` in `en-CA` with policy mapping to CAD.
+  - `"USD1,234.56"` / `"1,234.56USD"` (no space).
+  - `ZeroCurrencyPolicy`: `"0.00"` with and without default currency.
+
+---
+
+### Bottom line
+- NodaMoney’s current formatting/parsing is solid. The suggestions above are about making certain policies explicit, covering a few tricky locale cases (spaces, negatives), and adding symbol disambiguation controls that you’ve already hinted at in `MoneyContext` TODOs.
+- If you document how the existing specifiers map to these behaviors (or expose them as `MoneyFormatOptions`/`MoneyParseOptions` presets), you’ll match or surpass the “polish” users often want.
