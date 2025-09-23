@@ -26,32 +26,17 @@ counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provi
 obvious. This is because the requirements for these algorithms vary widely between domains. This library is intended to act as the
 base layer, providing classes that should be in the .NET Framework. It complies with the currencies in [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).
 
-Usage
+Basic Usage
 -----
 The main classes are:
-- Money: An immutable structure that represents money in a specified currency.
-- Currency: A small immutable structure that represents a currency unit.
+- Money: An immutable structure that represents money in a specified currency;
+- FastMoney: A high-performance immutable structure optimized for arithmetic;
+- Currency: A small immutable structure that represents a currency unit;
 - CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
-and custom currencies. It auto-converts to Currency.
+and custom currencies. It auto-converts to Currency;
 - ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
-from one currency to another currency.
-
-**Initializing Currency**
-
-```csharp
-// Create Currency Unit
-Currency euro = Currency.FromCode("EUR");
-
-// Create CurrencyInfo (for metadata about Currency)
-CurrencyInfo ci = CurrencyInfo.FromCode("EUR");
-CurrencyInfo ci = CurrencyInfo.GetInstance(euro); // From Currency Unit To CurrencyInfo
-Currencyinfo ci = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
-Currencyinfo ci = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
-Currencyinfo ci = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
-CurrencyInfo ci = CurrencyInfo.CurrentCurrency;
-
-Currency euro = ci; // Implicit cast to Currency Unit
-```
+from one currency to another currency;
+- MoneyContext: Configurable rounding, scale and default currency context used by Money operations; supports DI and named contexts.
 
 **Initializing money**
 
@@ -227,7 +212,81 @@ Money euro;
 Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 ```
 
-**Create custom Currency**
+## FastMoney
+
+`Money` type is based on `decimal` and by default always rounded to the currency minor unit (use `MoneyContext` to override).
+`Money` has 28 digits precision (±1.0 × 10^-28 to ±7.9 × 10^28)
+
+FastMoney type is an optimized version of `Money` that:
+- has 17 digits precision (±1.0 × 10^-17 to ±9.2 × 10^17)
+- has fixed four decimal places
+- no internal rounding based on the currency minor unit
+- is faster for add/subtract/multiply/divide/increment/decrement/remainder using 64-bit integer arithmetic
+- is best for high-throughput calculations where 4-decimal precision is enough (x18 faster)
+- is smaller than Money (12 bytes vs. 16 bytes) because the type is based on `long` instead of `decimal`
+- aligns and converts with SqlMoney and OLE Automation Currency value (OACurrency)
+
+Only use FastMoney when you need the fastest performance, and you know what you're doing regarding currency rounding and don't mind the
+loss of precision. Convert `FastMoney` to `Money` for presentation and formatting.
+
+Usage:
+
+```csharp
+using NodaMoney;
+
+var eur = new FastMoney(10.1234m, "EUR");
+var fee = new FastMoney(0.1000m, "EUR");
+var total = eur + fee;              // currency-safe operations
+
+// Convert to Money for formatting/rounding/presentation
+Money display = eur.ToMoney();      // or (Money)eur
+var text = display.ToString("C");
+
+// Convert from Money (explicit)
+var money = new Money(12.34m, "EUR");
+FastMoney fast = (FastMoney)money;  // or new FastMoney(money)
+
+// Convert from SqlMoney
+SqlMoney sqlMoney = db.MoneyFromDb();
+FastMoney? fast = FastMoney.FromSqlMoney(sqlMoney, Currency.FromCode("EUR")); // or (FastMoney?)sqlMoney
+
+// Convert to SqlMoney
+SqlMoney sqlMoney1 = fast.ToSqlMoney(Currency.FromCode("EUR"));
+
+// Convert from OLE Automation Currency
+long oaCurrency = db.CurrencyFromDb();
+FastMoney fast = FastMoney.FromOACurrency(oaCurrency, Currency.FromCode("EUR"));
+
+// Convert to OLE Automation Currency
+long oaCurrency = fast.ToOACurrency();
+```
+
+Currency(Info)
+-----
+`Currency` is a unit of currency that is a small optimized struct that represencts the Currency Code. It is used inside `Money` and as
+struct in fast lookups.
+
+`CurrencyInfo` is a class that contains information about the currency, such as the ISO 4217 code, the symbol, the name, and the minor unit.
+It is used to create a `Currency` instance (implicit cast) or to register a custom currency.
+
+**Initializing Currency**
+
+```csharp
+// Create Currency unit
+Currency euro = Currency.FromCode("EUR");
+
+// Create CurrencyInfo (for metadata about Currency)
+CurrencyInfo ci = CurrencyInfo.FromCode("EUR");
+CurrencyInfo ci = CurrencyInfo.GetInstance(euro); // From Currency unit To CurrencyInfo
+Currencyinfo ci = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
+Currencyinfo ci = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
+Currencyinfo ci = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
+CurrencyInfo ci = CurrencyInfo.CurrentCurrency;
+
+Currency euro = ci; // Implicit cast to Currency Unit
+```
+
+**Create custom Currency (advanced)**
 
 ```csharp
 // Create custom currency
@@ -265,6 +324,104 @@ CurrencyInfo.Register(newEuro);
 var myEuro = Currency.FromCode("EUR"); // returns newEuro
 ```
 
+## MoneyContext (advanced)
+
+MoneyContext centralizes rounding, scale, and default currency configuration used by Money operations. You can set a global default, create
+scoped contexts, and integrate it with Microsoft.Extensions.DependencyInjection. Every Money object uses the context it was created in
+or was given explicitly.
+
+- What it controls: rounding strategy (e.g., MidpointRounding), maximum scale (decimal digits), and the default currency used when one isn’t explicitly provided.
+- Where it’s used: by Money arithmetic, parsing/formatting where applicable, and helpers that assume an implicit currency.
+
+Set own global default without DI:
+
+```csharp
+using NodaMoney;
+using NodaMoney.Context;
+
+// Set global default MoneyContext, will be used by all created Money objects
+MoneyContext myDefaultContext = MoneyContext.Create(opt =>
+{
+    opt.MaxScale = 4;
+    opt.DefaultCurrency = CurrencyInfo.FromCode("USD");
+    opt.EnforceZeroCurrencyMatching = true;
+});
+MoneyContext.DefaultThreadContext = myDefaultContext;
+
+// or
+MoneyContext.CreateAndSetDefault(opt =>
+{
+    opt.MaxScale = 4;
+    opt.DefaultCurrency = CurrencyInfo.FromCode("USD");
+    opt.EnforceZeroCurrencyMatching = true;
+});
+```
+
+Use MoneyContext by instance or scope:
+
+```csharp
+// Explicit MoneyContext when creating a new Money object
+MoneyContext myOwnContext = MoneyContext.Create(opt =>
+{
+    opt.MaxScale = 2;
+    opt.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+    opt.DefaultCurrency = CurrencyInfo.FromCode("EUR");
+});
+
+Money money1 = new Money(6.54m, "EUR", myOwnContext); // explicit MoneyContext
+Money money2 = new Money(6.54m, "EUR"); // implicit global MoneyContext
+
+// This will throw an InvalidOperationException because money1 and money2 have different contexts:
+var result = money1 + money2;
+
+// Instead, align contexts using the 'with' expression:
+var result = money1 + (money2 with { Context = money1.Context });
+
+// Use MoneyContext in a scope (sets MoneyContext.ThreadContext for the duration of the scope):
+using (MoneyContext.CreateScope(myOwnContext))
+{
+    Money money3 = new Money(10.00m, "EUR");
+    Money money4 = new Money(5.00m, "EUR");
+    var total = money3 + money4;
+}
+```
+
+Use MoneyContext with Dependency Injection (Nuget: NodaMoney.DependencyInjection):
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using NodaMoney;
+using NodaMoney.Context;
+using NodaMoney.DependencyInjection; // NuGet: NodaMoney.DependencyInjection
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Register MoneyContext with custom options as default global context
+builder.Services.AddMoneyContext(options =>
+{
+    options.DefaultCurrency = Currency.FromCode("USD");
+    options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+    options.MaxScale = 2;
+    opt.EnforceZeroCurrencyMatching = true;
+});
+
+var app = builder.Build();
+
+// Consume MoneyContext via DI
+app.MapGet("/total", (MoneyContext context) =>
+{
+    Console.WriteLine(context.DefaultCurrency); // returns "USD"
+
+    var price = new Money(10m, "USD"); // uses registered default context
+    return price.Round().ToString("C");
+});
+
+app.Run();
+```
+
+You can also configure via IConfiguration (appsettings.json) and register multiple named contexts.
+See the [NodaMoney.DependencyInjection README](src/NodaMoney.DependencyInjection/README.md) for full examples.
+
 ## Releases
 
 This library uses [Semantic Versioning](https://semver.org/) to give meaning to the version numbers.
@@ -297,7 +454,7 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 ## Credits
 
-This library wouldn't have been possible without the following tools, packages and companies:
+This library wouldn't have been possible without the following tools, packages, and companies:
 
 * [xUnit](https://xunit.net/) - Unit testing
 * [MinVer](https://github.com/adamralph/minver) - Minimalistic versioning using Git tags by [Adam Ralph](https://github.com/adamralph)

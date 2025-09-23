@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using NodaMoney.Context;
-
-namespace NodaMoney;
+﻿namespace NodaMoney;
 
 public partial struct Money
 {
