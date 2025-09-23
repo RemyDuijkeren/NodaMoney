@@ -1,4 +1,30 @@
-### Summary
+# Feature Proposals from comparing NodaMoney to JavaMoney and JodaMoney
+
+This folder contains one proposal per feature extracted from the comparingson below. Each proposal summarizes why it matters, the suggested direction, and concrete implementation options and API sketches when available.
+
+Index
+- 01-rounding-provider-ecosystem.md
+- 02-cash-rounding-and-denomination-policies.md
+- 03-ambiguous-currency-symbol-policies.md
+- 04-exchange-rate-provider-model-and-conversion-context.md
+- 05-big-unscaled-amount-type.md
+- 06-allocation-proration-apis.md
+- 07-monetary-operators-and-queries.md
+- 08-provider-based-discovery-and-di-integration.md
+- 09-context-equality-identity-and-pooling.md
+- 10-culture-locale-sensitive-defaults-and-policies.md
+- 11-validation-policies-for-zero-amounts-and-currency-checks.md
+- 12-serialization-ecosystem-completeness.md
+- 13-precision-scale-governance-and-trailing-zero-policy.md
+- 14-deterministic-arithmetic-across-types.md
+- 15-temporal-aspects-for-rates-and-rounding.md
+- 16-test-kits-and-property-based-tests.md
+- rounding-strategy-vs-provider-and-operators.md
+- exchange-rate-model-example.md
+- split-design.md
+- formatting-and-parsing.md
+
+## Summary
 You’ve introduced `MoneyContext` to centralize precision, scale, rounding, and defaults, with thread-local scoping and named lookups. That’s a strong step toward what JavaMoney (JSR 354, Moneta) calls `MonetaryContext`/`Rounding` and what Joda-Money addresses more lightly with immutable types and explicit rounding APIs. Below is a focused comparison and concrete opportunities to close gaps or add differentiating features.
 
 ---

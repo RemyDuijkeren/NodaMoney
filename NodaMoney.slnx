@@ -7,7 +7,6 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path=".junie\guidelines.md" />
-    <File Path="PossibleFeatures.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/NodaMoney.DependencyInjection/NodaMoney.DependencyInjection.csproj" />
