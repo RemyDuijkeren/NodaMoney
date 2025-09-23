@@ -16,4 +16,17 @@ public class CreateFromMoney
         fast.Currency.Should().Be(rounded.Currency);
     }
 
+    [Fact]
+    public void WhenFromOACurrency()
+    {
+        // Arrange
+        long cy = 123456789;
+
+        // Act
+        var fast = FastMoney.FromOACurrency(cy, Currency.FromCode("EUR"));
+
+        // Assert
+        fast.Amount.Should().Be(12345.6789m);
+        fast.Currency.Should().Be(Currency.FromCode("EUR"));
+    }
 }

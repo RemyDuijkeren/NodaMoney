@@ -64,7 +64,7 @@ static class CurrencyRegistry
     {
         if (string.IsNullOrEmpty(code))
         {
-            currencyInfo = null;
+            currencyInfo = null!;
             return false;
         }
 
@@ -560,7 +560,7 @@ static class CurrencyRegistry
             // Other currencies (Non-ISO-4217)
             new ("BTC", 0, MinorUnit.Eight, "Bitcoin", "₿") { IsIso4217 = false, IntroducedOn = new DateTime(2009, 1, 3) },
 
-            // The smallest unit of Ethereum is called a wei, which is equivalent to 10E−18 => TODO: How to store this? 13 is the max currently
-            new ("ETH", 0, MinorUnit.Thirteen, "Ethereum", "Ξ") { IsIso4217 = false, IntroducedOn = new DateTime(2015, 7, 30) }
+            // The smallest unit of Ethereum is called a wei, which is equivalent to 10E−18
+            new ("ETH", 0, MinorUnit.Eighteen, "Ethereum", "Ξ") { IsIso4217 = false, IntroducedOn = new DateTime(2015, 7, 30) }
         ];
 }

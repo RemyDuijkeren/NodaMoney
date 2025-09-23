@@ -43,14 +43,14 @@ from one currency to another currency.
 Currency euro = Currency.FromCode("EUR");
 
 // Create CurrencyInfo (for metadata about Currency)
-CurrencyInfo info = CurrencyInfo.FromCode("EUR");
-CurrencyInfo info = CurrencyInfo.GetInstance(euro); // Currency to CurrencyInfo
-Currencyinfo info = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
-Currencyinfo info = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
-Currencyinfo info = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
-CurrencyInfo info = CurrencyInfo.CurrentCurrency;
+CurrencyInfo ci = CurrencyInfo.FromCode("EUR");
+CurrencyInfo ci = CurrencyInfo.GetInstance(euro); // From Currency Unit To CurrencyInfo
+Currencyinfo ci = CurrencyInfo.GetInstance(CultureInfo.CurrentCulture);
+Currencyinfo ci = CurrencyInfo.GetInstance(RegionInfo.CurrentRegion);
+Currencyinfo ci = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
+CurrencyInfo ci = CurrencyInfo.CurrentCurrency;
 
-Currency euro = info; // implicit cast to Currency Unit
+Currency euro = ci; // Implicit cast to Currency Unit
 ```
 
 **Initializing money**
@@ -67,18 +67,16 @@ Money dollars = euros with { Currency = CurrencyInfo.FromCode("USD") };
 Money myEuros = euros with { Amount = 10.12m };
 
 // Define money explicit using helper method for most used currencies in the world
-Money money = Money.Euro(6.54m);
-Money money = Money.USDollar(6.54m);
-Money money = Money.PoundSterling(6.54m);
-Money money = Money.Yen(6);
+Money euros = Money.Euro(6.54m);
+Money dollars = Money.USDollar(6.54m);
+Money pounds = Money.PoundSterling(6.54m);
+Money yens = Money.Yen(6);
 
 // Implicit Currency based on current culture/region.
 // When culture is 'NL-nl' code below results in Euros.
-Money money = new Money(6.54m);
-Money money = new (6.54m);
-Money money = (Money)6.54m;
-Money money = (Money)6;
-Money money = (Money)6.54;
+Money euros = new Money(6.54m);
+Money euros = new (6.54m);
+Money euros = (Money)6.54m;
 
 // Auto-rounding to the minor unit will take place with MidpointRounding.ToEven
 // also known as banker's rounding

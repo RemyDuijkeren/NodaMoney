@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 public partial struct Money : IComparable, IComparable<Money>
 #if NET7_0_OR_GREATER
     , IComparisonOperators<Money, Money, bool>
@@ -89,14 +88,14 @@ public partial struct Money : IComparable, IComparable<Money>
     /// <exception cref="ArgumentException">object is not the same type as this instance.</exception>
     public int CompareTo(object? obj)
     {
-            if (obj == null)
-                return 1;
+        if (obj == null)
+            return 1;
 
-            if (obj is not Money money)
-                throw new ArgumentException("obj is not the same type as this instance", nameof(obj));
+        if (obj is not Money money)
+            throw new ArgumentException("obj is not the same type as this instance", nameof(obj));
 
-            return CompareTo(money);
-        }
+        return CompareTo(money);
+    }
 
     /// <summary>Compares this instance to a specified <see cref="object"/>.</summary>
     /// <param name="other">An <see cref="object"/> or null.</param>
@@ -123,7 +122,33 @@ public partial struct Money : IComparable, IComparable<Money>
     /// </returns>
     public int CompareTo(Money other)
     {
-            EnsureSameCurrency(this, other);
-            return Amount.CompareTo(other.Amount);
+        ThrowIfCurrencyIncompatible(other);
+
+        // Fast path: handle zeros (sign is not important for zero)
+        uint thisMag = _low | _mid | _high;
+        uint otherMag = other._low | other._mid | other._high;
+        if ((thisMag | otherMag) == 0u)
+            return 0;
+
+        // Fast path: If signs differ, the negative is less
+        bool thisNeg = (_flags & SignMask) != 0;
+        bool otherNeg = (other._flags & SignMask) != 0;
+        if (thisNeg != otherNeg)
+            return thisNeg ? -1 : 1;
+
+        // Fast path: If scales are the same, we can compare the 96-bit integers lexicographically
+        if (Scale == other.Scale)
+        {
+            // Compare high, then mid, then low
+#pragma warning disable RCS1238
+            if (_high != other._high) return _high < other._high ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+            if (_mid  != other._mid)  return _mid  < other._mid  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+            if (_low  != other._low)  return _low  < other._low  ? (thisNeg ? 1 : -1) : (thisNeg ? -1 : 1);
+#pragma warning restore RCS1238
+            return 0;
         }
+
+        // Fallback when scales differ: rely on decimal comparison which aligns scales
+        return Amount.CompareTo(other.Amount);
+    }
 }

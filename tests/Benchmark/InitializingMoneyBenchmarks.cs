@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using NodaMoney;
+using NodaMoney.Context;
 
 namespace Benchmark;
 
@@ -10,19 +11,32 @@ public class InitializingMoneyBenchmarks
     readonly Money _money = new Money(10m, "EUR");
 
     [Benchmark(Baseline = true)]
-    public Money ExplicitCurrencyCodeA()
+    public Money CurrencyCode()
     {
         return new Money(6.54m, "EUR");
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyCodeAndRounding()
+    public FastMoney fCurrencyCode()
+    {
+        return new FastMoney(6.54m, "EUR");
+    }
+
+    [Benchmark]
+    public Money CurrencyCodeAndRoundingMode()
     {
         return new Money(765.425m, "EUR", MidpointRounding.AwayFromZero);
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyFromCode()
+    public Money CurrencyCodeAndContext()
+    {
+        MoneyContext ctx = MoneyContext.DefaultThreadContext;
+        return new Money(765.425m, "EUR", ctx);
+    }
+
+    [Benchmark]
+    public Money CurrencyFromCode()
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         return new Money(6.54m, Currency.FromCode("EUR"));
@@ -30,13 +44,13 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
-    public Money ExplicitCurrencyInfoFromCode()
+    public Money CurrencyInfoFromCode()
     {
         return new Money(6.54m, CurrencyInfo.FromCode("EUR"));
     }
 
     [Benchmark]
-    public Money ExtensionMethod()
+    public Money ExtensionMethodEuro()
     {
         return Money.Euro(6.54m);
     }

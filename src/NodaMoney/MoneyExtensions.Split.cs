@@ -91,4 +91,7 @@ public static class MoneyExtensions
             yield return new Money(remainder, money.Currency);
         }
     }
+
+    internal static Money Apply(this Money money, Func<decimal, decimal> adjustment)
+        => money with { Amount = adjustment(money.Amount) };
 }

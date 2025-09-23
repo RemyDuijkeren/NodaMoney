@@ -1,0 +1,71 @@
+---
+name: Benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360 # Default: 360 minutes
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: 🛠️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: 💾 Restore dependencies
+        run: dotnet restore
+
+      - name: ⚙️ Build
+        run: dotnet build -c Release --no-restore
+
+      - name: 🚦 Run Benchmarks
+        working-directory: tests/Benchmark
+        run: dotnet run -c Release --framework net9.0 --no-build --no-launch-profile
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: BenchmarkDotNet.Artifacts
+          path: tests/Benchmark/BenchmarkDotNet.Artifacts/
+          if-no-files-found: error
+
+      - name: Output results to JobSummary
+        working-directory: tests/Benchmark
+        shell: pwsh
+        run: |
+          $items = Get-ChildItem "BenchmarkDotNet.Artifacts/results/*.md" | where Name -ne 'reports.md'
+          foreach($item in $items) {
+            $title = $item.Name
+            $title = $title.Replace('-report-console.md', '')
+            $title = $title.Replace('_Int32_' , '&lt;int&gt;')
+            $title = $title.Replace('_String_', '&lt;string&gt;')
+            $title = $title.Replace('_Double_', '&lt;double&gt;')
+
+            $content = Get-Content $item.FullName -Raw
+            $tableContent = $content.Substring($content.IndexOf('|'))
+            $tableContent.Replace('<', '&lt;').Replace('>', '&gt;')
+
+            Write-Output ('## {0}' -f $title)  >> $env:GITHUB_STEP_SUMMARY
+            Write-Output $tableContent         >> $env:GITHUB_STEP_SUMMARY
+          }
+
+      # https://github.com/benchmark-action/github-action-benchmark?tab=readme-ov-file
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkdotnet'
+          output-file-path: BenchmarkDotNet.Artifacts/results/Sample.Benchmarks-report-full-compressed.json

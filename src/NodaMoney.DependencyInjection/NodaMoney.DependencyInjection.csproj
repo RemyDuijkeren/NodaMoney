@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0' Or '$(TargetFramework)' == 'net10.0'">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Label="PackageProperties">
+    <PackageId>NodaMoney.DependencyInjection</PackageId>
+    <Description>NodaMoney.DependencyInjection provides dependency injection extensins for the library NodaMoney.</Description>
+    <Copyright>Copyright (c) Remy van Duijkeren 2025</Copyright>
+    <Authors>Remy van Duijkeren (@RemyDuijkeren)</Authors>
+    <PackageProjectUrl>https://github.com/RemyDuijkeren/NodaMoney</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>logo_nodamoney.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/RemyDuijkeren/NodaMoney.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Noda Money Currency ExchangeRate DependencyInjection</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLinkProperties">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(Deterministic)'=='true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NodaMoney\NodaMoney.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" PrivateAssets="all" Version="6.0.0" />
+    <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" Version="4.14.0" />
+
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[5.0.0,10.0.0)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[5.0.0,10.0.0)" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="[5.0.0,10.0.0)" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[5.0.0,10.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Add InternalsVisibleTo to src projects to enable testing internal methods https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm -->
+    <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_nodamoney.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

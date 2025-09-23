@@ -13,18 +13,19 @@ public readonly partial record struct Currency
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
     const ushort Iso4217BitMask = 1 << 15;
 
-    /// <summary>ushort = 2bytes, only 15bits needed for code, 1bit left that is to indicate flag 'IsIso4217'.</summary>
-    readonly ushort _encodedValue;
+    /// <summary>ushort = 2 bytes, only 15 bits needed for code, 1bit left that is to indicate the flag 'IsIso4217'.</summary>
+    internal ushort EncodedValue { get; private init; }
+    internal Currency(ushort encodedValue) => EncodedValue = encodedValue;
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
-    /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>
+    /// <param name="isIso4217">Indicates if the currency is in ISO-4217</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
     internal Currency(string code, bool isIso4217 = true) : this(code.AsSpan(), isIso4217) { }
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
-    /// <param name="isIso4217">Indicates if currency is in ISO-4217</param>
+    /// <param name="isIso4217">Indicates if the currency is in ISO-4217</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
     internal Currency(ReadOnlySpan<char> code, bool isIso4217 = true)
     {
@@ -38,14 +39,14 @@ public readonly partial record struct Currency
             return;
         }
 
-        // A-Z (65-90 in ASCII), move to 1-26 so that it fits in 5 bits.
+        // A-Z (65-90 in ASCII), moves to 1-26 so that it fits in 5 bits.
         // Store in ushort (2 bytes) by shifting 5 bits to the left for each char.
         foreach (var c in code)
         {
             if (c is < 'A' or > 'Z')
                 throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
 
-            _encodedValue = (ushort)(_encodedValue << 5 | (c - 'A' + 1));
+            EncodedValue = (ushort)(EncodedValue << 5 | (c - 'A' + 1));
         }
 
         IsIso4217 = isIso4217;
@@ -60,15 +61,15 @@ public readonly partial record struct Currency
     {
         get
         {
-            if (_encodedValue is 0 or 25368) // 25368; // Precomputed value of "XXX"
+            if (EncodedValue is 0 or 25368) // 25368; // Precomputed value of "XXX"
                 return NoCurrencyCode;
 
             // Decode the stored ushort value into a 3-character string by shifting back into
             // separate bytes with clearing the left 3 bits using '& 0b_0001_1111' (= '& 0x1F')
             Span<char> result = stackalloc char[3];
-            result[0] = (char)((_encodedValue >> 10 & 0x1F) + 'A' - 1); // 1-26 => A-Z (65-90 in ASCII)
-            result[1] = (char)((_encodedValue >> 5 & 0x1F) + 'A' - 1);
-            result[2] = (char)((_encodedValue & 0x1F) + 'A' - 1);
+            result[0] = (char)((EncodedValue >> 10 & 0x1F) + 'A' - 1); // 1-26 => A-Z (65-90 in ASCII)
+            result[1] = (char)((EncodedValue >> 5 & 0x1F) + 'A' - 1);
+            result[2] = (char)((EncodedValue & 0x1F) + 'A' - 1);
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER // Optimize by using Span<char>
             return new string(result);
@@ -83,11 +84,11 @@ public readonly partial record struct Currency
     {
         get
         {
-            return (_encodedValue & Iso4217BitMask) == 0; // Check if the 15th bit is NOT set
+            return (EncodedValue & Iso4217BitMask) == 0; // Check if the 15th bit is NOT set
         }
         init
         {
-            if (!value) _encodedValue |= Iso4217BitMask; // Set the 15th bit (= non ISO-4217)
+            if (!value) EncodedValue |= Iso4217BitMask; // Set the 15th bit (= non ISO-4217)
         }
     }
 
@@ -99,10 +100,10 @@ public readonly partial record struct Currency
     public static Currency FromCode(string code) => CurrencyInfo.FromCode(code);
 
     /// <summary>Gets the smallest amount of the currency unit.</summary>
-    public decimal MinimalAmount => CurrencyInfo.FromCode(Code).MinimalAmount;
+    public decimal MinimalAmount => CurrencyInfo.GetInstance(this).MinimalAmount;
 
     /// <summary>Gets the currency symbol.</summary>
-    public string Symbol => CurrencyInfo.FromCode(Code).Symbol;
+    public string Symbol => CurrencyInfo.GetInstance(this).Symbol;
 
     /// <summary>Deconstructs the current instance into its components.</summary>
     /// <param name="code">The three-character currency code (ISO-4217) of the current instance.</param>

@@ -16,7 +16,12 @@ public class ParseImplicitCurrency
     [Fact, UseCulture("fr-BE")]
     public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
     {
-        var euro = Money.Parse("-98 765,43 €");
+#if NET48
+        // The France group separator for .NET4.8 is `.`, where >.NET6.0 uses space ` `
+        var euro = Money.Parse("-98.765,43 €", CurrencyInfo.FromCode("EUR"));
+#else
+        var euro = Money.Parse("-98 765,43 €", CurrencyInfo.FromCode("EUR"));
+#endif
 
         euro.Should().Be(new Money(-98_765.43m, "EUR"));
     }

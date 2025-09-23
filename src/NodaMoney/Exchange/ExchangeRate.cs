@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace NodaMoney.Exchange;
 
-/// <summary>A conversion of money of one currency into money of another currency.</summary>
+/// <summary>A conversion rate to convert a money amount from one currency into another currency.</summary>
 /// <remarks>See http://en.wikipedia.org/wiki/Exchange_rate .</remarks>
 public readonly record struct ExchangeRate
 #if NET7_0_OR_GREATER

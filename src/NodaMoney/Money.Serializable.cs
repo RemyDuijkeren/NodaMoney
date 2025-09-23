@@ -6,11 +6,11 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using NodaMoney.Context;
 using NodaMoney.Serialization;
 
 namespace NodaMoney;
 
-/// <summary>Represents Money, an amount defined in a specific Currency.</summary>
 [Serializable]
 [TypeConverter(typeof(MoneyTypeConverter))] // Used by Newtonsoft.Json to do the serialization.
 [JsonConverter(typeof(MoneyJsonConverter))] // Used by System.Text.Json to do the serialization.
@@ -66,8 +66,12 @@ public partial struct Money : IXmlSerializable, ISerializable
 
         // Don't use TypeDescriptor.GetConverter(typeof(Currency)). Use CurrencyTypeConverter explicit for Native AOT
         CurrencyTypeConverter currencyTypeConverter = new();
-        Currency = (Currency)(currencyTypeConverter.ConvertFromString(currency) ?? new SerializationException("Member 'Currency' could not be converted from string to Currency."));
-        Amount = Round(amount, Currency, MidpointRounding.ToEven);
+        Currency = (Currency)(currencyTypeConverter.ConvertFromString(currency) ??
+                              new SerializationException("Member 'Currency' could not be converted from string to Currency."));
+
+        // No rounding, because we are deserializing the exact state that was serialized.
+        ContextIndex = MoneyContext.NoRounding.Index;
+        Amount = amount;
     }
 #pragma warning restore CA1801 // Parameter context of method.ctor is never used.
 

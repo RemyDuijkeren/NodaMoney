@@ -90,7 +90,12 @@ public class TryParseExplicitCurrency
         CurrencyInfo currencyInfo = CurrencyInfo.FromCode("EUR");
 
         // Act
-        bool parseResult = Money.TryParse("-98 765,43 €", currencyInfo, out Money euro);
+#if NET48
+        // The France group separator for .NET4.8 is `.`, where >.NET6.0 uses space ` `
+        bool parseResult = Money.TryParse("-98.765,43 €", currencyInfo, out Money euro);
+#else
+        bool parseResult = Money.TryParse("-98 765,43 €", currencyInfo, out Money euro);
+#endif
 
         // Assert
         parseResult.Should().BeTrue();

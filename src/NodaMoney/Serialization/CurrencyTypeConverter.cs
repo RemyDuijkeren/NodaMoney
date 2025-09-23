@@ -34,9 +34,9 @@ public class CurrencyTypeConverter : TypeConverter
 
         var valueAsSpan = valueAsString.AsSpan();
         var separatorIndex = valueAsSpan.IndexOf(';');
-        if (separatorIndex != -1) // Has 2de part
+        if (separatorIndex != -1) // Has the 2nd part
         {
-            // In V1 if the 2nd part is not empty and not "ISO-4217" then it is a non-iso4217 currency,
+            // In V1 if the 2nd part is not empty and not "ISO-4217", then it is a non-iso4217 currency,
             // but in V2 it doesn't matter because currency codes are unique
             var currencyCode = valueAsSpan.Slice(0, separatorIndex).ToString();
             return (Currency)CurrencyInfo.FromCode(currencyCode);
@@ -55,15 +55,13 @@ public class CurrencyTypeConverter : TypeConverter
     /// <exception cref="NotSupportedException">The conversion cannot be performed. </exception>
     public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
     {
-            if (destinationType == typeof(string) && value is Currency currency)
-            {
-                    var result = new StringBuilder();
-                    result.Append(currency.Code);
-                    return result.ToString();
-            }
-
-            return base.ConvertTo(context, culture, value, destinationType);
+        if (destinationType == typeof(string) && value is Currency currency)
+        {
+            var result = new StringBuilder();
+            result.Append(currency.Code);
+            return result.ToString();
         }
 
-    // IsValid(ITypeDescriptorContext, Object)
+        return base.ConvertTo(context, culture, value, destinationType);
+    }
 }

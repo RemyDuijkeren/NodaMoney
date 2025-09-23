@@ -29,6 +29,7 @@ jobs:
             6.0.x
             8.0.x
             9.0.x
+            10.0.x
           cache: true
           cache-dependency-path: '**/packages.lock.json'
         env:
@@ -45,3 +46,4 @@ jobs:
           dotnet test -f net6.0 -c Release -l trx --results-directory ./artifacts/ --no-build
           dotnet test -f net8.0 -c Release -l trx --results-directory ./artifacts/ --no-build
           dotnet test -f net9.0 -c Release -l trx --results-directory ./artifacts/ --no-build
+          dotnet test -f net10.0 -c Release -l trx --results-directory ./artifacts/ --no-build

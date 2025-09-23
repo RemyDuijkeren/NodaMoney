@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace NodaMoney;
 
@@ -43,7 +44,9 @@ public partial struct Money
     public static bool IsPositive(Money value) => value.Amount >= 0;
 
     /// <inheritdoc cref="INumberBase{TSelf}.IsZero(TSelf)" />
-    public static bool IsZero(Money value) => value.Amount == 0;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsZero(in Money value) => (value._low | value._mid | value._high) == 0u;
+    //public static bool IsZero(Money value) => (value._low | value._mid | value._high) == 0;
 
     /// <inheritdoc cref="INumberBase{TSelf}.MinMagnitude(TSelf, TSelf)" />
     public static Money MinMagnitude(Money x, Money y)

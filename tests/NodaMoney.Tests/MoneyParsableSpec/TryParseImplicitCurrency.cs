@@ -21,8 +21,7 @@ public class TryParseImplicitCurrency
     public void WhenInBelgiumDutchSpeaking_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("nl-BE");
-        Money euro;
-        Money.TryParse("€ -98.765,43", out euro).Should().BeTrue();
+        Money.TryParse("€ -98.765,43", out Money euro).Should().BeTrue();
 
         euro.Should().Be(new Money(-98_765.43m, "EUR"));
     }
@@ -31,8 +30,13 @@ public class TryParseImplicitCurrency
     public void WhenInBelgiumFrenchSpeaking_ThenThisShouldSucceed()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("fr-BE");
-        Money euro;
-        Money.TryParse("-98 765,43 €", out euro).Should().BeTrue();
+
+#if NET48
+        // The France group separator for .NET4.8 is `.`, where >.NET6.0 uses space ` `
+        Money.TryParse("-98.765,43 €", out Money euro).Should().BeTrue();
+#else
+        Money.TryParse("-98 765,43 €", out Money euro).Should().BeTrue();
+#endif
 
         euro.Should().Be(new Money(-98_765.43, "EUR"));
     }

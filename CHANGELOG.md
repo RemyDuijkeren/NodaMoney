@@ -7,22 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
+- Add MoneyContext to configure money behavior like rounding, scale and precision. This can be specified globally,
+  per thread or by money instance. This should solve much of the discussion in issue #27 about internal rounding.
+- Add extra constructors on Money to create with a given MoneyContext, instead of MidpointRounding.
+- Add MoneyContext property on Money.
+- Add Scale property on Money.
+- Add Precision property on Money (= still internal!).
+- Add NodaMoney.DependencyInjection package to register MoneyContext .NET DI.
+- Add the FastMoney struct, based on long, for a smaller footprint and faster operations with a default MoneyContext of { Precision = 19, MaxScale = 4, RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) }.
+
+### Changed
+- Optimized Money struct size. This was 18 bytes (padded 24 bytes), but is now 16 bytes (padded 16 bytes) (33% less).
+  This means Money is the same size as Decimal struct!!!
+- Improved Parsing: memory allocation (75% less) and performance (2x)
+- Improved Increment(++) and Decrement(--): zero memory allocation (was 32 B) and performance (3x)
+
+### Removed
+- IConvertible implementation for Money. Methods that don't make sense to convert from and to Money are removed, like ToBoolean, ToDateTime, etc.
+- Removed From-methods and numeric casts on Money where constructors exist or are more appropriate, like FromDecimal, FromInt32 FromInt64, etc.
+- Remove Money constructors and factory methods with MidpointRounding param for non-decimal numeric types, like `new Money(double, Currency, MidpointRounding)`.
+
+## [2.3]
+
+### Added
+- CurrencyInfo.TryFromCode method to get CurrencyInfo from code without throwing an exception.
+
+## [2.2.1]
+
+### Changed
+- Fixed #107 When subtracting from $0, the result is negated
+
+## [2.2]
+
+### Added
 - ISO 4217 AMENDMENT NUMBER 179, add new currency XAD for the Finance Department Arab Monetary Fund (AMF)
 
 ### Changed
+- Updated System.Text.Json dependency to allow versions from 4.7.2 and up for better backwards compatibility.
+- No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency (breaking-change).
 - Allow ExchangeRate to have the same currency as both base and quote by @gliljas in #103
-- Removed NumberStyle param for Parse and TryParse methods (Breaking Change)
-- No rounding for Currencies where MinorUnit is NotApplicable, like Currency(Info).NoCurrency.
-- Updated System.Text.Json dependency to allow versions from 4.7.2 and up for better compatibility and flexibility.
-- CurrencyInfo.MinorUnitAsExponentOfBase10 changed to internal
 
 ### Removed
--
+- Removed NumberStyle param for Parse- and TryParse-methods (breaking-change). Money expects to parse a Currency number.
+  Pre-parse with Decimal.Parse() if more fine-grained control is needed.
+- CurrencyInfo.MinorUnitAsExponentOfBase10 changed from public to internal (breaking-change)
 
 ## [2.1.1]
 
 ### Added
-- Allow creating Money using 'with' expression
+- Allow creating Money using the 'with' expression
 - Add format N, Number format (e.g., "2,765.43")
 - Add format F, Fixed point format (e.g., "2765,43")
 - Add compatibility with Native AOT and Trimming
@@ -45,9 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Rename SafeDivide to Split and move in NodaMoney namespace
 - NotNullWhenAttribute is now internal #101
-
-### Removed
--
 
 ## [2.0]
 

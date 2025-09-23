@@ -7,7 +7,7 @@ public class ConvertMoneyToNumericType
     [Fact]
     public void WhenConvertingToDecimal_ThenThisShouldSucceed()
     {
-        var result = Money.ToDecimal(_euros);
+        var result = _euros.ToDecimal();
 
         result.Should().Be(765.43m);
     }
@@ -15,16 +15,24 @@ public class ConvertMoneyToNumericType
     [Fact]
     public void WhenConvertingToDouble_ThenThisShouldSucceed()
     {
-        var result = Money.ToDouble(_euros);
+        var result = _euros.ToDouble();
 
         result.Should().BeApproximately(765.43d, 0.001d);
     }
 
     [Fact]
-    public void WhenConvertingToSingle_ThenThisShouldSucceed()
+    public void WhenConvertingToLong_ThenThisShouldSucceed()
     {
-        var result = Money.ToSingle(_euros);
+        var result = _euros.ToInt64();
 
-        result.Should().BeApproximately(765.43f, 0.001f);
+        result.Should().Be(765);
+    }
+
+    [Fact]
+    public void WhenConvertingToInt_ThenThisShouldSucceed()
+    {
+        var result = _euros.ToInt32();
+
+        result.Should().Be(765);
     }
 }

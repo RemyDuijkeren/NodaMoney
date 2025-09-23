@@ -88,12 +88,15 @@ public class CastNumericTypeToMoneyWithImplicitCurrencyFromTheCurrentCulture
     [UseCulture("nl-NL")]
     public void WhenValueIsUint64_ThenCreatingShouldSucceed()
     {
-            const ulong uInt64Value = 600;
-            Money money = (Money)uInt64Value;
+        const ulong uInt64Value = 600;
+        // Money money = (Money)uInt64Value;
 
-            money.Currency.Should().Be(_euro);
-            money.Amount.Should().Be(600);
-        }
+        // use constructor instead
+        var money = new Money(uInt64Value, _euro);
+
+        money.Currency.Should().Be(_euro);
+        money.Amount.Should().Be(600);
+    }
 
     [Fact]
     [UseCulture("nl-NL")]
@@ -108,7 +111,7 @@ public class CastNumericTypeToMoneyWithImplicitCurrencyFromTheCurrentCulture
 
     [Fact]
     [UseCulture("nl-NL")]
-    public void WhenValueIsDoubl_ThenCreatingShouldSucceed()
+    public void WhenValueIsDouble_ThenCreatingShouldSucceed()
     {
             var money = (Money)25.00;
 
