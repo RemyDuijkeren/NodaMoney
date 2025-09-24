@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
+-
+
+### Changed
+- ISO 4217 AMENDMENT NUMBER 180, Bulgaria will use EUR from 1 January 2026 and BGN will move to the historic list
+
+### Removed
+-
+
+## [2.5]
+
+### Added
 - Add MoneyContext to configure money behavior like rounding, scale and precision. This can be specified globally,
   per thread or by money instance. This should solve much of the discussion in issue #27 about internal rounding.
 - Add extra constructors on Money to create with a given MoneyContext, instead of MidpointRounding.

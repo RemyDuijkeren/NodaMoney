@@ -254,7 +254,6 @@ static class CurrencyRegistry
             new ("BAM", 977, MinorUnit.Two, "Bosnia and Herzegovina convertible mark", "KM"),
             new ("BBD", 052, MinorUnit.Two, "Barbados dollar", "$") { InternationalSymbol = "BBD$", AlternativeSymbols = ["Bds$", "BB$", "BDS$"] },
             new ("BDT", 050, MinorUnit.Two, "Bangladeshi taka", "৳") { InternationalSymbol = "Tk" },
-            new ("BGN", 975, MinorUnit.Two, "Bulgarian lev", "лв."),
             new ("BHD", 048, MinorUnit.Three, "Bahraini dinar", "BD"), // or د.ب. (switched for unit tests to work)
             new ("BIF", 108, MinorUnit.Zero, "Burundian franc", "FBu"),
             new ("BMD", 060, MinorUnit.Two, "Bermudian dollar", "$") { InternationalSymbol = "BD$" },
@@ -423,9 +422,10 @@ static class CurrencyRegistry
             new ("XAD", 396, MinorUnit.Two, "Arab Accounting Dinar") { IntroducedOn = new DateTime(2025, 05, 12) }, // Amendment 179, add new currency for the Finance Department Arab Monetary Fund (AMF)
 
             // Still Active list one: will move to Historic (list three) in the future
-            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 07, 01) }, // Amendment 176, replaced by XCG/532
+            new ("BGN", 975, MinorUnit.Two, "Bulgarian lev", "лв.") { ExpiredOn = new DateTime(2026, 01, 01) }, // Amendment 180, replaced by EUR/978,
 
             // Historic ISO-4217 currencies (list three)
+            new ("ANG", 532, MinorUnit.Two, "Netherlands Antillean guilder", "ƒ") { ExpiredOn = new DateTime(2025, 07, 01) }, // Amendment 176, replaced by XCG/532
             new ("CUC", 931, MinorUnit.Two, "Cuban convertible peso", "CUC$") { ExpiredOn = new DateTime(2021, 06, 30), IntroducedOn = new DateTime(2009, 03, 01) }, // $ or CUC // Amendment 178, replace by CUP/192,
             new ("ZWL", 932, MinorUnit.Two, "Zimbabwean dollar", "$") { ExpiredOn = new DateTime(2024, 08, 31) }, // Amendment 177, replaces ZWG/924,
             new ("HRK", 191, MinorUnit.Two, "Croatian kuna", "kn") { ExpiredOn = new DateTime(2022, 12, 31) }, // replaced by EUR/978
