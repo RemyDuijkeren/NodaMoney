@@ -6,37 +6,68 @@
 [![Pre-release NuGet](https://img.shields.io/github/v/tag/RemyDuijkeren/NodaMoney?label=pre-release%20nuget&logo=github)](https://github.com/users/RemyDuijkeren/packages/nuget/package/NodaMoney)
 [![CI](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml/badge.svg)](https://github.com/RemyDuijkeren/NodaMoney/actions/workflows/ci.yml)
 
-About
+Overview
+--------
+NodaMoney is a small, focused .NET library that treats money as a first‑class citizen. It gives you type‑safe money and currency types,
+correct rounding, parsing/formatting, and currency‑aware arithmetic so you don’t have to reinvent the tricky bits.
+
+Why not just decimal? The built‑in [decimal](http://msdn.microsoft.com/en-us/library/364x0z75.aspx) is great for precision but has no concept of currency, minor units (cents), symbols or
+culture‑aware formatting, nor common money behaviors (like splitting amounts without losing a cent). NodaMoney provides these domain concepts
+and behaviors so you can write clearer and safer code.
+
+NodaMoney is inspired by the Java library [JodaMoney](http://www.joda.org/joda-money/) (just like NodaTime is inspired by JodaTime). It aims to be a solid base layer
+with clear, minimal APIs and ISO‑4217 currency data.
+
+What you get
+- Money: immutable, currency‑aware value type with safe operators and culture‑aware formatting/parsing
+- FastMoney: high‑throughput alternative using 64‑bit integer arithmetic (fixed 4‑decimal scale)
+- Currency and CurrencyInfo: ISO 4217 catalog with metadata; supports custom currencies
+- Rounding and MoneyContext: configurable rounding/scale and default currency; DI support and named contexts
+- ExchangeRate: represent currency pairs and convert between currencies
+- Serialization: XML, System.Text.Json and Newtonsoft.Json converters; type converters
+- Dependency Injection package: Microsoft.Extensions.* integration for configuring MoneyContext
+- AOT‑friendly builds and multi‑TFM support (see Compatibility below)
+
+Installation
+```powershell
+dotnet add package NodaMoney
+dotnet add package NodaMoney.DependencyInjection # optional DI integration
+```
+
+Quick start
 ----
-NodaMoney provides a library that treats Money as a first class citizen in .NET and handles all the ugly bits like currencies
-and formatting.
 
-We have the [decimal type](http://msdn.microsoft.com/en-us/library/364x0z75.aspx) in .NET to store an amount of money, which can
-be used for very basic things. But it's still a numeric value without knowledge about its currency, major and minor units,
-formatting, etc. The .NET Framework has the System.Globalization namespace that helps with formatting of money in different cultures and regions,
-but it only captures some info about currencies, but not everything.
+```csharp
+using NodaMoney;
 
-There is also some business logic surrounding money, like dividing without losing pennies (like in the movie [Office Space](http://www.imdb.com/title/tt0151804/)),
-conversion, etc. that motivates to have a Money type that contains all the domain logic, like Martin Fowler already described in
-his book Patterns of Enterprise Application Architecture, see pages about [Money](http://martinfowler.com/eaaCatalog/money.html)
-and [Quantity](https://martinfowler.com/eaaDev/Quantity.html).
+var price = new Money(12.99m, "USD");
+var tax = price * 0.21m;      // currency‑safe arithmetic
+var total = price + tax;      // auto‑rounded to minor unit
 
-NodaMoney represents the .NET counterpart of java library [JodaMoney](http://www.joda.org/joda-money/), like NodaTime is the .NET
-counterpart of JodaTime. NodaMoney does not provide, nor is it intended to provide, monetary algorithms beyond the most basic and
-obvious. This is because the requirements for these algorithms vary widely between domains. This library is intended to act as the
-base layer, providing classes that should be in the .NET Framework. It complies with the currencies in [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).
+string text = total.ToString("C", new System.Globalization.CultureInfo("en-US"));
+// e.g. "$15.72"
 
-Basic Usage
+// Parse
+var parsed = Money.Parse("$15.72", Currency.FromCode("USD"));
+
+// Split without losing cents
+var shares = total.Split(3);  // e.g. [$5.24, $5.24, $5.24]
+```
+
+Main building blocks
+- `Money`: An immutable structure that represents money in a specified currency
+- `FastMoney`: A high‑performance immutable structure optimized for arithmetic
+- `Currency`: A compact immutable structure that represents a currency unit
+- `CurrencyInfo`: Currency metadata (ISO 4217 + custom); implicitly converts to Currency
+- `MoneyContext`: Configurable rounding, scale and default currency; supports DI and named contexts
+- `ExchangeRate`: Represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) to convert between currencies
+
+Usage
 -----
-The main classes are:
-- Money: An immutable structure that represents money in a specified currency;
-- FastMoney: A high-performance immutable structure optimized for arithmetic;
-- Currency: A small immutable structure that represents a currency unit;
-- CurrencyInfo: An immutable structure that represents a currency with all its information. It can give all ISO 4217
-and custom currencies. It auto-converts to Currency;
-- ExchangeRate: A structure that represents a [currency pair](http://en.wikipedia.org/wiki/Currency_pair) that can convert money
-from one currency to another currency;
-- MoneyContext: Configurable rounding, scale and default currency context used by Money operations; supports DI and named contexts.
+
+`Money` type is based on `decimal` and has the same 28-digit precision (±1.0 × 10^-28 to ±7.9 × 10^28). `Money` also has
+the same size as a decimal, even with the extra Currency and MoneyContext information. By default, `Money` is always
+rounded to the currency minor unit (use `MoneyContext` to override), which is executed after every arithmetic operation.
 
 **Initializing money**
 
@@ -89,7 +120,7 @@ euro20 > euro10; // true;
 euro10 <= dollar10; // throws InvalidCurrencyException!
 zeroEuro == zeroDollar; // true; special zero handling
 
-// Add and Substract
+// Add and Subtract
 Money euro30 = euro10 + euro20;
 Money euro10 = euro20 - euro10;
 Money m = euro10 + dollar10; // throws InvalidCurrencyException!
@@ -212,22 +243,38 @@ Money euro;
 Money.TryParse("€ 765,43", Currency.FromCode("EUR"), out euro);
 ```
 
+**Exchange rates (convert)**
+
+```csharp
+using NodaMoney.Exchange;
+
+// EUR/USD at 1.2591
+var rate = new ExchangeRate("EUR", "USD", 1.2591);
+
+var eur = Money.Euro(100.99m);
+var usd = rate.Convert(eur);   // -> USD 127.16 (rounded to cents)
+
+// Converting back uses the same rate
+var eurAgain = rate.Convert(usd); // -> EUR 100.99
+```
+
 ## FastMoney
 
-`Money` type is based on `decimal` and by default always rounded to the currency minor unit (use `MoneyContext` to override).
-`Money` has 28 digits precision (±1.0 × 10^-28 to ±7.9 × 10^28)
+Where `Money` type is based on `decimal`, `FastMoney` is based on `long` and has smaller precision (17 instead of 28) and has a
+fixed four decimal scale, like [SqlMoney](https://learn.microsoft.com/en-us/dotnet/api/system.data.sqltypes.sqlmoney?view=net-9.0) and OLE Automation Currency value. Because it is based on `long` it has way faster for
+arithmetic operations.
 
 FastMoney type is an optimized version of `Money` that:
 - has 17 digits precision (±1.0 × 10^-17 to ±9.2 × 10^17)
 - has fixed four decimal places
 - no internal rounding based on the currency minor unit
 - is faster for add/subtract/multiply/divide/increment/decrement/remainder using 64-bit integer arithmetic
-- is best for high-throughput calculations where 4-decimal precision is enough (x18 faster)
-- is smaller than Money (12 bytes vs. 16 bytes) because the type is based on `long` instead of `decimal`
+- is best for high-throughput calculations where 4-decimal precision is enough (up to 18 times)
+- is smaller than Money (12 bytes vs. 16 bytes)
 - aligns and converts with SqlMoney and OLE Automation Currency value (OACurrency)
 
-Only use FastMoney when you need the fastest performance, and you know what you're doing regarding currency rounding and don't mind the
-loss of precision. Convert `FastMoney` to `Money` for presentation and formatting.
+Only use FastMoney when you need the fastest performance, and you know what you're doing regarding currency rounding and
+don't mind the loss of precision. For presentation and formatting, convert `FastMoney` type to `Money`.
 
 Usage:
 
@@ -263,11 +310,11 @@ long oaCurrency = fast.ToOACurrency();
 
 Currency(Info)
 -----
-`Currency` is a unit of currency that is a small optimized struct that represencts the Currency Code. It is used inside `Money` and as
-struct in fast lookups.
+`Currency` is a unit of currency that is a small optimized struct that represents the Currency Code. It is used inside
+`Money` and as struct in fast lookups.
 
-`CurrencyInfo` is a class that contains information about the currency, such as the ISO 4217 code, the symbol, the name, and the minor unit.
-It is used to create a `Currency` instance (implicit cast) or to register a custom currency.
+`CurrencyInfo` is a class that contains information about the currency, such as the ISO 4217 code, the symbol, the name,
+and the minor unit. It is used to create a `Currency` instance (implicit cast) or to register a custom currency.
 
 **Initializing Currency**
 
@@ -284,6 +331,16 @@ Currencyinfo ci = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
 CurrencyInfo ci = CurrencyInfo.CurrentCurrency;
 
 Currency euro = ci; // Implicit cast to Currency Unit
+```
+
+**Retrieving Currencies**
+
+```csharp
+// Get all currencies
+var currencyList = CurrencyInfo.GetAllCurrencies();
+
+// Fast lookup by code or symbol
+var findCurrencies = CurrencyInfo.GetAllCurrencies("$");
 ```
 
 **Create custom Currency (advanced)**
@@ -421,6 +478,13 @@ app.Run();
 
 You can also configure via IConfiguration (appsettings.json) and register multiple named contexts.
 See the [NodaMoney.DependencyInjection README](src/NodaMoney.DependencyInjection/README.md) for full examples.
+
+## Compatibility
+
+- Core library (NodaMoney): net9.0; net8.0; netstandard2.0; netstandard2.1
+- DI package (NodaMoney.DependencyInjection): net9.0; net8.0; netstandard2.0; netstandard2.1
+- AOT: compatible on .NET 8/9/10
+- Packages ship with SourceLink and symbol packages;
 
 ## Releases
 
