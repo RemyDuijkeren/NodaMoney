@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
-- Format to Compact notation, like USD 1.2K, €3.4M (#111)
+- Format K ($1.2K) and k (USD 1.2K) to Compact notation, like USD 1.2K, €3.4M (https://github.com/RemyDuijkeren/NodaMoney/issues/111)
 
 ### Changed
 - ISO 4217 AMENDMENT NUMBER 180, Bulgaria will use EUR from 1 January 2026, and BGN will move to the historic list.
-- Formatting format 'C' has different behavior depending on capitalization. Format 'C' will use the international currency symbol (US$),
+- Formatting format 'C' now has different behavior depending on capitalization. Format 'C' will use the international currency symbol (US$),
   where 'c' will use the local currency code ($).
 
 ### Removed

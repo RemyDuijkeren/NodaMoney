@@ -370,10 +370,10 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // styles: symbol, international symbol, code, name, local name, accounting
 
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
-        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43 , EUR 23,002.43, 23,002.43 EUR
-        // C: Currency Symbol format, like € 23.002,43 , € 23,002.43, 23,002.43 €
-        // C => TODO: if symbol is GenericCurrencySign, then use code? What if NoCurrency?
-        // c => TODO: use C for international version (US$) and c for local version ($) in some locals?
+        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43, EUR 23,002.43, 23,002.43 EUR
+        // C: Currency Symbol format, like € 23.002,43, € 23,002.43, 23,002.43 €
+        // C => C for the international version (US$)
+        // c => c for the local version ($) in some locals?
         // R: Round-trip format with currency code
         // N: Number format = decimal 2.765,43
         // F: Fixed point format = decimal 2765,43
@@ -381,7 +381,8 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // l: Native name, like 23.002,43 dólar
         // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
         // ?: Accounting ($23.002,43) for negative numbers
-        // ?: Compact/abbreviated notation, for example in dashboards showing USD 1.2K, €3.4M.
+        // K: Compact/abbreviated notation using currency code, for example, in dashboards showing €3.4M.
+        // k: Compact/abbreviated notation using ISO code, for example, in dashboards showing USD 1.2K.
 
         // If the argument is not a Money, fallback to default formatting
         if (arg is not Money money)
@@ -405,23 +406,22 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // TODO: check if Money.Currency and this is equal, and also check IFormatProvider? What to do if not equal?
         // Always use CurrencyDecimalDigits and CurrencySymbol from CurrencyInfo, but override other properties?
 
-        NumberFormatInfo nfiLocal = ToNumberFormatInfo(formatProvider);
-        NumberFormatInfo nfiIntl = ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true);
+        NumberFormatInfo nfi = ToNumberFormatInfo(formatProvider);
         char fmt = ParseFormatSpecifier(format.AsSpan(), out int digits);
         if (fmt == 0)
         {
             // TODO: allow custom format with currency sign ($)?
-            // custom numeric format: delegate to amount with local currency settings
-            return money.Amount.ToString(format, nfiLocal);
+            // custom numeric format: delegate to amount with default currency settings (= local currency code (e.g., $))
+            return money.Amount.ToString(format, nfi);
         }
 
         return fmt switch
         {
-            // Currency format
-            'c' when digits == -1 => money.Amount.ToString("C", nfiLocal),
-            'c' => money.Amount.ToString($"C{digits}", nfiLocal),
-            'C' when digits == -1 => money.Amount.ToString("C", nfiIntl),
-            'C' => money.Amount.ToString($"C{digits}", nfiIntl),
+            // Currency format (e.g., "$ 2.765,43" or "US$ 2.765,43")
+            'c' when digits == -1 => money.Amount.ToString("C", nfi),
+            'c' => money.Amount.ToString($"C{digits}", nfi),
+            'C' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true)),
+            'C' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true)),
 
             // General format (e.g., "USD 2.765,43")
             'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
@@ -430,11 +430,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             // English Name currency (e.g., "1.234.56 US dollars") // TODO: future use lower-case for local native name
             'L' or 'l' when digits == -1 =>
                 // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
-                $"{money.Amount.ToString($"N{nfiLocal.CurrencyDecimalDigits}", nfiLocal)} {EnglishName}",
-            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfiLocal)} {EnglishName}",
+                $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
+            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
 
             // Round-trip format (e.g., "USD 1234.56"). Ignore precision specifier, like R2
-            'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfiLocal)}",
+            'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfi)}",
 
             // Number format (e.g., "2.765,43")
             'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, true)),
@@ -445,23 +445,18 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, true)),
 
             // Compact notation (e.g., "$1.2K", "USD 3.4M")
-            'K' or 'k' => FormatCompact(money, nfiLocal, useCode: fmt == 'k', digits),
+            'K' => FormatCompact(money, nfi, digits),
+            'k' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useCurrencyCode: true), digits),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
     }
 
-    private string FormatCompact(in Money money, NumberFormatInfo baseNfi, bool useCode, int digits)
+    private string FormatCompact(in Money money, NumberFormatInfo nfi, int digits)
     {
-        // Determine culture-aware number formatting and currency symbol/code
-        NumberFormatInfo nfi = ToNumberFormatInfo(baseNfi, useCode);
-
-        // Determine absolute value and tier
-        decimal amount = money.Amount;
-        decimal abs = amount >= 0 ? amount : -amount;
-
-        // Select divisor and suffix (initial tier). If the caller explicitly requested compact ('K'/'k'),
-        // we honor compact formatting even below 1,000 and let rounding/escalation decide (per checklist).
+        // Determine absolute value and tier by selecting divisor and suffix (initial tier).
+        // We honor compact formatting even below 1,000 and let rounding/escalation decide.
+        decimal abs = Math.Abs(money.Amount);
         decimal divisor;
         string suffix;
         switch (abs)
@@ -485,7 +480,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // Determine decimals: default 1; if provided, honor as exact
         int decimals = digits == -1 ? 1 : digits;
 
-        // Round using MidpointRounding.AwayFromZero as per checklist
+        // Round using MidpointRounding.AwayFromZero!
         decimal rounded = Math.Round(scaled, decimals, MidpointRounding.AwayFromZero);
 
         // If rounding pushes the value to the next tier (e.g., 999.95K -> 1.0K or 1000.0K),
@@ -530,7 +525,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         };
 
         // Negative numbers: per checklist, prefer leading minus regardless of culture parenthesis patterns
-        if (amount < 0)
+        if (money.Amount < 0)
         {
             return nfi.NegativeSign + positive;
         }
@@ -600,7 +595,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         string symbolToUse = useInternationalSymbol ? InternationalSymbol : Symbol;
         numberFormatInfo.CurrencySymbol = symbolToUse;
 
-        // Replace with currency code if explicitly requested or if symbol is generic
+        // Replace it with currency code if explicitly requested or if the symbol is generic
         if (useCurrencyCode || numberFormatInfo.CurrencySymbol == GenericCurrencySign)
         {
             numberFormatInfo.CurrencySymbol = Code;

@@ -117,26 +117,29 @@
 
 ## MoneyFormatting
 #### v1
-| Method             |     Mean |   Error |  Gen 0 | Allocated |
-|--------------------|---------:|--------:|-------:|----------:|
-| Implicit           | 194.0 ns | 3.93 ns | 0.0286 |     240 B |
-| ImplicitWithFormat | 197.6 ns | 3.98 ns | 0.0286 |     240 B |
-| Explicit           | 271.5 ns | 5.50 ns | 0.0525 |     440 B |
-| ExplicitWithFormat | 270.3 ns | 5.42 ns | 0.0525 |     440 B |
+| Method                         |     Mean |   Error |  Gen 0 | Allocated |
+|--------------------------------|---------:|--------:|-------:|----------:|
+| DefaultFormat                  | 194.0 ns | 3.93 ns | 0.0286 |     240 B |
+| FormatWithPrecision            | 197.6 ns | 3.98 ns | 0.0286 |     240 B |
+| FormatProvider                 | 271.5 ns | 5.50 ns | 0.0525 |     440 B |
+| FormatWithPrecisionAndProvider | 270.3 ns | 5.42 ns | 0.0525 |     440 B |
 #### v2
-| Method             |     Mean |   Error |   Gen0 | Allocated |
-|--------------------|---------:|--------:|-------:|----------:|
-| Implicit           | 106.3 ns | 2.06 ns | 0.0468 |     392 B |
-| ImplicitWithFormat | 147.5 ns | 2.66 ns | 0.0505 |     424 B |
-| Explicit           | 109.1 ns | 2.14 ns | 0.0468 |     392 B |
-| ExplicitWithFormat | 144.8 ns | 2.92 ns | 0.0505 |     424 B |
+| Method                         |     Mean |   Error |   Gen0 | Allocated |
+|--------------------------------|---------:|--------:|-------:|----------:|
+| DefaultFormat                  | 106.3 ns | 2.06 ns | 0.0468 |     392 B |
+| FormatWithPrecision            | 147.5 ns | 2.66 ns | 0.0505 |     424 B |
+| FormatProvider                 | 109.1 ns | 2.14 ns | 0.0468 |     392 B |
+| FormatWithPrecisionAndProvider | 144.8 ns | 2.92 ns | 0.0505 |     424 B |
 #### v2.5
-| Method             |     Mean |   Error |        Op/s |   Gen0 | Allocated |
-|--------------------|---------:|--------:|------------:|-------:|----------:|
-| Implicit           | 115.5 ns | 2.36 ns | 8,657,442.3 | 0.0459 |     384 B |
-| ImplicitWithFormat | 144.3 ns | 2.81 ns | 6,931,054.6 | 0.0496 |     416 B |
-| Explicit           | 119.0 ns | 2.42 ns | 8,405,527.7 | 0.0459 |     384 B |
-| ExplicitWithFormat | 149.4 ns | 3.01 ns | 6,695,496.3 | 0.0496 |     416 B |
+| Method                         |     Mean |   Error |        Op/s |   Gen0 | Allocated |
+|--------------------------------|---------:|--------:|------------:|-------:|----------:|
+| DefaultFormat                  | 121.1 ns | 2.41 ns | 8,259,783.1 | 0.0458 |     384 B |
+| FormatWithPrecision            | 161.3 ns | 3.12 ns | 6,199,592.9 | 0.0496 |     416 B |
+| FormatProvider                 | 113.2 ns | 2.31 ns | 8,834,277.4 | 0.0459 |     384 B |
+| FormatWithPrecisionAndProvider | 147.0 ns | 2.90 ns | 6,803,103.3 | 0.0496 |     416 B |
+| CompactFormat                  | 230.4 ns | 4.06 ns | 4,340,834.0 | 0.0572 |     480 B |
+| GeneralFormat                  | 170.2 ns | 3.46 ns | 5,876,783.1 | 0.0842 |     704 B |
+| RondTripFormat                 | 118.1 ns | 2.42 ns | 8,465,497.5 | 0.0515 |     432 B |
 
 ## MoneyParsing
 #### v1

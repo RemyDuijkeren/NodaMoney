@@ -11,26 +11,44 @@ public class MoneyFormattingBenchmarks
     readonly CultureInfo ci = new CultureInfo("nl-NL");
 
     [Benchmark]
-    public string Implicit()
+    public string DefaultFormat()
     {
         return _euro.ToString();
     }
 
     [Benchmark]
-    public string ImplicitWithFormat()
+    public string FormatWithPrecision()
     {
-        return _euro.ToString("C2");
+        return _euro.ToString("c2");
     }
 
     [Benchmark]
-    public string Explicit()
+    public string FormatProvider()
     {
         return _euro.ToString(ci);
     }
 
     [Benchmark]
-    public string ExplicitWithFormat()
+    public string FormatWithPrecisionAndProvider()
     {
-        return _euro.ToString("C2", ci);
+        return _euro.ToString("c2", ci);
+    }
+
+    [Benchmark]
+    public string CompactFormat()
+    {
+        return _euro.ToString("K");
+    }
+
+    [Benchmark]
+    public string GeneralFormat()
+    {
+        return _euro.ToString("G");
+    }
+
+    [Benchmark]
+    public string RondTripFormat()
+    {
+        return _euro.ToString("R");
     }
 }
