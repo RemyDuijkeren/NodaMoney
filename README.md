@@ -202,6 +202,8 @@ euro.ToString("L");  // "2.765,43 Euro" English name format
 euro.ToString("R");  // "EUR 2,765.43"  Round-trip format
 euro.ToString("N");  // "2,765.43"      Number format
 euro.ToString("F");  // "2765,43"       Fixed point format
+euro.ToString("K");  // "€ 2,8K"        Compact format
+euro.ToString("k");  // "EUR 2,8K"      Compact format (international)
 ```
 
 **Money parsing**
@@ -261,7 +263,7 @@ var eurAgain = rate.Convert(usd); // -> EUR 100.99
 ## FastMoney
 
 Where `Money` type is based on `decimal`, `FastMoney` is based on `long` and has smaller precision (17 instead of 28) and has a
-fixed four decimal scale, like [SqlMoney](https://learn.microsoft.com/en-us/dotnet/api/system.data.sqltypes.sqlmoney?view=net-9.0) and OLE Automation Currency value. Because it is based on `long` it has way faster for
+fixed four decimal scale, like [SqlMoney](https://learn.microsoft.com/en-us/dotnet/api/system.data.sqltypes.sqlmoney?view=net-9.0) and OLE Automation Currency value. Because it is based on `long` it is way faster for
 arithmetic operations.
 
 FastMoney type is an optimized version of `Money` that:

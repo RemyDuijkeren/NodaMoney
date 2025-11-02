@@ -443,8 +443,98 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, true)),
             'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, true)),
 
+            // Compact notation (e.g., "$1.2K", "USD 3.4M")
+            'K' or 'k' => FormatCompact(money, nfi, useCode: fmt == 'k', digits),
+
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
+    }
+
+    private string FormatCompact(in Money money, NumberFormatInfo baseNfi, bool useCode, int digits)
+    {
+        // Determine culture-aware number formatting and currency symbol/code
+        NumberFormatInfo nfi = ToNumberFormatInfo(baseNfi, useCode);
+
+        // Determine absolute value and tier
+        decimal amount = money.Amount;
+        decimal abs = amount >= 0 ? amount : -amount;
+
+        // Select divisor and suffix (initial tier). If the caller explicitly requested compact ('K'/'k'),
+        // we honor compact formatting even below 1,000 and let rounding/escalation decide (per checklist).
+        decimal divisor;
+        string suffix;
+        switch (abs)
+        {
+            case < 1_000_000m:
+                divisor = 1_000m; suffix = "K";
+                break;
+            case < 1_000_000_000m:
+                divisor = 1_000_000m; suffix = "M";
+                break;
+            case < 1_000_000_000_000m:
+                divisor = 1_000_000_000m; suffix = "B";
+                break;
+            default:
+                divisor = 1_000_000_000_000m; suffix = "T";
+                break;
+        }
+
+        decimal scaled = abs / divisor;
+
+        // Determine decimals: default 1; if provided, honor as exact
+        int decimals = digits == -1 ? 1 : digits;
+
+        // Round using MidpointRounding.AwayFromZero as per checklist
+        decimal rounded = Math.Round(scaled, decimals, MidpointRounding.AwayFromZero);
+
+        // If rounding pushes the value to the next tier (e.g., 999.95K -> 1.0K or 1000.0K),
+        // escalate to the next suffix, keeping the same decimals
+        if (rounded >= 1000m && suffix != "T")
+        {
+            rounded /= 1000m;
+            suffix = suffix == "K" ? "M" : suffix == "M" ? "B" : "T";
+        }
+
+        string number = rounded.ToString($"N{decimals}", nfi);
+
+        // If default decimals were used, trim trailing zeros and possible decimal separator
+        if (digits == -1)
+        {
+            string decSep = nfi.NumberDecimalSeparator;
+            if (number.Contains(decSep))
+            {
+                // Trim trailing zeros
+                int i = number.Length - 1;
+                while (i >= 0 && number[i] == '0') i--;
+                // If last is a decimal separator, remove it as well
+                if (i >= decSep.Length - 1 && number.AsSpan(i - decSep.Length + 1, decSep.Length).SequenceEqual(decSep.AsSpan()))
+                {
+                    i -= decSep.Length;
+                }
+                number = number.Substring(0, i + 1);
+            }
+        }
+
+        string numberWithSuffix = number + suffix;
+
+        // Compose with currency symbol/code using culture positive patterns
+        string symbol = nfi.CurrencySymbol;
+        string positive = nfi.CurrencyPositivePattern switch
+        {
+            0 => symbol + numberWithSuffix,        // $n
+            1 => numberWithSuffix + symbol,        // n$
+            2 => symbol + " " + numberWithSuffix,  // $ n
+            3 => numberWithSuffix + " " + symbol,  // n $
+            _ => symbol + " " + numberWithSuffix
+        };
+
+        // Negative numbers: per checklist, prefer leading minus regardless of culture parenthesis patterns
+        if (amount < 0)
+        {
+            return nfi.NegativeSign + positive;
+        }
+
+        return positive;
     }
 
     /// <summary>Deconstructs the current <see cref="CurrencyInfo" /> instance into its components.</summary>
