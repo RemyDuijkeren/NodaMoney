@@ -12,7 +12,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<char> destination = stackalloc char[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = CultureInfo.InvariantCulture;
 
         // Act
@@ -29,7 +29,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<char> destination = stackalloc char[5]; // Smaller than needed
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = CultureInfo.InvariantCulture;
 
         // Act
@@ -63,7 +63,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("EUR"));
         Span<char> destination = stackalloc char[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = new CultureInfo("fr-FR"); // French culture
 
         // Act
@@ -81,7 +81,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<char> destination = stackalloc char[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
 
         // Act
         bool result = money.TryFormat(destination, out int charsWritten, format.AsSpan(), null);
@@ -147,7 +147,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("JPY")); // Japanese Yen, no decimal places
         Span<char> destination = stackalloc char[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = new CultureInfo("en-US"); // Culture is US
 
         // Act
@@ -164,7 +164,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<byte> destination = stackalloc byte[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = CultureInfo.InvariantCulture;
 
         // Act
@@ -185,7 +185,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<byte> destination = stackalloc byte[5]; // Smaller than needed
-        var format = "C";
+        var format = "c";
         var provider = CultureInfo.InvariantCulture;
 
         // Act
@@ -223,7 +223,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("EUR"));
         Span<byte> destination = stackalloc byte[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
         var provider = new CultureInfo("fr-FR"); // French culture
 
         // Act
@@ -245,7 +245,7 @@ public class TryFormat
         // Arrange
         var money = new Money(1234.56m, Currency.FromCode("USD"));
         Span<byte> destination = stackalloc byte[50];
-        var format = "C"; // Currency format
+        var format = "c"; // Currency format (local)
 
         // Act
         bool result = money.TryFormat(destination, out int bytesWritten, format.AsSpan(), null);
@@ -287,7 +287,7 @@ public class TryFormat
         string expected = "$1,234.56";
         var utf8ExpectedLength = Encoding.UTF8.GetByteCount(expected);
         Span<byte> destination = stackalloc byte[utf8ExpectedLength]; // Exact size of the needed UTF-8 bytes
-        var format = "C";
+        var format = "c";
         var provider = CultureInfo.InvariantCulture;
 
         // Act

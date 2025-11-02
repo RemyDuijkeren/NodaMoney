@@ -30,10 +30,10 @@ public class DefaultFormat
     public void ThenEqualToFormatC()
     {
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("en-US");
-        _yen.ToString().Should().Be(_yen.ToString("C"));
-        _euro.ToString().Should().Be(_euro.ToString("C"));
-        _dollar.ToString().Should().Be(_dollar.ToString("C"));
-        _dinar.ToString().Should().Be(_dinar.ToString("C"));
+        _yen.ToString().Should().Be(_yen.ToString("c"));
+        _euro.ToString().Should().Be(_euro.ToString("c"));
+        _dollar.ToString().Should().Be(_dollar.ToString("c"));
+        _dinar.ToString().Should().Be(_dinar.ToString("c"));
     }
 
     [Fact]
@@ -151,15 +151,15 @@ public class DefaultFormat
     [Fact]
     public void WhenUsingToStringWithCFormat_ThenReturnsTheSameAsTheDefaultFormat()
     {
-        _yen.ToString("C", null).Should().Be(_yen.ToString(null, null));
+        _yen.ToString("c", null).Should().Be(_yen.ToString(null, null));
     }
 
     [Fact]
     public void WhenUsingToStringWithCFormatWithCulture_ThenReturnsTheSameAsTheDefaultFormatWithThatCulture()
     {
-        _yen.ToString("C", CultureInfo.InvariantCulture).Should().Be(_yen.ToString(null, CultureInfo.InvariantCulture));
-        _yen.ToString("C", CultureInfo.GetCultureInfo("nl-NL")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("nl-NL")));
-        _yen.ToString("C", CultureInfo.GetCultureInfo("fr-FR")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("fr-FR")));
+        _yen.ToString("c", CultureInfo.InvariantCulture).Should().Be(_yen.ToString(null, CultureInfo.InvariantCulture));
+        _yen.ToString("c", CultureInfo.GetCultureInfo("nl-NL")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("nl-NL")));
+        _yen.ToString("c", CultureInfo.GetCultureInfo("fr-FR")).Should().Be(_yen.ToString(null, CultureInfo.GetCultureInfo("fr-FR")));
     }
 
     [Fact]

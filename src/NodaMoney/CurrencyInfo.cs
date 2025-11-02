@@ -391,7 +391,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                 : arg?.ToString() ?? string.Empty;
         }
 
-        // TODO: short= $13B, $12.8B or long= $14 billion
         // TODO: CLDR-data: https://github.com/unicode-org/cldr-json/tree/main/cldr-json/cldr-numbers-full
         // For example USD in NL
         // "USD": {
@@ -406,34 +405,36 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // TODO: check if Money.Currency and this is equal, and also check IFormatProvider? What to do if not equal?
         // Always use CurrencyDecimalDigits and CurrencySymbol from CurrencyInfo, but override other properties?
 
-        NumberFormatInfo nfi = ToNumberFormatInfo(formatProvider);
+        NumberFormatInfo nfiLocal = ToNumberFormatInfo(formatProvider);
+        NumberFormatInfo nfiIntl = ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true);
         char fmt = ParseFormatSpecifier(format.AsSpan(), out int digits);
         if (fmt == 0)
         {
             // TODO: allow custom format with currency sign ($)?
-            // custom format
-            return money.Amount.ToString(format, nfi);
+            // custom numeric format: delegate to amount with local currency settings
+            return money.Amount.ToString(format, nfiLocal);
         }
 
         return fmt switch
         {
-            // Currency format (e.g., "$ 2.765,43")
-            'C' when digits == -1 => money.Amount.ToString("C", nfi),
-            'C' or 'c' => // TODO: use C for international version (US$) and c for local version ($) in some locals
-                money.Amount.ToString($"C{digits}", nfi),
+            // Currency format
+            'c' when digits == -1 => money.Amount.ToString("C", nfiLocal),
+            'c' => money.Amount.ToString($"C{digits}", nfiLocal),
+            'C' when digits == -1 => money.Amount.ToString("C", nfiIntl),
+            'C' => money.Amount.ToString($"C{digits}", nfiIntl),
 
             // General format (e.g., "USD 2.765,43")
-            'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, true)),
-            'G' or 'g' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, true)),
+            'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'G' or 'g' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             // English Name currency (e.g., "1.234.56 US dollars") // TODO: future use lower-case for local native name
             'L' or 'l' when digits == -1 =>
                 // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
-                $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
-            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
+                $"{money.Amount.ToString($"N{nfiLocal.CurrencyDecimalDigits}", nfiLocal)} {EnglishName}",
+            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfiLocal)} {EnglishName}",
 
             // Round-trip format (e.g., "USD 1234.56"). Ignore precision specifier, like R2
-            'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfi)}",
+            'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfiLocal)}",
 
             // Number format (e.g., "2.765,43")
             'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, true)),
@@ -444,7 +445,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, true)),
 
             // Compact notation (e.g., "$1.2K", "USD 3.4M")
-            'K' or 'k' => FormatCompact(money, nfi, useCode: fmt == 'k', digits),
+            'K' or 'k' => FormatCompact(money, nfiLocal, useCode: fmt == 'k', digits),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
@@ -584,7 +585,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <param name="formatProvider">An optional format provider to influence the number formatting. If null, the current culture's format provider is used.</param>
     /// <param name="useCurrencyCode">A boolean value indicating whether the currency symbol should be replaced with the currency code. Default is false.</param>
     /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
-    private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false)
+    private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false, bool useInternationalSymbol = false)
     {
         NumberFormatInfo numberFormatInfo = formatProvider switch
         {
@@ -594,35 +595,38 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         };
 
         numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
-        numberFormatInfo.CurrencySymbol = Symbol;
 
-        // check if we need to replace with currency code
-        if (!useCurrencyCode && Symbol != GenericCurrencySign) return numberFormatInfo;
+        // Decide which symbol to use initially: local or international
+        string symbolToUse = useInternationalSymbol ? InternationalSymbol : Symbol;
+        numberFormatInfo.CurrencySymbol = symbolToUse;
 
-        // Replace currency symbol with the code
-        numberFormatInfo.CurrencySymbol = Code;
-
-        // For PositivePattern add space between code and value
-        numberFormatInfo.CurrencyPositivePattern = numberFormatInfo.CurrencyPositivePattern switch
+        // Replace with currency code if explicitly requested or if symbol is generic
+        if (useCurrencyCode || numberFormatInfo.CurrencySymbol == GenericCurrencySign)
         {
-            0 => 2, // $n -> $ n
-            1 => 3, // n$ -> n $
-            _ => numberFormatInfo.CurrencyPositivePattern // No change needed
-        };
+            numberFormatInfo.CurrencySymbol = Code;
 
-        // For NegativePattern add space between code and value
-        numberFormatInfo.CurrencyNegativePattern = numberFormatInfo.CurrencyNegativePattern switch
-        {
-            0 => 14, // ($n) -> ($ n)
-            1 => 9, // -$n -> -$ n
-            2 => 12, // $-n -> $ -n
-            3 => 11, // $n- -> $ n-
-            4 => 15, // (n$) -> (n $)
-            5 => 8, // -n$ -> -n $
-            6 => 13, // n-$ -> n- $
-            7 => 10, // n$- -> n $-
-            _ => numberFormatInfo.CurrencyNegativePattern // No change needed
-        };
+            // For PositivePattern add space between code and value
+            numberFormatInfo.CurrencyPositivePattern = numberFormatInfo.CurrencyPositivePattern switch
+            {
+                0 => 2, // $n -> $ n
+                1 => 3, // n$ -> n $
+                _ => numberFormatInfo.CurrencyPositivePattern // No change needed
+            };
+
+            // For NegativePattern add space between code and value
+            numberFormatInfo.CurrencyNegativePattern = numberFormatInfo.CurrencyNegativePattern switch
+            {
+                0 => 14, // ($n) -> ($ n)
+                1 => 9, // -$n -> -$ n
+                2 => 12, // $-n -> $ -n
+                3 => 11, // $n- -> $ n-
+                4 => 15, // (n$) -> (n $)
+                5 => 8, // -n$ -> -n $
+                6 => 13, // n-$ -> n- $
+                7 => 10, // n$- -> n $-
+                _ => numberFormatInfo.CurrencyNegativePattern // No change needed
+            };
+        }
 
         return numberFormatInfo;
     }
@@ -703,11 +707,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             }
         }
 
-        // The default empty format to be "C"; the custom format is signified with '\0'.
+        // The default empty format to be "c" (local currency); the custom format is signified with '\0'.
         digits = -1;
         return format.Length == 0 || c == '\0'
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
-            'C'
+            'c'
             : '\0';
     }
 
