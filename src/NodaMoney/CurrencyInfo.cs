@@ -488,7 +488,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         if (rounded >= 1000m && suffix != "T")
         {
             rounded /= 1000m;
-            suffix = suffix == "K" ? "M" : suffix == "M" ? "B" : "T";
+            suffix = suffix switch
+            {
+                "K" => "M",
+                "M" => "B",
+                _ => "T"
+            };
         }
 
         string number = rounded.ToString($"N{decimals}", nfi);
