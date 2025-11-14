@@ -522,11 +522,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         string symbol = nfi.CurrencySymbol;
         string positive = nfi.CurrencyPositivePattern switch
         {
-            0 => symbol + numberWithSuffix,        // $n
-            1 => numberWithSuffix + symbol,        // n$
-            2 => symbol + " " + numberWithSuffix,  // $ n
-            3 => numberWithSuffix + " " + symbol,  // n $
-            _ => symbol + " " + numberWithSuffix
+            0 => symbol + numberWithSuffix,      // $n
+            1 => numberWithSuffix + symbol,      // n$
+            2 => $"{symbol} {numberWithSuffix}", // $ n
+            3 => $"{numberWithSuffix} {symbol}", // n $
+            _ => $"{symbol} {numberWithSuffix}"  // $ n
         };
 
         // Negative numbers: per checklist, prefer leading minus regardless of culture parenthesis patterns
@@ -597,8 +597,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
 
         // Decide which symbol to use initially: local or international
-        string symbolToUse = useInternationalSymbol ? InternationalSymbol : Symbol;
-        numberFormatInfo.CurrencySymbol = symbolToUse;
+        numberFormatInfo.CurrencySymbol = useInternationalSymbol ? InternationalSymbol : Symbol;
 
         // Replace it with currency code if explicitly requested or if the symbol is generic
         if (useCurrencyCode || numberFormatInfo.CurrencySymbol == GenericCurrencySign)

@@ -65,18 +65,18 @@
 | NotEqualCurrency |  3.684 ns | 0.0314 ns |      - |         - |
 | Bigger           |  3.908 ns | 0.0517 ns |      - |         - |
 #### v2.5
-| Method            |      Mean |     Error |             Op/s | Ratio | Allocated | Alloc Ratio |
-|-------------------|----------:|----------:|-----------------:|------:|----------:|------------:|
-| Equal             | 4.4272 ns | 0.0219 ns |    225,876,308.7 |  1.00 |         - |          NA |
-| NotEqualValue     | 3.3010 ns | 0.0106 ns |    302,937,662.6 |  0.75 |         - |          NA |
-| NotEqualCurrency  | 1.6208 ns | 0.0155 ns |    616,986,372.1 |  0.37 |         - |          NA |
-| EqualOrBigger     | 5.1683 ns | 0.0247 ns |    193,487,584.6 |  1.17 |         - |          NA |
-| Bigger            | 5.8932 ns | 0.0162 ns |    169,687,290.4 |  1.33 |         - |          NA |
-| fEqual            | 0.0493 ns | 0.0057 ns | 20,299,577,551.3 |  0.01 |         - |          NA |
-| fNotEqualValue    | 0.2618 ns | 0.0098 ns |  3,819,388,789.5 |  0.06 |         - |          NA |
-| fNotEqualCurrency | 0.2164 ns | 0.0045 ns |  4,621,476,787.7 |  0.05 |         - |          NA |
-| fEqualOrBigger    | 1.3441 ns | 0.0398 ns |    743,976,298.4 |  0.30 |         - |          NA |
-| fBigger           | 1.3833 ns | 0.0216 ns |    722,884,092.4 |  0.31 |         - |          NA |
+| Method            |      Mean |     Error |            Op/s | Ratio | Allocated | Alloc Ratio |
+|-------------------|----------:|----------:|----------------:|------:|----------:|------------:|
+| Equal             | 4.4893 ns | 0.0446 ns |   222,753,932.0 |  1.00 |         - |          NA |
+| NotEqualValue     | 3.5042 ns | 0.0959 ns |   285,373,664.3 |  0.78 |         - |          NA |
+| NotEqualCurrency  | 1.7181 ns | 0.0622 ns |   582,046,685.4 |  0.38 |         - |          NA |
+| EqualOrBigger     | 5.1530 ns | 0.0307 ns |   194,060,251.2 |  1.15 |         - |          NA |
+| Bigger            | 5.3321 ns | 0.0461 ns |   187,544,525.5 |  1.19 |         - |          NA |
+| fEqual            | 0.1510 ns | 0.0110 ns | 6,624,626,124.1 |  0.03 |         - |          NA |
+| fNotEqualValue    | 0.3422 ns | 0.0279 ns | 2,922,441,245.4 |  0.08 |         - |          NA |
+| fNotEqualCurrency | 0.2224 ns | 0.0187 ns | 4,496,291,443.1 |  0.05 |         - |          NA |
+| fEqualOrBigger    | 1.2799 ns | 0.0207 ns |   781,291,453.2 |  0.29 |         - |          NA |
+| fBigger           | 1.3996 ns | 0.0577 ns |   714,509,324.0 |  0.31 |         - |          NA |
 
 ## MoneyOperations
 #### v1

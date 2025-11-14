@@ -186,7 +186,8 @@ public readonly partial struct Money : IEquatable<Money>
     /// <returns>true if value is equal to this instance; otherwise, false.</returns>
     public bool Equals(Money other)
     {
-        // Equality for Money should be based on Currency and numeric Amount value, independent of scale, context index, or internal decimal representation.
+        // Equality for Money should be based on Currency and numeric Amount value, independent of scale,
+        // context index, or internal decimal representation.
 
         // Fast-path: if currency differs, not equal.
         if (!EqualCurrency(other)) return false;
