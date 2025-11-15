@@ -162,6 +162,24 @@ Money remainder = total % unitPrice; // USD 5.50
 
 **Money formatting**
 
+| Format | Meaning                          | Example (USD, en-US, 12 345.67) |
+|--------|----------------------------------|---------------------------------|
+| `C`    | Local currency symbol (default)  | `$12,345.67`                    |
+| `c`    | Compact + local symbol           | `$12.3K`                        |
+| `G`    | ISO currency code                | `USD 12,345.67`                 |
+| `g`    | Compact + ISO code               | `USD 12.3K`                     |
+| `I`    | International currency symbol    | `US$ 12,345.67`                 |
+| `i`    | Compact + international symbol   | `US$ 12.3K`                     |
+| `L`    | English currency name            | `12,345.67 US dollar`           |
+| `l`    | Compact + English currency name  | `12.3K US dollar`               |
+| `N`    | Number format (no currency)      | `12,345.67`                     |
+| `F`    | Fixed-point number (no currency) | `12345.67`                      |
+| `R`    | Round-trip (“CODE amount”)       | `USD 12345.67`                  |
+
+Notes:
+- `G`, `L`, `N`, `F`, `R` keep their existing semantics as much as possible.
+- Lowercase variants (`c`, `g`, `i`, `l`) apply **compact** formatting to the numeric part but keep the same identifier style as their uppercase counterpart.
+
 ```csharp
 Money yen = new Money(2765m, "JPY");
 Money euro = new Money(2765.43m, "EUR");
@@ -195,15 +213,18 @@ dollar.ToString(ci); // "$ 2.765,43"
 dinar.ToString(ci);  // "BD 2.765,432"
 
 // Standard Formats when currenct culture is 'nl-NL'
-euro.ToString("C");  // "€ 2.765,43"    Currency format
-euro.ToString("C0"); // "€ 2.765"       Currency format with precision specifier
-euro.ToString("G");  // "EUR 2.765,43"  General format (= C but with currency code)
-euro.ToString("L");  // "2.765,43 Euro" English name format
-euro.ToString("R");  // "EUR 2,765.43"  Round-trip format
-euro.ToString("N");  // "2,765.43"      Number format
-euro.ToString("F");  // "2765,43"       Fixed point format
-euro.ToString("K");  // "€ 2,8K"        Compact format
-euro.ToString("k");  // "EUR 2,8K"      Compact format (international)
+dollar.ToString("C"); // "$ 2.765,43"      Currency symbol format
+dollar.ToString("C0");// "$ 2.765"         Currency symbol format with precision specifier
+dollar.ToString("c"); // "$ 2.8K"          Compact Currency symbol format
+dollar.ToString("I"); // "US$ 2.765,43"    International Currency symbol format
+dollar.ToString("i"); // "US$ 2.8K"        Compact International Currency symbol format
+dollar.ToString("G"); // "USD 2.765,43"    ISO currency code format (= C but with currency code)
+dollar.ToString("g"); // "USD 2.8K"        Compact ISO currency code format (international)
+dollar.ToString("L"); // "2.765,43 dollar" English name format
+dollar.ToString("l"); // "2.8K dollar"     Compact English name format
+dollar.ToString("R"); // "USD 2,765.43"    Round-trip format
+dollar.ToString("N"); // "2,765.43"        Number format (no currency)
+dollar.ToString("F"); // "2765,43"         Fixed point format (no currency)
 ```
 
 **Money parsing**
@@ -483,8 +504,8 @@ See the [NodaMoney.DependencyInjection README](src/NodaMoney.DependencyInjection
 
 ## Compatibility
 
-- Core library (NodaMoney): net9.0; net8.0; netstandard2.0; netstandard2.1
-- DI package (NodaMoney.DependencyInjection): net9.0; net8.0; netstandard2.0; netstandard2.1
+- Core library (NodaMoney): net10.0, net9.0; net8.0; netstandard2.0; netstandard2.1
+- DI package (NodaMoney.DependencyInjection): net10.0, net9.0; net8.0; netstandard2.0; netstandard2.1
 - AOT: compatible on .NET 8/9/10
 - Packages ship with SourceLink and symbol packages;
 
