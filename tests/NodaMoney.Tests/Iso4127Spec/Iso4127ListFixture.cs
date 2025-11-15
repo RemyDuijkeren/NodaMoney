@@ -1,6 +1,3 @@
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Xml.Linq;
 
 namespace NodaMoney.Tests.Iso4127Spec;
@@ -15,10 +12,11 @@ public class Iso4127ListFixture
         const string fileName = "iso4127.xml";
         const string listOneUrl = "https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml";
 
-        // Download ISO-4127 XML as file
-        using HttpClient client = new();
+        // ReSharper disable once RedundantNameQualifier - required for .NET 4.8
+        using System.Net.Http.HttpClient client = new();
         using (Stream contentStream = client.GetStreamAsync(listOneUrl).GetAwaiter().GetResult())
         {
+            // Download ISO-4127 XML as a file
             using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
             contentStream.CopyTo(fileStream);
         }

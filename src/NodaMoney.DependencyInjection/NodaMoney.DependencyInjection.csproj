@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net8.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -45,10 +45,10 @@
     <PackageReference Include="MinVer" PrivateAssets="all" Version="6.0.0" />
     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" Version="4.14.1" />
 
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[5.0.0,10.0.0)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[5.0.0,10.0.0)" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="[5.0.0,10.0.0)" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[5.0.0,10.0.0)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[5.0.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[5.0.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="[5.0.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[5.0.0,)" />
   </ItemGroup>
 
   <ItemGroup>

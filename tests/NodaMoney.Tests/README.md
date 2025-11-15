@@ -11,10 +11,11 @@ the NSubtitute binding for AutoBogus.
 ## Test Targets
 
 Our test targets are:
-1. `net9.0` - Tests the most recent .NET version
-2. `net8.0` - Tests against .NET 8
-3. `net6.0` - To test functionality for netstandard2.1 compatibility
-4. `net48`  - To test functionality for netstandard2.0 compatibility
+1. `net10.0` - Tests the most recent .NET version
+2. `net9.0` - Tests against .NET 9
+3. `net8.0` - Tests against .NET 8
+4. `net6.0` - To test functionality for netstandard2.1 compatibility
+5. `net48`  - To test functionality for netstandard2.0 compatibility
 
 This approach provides coverage for both the modern .NET versions and the compatibility scenarios:
 - .NET Framework 4.8 implements netstandard2.0

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
+-
+
+### Changed
+-
+
+### Removed
+-
+
+## [2.6]
+
+### Added
+- Support .NET 10.0
 - Format K ($1.2K) and k (USD 1.2K) to Compact notation, like USD 1.2K, €3.4M (https://github.com/RemyDuijkeren/NodaMoney/issues/111)
 
 ### Changed
