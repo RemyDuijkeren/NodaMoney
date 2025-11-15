@@ -19,15 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Support .NET 10.0
-- Format K ($1.2K) and k (USD 1.2K) to Compact notation, like USD 1.2K, €3.4M (https://github.com/RemyDuijkeren/NodaMoney/issues/111)
+- Lower-case formats, like 'c/g/i' will do compact notation, like USD 1.2K, €3.4M (https://github.com/RemyDuijkeren/NodaMoney/issues/111, https://github.com/RemyDuijkeren/NodaMoney/issues/113)
+- Formatting format 'I' will use the international currency symbol (US$), where 'C' will use the local currency code ($).
 
 ### Changed
 - ISO 4217 AMENDMENT NUMBER 180, Bulgaria will use EUR from 1 January 2026, and BGN will move to the historic list.
-- Formatting format 'C' now has different behavior depending on capitalization. Format 'C' will use the international currency symbol (US$),
-  where 'c' will use the local currency code ($).
-
-### Removed
--
 
 ## [2.5]
 

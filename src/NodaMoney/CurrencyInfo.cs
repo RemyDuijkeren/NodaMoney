@@ -370,19 +370,17 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         // styles: symbol, international symbol, code, name, local name, accounting
 
         // Supported formats: see https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
-        // G: General format = C but with currency code => ISO code with number, like EUR 23.002,43, EUR 23,002.43, 23,002.43 EUR
-        // C: Currency Symbol format, like € 23.002,43, € 23,002.43, 23,002.43 €
-        // C => C for the international version (US$)
-        // c => c for the local version ($) in some locals?
+        // G: General format = ISO currency code with number, like EUR 23.002,43, EUR 23,002.43, 23,002.43 EUR
+        // C: Local Currency Symbol format, like € 23.002,43, € 23,002.43, 23,002.43 €
+        // I: International currency symbol (e.g., US$)
         // R: Round-trip format with currency code
         // N: Number format = decimal 2.765,43
         // F: Fixed point format = decimal 2765,43
         // L: English name, like 23.002,43 dollar
-        // l: Native name, like 23.002,43 dólar
+        // E: Native name, like 23.002,43 dólar
         // ?: Name in currency culture (needs Unicode CLDR https://cldr.unicode.org/)
         // ?: Accounting ($23.002,43) for negative numbers
-        // K: Compact/abbreviated notation using currency code, for example, in dashboards showing €3.4M.
-        // k: Compact/abbreviated notation using ISO code, for example, in dashboards showing USD 1.2K.
+        // Compact variants (lowercase): c/g/i/l
 
         // If the argument is not a Money, fallback to default formatting
         if (arg is not Money money)
@@ -417,42 +415,47 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
         return fmt switch
         {
-            // Currency format (e.g., "$ 2.765,43" or "US$ 2.765,43")
-            'c' when digits == -1 => money.Amount.ToString("C", nfi),
-            'c' => money.Amount.ToString($"C{digits}", nfi),
-            'C' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true)),
-            'C' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: false, useInternationalSymbol: true)),
+            // Local currency symbol, normal (uppercase C)
+            'C' when digits == -1 => money.Amount.ToString("C", nfi),
+            'C' => money.Amount.ToString($"C{digits}", nfi),
 
-            // General format (e.g., "USD 2.765,43")
-            'G' or 'g' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'G' or 'g' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            // Compact + local symbol (lowercase c)
+            'c' => FormatCompact(money, nfi, digits),
 
-            // English Name currency (e.g., "1.234.56 US dollars") // TODO: future use lower-case for local native name
-            'L' or 'l' when digits == -1 =>
-                // N will use NumberDecimalDigits instead of CurrencyDecimalDigits.
-                $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
-            'L' or 'l' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
+            // ISO code, normal (uppercase G)
+            'G' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'G' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            // Compact + ISO code (lowercase g)
+            'g' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useCurrencyCode: true), digits),
+
+            // International symbol, normal (uppercase I)
+            'I' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
+            'I' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
+            // Compact + international symbol (lowercase i)
+            'i' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useInternationalSymbol: true), digits),
+
+            // English Name currency (uppercase L normal)
+            'L' when digits == -1 => $"{money.Amount.ToString($"N{nfi.CurrencyDecimalDigits}", nfi)} {EnglishName}",
+            'L' => $"{money.Amount.ToString($"N{digits}", nfi)} {EnglishName}",
+            // Compact number-only + English name (lowercase l)
+            'l' => $"{FormatCompact(money, nfi, digits, onlyNumber: true)} {EnglishName}",
 
             // Round-trip format (e.g., "USD 1234.56"). Ignore precision specifier, like R2
             'R' or 'r' => $"{Code} {money.Amount.ToString("R", nfi)}",
 
             // Number format (e.g., "2.765,43")
-            'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, true)),
-            'N' or 'n' => money.Amount.ToString($"N{digits}", ToNumberFormatInfo(formatProvider, true)),
+            'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'N' or 'n' => money.Amount.ToString($"N{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             // Fixed point format (e.g., "2765,43")
-            'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, true)),
-            'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, true)),
-
-            // Compact notation (e.g., "$1.2K", "USD 3.4M")
-            'K' => FormatCompact(money, nfi, digits),
-            'k' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useCurrencyCode: true), digits),
+            'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
     }
 
-    private string FormatCompact(in Money money, NumberFormatInfo nfi, int digits)
+    private string FormatCompact(in Money money, NumberFormatInfo nfi, int digits, bool onlyNumber = false)
     {
         // Determine absolute value and tier by selecting divisor and suffix (initial tier).
         // We honor compact formatting even below 1,000 and let rounding/escalation decide.
@@ -517,6 +520,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         }
 
         string numberWithSuffix = number + suffix;
+
+        // onlyNumber: return number without currency symbol/code
+        if (onlyNumber)
+        {
+            return money.Amount < 0 ? nfi.NegativeSign + numberWithSuffix : numberWithSuffix;
+        }
 
         // Compose with currency symbol/code using culture positive patterns
         string symbol = nfi.CurrencySymbol;
@@ -584,6 +593,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// </summary>
     /// <param name="formatProvider">An optional format provider to influence the number formatting. If null, the current culture's format provider is used.</param>
     /// <param name="useCurrencyCode">A boolean value indicating whether the currency symbol should be replaced with the currency code. Default is false.</param>
+    /// <param name="useInternationalSymbol">Use the international currency symbol (US$) instead of the local one ($). Default is false.</param>
     /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
     private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false, bool useInternationalSymbol = false)
     {
@@ -706,11 +716,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             }
         }
 
-        // The default empty format to be "c" (local currency); the custom format is signified with '\0'.
+        // The default empty format to be "C" (local currency symbol, normal); the custom format is signified with '\0'.
         digits = -1;
         return format.Length == 0 || c == '\0'
             ? // For compat, treat '\0' as the end of the specifier, even if the specifier extends beyond it.
-            'c'
+            'C'
             : '\0';
     }
 
