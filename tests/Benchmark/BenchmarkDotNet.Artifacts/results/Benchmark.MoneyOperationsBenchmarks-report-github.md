@@ -1,30 +1,30 @@
 ```
 
-BenchmarkDotNet v0.15.2, Windows 11 (10.0.26100.6584/24H2/2024Update/HudsonValley)
+BenchmarkDotNet v0.15.6, Windows 11 (10.0.26200.7171)
 AMD Ryzen 7 5800H with Radeon Graphics 3.20GHz, 1 CPU, 16 logical and 8 physical cores
-.NET SDK 10.0.100-rc.1.25451.107
-  [Host]     : .NET 9.0.9 (9.0.925.41916), X64 RyuJIT AVX2
-  DefaultJob : .NET 9.0.9 (9.0.925.41916), X64 RyuJIT AVX2
+.NET SDK 10.0.100
+  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v3
+  DefaultJob : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v3
 
 
 ```
 | Method                  | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
 |------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
-| Add                     | 26.968 ns | 0.2871 ns |  37,080,694.8 | 18.28 |         - |          NA |
-| Subtract                | 25.921 ns | 0.1544 ns |  38,579,474.4 | 17.57 |         - |          NA |
-| Multiple                | 30.849 ns | 0.4080 ns |  32,416,301.6 | 20.92 |         - |          NA |
-| Divide                  | 83.995 ns | 0.4120 ns |  11,905,409.6 | 56.95 |         - |          NA |
-| Increment               | 16.407 ns | 0.0855 ns |  60,950,309.8 | 11.12 |         - |          NA |
-| Decrement               | 19.793 ns | 0.3293 ns |  50,521,853.8 | 13.42 |         - |          NA |
-| Remainder               | 21.764 ns | 0.1380 ns |  45,948,316.5 | 14.76 |         - |          NA |
-| fAdd                    |  1.475 ns | 0.0188 ns | 677,926,754.0 |  1.00 |         - |          NA |
-| fSubtract               |  1.927 ns | 0.0433 ns | 518,833,833.6 |  1.31 |         - |          NA |
-| fMultipleDec            | 28.538 ns | 0.5040 ns |  35,041,170.3 | 19.35 |         - |          NA |
-| fMultipleDecWholeNumber | 14.430 ns | 0.1620 ns |  69,301,660.6 |  9.78 |         - |          NA |
-| fMultipleLong           |  2.204 ns | 0.0308 ns | 453,750,585.1 |  1.49 |         - |          NA |
-| fDivideDec              | 79.456 ns | 0.7799 ns |  12,585,508.5 | 53.87 |         - |          NA |
-| fDivideDecWholeNumber   | 12.855 ns | 0.0787 ns |  77,791,781.7 |  8.72 |         - |          NA |
-| fDivideLong             |  1.789 ns | 0.0158 ns | 558,992,014.8 |  1.21 |         - |          NA |
-| fIncrement              |  6.150 ns | 0.1163 ns | 162,607,271.5 |  4.17 |         - |          NA |
-| fDecrement              |  6.125 ns | 0.0587 ns | 163,260,592.0 |  4.15 |         - |          NA |
-| fRemainder              |  1.963 ns | 0.0291 ns | 509,443,667.2 |  1.33 |         - |          NA |
+| Add                     | 28.195 ns | 0.5836 ns |  35,466,906.4 | 14.90 |         - |          NA |
+| Subtract                | 30.374 ns | 0.3741 ns |  32,922,933.9 | 16.05 |         - |          NA |
+| Multiple                | 29.046 ns | 0.3349 ns |  34,427,988.1 | 15.35 |         - |          NA |
+| Divide                  | 70.748 ns | 0.9017 ns |  14,134,735.2 | 37.39 |         - |          NA |
+| Increment               |  9.157 ns | 0.1865 ns | 109,206,346.3 |  4.84 |         - |          NA |
+| Decrement               |  9.338 ns | 0.2062 ns | 107,087,451.5 |  4.94 |         - |          NA |
+| Remainder               | 20.345 ns | 0.1780 ns |  49,152,774.0 | 10.75 |         - |          NA |
+| fAdd                    |  1.893 ns | 0.0566 ns | 528,159,297.6 |  1.00 |         - |          NA |
+| fSubtract               |  1.737 ns | 0.0504 ns | 575,731,435.0 |  0.92 |         - |          NA |
+| fMultipleDec            | 29.450 ns | 1.6689 ns |  33,955,903.5 | 15.57 |         - |          NA |
+| fMultipleDecWholeNumber |  9.521 ns | 0.1498 ns | 105,031,040.1 |  5.03 |         - |          NA |
+| fMultipleLong           |  2.131 ns | 0.0690 ns | 469,277,233.0 |  1.13 |         - |          NA |
+| fDivideDec              | 70.444 ns | 1.1502 ns |  14,195,762.2 | 37.23 |         - |          NA |
+| fDivideDecWholeNumber   | 10.886 ns | 0.2397 ns |  91,858,580.4 |  5.75 |         - |          NA |
+| fDivideLong             |  2.024 ns | 0.0540 ns | 493,960,294.3 |  1.07 |         - |          NA |
+| fIncrement              |  5.215 ns | 0.1268 ns | 191,744,815.9 |  2.76 |         - |          NA |
+| fDecrement              |  4.627 ns | 0.1185 ns | 216,144,432.2 |  2.45 |         - |          NA |
+| fRemainder              |  1.935 ns | 0.0278 ns | 516,849,107.9 |  1.02 |         - |          NA |
