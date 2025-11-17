@@ -20,17 +20,19 @@ jobs:
 
     steps:
       - name: 🛠️ Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
       - name: 📥 Download Packages
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: Packages
           path: ./pkg/
 
       - name: 🚀 Push to NuGet
         run: |
-          dotnet nuget push ./pkg/**/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
-          dotnet nuget push ./pkg/**/*.snupkg --symbol-api-key ${{secrets.NUGET_API_KEY}} --symbol-source https://api.nuget.org/v3/index.json
+          dotnet nuget push "./pkg/**/*.nupkg" "./pkg/**/*.snupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
