@@ -52,7 +52,7 @@ public readonly partial record struct Currency
             EncodedValue = (ushort)(EncodedValue << 5 | (c - 'A' + 1));
         }
 
-        bool bit = isMinorUnit2 ?? (CurrencyRegistry.TryGet(code.ToString(), out var info) && info.MinorUnit == MinorUnit.Two);
+        bool bit = isMinorUnit2 ?? (CurrencyInfo.TryFromCode(code.ToString(), out var ci) && ci.MinorUnit == MinorUnit.Two);
         if (bit)
         {
             EncodedValue |= MinorUnit2Mask;
