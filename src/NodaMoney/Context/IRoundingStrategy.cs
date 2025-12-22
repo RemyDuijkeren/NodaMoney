@@ -59,10 +59,10 @@ namespace NodaMoney.Context;
 /// <seealso cref="CashDenominationRounding"/>
 public interface IRoundingStrategy
 {
-    /// <summary>Rounds the specified monetary amount according to the defined rounding strategy.</summary>
+    /// <summary>Rounds the specified amount based on the provided currency and rounding rules.</summary>
     /// <param name="amount">The monetary amount to be rounded.</param>
-    /// <param name="currencyInfo">The associated currency information used to guide rounding rules, such as denomination or rounding increments.</param>
-    /// <param name="decimals">An optional parameter specifying the number of decimal places to round to. If null, the default for the currency will be used.</param>
-    /// <returns>The rounded monetary value as a decimal.</returns>
-    decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals);
+    /// <param name="currency">The currency that determines the rounding rules.</param>
+    /// <param name="decimals">An optional parameter specifying the number of decimal places to round to. If null, the default decimal settings for the currency will be applied.</param>
+    /// <returns>The monetary value rounded according to the specified strategy and currency rules.</returns>
+    decimal Round(decimal amount, Currency currency, int? decimals);
 }

@@ -19,7 +19,7 @@ public class MoneyFormattingBenchmarks
     [Benchmark]
     public string FormatWithPrecision()
     {
-        return _euro.ToString("c2");
+        return _euro.ToString("C2");
     }
 
     [Benchmark]
@@ -31,13 +31,13 @@ public class MoneyFormattingBenchmarks
     [Benchmark]
     public string FormatWithPrecisionAndProvider()
     {
-        return _euro.ToString("c2", ci);
+        return _euro.ToString("C2", ci);
     }
 
     [Benchmark]
     public string CompactFormat()
     {
-        return _euro.ToString("K");
+        return _euro.ToString("c");
     }
 
     [Benchmark]

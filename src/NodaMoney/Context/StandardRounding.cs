@@ -12,10 +12,27 @@ namespace NodaMoney.Context;
 /// <seealso cref="IRoundingStrategy"/>
 public record StandardRounding(MidpointRounding Mode = MidpointRounding.ToEven) : IRoundingStrategy
 {
+    /// <summary>Rounds the specified amount using the currency's rounding rules.</summary>
+    /// <param name="amount">The amount to round.</param>
+    /// <param name="currency">The currency to use for rounding rules.</param>
+    /// <param name="decimals">The number of decimal places to round to. If null, the currency's default is used.</param>
+    /// <returns>The rounded amount.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public decimal Round(decimal amount, Currency currency, int? decimals)
+    {
+        // Fast-path: Optimized for 2-decimal currencies (USD, EUR, GBP, etc.)
+        if (currency.IsMinorUnit2 && decimals is null or 2)
+        {
+            return decimal.Round(amount, 2, Mode);
+        }
+
+        // Slow path: use the currency info for rounding
+        return Round(amount, CurrencyInfo.GetInstance(currency), decimals);
+    }
+
     /// <inheritdoc cref="IRoundingStrategy.Round"/>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="decimals"/> is less than 0
     /// or greater than 28.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals)
     {
         if (currencyInfo is null) throw new ArgumentNullException(nameof(currencyInfo));

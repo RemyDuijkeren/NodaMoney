@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- Encode `MinorUnit = 2` hint directly into the `Currency` struct's 15th bit for faster rounding and lookups.
 
 ### Changed
--
+- Improved performance for Money creation, arithmetic, and formatting (up to 30%).
+- `Currency.IsIso4217` is now a computed property (delegates to `CurrencyInfo`).
+- IRoundingStrategy.Round() uses Currency as a parameter instead of CurrencyInfo.
 
 ### Removed
 -

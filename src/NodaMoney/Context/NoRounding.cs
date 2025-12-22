@@ -14,5 +14,5 @@ public record NoRounding : IRoundingStrategy
 {
     /// <inheritdoc cref="IRoundingStrategy.Round"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public decimal Round(decimal amount, CurrencyInfo currencyInfo, int? decimals) => amount;
+    public decimal Round(decimal amount, Currency currency, int? decimals) => amount;
 }

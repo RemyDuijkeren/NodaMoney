@@ -25,18 +25,22 @@ public readonly partial record struct Currency : IXmlSerializable, ISerializable
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
+        // v1 format: <Money Amount="765.43" Currency="USD;CUSTOM" />
+        // v2 format: <Money Currency="EUR">765.43</Money>
         var currency = reader.GetAttribute("Currency");
         if (currency is not null)
         {
-            // v1 format: <Money Amount="765.43" Currency="USD;CUSTOM" />
-            string[] v = currency.Split([';']);
-            if (v.Length == 1 || string.IsNullOrWhiteSpace(v[1]) || v[1] == "ISO-4217")
+            ReadOnlySpan<char> currencySpan = currency.AsSpan();
+            int separatorIndex = currencySpan.IndexOf(';');
+            if (separatorIndex == -1)
             {
-                Unsafe.AsRef(in this) = new Currency(v[0]);
+                // v2 fast path: No semicolon, use the string directly
+                Unsafe.AsRef(in this) = new Currency(currencySpan);
             }
-            else // Only if the 2nd part is not empty and not "ISO-4217", it is a custom currency
+            else
             {
-                Unsafe.AsRef(in this) = new Currency(v[0]) { IsIso4217 = false };
+                // v1 fallback: Slice the span to get the part before the semicolon
+                Unsafe.AsRef(in this) = new Currency(currencySpan.Slice(0, separatorIndex));
             }
         }
     }
@@ -47,7 +51,7 @@ public readonly partial record struct Currency : IXmlSerializable, ISerializable
         if (writer == null)
             throw new ArgumentNullException(nameof(writer));
 
-        writer.WriteAttributeString("Currency", IsIso4217 ? Code : $"{Code};CUSTOM");
+        writer.WriteAttributeString("Currency", Code);
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -57,6 +61,5 @@ public readonly partial record struct Currency : IXmlSerializable, ISerializable
             throw new ArgumentNullException(nameof(info));
 
         info.AddValue("code", Code);
-        info.AddValue("isIso4217", IsIso4217);
     }
 }

@@ -11,23 +11,26 @@ public readonly partial record struct Currency
 
     const string NoCurrencyCode = "XXX";
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
-    const ushort Iso4217BitMask = 1 << 15;
+#pragma warning disable RCS1181
+    const ushort MinorUnit2Mask = 1 << 15; // Bit 15
+    const ushort CurrencyCodeMask = unchecked((ushort)~MinorUnit2Mask); // Bits 0-14
+#pragma warning restore RCS1181
 
-    /// <summary>ushort = 2 bytes, only 15 bits needed for code, 1bit left that is to indicate the flag 'IsIso4217'.</summary>
+    /// <summary>ushort = 2 bytes, only 15 bits needed for code, 1bit left that is to indicate the flag 'IsMinorUnit2'.</summary>
     internal ushort EncodedValue { get; private init; }
     internal Currency(ushort encodedValue) => EncodedValue = encodedValue;
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
-    /// <param name="isIso4217">Indicates if the currency is in ISO-4217</param>
+    /// <param name="isMinorUnit2">Indicates if the currency has a minor unit of 2. If null, a registry lookup will be performed.</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
-    internal Currency(string code, bool isIso4217 = true) : this(code.AsSpan(), isIso4217) { }
+    internal Currency(string code, bool? isMinorUnit2 = null) : this(code.AsSpan(), isMinorUnit2) { }
 
     /// <summary>Initializes a new instance of the <see cref="Currency"/> struct.</summary>
     /// <param name="code">The (ISO-4217) three-character code of the currency</param>
-    /// <param name="isIso4217">Indicates if the currency is in ISO-4217</param>
+    /// <param name="isMinorUnit2">Indicates if the currency has a minor unit of 2. If null, a registry lookup will be performed.</param>
     /// <remarks>Represents a currency using the ISO-4217 three-character code system.</remarks>
-    internal Currency(ReadOnlySpan<char> code, bool isIso4217 = true)
+    internal Currency(ReadOnlySpan<char> code, bool? isMinorUnit2 = null)
     {
         if (code.IsEmpty) throw new ArgumentNullException(nameof(code));
         if (code.Length != 3) throw new ArgumentException(InvalidCurrencyMessage, nameof(code));
@@ -39,7 +42,7 @@ public readonly partial record struct Currency
             return;
         }
 
-        // A-Z (65-90 in ASCII), moves to 1-26 so that it fits in 5 bits.
+        // A-Z (65-90 in ASCII) moves to 1-26 so that it fits in 5 bits.
         // Store in ushort (2 bytes) by shifting 5 bits to the left for each char.
         foreach (var c in code)
         {
@@ -49,7 +52,11 @@ public readonly partial record struct Currency
             EncodedValue = (ushort)(EncodedValue << 5 | (c - 'A' + 1));
         }
 
-        IsIso4217 = isIso4217;
+        bool bit = isMinorUnit2 ?? (CurrencyRegistry.TryGet(code.ToString(), out var info) && info.MinorUnit == MinorUnit.Two);
+        if (bit)
+        {
+            EncodedValue |= MinorUnit2Mask;
+        }
 
         Debug.Assert(Code != null, "Code should not be null");
         Debug.Assert(Code!.Length == 3, InvalidCurrencyMessage);
@@ -61,7 +68,7 @@ public readonly partial record struct Currency
     {
         get
         {
-            if (EncodedValue is 0 or 25368) // 25368; // Precomputed value of "XXX"
+            if (EncodedValue is 0 or 25368) // 25368 = Precomputed value of "XXX" + IsMinorUnit2Mask=false
                 return NoCurrencyCode;
 
             // Decode the stored ushort value into a 3-character string by shifting back into
@@ -79,21 +86,13 @@ public readonly partial record struct Currency
         }
     }
 
-    /// <summary>Gets a value indicating whether this currency is a ISO-4217 currency.</summary>
-    public bool IsIso4217
-    {
-        get
-        {
-            return (EncodedValue & Iso4217BitMask) == 0; // Check if the 15th bit is NOT set
-        }
-        init
-        {
-            if (!value) EncodedValue |= Iso4217BitMask; // Set the 15th bit (= non ISO-4217)
-        }
-    }
+    /// <summary>Gets a value indicating whether this currency is an ISO-4217 currency.</summary>
+    public bool IsIso4217 => CurrencyInfo.GetInstance(this).IsIso4217;
 
-    /// <summary>Create an instance of the <see cref="Currency"/> based on a ISO 4217 currency code.</summary>
-    /// <param name="code">A ISO 4217 currency code, like EUR or USD.</param>
+    internal bool IsMinorUnit2 => (EncodedValue & MinorUnit2Mask) != 0;
+
+    /// <summary>Create an instance of the <see cref="Currency"/> based on an ISO 4217 currency code.</summary>
+    /// <param name="code">An ISO 4217 currency code, like EUR or USD.</param>
     /// <returns>An instance of the type <see cref="Currency"/>.</returns>
     /// <exception cref="ArgumentNullException">The value of 'code' cannot be null.</exception>
     /// <exception cref="ArgumentException">The 'code' is an unknown ISO 4217 currency code.</exception>

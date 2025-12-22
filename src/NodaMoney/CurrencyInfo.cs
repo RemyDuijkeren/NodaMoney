@@ -238,7 +238,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>Defines an implicit conversion operator from <see cref="CurrencyInfo"/> to <see cref="Currency"/>.</summary>
     /// <param name="currencyInfo">The currency information from which a <see cref="Currency"/> instance will be created.</param>
     /// <returns>A new instance of <see cref="Currency"/> initialized with the provided <see cref="CurrencyInfo"/>.</returns>
-    public static implicit operator Currency(CurrencyInfo currencyInfo) => new(currencyInfo.Code.AsSpan(), currencyInfo.IsIso4217);
+    public static implicit operator Currency(CurrencyInfo currencyInfo) => new(currencyInfo.Code.AsSpan(), currencyInfo.MinorUnit == MinorUnit.Two);
 
     /// <summary>Creates a new instance of <see cref="CurrencyInfo"/> with the specified three-character currency code.</summary>
     /// <param name="code">The (ISO-4217) three-character currency code.</param>

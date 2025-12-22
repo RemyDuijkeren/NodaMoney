@@ -14,10 +14,10 @@ public readonly partial struct Money : IEquatable<Money>
 {
 #pragma warning disable RCS1181
     // Masks for the Flags field
-    private const int CurrencyMask = 0b_11111111_11111111; // Bits 0–15, for Currency (16 bits)
-    private const int ScaleMask = 0b_11111111_00000000_00000000; // Bits 16-23 for the Decimal scale
-    private const int IndexMask = 0b_01111111 << 24; // Bits 24–30, for Index (7 bits)
-    private const int SignMask = unchecked((int)0b_10000000_00000000_00000000_00000000); // Bit 31 for the Decimal sign bit (negative)
+    private const int CurrencyMask = 0xFF_FF; // Bits 0–15, for Currency (16 bits)
+    private const int ScaleMask = 0xFF_00_00; // Bits 16-23 for the Decimal scale
+    private const int IndexMask = 0x7F << 24; // Bits 24–30, for Index (7 bits)
+    private const int SignMask = unchecked((int)1u << 31); // Bit 31 for the Decimal sign bit (negative)
 
     // Fields for storing the components of the decimal representation where bit layout in _flags is as follows:
     // bits 00..15: Currency
@@ -53,12 +53,11 @@ public readonly partial struct Money : IEquatable<Money>
         }
 
         // Round the amount to the correct scale
-        var currencyInfo = CurrencyInfo.GetInstance(currency);
         amount = context!.RoundingStrategy switch
         {
-            NoRounding noRounding => noRounding.Round(amount, currencyInfo, context.MaxScale),
-            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, context.MaxScale),
-            _ => context.RoundingStrategy.Round(amount, currencyInfo, context.MaxScale)
+            NoRounding nr => nr.Round(amount, currency, context.MaxScale),
+            StandardRounding sr => sr.Round(amount, currency, context.MaxScale),
+            _ => context.RoundingStrategy.Round(amount, currency, context.MaxScale)
         };
 
         // Extract the 4 integers from the decimal amount.
@@ -110,9 +109,9 @@ public readonly partial struct Money : IEquatable<Money>
             // Round the amount to the correct scale
             var amount = Context.RoundingStrategy switch
             {
-                NoRounding noRounding => noRounding.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale),
-                StandardRounding standardRounding => standardRounding.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale),
-                _ => Context.RoundingStrategy.Round(value, CurrencyInfo.GetInstance(Currency), Context.MaxScale)
+                NoRounding nr => nr.Round(value, Currency, Context.MaxScale),
+                StandardRounding sr => sr.Round(value, Currency, Context.MaxScale),
+                _ => Context.RoundingStrategy.Round(value, Currency, Context.MaxScale)
             };
 
             // Separate the Decimal bits during initialization
