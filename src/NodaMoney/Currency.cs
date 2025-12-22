@@ -86,9 +86,6 @@ public readonly partial record struct Currency
         }
     }
 
-    /// <summary>Gets a value indicating whether this currency is an ISO-4217 currency.</summary>
-    public bool IsIso4217 => CurrencyInfo.GetInstance(this).IsIso4217;
-
     internal bool IsMinorUnit2 => (EncodedValue & MinorUnit2Mask) != 0;
 
     /// <summary>Create an instance of the <see cref="Currency"/> based on an ISO 4217 currency code.</summary>

@@ -6,14 +6,14 @@ public class CreateInternalCurrency
     [InlineData("EUR")]
     [InlineData("MYR")]
     [InlineData("USD")]
-    public void WhenIsoCodeIsThreeCapitalLetters_IsoCurrencyIsCreated(string code)
+    public void WhenIsoCodeIsThreeCapitalLetters_CurrencyIsCreated(string code)
     {
         // Arrange / Act
         var currency = new Currency(code);
 
         // Assert
         currency.Code.Should().Be(code);
-        currency.IsIso4217.Should().BeTrue();
+        currency.IsMinorUnit2.Should().BeTrue();
     }
 
     [Theory]
@@ -48,11 +48,11 @@ public class CreateInternalCurrency
         noCurrency.Should().NotBeNull();
         noCurrency.Should().Be(default(Currency));
         noCurrency.Code.Should().Be("XXX");
-        noCurrency.IsIso4217.Should().BeTrue();
+        noCurrency.IsMinorUnit2.Should().BeFalse();
         defaultCurrency.Should().NotBeNull();
         defaultCurrency.Should().Be(default(Currency));
         defaultCurrency.Code.Should().Be("XXX");
-        defaultCurrency.IsIso4217.Should().BeTrue();
+        defaultCurrency.IsMinorUnit2.Should().BeFalse();
 
         // Assert with XUnit methods, because https://stackoverflow.com/questions/61556309/fluent-assertions-be-vs-equals
         Assert.Equal(default, noCurrency);

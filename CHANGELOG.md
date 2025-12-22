@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
-- Encode `MinorUnit = 2` hint directly into the `Currency` struct's 15th bit for faster rounding and lookups.
+-
 
 ### Changed
-- Improved performance for Money creation, arithmetic, and formatting (up to 30%).
-- `Currency.IsIso4217` is now a computed property (delegates to `CurrencyInfo`).
+- Improved performance for Money creation, arithmetic, and formatting (up to 30%) by encoding `MinorUnit = 2` hint
+  directly into the `Currency` struct's 15th bit for faster rounding and lookups.
 - IRoundingStrategy.Round() uses Currency as a parameter instead of CurrencyInfo.
 
 ### Removed
--
+- `Currency.IsIso4217` is removed, use `CurrencyInfo.IsIso4217` instead.
 
 ## [2.6]
 
@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.5]
 
 ### Added
-- Add MoneyContext to configure money behavior like rounding, scale and precision. This can be specified globally,
+- Add MoneyContext to configure money behavior like rounding, scale, and precision. This can be specified globally,
   per thread or by money instance. This should solve much of the discussion in issue #27 about internal rounding.
 - Add extra constructors on Money to create with a given MoneyContext, instead of MidpointRounding.
 - Add MoneyContext property on Money.
@@ -143,8 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed support for JavaScriptSerializer in ASP.NET (NodaMoney.Serialization.AspNet)
-- Removed support .NET Core 3.1, .NET 4.0 and .NET 4.5 (implicitly supported by .NET Standard 2.0)
-- CurrencyBuilder is removed (use CurrencyInfo to Create, Register and Unregister).
+- Removed support .NET Core 3.1, .NET 4.0, and .NET 4.5 (implicitly supported by .NET Standard 2.0)
+- CurrencyBuilder is removed (use CurrencyInfo to Create, Register, and Unregister).
 - Formatting format I is removed (replaced by format G)
 - Formatting format O is removed (replaced by format R)
 - Formatting format F is removed (replaced by format L)

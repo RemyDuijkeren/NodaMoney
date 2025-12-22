@@ -12,7 +12,7 @@ public class CurrencyFromIsoCode
         currency.Should().NotBeNull();
         currency.Code.Should().Be("EUR");
         currency.Symbol.Should().Be("€");
-        currency.IsIso4217.Should().BeTrue();
+        currency.IsMinorUnit2.Should().BeTrue();
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class CurrencyFromIsoCode
         currency.Should().NotBeNull();
         currency.Code.Should().Be("BTC");
         currency.Symbol.Should().Be("₿");
-        currency.IsIso4217.Should().BeFalse();
+        currency.IsMinorUnit2.Should().BeFalse();
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class CurrencyFromIsoCode
         currency.Should().NotBeNull();
         currency.Code.Should().Be("EUR");
         currency.Symbol.Should().Be("€");
-        currency.IsIso4217.Should().BeTrue();
+        currency.IsMinorUnit2.Should().BeTrue();
     }
 
     [Fact]
@@ -69,6 +69,6 @@ public class CurrencyFromIsoCode
         currency.Should().NotBeNull();
         currency.Code.Should().Be("BTC");
         currency.Symbol.Should().Be("₿");
-        currency.IsIso4217.Should().BeFalse();
+        currency.IsMinorUnit2.Should().BeFalse();
     }
 }
