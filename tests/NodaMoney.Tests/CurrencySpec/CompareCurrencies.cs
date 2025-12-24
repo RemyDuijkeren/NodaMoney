@@ -41,4 +41,18 @@ public class CompareCurrencies
         _euro1.GetHashCode().Should().Be(_euro2.GetHashCode());
         _euro1.GetHashCode().Should().NotBe(_dollar.GetHashCode());
     }
+
+    [Fact]
+    public void GivenTwoCurrenciesWithSameCodeButDifferentHint_WhenComparing_ShouldBeEqual()
+    {
+        var eurWithHint = new Currency("EUR", true);
+        var eurWithoutHint = new Currency("EUR", false);
+
+        eurWithHint.IsMinorUnit2.Should().BeTrue();
+        eurWithoutHint.IsMinorUnit2.Should().BeFalse();
+
+        eurWithHint.Should().Be(eurWithoutHint);
+        (eurWithHint == eurWithoutHint).Should().BeTrue();
+        eurWithHint.GetHashCode().Should().Be(eurWithoutHint.GetHashCode());
+    }
 }

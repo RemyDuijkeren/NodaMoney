@@ -13,7 +13,7 @@ public readonly partial record struct Currency
     const string InvalidCurrencyMessage = "Currency code should only exist out of three capital letters";
 #pragma warning disable RCS1181
     const ushort MinorUnit2Mask = 1 << 15; // Bit 15
-    const ushort CurrencyCodeMask = unchecked((ushort)~MinorUnit2Mask); // Bits 0-14
+    internal const ushort CurrencyCodeMask = unchecked((ushort)~MinorUnit2Mask); // Bits 0-14
 #pragma warning restore RCS1181
 
     /// <summary>ushort = 2 bytes, only 15 bits needed for code, 1bit left that is to indicate the flag 'IsMinorUnit2'.</summary>
@@ -87,6 +87,15 @@ public readonly partial record struct Currency
     }
 
     internal bool IsMinorUnit2 => (EncodedValue & MinorUnit2Mask) != 0;
+
+    /// <summary>Indicates whether the current currency is equal to another currency.</summary>
+    /// <param name="other">A currency to compare with this currency.</param>
+    /// <returns>true if the current currency is equal to the other parameter; otherwise, false.</returns>
+    public bool Equals(Currency other) => ((EncodedValue ^ other.EncodedValue) & CurrencyCodeMask) == 0;
+
+    /// <summary>Returns the hash code for this instance.</summary>
+    /// <returns>A 32-bit signed integer hash code.</returns>
+    public override int GetHashCode() => (EncodedValue & CurrencyCodeMask).GetHashCode();
 
     /// <summary>Create an instance of the <see cref="Currency"/> based on an ISO 4217 currency code.</summary>
     /// <param name="code">An ISO 4217 currency code, like EUR or USD.</param>

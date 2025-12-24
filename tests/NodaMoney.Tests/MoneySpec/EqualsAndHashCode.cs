@@ -100,4 +100,18 @@ public class EqualsAndHashCode
         a.Equals(b).Should().BeFalse();
         a.GetHashCode().Should().NotBe(b.GetHashCode());
     }
+
+    [Fact]
+    public void GivenTwoMoneyInstancesWithSameCurrencyButDifferentHint_WhenComparing_ShouldBeEqual()
+    {
+        var eurWithHint = new Currency("EUR", true);
+        var eurWithoutHint = new Currency("EUR", false);
+
+        var moneyWithHint = new Money(100m, eurWithHint);
+        var moneyWithoutHint = new Money(100m, eurWithoutHint);
+
+        moneyWithHint.Should().Be(moneyWithoutHint);
+        (moneyWithHint == moneyWithoutHint).Should().BeTrue();
+        moneyWithHint.GetHashCode().Should().Be(moneyWithoutHint.GetHashCode());
+    }
 }

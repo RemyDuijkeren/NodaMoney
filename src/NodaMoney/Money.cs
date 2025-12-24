@@ -253,7 +253,7 @@ public readonly partial struct Money : IEquatable<Money>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool EqualCurrency(in Money other) => ((_flags ^ other._flags) & CurrencyMask) == 0;
+    private bool EqualCurrency(in Money other) => ((_flags ^ other._flags) & Currency.CurrencyCodeMask) == 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ThrowIfCurrencyMismatch(in Money other)
