@@ -502,6 +502,15 @@ app.Run();
 You can also configure via IConfiguration (appsettings.json) and register multiple named contexts.
 See the [NodaMoney.DependencyInjection README](src/NodaMoney.DependencyInjection/README.md) for full examples.
 
+## Performance
+-----------
+NodaMoney is highly optimized for performance, as precision and speed are critical for financial calculations.
+
+- **Optimized Core**: The `Money` type is designed to be as fast as a raw `decimal` while providing currency safety.
+- **Benchmarks**: We maintain a comprehensive suite of benchmark tests using [BenchmarkDotNet](https://benchmarkdotnet.org/) to track performance across different .NET versions.
+- **Continuous Monitoring**: Benchmarks are executed for every release to make sure performance doesn't downgrade.
+- **FastMoney**: For high-throughput scenarios where every nanosecond counts, we offer the `FastMoney` type. It uses 64-bit integer arithmetic (fixed 4-decimal scale) and is even faster than the standard `Money` type.
+
 ## Compatibility
 
 - Core library (NodaMoney): net10.0, net9.0; net8.0; netstandard2.0; netstandard2.1
