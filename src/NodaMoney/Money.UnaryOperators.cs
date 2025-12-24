@@ -60,15 +60,15 @@ public partial struct Money
     /// <summary>Increments the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Increment(in Money money) => AdjustByMinimal(money, true);
+    public static Money Increment(in Money money) => AdjustByMinorUnit(money, true);
 
     /// <summary>Decrements the specified money.</summary>
     /// <param name="money">The money.</param>
     /// <returns>The result.</returns>
-    public static Money Decrement(in Money money) => AdjustByMinimal(money, false);
+    public static Money Decrement(in Money money) => AdjustByMinorUnit(money, false);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Money AdjustByMinimal(in Money money, bool increment)
+    private static Money AdjustByMinorUnit(in Money money, bool increment)
     {
         // We can skip rounding because we're adding/subtracting the minimal amount. We can take the fast path
         var minimal = new decimal(1, 0, 0, false, money.Scale);

@@ -57,7 +57,7 @@ public readonly partial record struct FastMoney
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static FastMoney AdjustByMinorUnit(in FastMoney money, bool increment)
     {
-        int d = CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
+        int d = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
 
         // Fast index with range guard; keeps a single bounds check that the JIT can hoist
         if ((uint)d > 4u)
@@ -68,12 +68,11 @@ public readonly partial record struct FastMoney
 
         // Compute the OA step based on DecimalDigits (FastMoney fixed scale is 4).
         // step = 10^(4 - d), with d in [0..4]. d>4 is not allowed for FastMoney elsewhere.
-        long step = s_stepByDecimalDigits[d]; // Fast lookup for hot path
+        long step = s_stepByDecimalDigits[d]; // Fast lookup for the hot path
         long newAmount = increment
             ? checked(money.OACurrencyAmount + step)
             : checked(money.OACurrencyAmount - step);
 
         return money with { OACurrencyAmount = newAmount };
     }
-
 }

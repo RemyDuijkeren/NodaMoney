@@ -47,16 +47,20 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>
-    /// <param name="currencyInfo">The Currency of the money.</param>
+    /// <param name="currency">The Currency of the money.</param>
     /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance. If <value>null</value> the
     /// current <see cref="MoneyContext"/> will be used.</param>
-    public FastMoney(decimal amount, CurrencyInfo currencyInfo, MoneyContext? context = null) : this()
+    public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this()
     {
         if (amount is < MinValueLong or > MaxValueLong)
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
 
-        if (currencyInfo.DecimalDigits > 4)
-            throw new InvalidCurrencyException($"The currency '{currencyInfo.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
+        if (!currency.IsMinorUnit2)
+        {
+            var ci = CurrencyInfo.GetInstance(currency);
+            if (ci.DecimalDigits > 4)
+                throw new InvalidCurrencyException($"The currency '{ci.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
+        }
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
         if (context is not null)
@@ -79,13 +83,13 @@ public readonly partial record struct FastMoney // or CompactMoney? TODO add int
             NoRounding => amount,
             // Fast path: ToOACurrency() rounds to 4 decimals using MidpointRounding.ToEven! So we can skip the rounding here.
             StandardRounding { Mode: MidpointRounding.ToEven } when context.MaxScale == 4 => amount,
-            StandardRounding standardRounding => standardRounding.Round(amount, currencyInfo, context.MaxScale),
-            _ => context.RoundingStrategy.Round(amount, currencyInfo, context.MaxScale)
+            StandardRounding standardRounding => standardRounding.Round(amount, currency, context.MaxScale),
+            _ => context.RoundingStrategy.Round(amount, currency, context.MaxScale)
         };
 
         ContextIndex = context.Index;
         OACurrencyAmount = decimal.ToOACurrency(amount); // Rounds to 4 decimals using MidpointRounding.ToEven!
-        Currency = currencyInfo;
+        Currency = currency;
     }
 
     public bool Equals(FastMoney other) => EqualityComparer<long>.Default.Equals(this.OACurrencyAmount, other.OACurrencyAmount) &&

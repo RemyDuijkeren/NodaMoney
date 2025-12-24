@@ -10,21 +10,21 @@ AMD Ryzen 7 5800H with Radeon Graphics 3.20GHz, 1 CPU, 16 logical and 8 physical
 ```
 | Method                  |      Mean |     Error |          Op/s | Ratio | Allocated | Alloc Ratio |
 |-------------------------|----------:|----------:|--------------:|------:|----------:|------------:|
-| Add                     | 22.658 ns | 0.2233 ns |  44,134,477.1 | 11.66 |         - |          NA |
-| Subtract                | 22.469 ns | 0.3121 ns |  44,505,735.9 | 11.56 |         - |          NA |
-| Multiple                | 22.969 ns | 0.3151 ns |  43,536,290.5 | 11.82 |         - |          NA |
-| Divide                  | 62.319 ns | 0.4148 ns |  16,046,410.7 | 32.07 |         - |          NA |
+| Add                     | 22.086 ns | 0.1029 ns |  45,276,806.7 | 11.45 |         - |          NA |
+| Subtract                | 22.706 ns | 0.1814 ns |  44,041,379.2 | 11.77 |         - |          NA |
+| Multiple                | 22.399 ns | 0.0854 ns |  44,644,223.6 | 11.61 |         - |          NA |
+| Divide                  | 61.619 ns | 0.1808 ns |  16,228,811.3 | 31.95 |         - |          NA |
 | Increment               |  9.060 ns | 0.1538 ns | 110,370,651.0 |  4.66 |         - |          NA |
 | Decrement               |  9.150 ns | 0.0850 ns | 109,292,714.3 |  4.71 |         - |          NA |
-| Remainder               | 19.964 ns | 0.0962 ns |  50,089,749.6 | 10.27 |         - |          NA |
-| fAdd                    |  1.943 ns | 0.0274 ns | 514,543,168.8 |  1.00 |         - |          NA |
-| fSubtract               |  1.704 ns | 0.0363 ns | 586,992,554.2 |  0.88 |         - |          NA |
-| fMultipleDec            | 22.439 ns | 0.0806 ns |  44,565,077.2 | 11.55 |         - |          NA |
-| fMultipleDecWholeNumber |  9.019 ns | 0.0779 ns | 110,879,706.1 |  4.64 |         - |          NA |
-| fMultipleLong           |  2.071 ns | 0.0076 ns | 482,747,298.6 |  1.07 |         - |          NA |
-| fDivideDec              | 67.947 ns | 1.1503 ns |  14,717,453.6 | 34.97 |         - |          NA |
-| fDivideDecWholeNumber   | 10.327 ns | 0.0316 ns |  96,836,532.2 |  5.31 |         - |          NA |
-| fDivideLong             |  1.905 ns | 0.0097 ns | 524,836,563.0 |  0.98 |         - |          NA |
-| fIncrement              |  5.068 ns | 0.0969 ns | 197,327,456.3 |  2.61 |         - |          NA |
-| fDecrement              |  4.994 ns | 0.0314 ns | 200,234,138.1 |  2.57 |         - |          NA |
-| fRemainder              |  1.879 ns | 0.0300 ns | 532,138,838.7 |  0.97 |         - |          NA |
+| Remainder               | 21.660 ns | 0.2293 ns |  46,167,046.5 | 11.23 |         - |          NA |
+| fAdd                    |  1.929 ns | 0.0161 ns | 518,416,084.4 |  1.00 |         - |          NA |
+| fSubtract               |  1.703 ns | 0.0154 ns | 587,254,196.0 |  0.88 |         - |          NA |
+| fMultipleDec            | 22.378 ns | 0.0876 ns |  44,686,651.7 | 11.60 |         - |          NA |
+| fMultipleDecWholeNumber |  8.962 ns | 0.0270 ns | 111,582,197.6 |  4.65 |         - |          NA |
+| fMultipleLong           |  2.098 ns | 0.0113 ns | 476,662,397.6 |  1.09 |         - |          NA |
+| fDivideDec              | 67.078 ns | 0.2020 ns |  14,907,930.4 | 34.78 |         - |          NA |
+| fDivideDecWholeNumber   | 10.307 ns | 0.0301 ns |  97,021,995.4 |  5.34 |         - |          NA |
+| fDivideLong             |  1.922 ns | 0.0092 ns | 520,322,438.4 |  1.00 |         - |          NA |
+| fIncrement              |  2.121 ns | 0.0395 ns | 471,373,585.9 |  1.10 |         - |          NA |
+| fDecrement              |  2.258 ns | 0.0263 ns | 442,806,522.0 |  1.17 |         - |          NA |
+| fRemainder              |  1.957 ns | 0.0510 ns | 511,023,677.5 |  1.01 |         - |          NA |

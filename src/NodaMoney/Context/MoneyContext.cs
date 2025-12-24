@@ -374,14 +374,8 @@ public sealed record MoneyContext
     public static IDisposable CreateScope(string name)
         => CreateScope(Get(name) ?? throw new ArgumentException($"No context with name '{name}' found", nameof(name)));
 
-    private sealed class ContextScope : IDisposable
+    private sealed class ContextScope(Action onDispose) : IDisposable
     {
-        private readonly Action _onDispose;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ContextScope(Action onDispose) => _onDispose = onDispose;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose() => _onDispose();
+        public void Dispose() => onDispose();
     }
 }
