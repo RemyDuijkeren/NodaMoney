@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" PrivateAssets="all" Version="6.0.0" />
+    <PackageReference Include="MinVer" PrivateAssets="all" Version="7.0.0" />
     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" Version="4.15.0" />
 
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[5.0.0,)" />
