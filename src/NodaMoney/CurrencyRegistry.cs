@@ -416,7 +416,7 @@ static class CurrencyRegistry
             new ("UYW", 927, MinorUnit.Four, "Unidad Previsional", "Db") { IntroducedOn = new DateTime(2018, 8, 29) },
             new ("VES", 928, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2018, 8, 20) }, // or Bs.F. , Amendment 167 talks about delay but from multiple sources on the web the date seems to be 20 aug. // Replaced by VED/926 but stays active for now
             new ("VED", 926, MinorUnit.Two, "Venezuelan Bolívar Soberano", "Bs.") { IntroducedOn = new DateTime(2021, 10, 01) }, // replaces VES/928 (Amendment 170)
-            new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2021, 04, 01) }, // replaces SLL/694
+            new ("SLE", 925, MinorUnit.Two, "Sierra Leonean leone", "Le") { IntroducedOn = new DateTime(2022, 04, 01) }, // replaces SLL/694
             new ("ZWG", 924, MinorUnit.Two, "Zimbabwe Gold", "ZiG") { IntroducedOn = new DateTime(2024, 06, 25) }, // Amendment 177,  replaces ZWL/932,
             new ("XCG", 532, MinorUnit.Two, "Caribbean Guilder", "ƒ") { IntroducedOn = new DateTime(2025, 03, 31) }, // Amendment 176, replaces ANG/532 => Activate 31 March 2025
             new ("XAD", 396, MinorUnit.Two, "Arab Accounting Dinar") { IntroducedOn = new DateTime(2025, 05, 12) }, // Amendment 179, add new currency for the Finance Department Arab Monetary Fund (AMF)
