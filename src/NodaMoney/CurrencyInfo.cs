@@ -457,66 +457,116 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     private string FormatCompact(in Money money, NumberFormatInfo nfi, int digits, bool onlyNumber = false)
     {
-        // Determine absolute value and tier by selecting divisor and suffix (initial tier).
-        // We honor compact formatting even below 1,000 and let rounding/escalation decide.
+        // Compact formatting rules (Dashboard style):
+        // 1. If abs(value) < 100: No compacting. Show normal currency decimals, keep trailing zeros (e.g., $12.34, $0.50).
+        // 2. If 100 <= abs(value) < 1000: No compacting. Show 0 decimals (e.g., $123, $950).
+        // 3. If abs(value) >= 1000: Compact with suffix (K, M, B, T).
+        //    - If sigDigits == 1: Strict 1 significant digit (e.g., 12.3K -> 10K).
+        //    - If sigDigits >= 2: Dynamic decimals based on sigDigits, allowing up to 3 integer digits (e.g., 123K).
+        //    - Trim trailing zeros and decimal separator for all compact formats (>= 100).
+        // 4. Negative numbers always use a leading minus sign (e.g., -$1.2K).
+
         decimal abs = Math.Abs(money.Amount);
-        decimal divisor;
-        string suffix;
-        switch (abs)
+        int sigDigits = digits == -1 ? 2 : digits;
+        if (sigDigits < 1) sigDigits = 1;
+
+        string number;
+        string suffix = "";
+        bool shouldTrimTrailingZeros = true;
+
+        if (abs < 100m)
         {
-            case < 1_000_000m:
-                divisor = 1_000m; suffix = "K";
-                break;
-            case < 1_000_000_000m:
-                divisor = 1_000_000m; suffix = "M";
-                break;
-            case < 1_000_000_000_000m:
-                divisor = 1_000_000_000m; suffix = "B";
-                break;
-            default:
-                divisor = 1_000_000_000_000m; suffix = "T";
-                break;
+            // Case 1: Amount < 100 -> format with normal currency decimals and keep trailing zeros
+            number = abs.ToString($"N{nfi.CurrencyDecimalDigits}", nfi);
+            shouldTrimTrailingZeros = false;
         }
-
-        decimal scaled = abs / divisor;
-
-        // Determine decimals: default 1; if provided, honor as exact
-        int decimals = digits == -1 ? 1 : digits;
-
-        // Round using MidpointRounding.AwayFromZero!
-        decimal rounded = Math.Round(scaled, decimals, MidpointRounding.AwayFromZero);
-
-        // If rounding pushes the value to the next tier (e.g., 999.95K -> 1.0K or 1000.0K),
-        // escalate to the next suffix, keeping the same decimals
-        if (rounded >= 1000m && suffix != "T")
+        else if (abs < 1000m && Math.Round(abs, 0, MidpointRounding.AwayFromZero) < 1000m)
         {
-            rounded /= 1000m;
-            suffix = suffix switch
-            {
-                "K" => "M",
-                "M" => "B",
-                _ => "T"
-            };
+            // Case 2: Amount 100 - 999 -> format with 0 decimals
+            number = abs.ToString("N0", nfi);
+            shouldTrimTrailingZeros = false;
         }
-
-        string number = rounded.ToString($"N{decimals}", nfi);
-
-        // If default decimals were used, trim trailing zeros and possible decimal separator
-        if (digits == -1)
+        else
         {
-            string decSep = nfi.NumberDecimalSeparator;
-            if (number.Contains(decSep))
+            // Case 3: Compact range (>= 1000) - Pick magnitude and suffix
+            decimal divisor;
+            if (abs < 1_000_000m) { divisor = 1_000m; suffix = "K"; }
+            else if (abs < 1_000_000_000m) { divisor = 1_000_000m; suffix = "M"; }
+            else if (abs < 1_000_000_000_000m) { divisor = 1_000_000_000m; suffix = "B"; }
+            else { divisor = 1_000_000_000_000m; suffix = "T"; }
+
+            decimal scaled = abs / divisor;
+            decimal rounded;
+            int decimals;
+            if (sigDigits == 1)
             {
-                // Trim trailing zeros
-                int i = number.Length - 1;
-                while (i >= 0 && number[i] == '0') i--;
-                // If last is a decimal separator, remove it as well
-                if (i >= decSep.Length - 1 && number.AsSpan(i - decSep.Length + 1, decSep.Length).SequenceEqual(decSep.AsSpan()))
-                {
-                    i -= decSep.Length;
-                }
-                number = number.Substring(0, i + 1);
+                // Strict 1 significant digit: Round to the highest power of 10
+                int log = (int)Math.Floor(Math.Log10((double)scaled));
+                decimal scale = (decimal)Math.Pow(10, log);
+                rounded = Math.Round(scaled / scale, 0, MidpointRounding.AwayFromZero) * scale;
+                decimals = 0;
             }
+            else
+            {
+                // sigDigits >= 2: Calculate decimals needed to satisfy significant digits
+                int log = (int)Math.Floor(Math.Log10((double)scaled));
+                int digitsBeforeDecimal = log + 1;
+                decimals = Math.Max(0, sigDigits - digitsBeforeDecimal);
+                rounded = Math.Round(scaled, decimals, MidpointRounding.AwayFromZero);
+            }
+
+            // Escalation: If rounding pushed us into the next tier (e.g., 999.9K -> 1M)
+            if (rounded >= 1000m && suffix != "T")
+            {
+                rounded /= 1000m;
+                suffix = suffix switch { "K" => "M", "M" => "B", "B" => "T", _ => "T" };
+                int log = (int)Math.Floor(Math.Log10((double)rounded));
+                int digitsBeforeDecimal = log + 1;
+                if (sigDigits == 1)
+                {
+                    decimal scale = (decimal)Math.Pow(10, log);
+                    rounded = Math.Round(rounded / scale, 0, MidpointRounding.AwayFromZero) * scale;
+                    decimals = 0;
+                }
+                else
+                {
+                    decimals = Math.Max(0, sigDigits - digitsBeforeDecimal);
+                    rounded = Math.Round(rounded, decimals, MidpointRounding.AwayFromZero);
+                }
+            }
+
+            number = rounded.ToString($"N{decimals}", nfi);
+        }
+
+        // Step 4: Trim trailing zeros and decimal separator for brevity in compact formats
+        string decSep = nfi.NumberDecimalSeparator;
+        if (shouldTrimTrailingZeros && number.Contains(decSep))
+        {
+            // Trim trailing zeros
+            int i = number.Length - 1;
+            while (i >= 0 && number[i] == '0') i--;
+
+            // Check if we ended up at the decimal separator
+            bool isSeparator = false;
+            if (i >= decSep.Length - 1)
+            {
+                isSeparator = true;
+                for (int j = 0; j < decSep.Length; j++)
+                {
+                    if (number[i - decSep.Length + 1 + j] != decSep[j])
+                    {
+                        isSeparator = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isSeparator)
+            {
+                i -= decSep.Length;
+            }
+
+            number = number.Substring(0, i + 1);
         }
 
         string numberWithSuffix = number + suffix;
@@ -527,7 +577,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             return money.Amount < 0 ? nfi.NegativeSign + numberWithSuffix : numberWithSuffix;
         }
 
-        // Compose with currency symbol/code using culture positive patterns
+        // Step 5: Compose with currency symbol/code using culture-specific patterns
         string symbol = nfi.CurrencySymbol;
         string positive = nfi.CurrencyPositivePattern switch
         {
@@ -538,7 +588,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             _ => $"{symbol} {numberWithSuffix}"  // $ n
         };
 
-        // Negative numbers: per checklist, prefer leading minus regardless of culture parenthesis patterns
+        // Step 6: Handle negative numbers - use leading minus sign for consistency in compact dashboards
         if (money.Amount < 0)
         {
             return nfi.NegativeSign + positive;

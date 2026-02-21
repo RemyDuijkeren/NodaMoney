@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- FromMinorUnits and ToMinorUnits methods on Money and FastMoney https://github.com/RemyDuijkeren/NodaMoney/issues/118.
 
 ### Changed
 - Improved performance for Money creation, arithmetic, and formatting (up to 30%) by encoding `MinorUnit = 2` hint
   directly into the `Currency` struct's 15th bit for faster rounding and lookups.
 - IRoundingStrategy.Round() uses Currency as a parameter instead of CurrencyInfo.
+- Fixed IntroductionOn date for SLE currency https://github.com/RemyDuijkeren/NodaMoney/pull/117 by @General-66.
+- Compact format uses significant digits, values below 1000 are displayed as normal currency values
+  where > 100 without decimals https://github.com/RemyDuijkeren/NodaMoney/issues/111,
 
 ### Removed
 - `Currency.IsIso4217` is removed, use `CurrencyInfo.IsIso4217` instead.
