@@ -18,7 +18,9 @@ public class CreatePonds
     {
         //from decimal (other integral types are implicitly converted to decimal)
         var pounds1 = Money.PoundSterling(10.005m);
+#pragma warning disable CS0618 // Type or member is obsolete
         var pounds2 = Money.PoundSterling(10.005m, MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         pounds2.Currency.Should().Be(Currency.FromCode("GBP"));
         pounds2.Amount.Should().Be(10.01m);

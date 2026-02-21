@@ -56,7 +56,6 @@ public partial struct Money
     {
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((int)rounded);
-
     }
 
     /// <summary>Converts the value of this instance to an <see cref="long"/>.</summary>
@@ -68,6 +67,26 @@ public partial struct Money
     {
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((long)rounded);
+    }
 
+    /// <summary>Converts the value of this instance to minor units.</summary>
+    /// <returns>The value of the <see cref="Money"/> instance, converted to minor units (e.g., cents, yen, etc.).</returns>
+    /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>
+    public long ToMinorUnits()
+    {
+        var currencyInfo = CurrencyInfo.GetInstance(Currency);
+        decimal roundedAmount = Context.RoundingStrategy.Round(Amount, Currency, null);
+        return checked((long)(roundedAmount * currencyInfo.ScaleFactor));
+    }
+
+    /// <summary>Creates a <see cref="Money"/> instance from minor units.</summary>
+    /// <param name="minorUnits">The amount in minor units (e.g., cents, yen, etc.).</param>
+    /// <param name="currency">The currency of the money.</param>
+    /// <returns>A new <see cref="Money"/> instance.</returns>
+    public static Money FromMinorUnits(long minorUnits, Currency currency)
+    {
+        var currencyInfo = CurrencyInfo.GetInstance(currency);
+        decimal amount = (decimal)minorUnits / currencyInfo.ScaleFactor;
+        return new Money(amount, currency);
     }
 }

@@ -17,7 +17,7 @@ namespace NodaMoney;
 /// See also OLE Automation Currency, SQL Currency type and https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/currency-data-type.</para>
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 12)]
-public readonly partial record struct FastMoney // or CompactMoney? TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
+public readonly partial record struct FastMoney // TODO add interface IMoney or IMonetary or IMonetaryAmount? Using the interface will cause boxing!
 {
     private const byte Scale = 4;
     private const long ScaleFactor = 10_000;

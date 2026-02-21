@@ -25,7 +25,9 @@ public class InitializingMoneyBenchmarks
     [Benchmark]
     public Money CurrencyCodeAndRoundingMode()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         return new Money(765.425m, "EUR", MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Benchmark]

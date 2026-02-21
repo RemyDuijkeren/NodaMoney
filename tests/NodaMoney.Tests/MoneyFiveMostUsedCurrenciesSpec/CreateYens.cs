@@ -18,7 +18,9 @@ public class CreateYens
     {
         //from decimal (other integral types are implicitly converted to decimal)
         var yen1 = Money.Yen(10.5m);
+#pragma warning disable CS0618 // Type or member is obsolete
         var yen2 = Money.Yen(10.5m, MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         yen2.Currency.Should().Be(Currency.FromCode("JPY"));
         yen2.Amount.Should().Be(11m);

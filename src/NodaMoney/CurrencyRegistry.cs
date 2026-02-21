@@ -247,7 +247,7 @@ static class CurrencyRegistry
             new ("ALL", 008, MinorUnit.Two, "Albanian lek", "L"),
             new ("AMD", 051, MinorUnit.Two, "Armenian dram", "֏") { AlternativeSymbols = ["dram"] },
             new ("AOA", 973, MinorUnit.Two, "Angolan kwanza", "Kz"),
-            new ("ARS", 032, MinorUnit.Two, "Argentine peso", "$") { InternationalSymbol = "ARS" },
+            new ("ARS", 032, MinorUnit.Two, "Argentine peso", "$") { InternationalSymbol = "AR$" },
             new ("AUD", 036, MinorUnit.Two, "Australian dollar", "$") { InternationalSymbol = "A$" },
             new ("AWG", 533, MinorUnit.Two, "Aruban florin", "ƒ"),
             new ("AZN", 944, MinorUnit.Two, "Azerbaijan Manat", "ман"), // AZERBAIJAN
@@ -403,7 +403,7 @@ static class CurrencyRegistry
             new ("XDR", 960, MinorUnit.NotApplicable, "Special drawing rights"),
             new ("XOF", 952, MinorUnit.Zero, "CFA franc BCEAO", "CFA"),
             new ("XPD", 964, MinorUnit.NotApplicable, "Palladium (one troy ounce)"),
-            new ("XPF", 953, MinorUnit.Zero, "CFP franc", "F"),
+            new ("XPF", 953, MinorUnit.Zero, "CFP franc", "F") { AlternativeSymbols = ["₣", "CFP"]},
             new ("XPT", 962, MinorUnit.NotApplicable, "Platinum (one troy ounce)"),
             new ("XSU", 994, MinorUnit.NotApplicable, "SUCRE"),
             new ("XTS", 963, MinorUnit.NotApplicable, "Code reserved for testing purposes"),

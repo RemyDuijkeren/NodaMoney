@@ -18,6 +18,7 @@ public class MoneyEqualBenchmarks
     [Benchmark(Baseline = true)]
     public bool Equal()
     {
+        // ReSharper disable once EqualExpressionComparison
         return _euro10 == _euro10; // false
     }
 
@@ -48,6 +49,7 @@ public class MoneyEqualBenchmarks
     [Benchmark]
     public bool fEqual()
     {
+        // ReSharper disable once EqualExpressionComparison
         return _euro10fast == _euro10fast; // true
     }
 
