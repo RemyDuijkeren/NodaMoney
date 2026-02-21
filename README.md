@@ -321,7 +321,7 @@ SqlMoney sqlMoney = db.MoneyFromDb();
 FastMoney? fast = FastMoney.FromSqlMoney(sqlMoney, Currency.FromCode("EUR")); // or (FastMoney?)sqlMoney
 
 // Convert to SqlMoney
-SqlMoney sqlMoney1 = fast.ToSqlMoney(Currency.FromCode("EUR"));
+SqlMoney sqlMoney1 = fast.ToSqlMoney();
 
 // Convert from OLE Automation Currency
 long oaCurrency = db.CurrencyFromDb();
@@ -477,11 +477,11 @@ using NodaMoney.DependencyInjection; // NuGet: NodaMoney.DependencyInjection
 var builder = WebApplication.CreateBuilder(args);
 
 // Register MoneyContext with custom options as default global context
-builder.Services.AddMoneyContext(options =>
+builder.Services.AddMoneyContext(opt =>
 {
-    options.DefaultCurrency = Currency.FromCode("USD");
-    options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
-    options.MaxScale = 2;
+    opt.DefaultCurrency = Currency.FromCode("USD");
+    opt.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero);
+    opt.MaxScale = 2;
     opt.EnforceZeroCurrencyMatching = true;
 });
 
