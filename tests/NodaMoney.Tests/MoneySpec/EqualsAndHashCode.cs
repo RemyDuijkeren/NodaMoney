@@ -35,7 +35,7 @@ public class EqualsAndHashCode
     {
         // Arrange and Act
         var m = new Money(5m, "USD");
-        object? o = null;
+        object o = null;
 
         // Assert
         m.Equals(o).Should().BeFalse();

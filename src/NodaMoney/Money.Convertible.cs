@@ -56,7 +56,6 @@ public partial struct Money
     {
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((int)rounded);
-
     }
 
     /// <summary>Converts the value of this instance to an <see cref="long"/>.</summary>
@@ -68,6 +67,5 @@ public partial struct Money
     {
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((long)rounded);
-
     }
 }

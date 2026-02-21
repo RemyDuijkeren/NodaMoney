@@ -17,7 +17,9 @@ public class CreateEuros
     {
         // from decimal (other integral types are implicitly converted to decimal)
         var euros1 = Money.Euro(10.005m);
+#pragma warning disable CS0618 // Type or member is obsolete
         var euros2 = Money.Euro(10.005m, MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         euros2.Currency.Should().Be(Currency.FromCode("EUR"));
         euros2.Amount.Should().Be(10.01m);

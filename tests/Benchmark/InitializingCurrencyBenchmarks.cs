@@ -21,9 +21,9 @@ public class InitializingCurrencyBenchmarks
     }
 
     [Benchmark]
-    public CurrencyInfo CurrencyInfoTryFromCode()
+    public CurrencyInfo? CurrencyInfoTryFromCode()
     {
-        bool result = CurrencyInfo.TryFromCode("EUR", out CurrencyInfo currency);
+        bool result = CurrencyInfo.TryFromCode("EUR", out CurrencyInfo? currency);
         return currency;
     }
 }

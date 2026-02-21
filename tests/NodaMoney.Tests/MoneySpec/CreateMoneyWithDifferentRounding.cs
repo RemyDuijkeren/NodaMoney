@@ -7,7 +7,9 @@ public class CreateMoneyWithDifferentRounding
     {
         decimal amount = 0.525m;
         var defaultRounding = new Money(amount, "EUR");
+#pragma warning disable CS0618 // Type or member is obsolete
         var differentRounding = new Money(amount, "EUR", MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         defaultRounding.Amount.Should().Be(0.52m);
         differentRounding.Amount.Should().Be(0.53m);
@@ -18,7 +20,9 @@ public class CreateMoneyWithDifferentRounding
     {
         decimal amount = 0.525m;
         var defaultRounding = new Money(amount, "EUR");
+#pragma warning disable CS0618 // Type or member is obsolete
         var differentRounding = new Money(amount, "EUR", MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         defaultRounding.Amount.Should().Be(0.52m);
         differentRounding.Amount.Should().Be(0.53m);

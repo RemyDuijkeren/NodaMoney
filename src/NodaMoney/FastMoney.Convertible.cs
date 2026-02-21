@@ -100,7 +100,6 @@ public readonly partial record struct FastMoney
         // Fallback: use general strategy on decimal
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((int)rounded);
-
     }
 
     /// <summary>Converts the value of this instance to an <see cref="long"/>.</summary>

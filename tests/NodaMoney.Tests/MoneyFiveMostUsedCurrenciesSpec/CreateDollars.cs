@@ -17,7 +17,9 @@ public class CreateDollars
     {
         // from decimal (other integral types are implicitly converted to decimal)
         var dollars1 = Money.USDollar(10.005m);
+#pragma warning disable CS0618 // Type or member is obsolete
         var dollars2 = Money.USDollar(10.005m, MidpointRounding.AwayFromZero);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         dollars2.Currency.Should().Be(Currency.FromCode("USD"));
         dollars2.Amount.Should().Be(10.01m);
