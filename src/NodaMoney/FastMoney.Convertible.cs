@@ -10,6 +10,7 @@ public readonly partial record struct FastMoney
     // FastMoney <-> Money
 
     public static explicit operator Money(FastMoney money) => money.ToMoney();
+
     public static explicit operator FastMoney(Money money) => new(money);
     public Money ToMoney()
     {
@@ -17,6 +18,29 @@ public readonly partial record struct FastMoney
         // the provided context (strategy and max scale, currency rules).
         decimal amount = decimal.FromOACurrency(OACurrencyAmount);
         return new Money(amount, Currency);
+    }
+
+    // FastMoney <-> minor units
+
+    /// <summary>Converts the value of this instance to minor units.</summary>
+    /// <returns>The value of the <see cref="FastMoney"/> instance, converted to minor units (e.g., cents, yen, etc.).</returns>
+    /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>
+    public long ToMinorUnits()
+    {
+        var currencyInfo = CurrencyInfo.GetInstance(Currency);
+        decimal roundedAmount = Context.RoundingStrategy.Round(Amount, Currency, null);
+        return checked((long)(roundedAmount * currencyInfo.ScaleFactor));
+    }
+
+    /// <summary>Creates a <see cref="FastMoney"/> instance from minor units.</summary>
+    /// <param name="minorUnits">The amount in minor units (e.g., cents, yen, etc.).</param>
+    /// <param name="currency">The currency of the money.</param>
+    /// <returns>A new <see cref="FastMoney"/> instance.</returns>
+    public static FastMoney FromMinorUnits(long minorUnits, Currency currency)
+    {
+        var currencyInfo = CurrencyInfo.GetInstance(currency);
+        decimal amount = (decimal)minorUnits / currencyInfo.ScaleFactor;
+        return new FastMoney(amount, currency);
     }
 
     // FastMoney <-> SqlMoney
