@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 360 # Default: 360 minutes
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           filter: tree:0
@@ -37,7 +37,7 @@ jobs:
         run: dotnet run -c Release --framework net10.0 --no-build --no-launch-profile
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: BenchmarkDotNet.Artifacts
           path: tests/Benchmark/BenchmarkDotNet.Artifacts/
