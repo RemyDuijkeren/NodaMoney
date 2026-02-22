@@ -616,7 +616,7 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// Culture is a neutral culture, from which no region information can be extracted -or-
     /// The 'code' is an unknown ISO 4217 currency code.
     /// </exception>
-    private static CurrencyInfo FromCulture(CultureInfo culture)
+    internal static CurrencyInfo FromCulture(CultureInfo culture)
     {
         if (culture == null)
             throw new ArgumentNullException(nameof(culture));
@@ -626,6 +626,14 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         return GetInstance(new RegionInfo(culture.Name));
     }
 
+    /// <summary>Creates a new instance of <see cref="CurrencyInfo" /> from the specified <see cref="NumberFormatInfo" />.</summary>
+    /// <param name="nfi">The <see cref="NumberFormatInfo" /> instance containing the currency information.</param>
+    /// <returns>A <see cref="CurrencyInfo" /> instance initialized with the data from the provided <see cref="NumberFormatInfo" />.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="nfi"/> parameter is null.</exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the <paramref name="nfi"/> has a null or empty CurrencySymbol,
+    /// or if the CurrencySymbol is the generic currency sign (¤).
+    /// </exception>
     private static CurrencyInfo FromNumberFormatInfo(NumberFormatInfo nfi)
     {
         if (nfi == null)
