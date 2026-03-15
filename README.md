@@ -354,6 +354,10 @@ Currencyinfo ci = CurrencyInfo.GetInstance(NumberFormatInfo.InvariantInfo);
 CurrencyInfo ci = CurrencyInfo.CurrentCurrency;
 
 Currency euro = ci; // Implicit cast to Currency Unit
+
+// From CultureInfo or RegionInfo
+CurrencyInfo ci1 = new CultureInfo("en-US").GetCurrencyInfo();
+CurrencyInfo ci2 = new RegionInfo("US").GetCurrencyInfo();
 ```
 
 **Retrieving Currencies**
