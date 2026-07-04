@@ -151,8 +151,12 @@ public readonly partial struct Money : IEquatable<Money>
         }
     }
 
-    /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
-    public MoneyContext Context => MoneyContext.Get(ContextIndex);
+    /// <summary>Gets or initializes the context associated with this <see cref="Money"/> instance.</summary>
+    public MoneyContext Context
+    {
+        get => MoneyContext.Get(ContextIndex);
+        init => ContextIndex = value.Index;
+    }
 
     /// <summary>Gets the index of the <see cref="Context"/>.</summary>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the provided index value is outside the allowed range of 0 to 127.</exception>

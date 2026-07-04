@@ -34,13 +34,29 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
 
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
     [field: FieldOffset(8)]
-    public Currency Currency { get; init; }
+    public Currency Currency
+    {
+        get;
+        init
+        {
+            ValidateCurrency(value);
+            field = value;
+        }
+    }
 
     [field: FieldOffset(10)]
     private MoneyContextIndex ContextIndex { get; init; }
 
-    /// <summary>Gets the context associated with this <see cref="Money"/> instance.</summary>
-    public MoneyContext Context => MoneyContext.Get(ContextIndex);
+    /// <summary>Gets or initializes the context associated with this <see cref="Money"/> instance.</summary>
+    public MoneyContext Context
+    {
+        get => MoneyContext.Get(ContextIndex);
+        init
+        {
+            ValidateContext(value, nameof(value));
+            ContextIndex = value.Index;
+        }
+    }
 
     // [field: FieldOffset(11)]
     // private byte UnusedByte { get; init; }
@@ -55,21 +71,12 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
         if (amount is < MinValueLong or > MaxValueLong)
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
 
-        if (!currency.IsMinorUnit2)
-        {
-            var ci = CurrencyInfo.GetInstance(currency);
-            if (ci.DecimalDigits > 4)
-                throw new InvalidCurrencyException($"The currency '{ci.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
-        }
+        ValidateCurrency(currency);
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
         if (context is not null)
         {
-            if (context.MaxScale > 4)
-                throw new ArgumentOutOfRangeException(nameof(context), "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
-
-            if (context.Precision > 19)
-                throw new ArgumentOutOfRangeException(nameof(context), "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
+            ValidateContext(context, nameof(context));
         }
         else
         {
@@ -102,6 +109,33 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
     {
         amount = Amount;
         currency = Currency;
+    }
+
+    /// <summary>Validates that <paramref name="currency"/> can be represented by <see cref="FastMoney"/>'s fixed 4-decimal storage.</summary>
+    /// <param name="currency">The currency to validate.</param>
+    /// <exception cref="InvalidCurrencyException">Thrown when <paramref name="currency"/> requires more than 4 decimal places.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void ValidateCurrency(Currency currency)
+    {
+        if (currency.IsMinorUnit2) return;
+
+        var ci = CurrencyInfo.GetInstance(currency);
+        if (ci.DecimalDigits > 4)
+            throw new InvalidCurrencyException($"The currency '{ci.Code}' requires more than 4 decimal places, which cannot be represented by {nameof(FastMoney)}.");
+    }
+
+    /// <summary>Validates that <paramref name="context"/>'s scale and precision fit <see cref="FastMoney"/>'s fixed-point representation.</summary>
+    /// <param name="context">The context to validate.</param>
+    /// <param name="paramName">The parameter name to report in a thrown exception.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="context"/>'s <see cref="MoneyContext.MaxScale"/> exceeds 4 or <see cref="MoneyContext.Precision"/> exceeds 19.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void ValidateContext(MoneyContext context, string paramName)
+    {
+        if (context.MaxScale > 4)
+            throw new ArgumentOutOfRangeException(paramName, "Context max scale is more then 4, which is outside the allowable range for FastMoney.");
+
+        if (context.Precision > 19)
+            throw new ArgumentOutOfRangeException(paramName, "Context max precision is more then 19, which is outside the allowable range for FastMoney.");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

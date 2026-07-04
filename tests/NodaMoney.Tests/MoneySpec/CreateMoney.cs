@@ -111,6 +111,27 @@ public class CreateMoney
         result.Scale.Should().Be(10, "no rounding");
     }
 
+    [Fact]
+    public void WithDifferentContext()
+    {
+        // Arrange
+        MoneyContext otherContext = MoneyContext.Create(opt =>
+        {
+            opt.MaxScale = 6;
+            opt.RoundingStrategy = new NoRounding();
+        });
+        Money money = new Money(123456789.1234567890m, "EUR"); // default context, rounds to 2 decimals
+
+        // Act
+        var result = money with { Context = otherContext };
+
+        // Assert
+        result.Should().NotBeSameAs(money);
+        result.Context.Should().Be(otherContext);
+        result.Amount.Should().Be(money.Amount, "changing Context via 'with' must not re-round the stored decimal bits");
+        result.Currency.Should().Be(money.Currency);
+    }
+
     [Theory]
     [InlineData(0, 0)]
     [InlineData(0, 127)]
