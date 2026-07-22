@@ -1,13 +1,13 @@
 # User-specific files or directories
 *.suo
 *.user
-.vs
-.vscode
+.vs/
+.vscode/
 
 # Build results
-[Bb]in/
-[Oo]bj/
-[Aa]rtifacts/
+bin/
+obj/
+artifacts/
 
 # ReSharper is a .NET coding add-in
 _ReSharper*/
