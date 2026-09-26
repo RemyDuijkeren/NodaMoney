@@ -79,7 +79,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 }

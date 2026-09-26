@@ -145,7 +145,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -165,7 +165,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -190,7 +190,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -210,7 +210,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -244,7 +244,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -265,7 +265,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -305,7 +305,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -325,7 +325,7 @@ public readonly partial record struct FastMoney
         }
         catch (OverflowException ex)
         {
-            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+            throw WrapOverflow(ex);
         }
     }
 
@@ -355,15 +355,6 @@ public readonly partial record struct FastMoney
     }
 
 #if NET5_0_OR_GREATER
-    /// <summary>Powers of ten that fit a signed long (scale 0 through 18); a decimal scale above 18 takes the decimal path.</summary>
-    private static readonly long[] Pow10 =
-    [
-        1L, 10L, 100L, 1_000L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L,
-        1_000_000_000L, 10_000_000_000L, 100_000_000_000L, 1_000_000_000_000L, 10_000_000_000_000L,
-        100_000_000_000_000L, 1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L,
-        1_000_000_000_000_000_000L
-    ];
-
     /// <summary>Extracts a non-integer decimal's mantissa, power-of-ten scale factor and sign for 64-bit fixed-point division.</summary>
     /// <returns><see langword="false"/> when the mantissa needs more than 64 bits, does not fit a positive <see cref="long"/>, or the scale exceeds 18.</returns>
     private static bool TryGetFixedPointMantissa(decimal value, out long mantissa, out long scaleFactor, out bool negative)
@@ -390,7 +381,7 @@ public readonly partial record struct FastMoney
         }
 
         mantissa = (long)mantissaU;
-        scaleFactor = Pow10[scale];
+        scaleFactor = IntegerRounding.Pow10[scale];
         return true;
     }
 

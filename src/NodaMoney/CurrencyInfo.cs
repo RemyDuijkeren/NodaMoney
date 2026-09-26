@@ -485,20 +485,20 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         {
             // Local currency symbol, normal (uppercase C)
             'C' when digits == -1 => money.Amount.ToString("C", nfi),
-            'C' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), nfi),
+            'C' => money.Amount.ToString(GetDigitsFormat(s_currencyDigitsFormat, 'C', digits), nfi),
 
             // Compact + local symbol (lowercase c)
             'c' => FormatCompact(money, nfi, digits),
 
             // ISO code, normal (uppercase G)
             'G' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'G' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'G' => money.Amount.ToString(GetDigitsFormat(s_currencyDigitsFormat, 'C', digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
             // Compact + ISO code (lowercase g)
             'g' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useCurrencyCode: true), digits),
 
             // International symbol, normal (uppercase I)
             'I' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
-            'I' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
+            'I' => money.Amount.ToString(GetDigitsFormat(s_currencyDigitsFormat, 'C', digits), ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
             // Compact + international symbol (lowercase i)
             'i' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useInternationalSymbol: true), digits),
 
@@ -513,11 +513,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
             // Number format (e.g., "2.765,43")
             'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'N' or 'n' => money.Amount.ToString(GetNumberDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'N' or 'n' => money.Amount.ToString(GetDigitsFormat(s_numberDigitsFormat, 'N', digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             // Fixed point format (e.g., "2765,43")
             'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'F' or 'f' => money.Amount.ToString(GetFixedDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'F' or 'f' => money.Amount.ToString(GetDigitsFormat(s_fixedDigitsFormat, 'F', digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
@@ -806,15 +806,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     /// <summary>Precomputed standard format strings for the single-digit precision case (the common one), so 'C', 'N'
     /// and 'F' with an explicit digit count don't build a string via interpolation on every call.</summary>
-    private static readonly string[] s_currencyDigitsFormat = ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"];
-    private static readonly string[] s_numberDigitsFormat = ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"];
-    private static readonly string[] s_fixedDigitsFormat = ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9"];
+    private static readonly string[] s_currencyDigitsFormat = BuildDigitsFormats('C');
+    private static readonly string[] s_numberDigitsFormat = BuildDigitsFormats('N');
+    private static readonly string[] s_fixedDigitsFormat = BuildDigitsFormats('F');
 
-    private static string GetCurrencyDigitsFormat(int digits) => (uint)digits < 10 ? s_currencyDigitsFormat[digits] : $"C{digits}";
+    private static string[] BuildDigitsFormats(char specifier) => [.. Enumerable.Range(0, 10).Select(digits => $"{specifier}{digits}")];
 
-    private static string GetNumberDigitsFormat(int digits) => (uint)digits < 10 ? s_numberDigitsFormat[digits] : $"N{digits}";
-
-    private static string GetFixedDigitsFormat(int digits) => (uint)digits < 10 ? s_fixedDigitsFormat[digits] : $"F{digits}";
+    private static string GetDigitsFormat(string[] table, char specifier, int digits) => (uint)digits < 10 ? table[digits] : $"{specifier}{digits}";
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <summary>Formats a <see cref="Money"/> value straight into a span for the <c>C</c>, <c>G</c>, <c>I</c>, <c>N</c>
@@ -823,6 +821,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     internal bool TryFormatFast(in Money money, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? formatProvider, out bool handled)
     {
         char fmt = ParseFormatSpecifier(format, out int digits);
+        if (digits > 9)
+        {
+            // Rare (double-digit-or-more precision): let the caller fall back to the string path.
+            handled = false;
+            charsWritten = 0;
+            return false;
+        }
 
         NumberFormatInfo nfi;
         char decimalSpecifier;
@@ -854,14 +859,6 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                 handled = false;
                 charsWritten = 0;
                 return false;
-        }
-
-        if (digits > 9)
-        {
-            // Rare (double-digit-or-more precision): let the caller fall back to the string path.
-            handled = false;
-            charsWritten = 0;
-            return false;
         }
 
         handled = true;

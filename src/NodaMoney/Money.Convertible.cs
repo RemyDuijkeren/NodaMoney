@@ -5,16 +5,6 @@ namespace NodaMoney;
 
 public partial struct Money
 {
-    /// <summary>Powers of ten for scales 0 to 18, used by the integer-conversion fast path below. 10^18 is the
-    /// largest power that still fits comfortably under long.MaxValue (~9.22e18) so the scaled-up remainder never
-    /// overflows.</summary>
-    private static readonly long[] Pow10ForFastConversion =
-    [
-        1L, 10L, 100L, 1_000L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L, 1_000_000_000L,
-        10_000_000_000L, 100_000_000_000L, 1_000_000_000_000L, 10_000_000_000_000L, 100_000_000_000_000L,
-        1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L, 1_000_000_000_000_000_000L
-    ];
-
     /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
     /// <param name="money">The instance of <see cref="Money"/> to convert.</param>
     /// <returns>The resulting <see cref="double"/> value.</returns>
@@ -119,7 +109,7 @@ public partial struct Money
             return false;
         }
 
-        long divisor = Pow10ForFastConversion[scale];
+        long divisor = IntegerRounding.Pow10[scale];
         long signedMantissa = (long)mantissa;
         bool isNegative = (_flags & SignMask) != 0;
         return IntegerRounding.TryRound(signedMantissa / divisor, signedMantissa % divisor, divisor, context.Mode, isNegative, out value);

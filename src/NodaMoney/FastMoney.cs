@@ -113,6 +113,10 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
         return default(FastMoney) with { OACurrencyAmount = ticks, Currency = currency, ContextIndex = context.Index };
     }
 
+    /// <summary>Wraps an arithmetic <see cref="OverflowException"/> in the <see cref="FastMoney"/> message, keeping the original as inner exception.</summary>
+    private static OverflowException WrapOverflow(OverflowException ex) =>
+        new("Value was either too large or too small for a FastMoney.", ex);
+
     public bool Equals(FastMoney other) => EqualityComparer<long>.Default.Equals(this.OACurrencyAmount, other.OACurrencyAmount) &&
                                            EqualityComparer<Currency>.Default.Equals(this.Currency, other.Currency);
 

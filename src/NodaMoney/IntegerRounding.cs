@@ -7,6 +7,15 @@ namespace NodaMoney;
 /// and <see cref="FastMoney"/>, which work on the raw mantissa so they can skip the decimal round trip.</summary>
 internal static class IntegerRounding
 {
+    /// <summary>Powers of ten for scales 0 to 18. 10^18 is the largest power that still fits comfortably under
+    /// long.MaxValue, so a 64-bit mantissa divided or multiplied by an entry never needs more than 64 bits of headroom.</summary>
+    internal static readonly long[] Pow10 =
+    [
+        1L, 10L, 100L, 1_000L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L, 1_000_000_000L,
+        10_000_000_000L, 100_000_000_000L, 1_000_000_000_000L, 10_000_000_000_000L, 100_000_000_000_000L,
+        1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L, 1_000_000_000_000_000_000L
+    ];
+
     /// <summary>Rounds <c>quotient + remainder / divisor</c> (all non-negative magnitude parts) to an integer.</summary>
     /// <param name="quotient">The truncated magnitude quotient.</param>
     /// <param name="remainder">The magnitude remainder, in <c>[0, divisor)</c>.</param>

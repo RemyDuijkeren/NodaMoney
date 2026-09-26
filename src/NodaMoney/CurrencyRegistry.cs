@@ -139,13 +139,7 @@ static class CurrencyRegistry
             var mutableDictionary = s_lookupByCode.ToDictionary();
             mutableDictionary[currency.Code] = currency;
 
-            s_lookupByCode = mutableDictionary.ToFrozenDictionary();
-            s_lookupByCurrency = mutableDictionary.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);
-            s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
-#if NET9_0_OR_GREATER
-            s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
-#endif
-
+            PublishLookups(mutableDictionary);
             return true;
         }
 #else
@@ -156,10 +150,7 @@ static class CurrencyRegistry
 
             var mutableDictionary = new Dictionary<string, CurrencyInfo>(s_lookupByCode) { [currency.Code] = currency };
 
-            Volatile.Write(ref s_lookupByCode, mutableDictionary);
-            Volatile.Write(ref s_lookupByCurrency, mutableDictionary.Values.ToDictionary(ci => (Currency)ci, ci => ci));
-            Volatile.Write(ref s_lookupByCodeAndSymbol, CreateLookupByCodeAndSymbol());
-
+            PublishLookups(mutableDictionary);
             return true;
         }
 #endif
@@ -178,13 +169,7 @@ static class CurrencyRegistry
             if (!mutableDictionary.Remove(currency.Code))
                 return false;
 
-            s_lookupByCode = mutableDictionary.ToFrozenDictionary();
-            s_lookupByCurrency = mutableDictionary.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);
-            s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
-#if NET9_0_OR_GREATER
-            s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
-#endif
-
+            PublishLookups(mutableDictionary);
             return true;
         }
 #else
@@ -194,10 +179,7 @@ static class CurrencyRegistry
             if (!mutableDictionary.Remove(currency.Code))
                 return false;
 
-            Volatile.Write(ref s_lookupByCode, mutableDictionary);
-            Volatile.Write(ref s_lookupByCurrency, mutableDictionary.Values.ToDictionary(ci => (Currency)ci, ci => ci));
-            Volatile.Write(ref s_lookupByCodeAndSymbol, CreateLookupByCodeAndSymbol());
-
+            PublishLookups(mutableDictionary);
             return true;
         }
 #endif
@@ -205,6 +187,24 @@ static class CurrencyRegistry
 
     /// <summary>Groups every currency under its code, symbol, international symbol and alternative symbols,
     /// deduplicating keys that collide for the same currency (e.g. Symbol == InternationalSymbol).</summary>
+    /// <summary>Publishes a new code map and rebuilds the currency and code-and-symbol maps from it. Called under the
+    /// registration lock; the code map is published first because the code-and-symbol map is derived from it.</summary>
+    static void PublishLookups(Dictionary<string, CurrencyInfo> byCode)
+    {
+#if NET8_0_OR_GREATER
+        s_lookupByCode = byCode.ToFrozenDictionary();
+        s_lookupByCurrency = byCode.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);
+        s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+#if NET9_0_OR_GREATER
+        s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
+#endif
+#else
+        Volatile.Write(ref s_lookupByCode, byCode);
+        Volatile.Write(ref s_lookupByCurrency, byCode.Values.ToDictionary(ci => (Currency)ci, ci => ci));
+        Volatile.Write(ref s_lookupByCodeAndSymbol, CreateLookupByCodeAndSymbol());
+#endif
+    }
+
     static Dictionary<string, List<CurrencyInfo>> GroupByCodeAndSymbol()
     {
         var groups = new Dictionary<string, List<CurrencyInfo>>(StringComparer.Ordinal);
