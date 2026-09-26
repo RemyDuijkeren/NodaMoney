@@ -52,10 +52,12 @@ public readonly partial struct Money : IEquatable<Money>
             return;
         }
 
-        // Round the amount to the correct scale
+        // Round the amount to the correct scale. The first Standard arm is the two-decimal currency fast path
+        // (same rule as StandardRounding.Round), inlined here so the hot constructor avoids the strategy call.
         amount = context!.Kind switch
         {
             RoundingKind.None => amount,
+            RoundingKind.Standard when currency.IsMinorUnit2 && context.MaxScale is null or 2 => decimal.Round(amount, 2, context.Mode),
             RoundingKind.Standard => ((StandardRounding)context.RoundingStrategy).Round(amount, currency, context.MaxScale),
             _ => context.RoundingStrategy.Round(amount, currency, context.MaxScale)
         };
