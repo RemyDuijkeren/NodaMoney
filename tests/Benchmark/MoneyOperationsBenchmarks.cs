@@ -9,6 +9,7 @@ public class MoneyOperationsBenchmarks
 {
     readonly Money _euro10 = Money.Euro(10);
     readonly Money _euro20 = Money.Euro(20);
+    readonly Money _euro5Half = Money.Euro(5.5m); // scale 1, so adding it to a scale-2 value is a mixed-scale add
     readonly Money _dollar10 = Money.USDollar(10);
     Money _euro = new Money(765.43m, "EUR");
     FastMoney _euro10fast = new(10, "EUR");
@@ -19,6 +20,12 @@ public class MoneyOperationsBenchmarks
     public Money Add()
     {
         return _euro10 + _euro20;
+    }
+
+    [Benchmark]
+    public Money AddMixedScale()
+    {
+        return _euro10 + _euro5Half;
     }
 
     [Benchmark]

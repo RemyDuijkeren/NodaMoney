@@ -17,6 +17,13 @@ public class InitializingMoneyBenchmarks
     }
 
     [Benchmark]
+    public Money CurrencyCodeNeedsRounding()
+    {
+        // Three decimals for a two-decimal currency: a real rounding step runs, unlike the CurrencyCode case
+        return new Money(6.545m, "EUR");
+    }
+
+    [Benchmark]
     public FastMoney fCurrencyCode()
     {
         return new FastMoney(6.54m, "EUR");

@@ -7,10 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Next]
 
 ### Added
--
+- `tests/Benchmark/PerformanceReportV2.9-linux.md` with the benchmark results after the hot-path performance work, in the
+  same layout as the 2.8 report, plus three new benchmark cases: a `Money` construction that needs a real rounding step,
+  a mixed-scale `Money` addition, and `FastMoney` from `SqlMoney`.
 
 ### Changed
--
+- **Breaking**: `StandardRounding` and `NoRounding` are now `sealed`. Deriving from either record no longer compiles
+  (`CS0509`) and an assembly that derived from them fails at type load against this version. `IRoundingStrategy` remains
+  the extension point for custom rounding.
+- `Money.Abs` now returns a value in the operand's `MoneyContext`. It previously rebuilt the value under the current
+  thread context, so inside a `MoneyContext.CreateScope` the result could carry a different context than its operand.
+- `FastMoney` arithmetic that overflows now throws `OverflowException` with the message "Value was either too large or
+  too small for a FastMoney." and the arithmetic overflow as inner exception. The previous message filter never matched a
+  `long` overflow, so callers saw the bare "Arithmetic operation resulted in an overflow." message, and `++`/`--` had no
+  handler at all.
+- `FastMoney` construction accepts the full documented range, -922,337,203,685,477.5808 to 922,337,203,685,477.5807. It
+  previously rejected any amount beyond the whole-unit cutoff 922,337,203,685,477, so amounts within that last fraction
+  no longer throw `ArgumentOutOfRangeException`.
+- Performance of the `Money` and `FastMoney` hot paths, measured on Linux against the 2.8 report
+  (`tests/Benchmark/PerformanceReportV2.8-linux.md`): the `MoneyContext` registry is an array lookup instead of a
+  dictionary; rounding dispatches on a precomputed kind instead of type tests; `Negate`, `Abs`, `++` and `--` edit the
+  sign bit without resolving the context; `Money` addition and subtraction skip re-rounding when the result is already
+  within scale (20.7 to 16.4 ns); `ToInt32`/`ToInt64` round on the integer mantissa (28 to about 3 ns); `CurrencyInfo`
+  caches its `Currency` encoding and the current culture's currency (`new Money(6.54m)` 58 to 15.6 ns, no allocation);
+  `FastMoney` construction validates once (22.9 to 12.7 ns), divides by a non-integer `decimal` in fixed point (50.6 to
+  16.2 ns) and converts to and from `SqlMoney` by TDS ticks without a decimal round trip (13 ns to under 1 ns); formatting caches a
+  read-only `NumberFormatInfo` per currency (384 to 72 B per call) and `TryFormat(Span<char>)` no longer allocates for
+  the `C`, `G`, `I`, `N` and `F` specifiers; parsing looks up symbols without allocating a string or a list (160 to 24 B
+  per call) and `TryParse` no longer throws and catches internally. On the netstandard legs the currency and named
+  context registries read without taking a lock.
 
 ### Removed
 -

@@ -9,6 +9,8 @@ public class MoneyConvertingBenchmarks
 {
     readonly Money _euro = new(765.43m, "EUR");
     readonly FastMoney _euroFast = new (765.43m, "EUR");
+    readonly SqlMoney _sqlMoney = new(765.43m);
+    readonly Currency _eur = CurrencyInfo.FromCode("EUR");
 
     [Benchmark(Baseline = true)]
     public decimal ToDecimal()
@@ -74,6 +76,12 @@ public class MoneyConvertingBenchmarks
     public SqlMoney fToSqlMoney()
     {
         return _euroFast.ToSqlMoney();
+    }
+
+    [Benchmark]
+    public FastMoney? fFromSqlMoney()
+    {
+        return FastMoney.FromSqlMoney(_sqlMoney, _eur);
     }
 
     [Benchmark]

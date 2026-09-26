@@ -1,7 +1,7 @@
 ```
 
 BenchmarkDotNet v0.15.8, Linux Omarchy
-AMD Ryzen 7 8845HS w/ Radeon 780M Graphics 3.19GHz, 1 CPU, 16 logical and 8 physical cores
+AMD Ryzen 7 8845HS w/ Radeon 780M Graphics 1.09GHz, 1 CPU, 16 logical and 8 physical cores
 .NET SDK 10.0.401
   [Host]     : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v4
   DefaultJob : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v4
@@ -10,21 +10,22 @@ AMD Ryzen 7 8845HS w/ Radeon 780M Graphics 3.19GHz, 1 CPU, 16 logical and 8 phys
 ```
 | Method                  | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
 |------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
-| Add                     | 20.689 ns | 0.3419 ns |  48,333,857.1 | 15.81 |         - |          NA |
-| Subtract                | 20.123 ns | 0.0814 ns |  49,693,933.0 | 15.38 |         - |          NA |
-| Multiple                | 18.819 ns | 0.3971 ns |  53,138,659.5 | 14.38 |         - |          NA |
-| Divide                  | 61.429 ns | 0.8173 ns |  16,278,848.1 | 46.94 |         - |          NA |
-| Increment               |  9.589 ns | 0.1794 ns | 104,283,243.7 |  7.33 |         - |          NA |
-| Decrement               |  9.581 ns | 0.0612 ns | 104,378,673.5 |  7.32 |         - |          NA |
-| Remainder               | 18.224 ns | 0.0914 ns |  54,871,257.8 | 13.92 |         - |          NA |
-| fAdd                    |  1.309 ns | 0.0130 ns | 763,999,716.2 |  1.00 |         - |          NA |
-| fSubtract               |  1.198 ns | 0.0079 ns | 834,544,475.5 |  0.92 |         - |          NA |
-| fMultipleDec            | 15.800 ns | 0.1004 ns |  63,289,385.3 | 12.07 |         - |          NA |
-| fMultipleDecWholeNumber |  7.692 ns | 0.0166 ns | 130,010,288.7 |  5.88 |         - |          NA |
-| fMultipleLong           |  2.254 ns | 0.0124 ns | 443,601,922.4 |  1.72 |         - |          NA |
-| fDivideDec              | 50.625 ns | 0.3219 ns |  19,752,911.9 | 38.68 |         - |          NA |
-| fDivideDecWholeNumber   |  8.713 ns | 0.1105 ns | 114,777,109.5 |  6.66 |         - |          NA |
-| fDivideLong             |  2.294 ns | 0.0387 ns | 435,944,300.4 |  1.75 |         - |          NA |
-| fIncrement              |  5.160 ns | 0.0120 ns | 193,802,443.1 |  3.94 |         - |          NA |
-| fDecrement              |  5.196 ns | 0.0139 ns | 192,461,021.5 |  3.97 |         - |          NA |
-| fRemainder              |  1.693 ns | 0.0101 ns | 590,631,414.4 |  1.29 |         - |          NA |
+| Add                     | 16.404 ns | 0.0936 ns |  60,960,929.6 | 13.69 |         - |          NA |
+| AddMixedScale           | 17.611 ns | 0.1031 ns |  56,783,495.9 | 14.70 |         - |          NA |
+| Subtract                | 17.184 ns | 0.1270 ns |  58,192,692.8 | 14.34 |         - |          NA |
+| Multiple                | 19.092 ns | 0.1085 ns |  52,377,791.4 | 15.94 |         - |          NA |
+| Divide                  | 63.358 ns | 0.6121 ns |  15,783,370.4 | 52.89 |         - |          NA |
+| Increment               |  7.643 ns | 0.1098 ns | 130,830,863.8 |  6.38 |         - |          NA |
+| Decrement               |  9.034 ns | 0.0611 ns | 110,691,143.5 |  7.54 |         - |          NA |
+| Remainder               | 17.780 ns | 0.0718 ns |  56,242,694.7 | 14.84 |         - |          NA |
+| fAdd                    |  1.198 ns | 0.0119 ns | 834,658,443.4 |  1.00 |         - |          NA |
+| fSubtract               |  1.192 ns | 0.0108 ns | 838,972,962.1 |  0.99 |         - |          NA |
+| fMultipleDec            | 16.397 ns | 0.0625 ns |  60,985,315.4 | 13.69 |         - |          NA |
+| fMultipleDecWholeNumber |  8.024 ns | 0.0831 ns | 124,625,460.8 |  6.70 |         - |          NA |
+| fMultipleLong           |  2.322 ns | 0.0131 ns | 430,630,750.5 |  1.94 |         - |          NA |
+| fDivideDec              | 16.216 ns | 0.0796 ns |  61,667,290.3 | 13.54 |         - |          NA |
+| fDivideDecWholeNumber   | 10.012 ns | 0.0807 ns |  99,877,835.2 |  8.36 |         - |          NA |
+| fDivideLong             |  2.300 ns | 0.0268 ns | 434,725,822.4 |  1.92 |         - |          NA |
+| fIncrement              |  2.751 ns | 0.0272 ns | 363,456,105.1 |  2.30 |         - |          NA |
+| fDecrement              |  2.779 ns | 0.0178 ns | 359,827,914.2 |  2.32 |         - |          NA |
+| fRemainder              |  1.785 ns | 0.0106 ns | 560,288,361.7 |  1.49 |         - |          NA |
