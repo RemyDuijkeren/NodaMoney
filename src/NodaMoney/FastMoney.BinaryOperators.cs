@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace NodaMoney;
 
@@ -236,6 +237,14 @@ public readonly partial record struct FastMoney
                 return money with { OACurrencyAmount = totalAmount1 };
             }
 
+#if NET5_0_OR_GREATER
+            // Non-integer multiplier: try 64-bit fixed point first to avoid the decimal round trip.
+            if (TryMultiplyFixedPoint(money.OACurrencyAmount, multiplier, out long fixedPointAmount))
+            {
+                return money with { OACurrencyAmount = fixedPointAmount };
+            }
+#endif
+
             // For non-integer multipliers, fall back to decimal multiplication
             //long totalAmount = checked((long)(money.OACurrencyAmount * multiplier));
             decimal totalAmount = decimal.Multiply(money.Amount, multiplier);
@@ -289,6 +298,14 @@ public readonly partial record struct FastMoney
                 long totalAmount1 = checked(money.OACurrencyAmount / (long)divisor);
                 return money with { OACurrencyAmount = totalAmount1 };
             }
+
+#if NET5_0_OR_GREATER
+            // Non-integer divisor: try 64-bit fixed point first to avoid the decimal round trip.
+            if (TryDivideFixedPoint(money.OACurrencyAmount, divisor, out long fixedPointAmount))
+            {
+                return money with { OACurrencyAmount = fixedPointAmount };
+            }
+#endif
 
             // For non-integer multipliers, fall back to decimal multiplication
             decimal totalAmount = decimal.Divide(money.Amount, divisor);
@@ -344,4 +361,115 @@ public readonly partial record struct FastMoney
 
         return money1 with { OACurrencyAmount = rem };
     }
+
+#if NET5_0_OR_GREATER
+    /// <summary>Powers of ten that fit a signed long (scale 0 through 18); a decimal scale above 18 takes the decimal path.</summary>
+    private static readonly long[] Pow10 =
+    [
+        1L, 10L, 100L, 1_000L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L,
+        1_000_000_000L, 10_000_000_000L, 100_000_000_000L, 1_000_000_000_000L, 10_000_000_000_000L,
+        100_000_000_000_000L, 1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L,
+        1_000_000_000_000_000_000L
+    ];
+
+    /// <summary>Extracts a non-integer decimal's mantissa, power-of-ten scale factor and sign for 64-bit fixed-point arithmetic.</summary>
+    /// <returns><see langword="false"/> when the mantissa needs more than 64 bits, does not fit a positive <see cref="long"/>, or the scale exceeds 18.</returns>
+    private static bool TryGetFixedPointMantissa(decimal value, out long mantissa, out long scaleFactor, out bool negative)
+    {
+        Span<int> bits = stackalloc int[4];
+        decimal.GetBits(value, bits);
+
+        negative = bits[3] < 0;
+        int scale = (bits[3] >> 16) & 0xFF;
+
+        if (bits[2] != 0 || scale > 18)
+        {
+            mantissa = 0;
+            scaleFactor = 0;
+            return false;
+        }
+
+        ulong mantissaU = ((ulong)(uint)bits[1] << 32) | (uint)bits[0];
+        if (mantissaU > long.MaxValue)
+        {
+            mantissa = 0;
+            scaleFactor = 0;
+            return false;
+        }
+
+        mantissa = (long)mantissaU;
+        scaleFactor = Pow10[scale];
+        return true;
+    }
+
+    /// <summary>Multiplies OA currency <paramref name="ticks"/> by a non-integer <paramref name="multiplier"/> in 64-bit fixed point.</summary>
+    /// <returns><see langword="false"/> when the operand does not fit fixed point or the 128-bit product does not fit 64 bits, so the caller should fall back to the decimal path.</returns>
+    private static bool TryMultiplyFixedPoint(long ticks, decimal multiplier, out long result)
+    {
+        result = 0;
+        if (!TryGetFixedPointMantissa(multiplier, out long mantissa, out long scaleFactor, out bool negative))
+            return false;
+
+        long hi = Math.BigMul(ticks, mantissa, out long low);
+        if (hi != (low < 0 ? -1L : 0L))
+            return false; // ticks * mantissa does not fit in 64 bits
+
+        ulong magnitude = low < 0 ? (ulong)(-low) : (ulong)low;
+        ulong scale = (ulong)scaleFactor;
+        ulong quotient = magnitude / scale;
+        ulong remainder = magnitude % scale;
+
+        // ToEven tie-break, exactly what decimal.ToOACurrency does when it rounds.
+        ulong twiceRemainder = remainder * 2;
+        if (twiceRemainder > scale || (twiceRemainder == scale && (quotient & 1UL) != 0UL))
+            quotient++;
+
+        bool resultNegative = (low < 0) ^ negative;
+        result = ToSignedChecked(quotient, resultNegative);
+        return true;
+    }
+
+    /// <summary>Divides OA currency <paramref name="ticks"/> by a non-integer <paramref name="divisor"/> in 64-bit fixed point.</summary>
+    /// <returns><see langword="false"/> when the operand does not fit fixed point or ticks scaled by the divisor's power of ten does not fit 64 bits, so the caller should fall back to the decimal path.</returns>
+    private static bool TryDivideFixedPoint(long ticks, decimal divisor, out long result)
+    {
+        result = 0;
+        if (!TryGetFixedPointMantissa(divisor, out long mantissa, out long scaleFactor, out bool negative))
+            return false;
+
+        long hi = Math.BigMul(ticks, scaleFactor, out long scaledTicks);
+        if (hi != (scaledTicks < 0 ? -1L : 0L))
+            return false; // ticks * 10^scale does not fit in 64 bits
+
+        ulong magnitude = scaledTicks < 0 ? (ulong)(-scaledTicks) : (ulong)scaledTicks;
+        ulong divisorMagnitude = (ulong)mantissa;
+        ulong quotient = magnitude / divisorMagnitude;
+        ulong remainder = magnitude % divisorMagnitude;
+
+        // ToEven tie-break: compare twice the remainder with the divisor, choose the even quotient on a tie.
+        ulong twiceRemainder = remainder * 2;
+        if (twiceRemainder > divisorMagnitude || (twiceRemainder == divisorMagnitude && (quotient & 1UL) != 0UL))
+            quotient++;
+
+        bool resultNegative = (scaledTicks < 0) ^ negative;
+        result = ToSignedChecked(quotient, resultNegative);
+        return true;
+    }
+
+    /// <summary>Converts an unsigned magnitude and sign to a signed <see cref="long"/>, allowing the one magnitude
+    /// (2^63) whose negation is <see cref="long.MinValue"/> but whose positive form does not fit.</summary>
+    /// <exception cref="OverflowException">The magnitude does not fit in a <see cref="long"/> with the given sign.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static long ToSignedChecked(ulong magnitude, bool negative)
+    {
+        if (!negative)
+            return checked((long)magnitude);
+
+        const ulong absMinValue = 1UL << 63; // magnitude of long.MinValue
+        if (magnitude > absMinValue)
+            throw new OverflowException();
+
+        return magnitude == absMinValue ? long.MinValue : -(long)magnitude;
+    }
+#endif
 }

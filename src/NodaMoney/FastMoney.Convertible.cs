@@ -47,10 +47,21 @@ public readonly partial record struct FastMoney
 
     public static explicit operator SqlMoney(FastMoney money) => money.ToSqlMoney();
     public static explicit operator FastMoney?(SqlMoney money) => FromSqlMoney(money);
+
+#if NET8_0_OR_GREATER
+    /// <summary>Converts the value of this instance to a <see cref="SqlMoney"/> instance.</summary>
+    /// <returns>The resulting <see cref="SqlMoney"/> value.</returns>
+    /// <remarks>Both types share the TDS tick scale (scaled by 10,000), so this skips the decimal round trip.</remarks>
+    public SqlMoney ToSqlMoney() => SqlMoney.FromTdsValue(OACurrencyAmount);
+    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : FromOACurrency(sqlMoney.GetTdsValue());
+    public static FastMoney? FromSqlMoney(SqlMoney sqlMoney, Currency currency, MoneyContext? context = null) =>
+        sqlMoney.IsNull ? null : FromOACurrency(sqlMoney.GetTdsValue(), currency, context);
+#else
     public SqlMoney ToSqlMoney() => new(Amount);
     public static FastMoney? FromSqlMoney(SqlMoney sqlMoney) => sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value);
     public static FastMoney? FromSqlMoney(SqlMoney sqlMoney, Currency currency, MoneyContext? context = null) =>
         sqlMoney.IsNull ? null : new FastMoney(sqlMoney.Value, currency, context);
+#endif
 
     // FastMoney <-> OACurrency
 
