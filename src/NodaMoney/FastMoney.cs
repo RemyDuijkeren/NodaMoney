@@ -32,15 +32,17 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
     /// <summary>Gets the amount of money.</summary>
     public decimal Amount => decimal.FromOACurrency(OACurrencyAmount);
 
+    [FieldOffset(8)]
+    private readonly Currency _currency;
+
     /// <summary>Gets the <see cref="Currency"/> of the money.</summary>
-    [field: FieldOffset(8)]
     public Currency Currency
     {
-        get;
+        get => _currency;
         init
         {
             ValidateCurrency(value);
-            field = value;
+            _currency = value;
         }
     }
 
@@ -68,9 +70,6 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
     /// current <see cref="MoneyContext"/> will be used.</param>
     public FastMoney(decimal amount, Currency currency, MoneyContext? context = null) : this()
     {
-        if (amount is < MinValueLong or > MaxValueLong)
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
-
         ValidateCurrency(currency);
 
         // Use either provided context OR a dedicated FastMoney default context, NOT the global MoneyContext.CurrentContext!
@@ -95,8 +94,15 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
         };
 
         ContextIndex = context.Index;
-        OACurrencyAmount = decimal.ToOACurrency(amount); // Rounds to 4 decimals using MidpointRounding.ToEven!
-        Currency = currency;
+        try
+        {
+            OACurrencyAmount = decimal.ToOACurrency(amount); // Rounds to 4 decimals using MidpointRounding.ToEven!
+        }
+        catch (OverflowException)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount is outside the allowable range for FastMoney.");
+        }
+        _currency = currency;
     }
 
     public bool Equals(FastMoney other) => EqualityComparer<long>.Default.Equals(this.OACurrencyAmount, other.OACurrencyAmount) &&

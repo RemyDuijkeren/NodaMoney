@@ -69,10 +69,17 @@ public readonly partial record struct FastMoney
         // Compute the OA step based on DecimalDigits (FastMoney fixed scale is 4).
         // step = 10^(4 - d), with d in [0..4]. d>4 is not allowed for FastMoney elsewhere.
         long step = s_stepByDecimalDigits[d]; // Fast lookup for the hot path
-        long newAmount = increment
-            ? checked(money.OACurrencyAmount + step)
-            : checked(money.OACurrencyAmount - step);
+        try
+        {
+            long newAmount = increment
+                ? checked(money.OACurrencyAmount + step)
+                : checked(money.OACurrencyAmount - step);
 
-        return money with { OACurrencyAmount = newAmount };
+            return money with { OACurrencyAmount = newAmount };
+        }
+        catch (OverflowException ex)
+        {
+            throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
+        }
     }
 }

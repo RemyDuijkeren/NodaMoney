@@ -102,6 +102,20 @@ public class CreateFastMoney
     }
 
     [Fact]
+    public void WithJapaneseYen_ShouldConstructSuccessfully()
+    {
+        // Arrange
+        Currency jpy = CurrencyInfo.FromCode("JPY"); // 0 decimals, validated through the registry lookup path
+
+        // Act
+        var money = new FastMoney(100m, jpy);
+
+        // Assert
+        money.Amount.Should().Be(100m);
+        money.Currency.Should().Be(jpy);
+    }
+
+    [Fact]
     public void WithDifferentCurrency_WhenCurrencyRequiresMoreThan4Decimals_ThenThrowInvalidCurrencyException()
     {
         // Arrange

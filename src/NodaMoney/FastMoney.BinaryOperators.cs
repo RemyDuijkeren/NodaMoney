@@ -142,7 +142,7 @@ public readonly partial record struct FastMoney
             long totalAmount = checked(money1.OACurrencyAmount + money2.OACurrencyAmount); // Use checked for overflow
             return money1 with { OACurrencyAmount = totalAmount };
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
@@ -162,7 +162,7 @@ public readonly partial record struct FastMoney
             long totalAmount = checked(money1.OACurrencyAmount + decimal.ToOACurrency(decimal2)); // Use checked for overflow
             return money1 with { OACurrencyAmount = totalAmount };
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
@@ -187,7 +187,7 @@ public readonly partial record struct FastMoney
             long totalAmount = checked(money1.OACurrencyAmount - money2.OACurrencyAmount); // Use checked for overflow
             return money1 with { OACurrencyAmount = totalAmount };
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
@@ -207,7 +207,7 @@ public readonly partial record struct FastMoney
             long totalAmount = checked(money1.OACurrencyAmount - decimal.ToOACurrency(decimal2)); // Use checked for overflow
             return money1 with { OACurrencyAmount = totalAmount };
         }
-        catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
+        catch (OverflowException ex)
         {
             throw new OverflowException("Value was either too large or too small for a FastMoney.", ex);
         }
