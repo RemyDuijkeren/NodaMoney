@@ -1,5 +1,10 @@
+using System.Threading;
+using System.Threading.Tasks;
+using NodaMoney.Tests.Helpers;
+
 namespace NodaMoney.Tests.CurrencyInfoSpec;
 
+[Collection(nameof(NoParallelization))]
 public class RegisterCurrencyInfo
 {
     [Fact]
@@ -256,5 +261,48 @@ public class RegisterCurrencyInfo
 
         // Assert
         action.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public async Task WhenReadingWhileAnotherThreadRegistersAndUnregisters_ShouldNotThrow()
+    {
+        // Arrange
+        const string code = "ZZQ";
+        var writerDone = false;
+        Exception readerException = null;
+
+        // Act
+        var writer = Task.Run(() =>
+        {
+            for (var i = 0; i < 300; i++)
+            {
+                CurrencyInfo.Register(CurrencyInfo.Create(code) with { EnglishName = "Concurrency test currency", Symbol = "Z" });
+                CurrencyInfo.Unregister(code);
+            }
+            Volatile.Write(ref writerDone, true);
+        });
+
+        var reader = Task.Run(() =>
+        {
+            try
+            {
+                while (!Volatile.Read(ref writerDone))
+                {
+                    foreach (CurrencyInfo currencyInfo in CurrencyInfo.GetAllCurrencies())
+                    {
+                        CurrencyInfo.TryFromCode(currencyInfo.Code, out _);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                readerException = ex;
+            }
+        });
+
+        await Task.WhenAll(writer, reader);
+
+        // Assert
+        readerException.Should().BeNull();
     }
 }

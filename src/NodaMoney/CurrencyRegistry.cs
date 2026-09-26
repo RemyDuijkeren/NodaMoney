@@ -19,10 +19,10 @@ static class CurrencyRegistry
 #if NET9_0_OR_GREATER
     static FrozenDictionary<string, CurrencyInfo[]>.AlternateLookup<ReadOnlySpan<char>> s_lookupByCodeAndSymbolAlternate;
 #endif
-#else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
-    static readonly ReaderWriterLockSlim s_lockSlim = new();
-    static readonly Dictionary<Currency, CurrencyInfo> s_lookupByCurrency;
-    static readonly Dictionary<string, CurrencyInfo> s_lookupByCode;
+#else // In .NET Standard 2.0, writers replace the dictionary reference under a lock; readers take a volatile load without locking
+    static readonly object s_lock = new();
+    static Dictionary<Currency, CurrencyInfo> s_lookupByCurrency;
+    static Dictionary<string, CurrencyInfo> s_lookupByCode;
     static Dictionary<string, CurrencyInfo[]> s_lookupByCodeAndSymbol;
 #endif
 
@@ -78,15 +78,7 @@ static class CurrencyRegistry
 #if NET8_0_OR_GREATER
         return s_lookupByCode.TryGetValue(code, out currencyInfo);
 #else
-        s_lockSlim.EnterReadLock();
-        try
-        {
-            return s_lookupByCode.TryGetValue(code, out currencyInfo);
-        }
-        finally
-        {
-            s_lockSlim.ExitReadLock();
-        }
+        return Volatile.Read(ref s_lookupByCode).TryGetValue(code, out currencyInfo);
 #endif
     }
 
@@ -101,16 +93,8 @@ static class CurrencyRegistry
         if (s_lookupByCurrency.TryGetValue(currency, out var ci))
             return ci;
 #else
-        s_lockSlim.EnterReadLock();
-        try
-        {
-            if (s_lookupByCurrency.TryGetValue(currency, out var ci))
-                return ci;
-        }
-        finally
-        {
-            s_lockSlim.ExitReadLock();
-        }
+        if (Volatile.Read(ref s_lookupByCurrency).TryGetValue(currency, out var ci))
+            return ci;
 #endif
         throw new InvalidCurrencyException($"{currency} is unknown currency code!");
     }
@@ -122,15 +106,7 @@ static class CurrencyRegistry
 #if NET8_0_OR_GREATER
         return s_lookupByCode.Values.AsReadOnly();
 #else
-        s_lockSlim.EnterReadLock();
-        try
-        {
-            return s_lookupByCode.Values.ToList().AsReadOnly();
-        }
-        finally
-        {
-            s_lockSlim.ExitReadLock();
-        }
+        return Volatile.Read(ref s_lookupByCode).Values.ToList().AsReadOnly();
 #endif
     }
 
@@ -144,15 +120,7 @@ static class CurrencyRegistry
 #elif NET8_0_OR_GREATER
         return s_lookupByCodeAndSymbol.TryGetValue(currencyChars.ToString(), out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
 #else
-        s_lockSlim.EnterReadLock();
-        try
-        {
-            return s_lookupByCodeAndSymbol.TryGetValue(currencyChars.ToString(), out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
-        }
-        finally
-        {
-            s_lockSlim.ExitReadLock();
-        }
+        return Volatile.Read(ref s_lookupByCodeAndSymbol).TryGetValue(currencyChars.ToString(), out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
 #endif
     }
 
@@ -181,21 +149,18 @@ static class CurrencyRegistry
             return true;
         }
 #else
-        s_lockSlim.EnterWriteLock();
-        try
+        lock (s_lock)
         {
             if (s_lookupByCode.ContainsKey(currency.Code))
                 return false;
 
-            s_lookupByCode[currency.Code] = currency;
-            s_lookupByCurrency[(Currency)currency] = currency;
-            s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+            var mutableDictionary = new Dictionary<string, CurrencyInfo>(s_lookupByCode) { [currency.Code] = currency };
+
+            Volatile.Write(ref s_lookupByCode, mutableDictionary);
+            Volatile.Write(ref s_lookupByCurrency, mutableDictionary.Values.ToDictionary(ci => (Currency)ci, ci => ci));
+            Volatile.Write(ref s_lookupByCodeAndSymbol, CreateLookupByCodeAndSymbol());
 
             return true;
-        }
-        finally
-        {
-            s_lockSlim.ExitWriteLock();
         }
 #endif
     }
@@ -223,20 +188,17 @@ static class CurrencyRegistry
             return true;
         }
 #else
-        s_lockSlim.EnterWriteLock();
-        try
+        lock (s_lock)
         {
-            if (!s_lookupByCode.Remove(currency.Code))
+            var mutableDictionary = new Dictionary<string, CurrencyInfo>(s_lookupByCode);
+            if (!mutableDictionary.Remove(currency.Code))
                 return false;
 
-            s_lookupByCurrency.Remove((Currency)currency);
-            s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+            Volatile.Write(ref s_lookupByCode, mutableDictionary);
+            Volatile.Write(ref s_lookupByCurrency, mutableDictionary.Values.ToDictionary(ci => (Currency)ci, ci => ci));
+            Volatile.Write(ref s_lookupByCodeAndSymbol, CreateLookupByCodeAndSymbol());
 
             return true;
-        }
-        finally
-        {
-            s_lockSlim.ExitWriteLock();
         }
 #endif
     }

@@ -31,9 +31,8 @@ public sealed record MoneyContext
     private static readonly MoneyContext?[] s_activeContexts = new MoneyContext?[128];
 #if NET8_0_OR_GREATER // In .NET 8 or higher, we use FrozenDictionary for optimal immutability and performance
     private static FrozenDictionary<string, byte> s_namedContexts = new Dictionary<string, byte>(6, StringComparer.OrdinalIgnoreCase).ToFrozenDictionary();
-#else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
-    private static readonly ReaderWriterLockSlim s_contextLock = new();
-    private static readonly Dictionary<string, byte> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
+#else // In .NET Standard 2.0, writers replace the dictionary reference under s_lock; readers take a volatile load without locking
+    private static Dictionary<string, byte> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
 #endif
 
     private static readonly AsyncLocal<MoneyContext?> s_threadLocalContext = new();
@@ -176,14 +175,10 @@ public sealed record MoneyContext
                 s_namedContexts = mutableDictionary.ToFrozenDictionary();
             }
 #else
-            s_contextLock.EnterWriteLock();
-            try
+            lock (s_lock)
             {
-                s_namedContexts[name!] = ctx.Index;
-            }
-            finally
-            {
-                s_contextLock.ExitWriteLock();
+                var mutableDictionary = new Dictionary<string, byte>(s_namedContexts, StringComparer.OrdinalIgnoreCase) { [name!] = ctx.Index };
+                Volatile.Write(ref s_namedContexts, mutableDictionary);
             }
 #endif
         }
@@ -280,17 +275,9 @@ public sealed record MoneyContext
             ? Get(moneyContextIndex)
             : null;
 #else
-        s_contextLock.EnterReadLock();
-        try
-        {
-            return s_namedContexts.TryGetValue(name, out var moneyContextIndex)
-                ? Get(moneyContextIndex)
-                : null;
-        }
-        finally
-        {
-            s_contextLock.ExitReadLock();
-        }
+        return Volatile.Read(ref s_namedContexts).TryGetValue(name, out var moneyContextIndex)
+            ? Get(moneyContextIndex)
+            : null;
 #endif
     }
 

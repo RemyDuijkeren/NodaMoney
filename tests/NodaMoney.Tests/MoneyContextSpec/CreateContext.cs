@@ -178,4 +178,17 @@ public class CreateContext
         act.Should().Throw<ArgumentException>()
            .WithMessage("MaxScale cannot be greater than precision");
     }
+
+    [Fact]
+    public void CreateNamedContext_ShouldBeResolvableByName()
+    {
+        // Arrange
+        const string name = "my-named-context";
+
+        // Act
+        var context = MoneyContext.Create(options => options.RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero), name);
+
+        // Assert
+        MoneyContext.Get(name).Should().Be(context);
+    }
 }
