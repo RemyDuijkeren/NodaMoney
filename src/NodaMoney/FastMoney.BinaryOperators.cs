@@ -237,14 +237,6 @@ public readonly partial record struct FastMoney
                 return money with { OACurrencyAmount = totalAmount1 };
             }
 
-#if NET5_0_OR_GREATER
-            // Non-integer multiplier: try 64-bit fixed point first to avoid the decimal round trip.
-            if (TryMultiplyFixedPoint(money.OACurrencyAmount, multiplier, out long fixedPointAmount))
-            {
-                return money with { OACurrencyAmount = fixedPointAmount };
-            }
-#endif
-
             // For non-integer multipliers, fall back to decimal multiplication
             //long totalAmount = checked((long)(money.OACurrencyAmount * multiplier));
             decimal totalAmount = decimal.Multiply(money.Amount, multiplier);
@@ -372,7 +364,7 @@ public readonly partial record struct FastMoney
         1_000_000_000_000_000_000L
     ];
 
-    /// <summary>Extracts a non-integer decimal's mantissa, power-of-ten scale factor and sign for 64-bit fixed-point arithmetic.</summary>
+    /// <summary>Extracts a non-integer decimal's mantissa, power-of-ten scale factor and sign for 64-bit fixed-point division.</summary>
     /// <returns><see langword="false"/> when the mantissa needs more than 64 bits, does not fit a positive <see cref="long"/>, or the scale exceeds 18.</returns>
     private static bool TryGetFixedPointMantissa(decimal value, out long mantissa, out long scaleFactor, out bool negative)
     {
@@ -399,33 +391,6 @@ public readonly partial record struct FastMoney
 
         mantissa = (long)mantissaU;
         scaleFactor = Pow10[scale];
-        return true;
-    }
-
-    /// <summary>Multiplies OA currency <paramref name="ticks"/> by a non-integer <paramref name="multiplier"/> in 64-bit fixed point.</summary>
-    /// <returns><see langword="false"/> when the operand does not fit fixed point or the 128-bit product does not fit 64 bits, so the caller should fall back to the decimal path.</returns>
-    private static bool TryMultiplyFixedPoint(long ticks, decimal multiplier, out long result)
-    {
-        result = 0;
-        if (!TryGetFixedPointMantissa(multiplier, out long mantissa, out long scaleFactor, out bool negative))
-            return false;
-
-        long hi = Math.BigMul(ticks, mantissa, out long low);
-        if (hi != (low < 0 ? -1L : 0L))
-            return false; // ticks * mantissa does not fit in 64 bits
-
-        ulong magnitude = low < 0 ? (ulong)(-low) : (ulong)low;
-        ulong scale = (ulong)scaleFactor;
-        ulong quotient = magnitude / scale;
-        ulong remainder = magnitude % scale;
-
-        // ToEven tie-break, exactly what decimal.ToOACurrency does when it rounds.
-        ulong twiceRemainder = remainder * 2;
-        if (twiceRemainder > scale || (twiceRemainder == scale && (quotient & 1UL) != 0UL))
-            quotient++;
-
-        bool resultNegative = (low < 0) ^ negative;
-        result = ToSignedChecked(quotient, resultNegative);
         return true;
     }
 

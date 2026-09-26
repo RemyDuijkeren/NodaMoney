@@ -105,6 +105,14 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
         _currency = currency;
     }
 
+    /// <summary>Builds an instance straight from OA currency ticks that need no further rounding. Validates the
+    /// currency (through the <see cref="Currency"/> init accessor) and the context like the constructor does.</summary>
+    private static FastMoney FromTicks(long ticks, Currency currency, MoneyContext context)
+    {
+        ValidateContext(context, nameof(context));
+        return default(FastMoney) with { OACurrencyAmount = ticks, Currency = currency, ContextIndex = context.Index };
+    }
+
     public bool Equals(FastMoney other) => EqualityComparer<long>.Default.Equals(this.OACurrencyAmount, other.OACurrencyAmount) &&
                                            EqualityComparer<Currency>.Default.Equals(this.Currency, other.Currency);
 

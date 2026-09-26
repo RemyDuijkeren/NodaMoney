@@ -72,8 +72,16 @@ public readonly partial record struct FastMoney
     public static FastMoney FromOACurrency(long cy) => new(decimal.FromOACurrency(cy));
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null) =>
-        new(decimal.FromOACurrency(cy), currency, context);
+    public static FastMoney FromOACurrency(long cy, Currency currency, MoneyContext? context = null)
+    {
+        context ??= MoneyContext.FastMoney;
+
+        // The ticks already carry four decimals, so a context that would not round them further can take them as-is
+        // and skip the decimal round trip; any other context rounds through the constructor.
+        bool ticksAreFinal = context.Kind == RoundingKind.None
+                             || (context.Kind == RoundingKind.Standard && context.Mode == MidpointRounding.ToEven && context.MaxScale == 4);
+        return ticksAreFinal ? FromTicks(cy, currency, context) : new FastMoney(decimal.FromOACurrency(cy), currency, context);
+    }
 
     // FastMoney <-> decimal, int, long, double
 

@@ -1,3 +1,4 @@
+using NodaMoney.Context;
 namespace NodaMoney.Tests.MoneyConvertibleSpec;
 
 public class FastMoneyOACurrency
@@ -99,5 +100,30 @@ public class FastMoneyOACurrency
         // Assert
         money.Amount.Should().Be(123.46m, "Money type will round 123.4567 to USD 123.46");
         money.Currency.Should().Be(Currency.FromCode("USD"));
+    }
+
+    [Fact]
+    public void FromOACurrency_WithCurrencyAndDefaultContext_KeepsAllFourDecimals()
+    {
+        var money = FastMoney.FromOACurrency(123_456, CurrencyInfo.FromCode("EUR"));
+
+        money.Amount.Should().Be(12.3456m);
+        money.ToOACurrency().Should().Be(123_456);
+        money.Context.Should().BeSameAs(MoneyContext.FastMoney);
+    }
+
+    [Fact]
+    public void FromOACurrency_WithNarrowerContext_StillRoundsThroughTheConstructor()
+    {
+        var twoDecimals = MoneyContext.Create(options =>
+        {
+            options.Precision = 19; // FastMoney rejects a precision above 19
+            options.MaxScale = 2;
+        });
+
+        var money = FastMoney.FromOACurrency(123_456, CurrencyInfo.FromCode("EUR"), twoDecimals);
+
+        money.Amount.Should().Be(12.35m);
+        money.Context.Should().BeSameAs(twoDecimals);
     }
 }
