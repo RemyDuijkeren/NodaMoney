@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -484,20 +485,20 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         {
             // Local currency symbol, normal (uppercase C)
             'C' when digits == -1 => money.Amount.ToString("C", nfi),
-            'C' => money.Amount.ToString($"C{digits}", nfi),
+            'C' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), nfi),
 
             // Compact + local symbol (lowercase c)
             'c' => FormatCompact(money, nfi, digits),
 
             // ISO code, normal (uppercase G)
             'G' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'G' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'G' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
             // Compact + ISO code (lowercase g)
             'g' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useCurrencyCode: true), digits),
 
             // International symbol, normal (uppercase I)
             'I' when digits == -1 => money.Amount.ToString("C", ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
-            'I' => money.Amount.ToString($"C{digits}", ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
+            'I' => money.Amount.ToString(GetCurrencyDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useInternationalSymbol: true)),
             // Compact + international symbol (lowercase i)
             'i' => FormatCompact(money, ToNumberFormatInfo(formatProvider, useInternationalSymbol: true), digits),
 
@@ -512,11 +513,11 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
             // Number format (e.g., "2.765,43")
             'N' or 'n' when digits == -1 => money.Amount.ToString("N", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'N' or 'n' => money.Amount.ToString($"N{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'N' or 'n' => money.Amount.ToString(GetNumberDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             // Fixed point format (e.g., "2765,43")
             'F' or 'f' when digits == -1 => money.Amount.ToString("F", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
-            'F' or 'f' => money.Amount.ToString($"F{digits}", ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
+            'F' or 'f' => money.Amount.ToString(GetFixedDigitsFormat(digits), ToNumberFormatInfo(formatProvider, useCurrencyCode: true)),
 
             _ => throw new FormatException($"Format specifier '{format}' was invalid!")
         };
@@ -712,6 +713,20 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
         return Money.ParseCurrencyInfo(nfi.CurrencySymbol.AsSpan()); // throws FormatException if invalid
     }
 
+    /// <summary>Cache key for the read-only <see cref="NumberFormatInfo"/> instances built per <see cref="CurrencyInfo"/>.</summary>
+    /// <remarks>Keyed on the source <see cref="NumberFormatInfo"/> instance (reference identity; the type does not
+    /// override <c>Equals</c>). Only read-only sources are cached, and a read-only source is immutable and identity-stable
+    /// (the default current culture and <see cref="CultureInfo.GetCultureInfo(string)"/> instances), so the entry can
+    /// never go stale.</remarks>
+    private readonly record struct NumberFormatCacheKey(NumberFormatInfo Source, bool UseCurrencyCode, bool UseInternationalSymbol);
+
+    /// <summary>Per-<see cref="CurrencyInfo"/> cache of read-only <see cref="NumberFormatInfo"/> instances, so formatting
+    /// does not clone and rebuild one on every call. Keyed by reference identity of the <see cref="CurrencyInfo"/> (a
+    /// <see cref="ConditionalWeakTable{TKey,TValue}"/> never calls the key's <c>Equals</c>), so record equality plays
+    /// no part. A mutable source (a <see cref="CultureInfo"/> created with <c>new</c>, or a caller-owned
+    /// <see cref="NumberFormatInfo"/>) is never cached: the caller may customize it, so it keeps today's per-call clone.</summary>
+    private static readonly ConditionalWeakTable<CurrencyInfo, ConcurrentDictionary<NumberFormatCacheKey, NumberFormatInfo>> s_numberFormatCache = new();
+
     /// <summary>
     /// Converts the currency information into a <see cref="NumberFormatInfo"/> object, setting the currency formatting properties based
     /// on the current currency settings and optionally replacing the currency symbol with the currency code.
@@ -722,13 +737,37 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <returns>A <see cref="NumberFormatInfo"/> instance configured with currency formatting properties specific to the current currency.</returns>
     private NumberFormatInfo ToNumberFormatInfo(IFormatProvider? formatProvider, bool useCurrencyCode = false, bool useInternationalSymbol = false)
     {
-        NumberFormatInfo numberFormatInfo = formatProvider switch
+        // Resolved at call time so two threads with different current cultures never share an entry.
+        NumberFormatInfo source = formatProvider switch
         {
-            CultureInfo ci => (NumberFormatInfo)ci.NumberFormat.Clone(),
-            NumberFormatInfo nfi => (NumberFormatInfo)nfi.Clone(),
-            _ => (NumberFormatInfo)CultureInfo.CurrentCulture.NumberFormat.Clone()
+            CultureInfo ci => ci.NumberFormat,
+            NumberFormatInfo nfi => nfi,
+            _ => CultureInfo.CurrentCulture.NumberFormat
         };
 
+        // A mutable source may be customized by the caller between calls, so it keeps today's per-call clone.
+        if (!source.IsReadOnly)
+        {
+            return BuildNumberFormatInfo((NumberFormatInfo)source.Clone(), useCurrencyCode, useInternationalSymbol);
+        }
+
+        var key = new NumberFormatCacheKey(source, useCurrencyCode, useInternationalSymbol);
+        ConcurrentDictionary<NumberFormatCacheKey, NumberFormatInfo> cache =
+            s_numberFormatCache.GetValue(this, static _ => new ConcurrentDictionary<NumberFormatCacheKey, NumberFormatInfo>());
+
+        if (cache.TryGetValue(key, out NumberFormatInfo? cached))
+        {
+            return cached;
+        }
+
+        NumberFormatInfo built = BuildNumberFormatInfo((NumberFormatInfo)source.Clone(), useCurrencyCode, useInternationalSymbol);
+        return cache.GetOrAdd(key, NumberFormatInfo.ReadOnly(built));
+    }
+
+    /// <summary>Applies the currency's symbol, decimal digits and, when the code replaces the symbol, the pattern edits
+    /// that add a space between code and value. Shared by the cached and the per-call (explicit provider) paths.</summary>
+    private NumberFormatInfo BuildNumberFormatInfo(NumberFormatInfo numberFormatInfo, bool useCurrencyCode, bool useInternationalSymbol)
+    {
         numberFormatInfo.CurrencyDecimalDigits = DecimalDigits;
 
         // Decide which symbol to use initially: local or international
@@ -764,6 +803,79 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
         return numberFormatInfo;
     }
+
+    /// <summary>Precomputed standard format strings for the single-digit precision case (the common one), so 'C', 'N'
+    /// and 'F' with an explicit digit count don't build a string via interpolation on every call.</summary>
+    private static readonly string[] s_currencyDigitsFormat = ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"];
+    private static readonly string[] s_numberDigitsFormat = ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"];
+    private static readonly string[] s_fixedDigitsFormat = ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9"];
+
+    private static string GetCurrencyDigitsFormat(int digits) => (uint)digits < 10 ? s_currencyDigitsFormat[digits] : $"C{digits}";
+
+    private static string GetNumberDigitsFormat(int digits) => (uint)digits < 10 ? s_numberDigitsFormat[digits] : $"N{digits}";
+
+    private static string GetFixedDigitsFormat(int digits) => (uint)digits < 10 ? s_fixedDigitsFormat[digits] : $"F{digits}";
+
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <summary>Formats a <see cref="Money"/> value straight into a span for the <c>C</c>, <c>G</c>, <c>I</c>, <c>N</c>
+    /// and <c>F</c> specifiers, with no intermediate string allocation. Any other specifier, or a digit count above 9,
+    /// is left to the caller's string-based fallback (<paramref name="handled"/> is <see langword="false"/>).</summary>
+    internal bool TryFormatFast(in Money money, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? formatProvider, out bool handled)
+    {
+        char fmt = ParseFormatSpecifier(format, out int digits);
+
+        NumberFormatInfo nfi;
+        char decimalSpecifier;
+        switch (fmt)
+        {
+            case 'C':
+                nfi = ToNumberFormatInfo(formatProvider);
+                decimalSpecifier = 'C';
+                break;
+            case 'G':
+                nfi = ToNumberFormatInfo(formatProvider, useCurrencyCode: true);
+                decimalSpecifier = 'C';
+                break;
+            case 'I':
+                nfi = ToNumberFormatInfo(formatProvider, useInternationalSymbol: true);
+                decimalSpecifier = 'C';
+                break;
+            case 'N':
+            case 'n':
+                nfi = ToNumberFormatInfo(formatProvider, useCurrencyCode: true);
+                decimalSpecifier = 'N';
+                break;
+            case 'F':
+            case 'f':
+                nfi = ToNumberFormatInfo(formatProvider, useCurrencyCode: true);
+                decimalSpecifier = 'F';
+                break;
+            default:
+                handled = false;
+                charsWritten = 0;
+                return false;
+        }
+
+        if (digits > 9)
+        {
+            // Rare (double-digit-or-more precision): let the caller fall back to the string path.
+            handled = false;
+            charsWritten = 0;
+            return false;
+        }
+
+        handled = true;
+        Span<char> decimalFormat = stackalloc char[2];
+        decimalFormat[0] = decimalSpecifier;
+        ReadOnlySpan<char> formatSpan = digits < 0 ? decimalFormat[..1] : decimalFormat;
+        if (digits >= 0)
+        {
+            decimalFormat[1] = (char)('0' + digits);
+        }
+
+        return money.Amount.TryFormat(destination, out charsWritten, formatSpan, nfi);
+    }
+#endif
 
     private static char ParseFormatSpecifier(ReadOnlySpan<char> format, out int digits)
     {

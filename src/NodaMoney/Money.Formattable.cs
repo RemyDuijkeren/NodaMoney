@@ -46,7 +46,20 @@ public partial struct Money : IFormattable
     /// <inheritdoc />
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        // TODO: optimize to use Span
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        // Allocation-free path for the C, G, I, N and F specifiers; other specifiers (and a digit count above 9)
+        // fall back to the string-based path below.
+        CurrencyInfo currencyInfo = CurrencyInfo.GetInstance(Currency);
+        if (currencyInfo.TryFormatFast(this, destination, out charsWritten, format, provider, out bool handled))
+        {
+            return true;
+        }
+
+        if (handled)
+        {
+            return false; // insufficient buffer; charsWritten is already 0
+        }
+#endif
 
         // Produce the same string as ToString(format.ToString(), provider)
         string formatted = Format(format.ToString(), provider);

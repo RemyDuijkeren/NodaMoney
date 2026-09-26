@@ -301,4 +301,64 @@ public class TryFormat
         string formattedResult = Encoding.UTF8.GetString(destination.Slice(0, bytesWritten).ToArray());
         formattedResult.Should().Be(expected);
     }
+
+    [Theory]
+    [InlineData("C")]
+    [InlineData("C0")]
+    [InlineData("G")]
+    [InlineData("N2")]
+    [InlineData("F")]
+    public void TryFormat_ShouldWriteSameCharactersAsToString_ForCurrencyStyleSpecifiers(string format)
+    {
+        // Arrange
+        var money = new Money(1234.56m, Currency.FromCode("USD"));
+        var provider = CultureInfo.InvariantCulture;
+        string expected = money.ToString(format, provider);
+        Span<char> destination = stackalloc char[64];
+
+        // Act
+        bool result = money.TryFormat(destination, out int charsWritten, format.AsSpan(), provider);
+
+        // Assert
+        result.Should().BeTrue();
+        charsWritten.Should().Be(expected.Length);
+        destination.Slice(0, charsWritten).ToString().Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("C")]
+    [InlineData("G")]
+    [InlineData("N2")]
+    [InlineData("F")]
+    public void TryFormat_ShouldFailWithZeroCharsWritten_WhenBufferTooSmallForCurrencyStyleSpecifiers(string format)
+    {
+        // Arrange
+        var money = new Money(1234.56m, Currency.FromCode("USD"));
+        var provider = CultureInfo.InvariantCulture;
+        Span<char> destination = stackalloc char[1]; // Too small for any currency-style output
+
+        // Act
+        bool result = money.TryFormat(destination, out int charsWritten, format.AsSpan(), provider);
+
+        // Assert
+        result.Should().BeFalse();
+        charsWritten.Should().Be(0);
+    }
+
+    [Fact]
+    public void TryFormat_ShouldSucceedThroughStringPath_ForCompactSpecifier()
+    {
+        // Arrange
+        var money = new Money(1234.56m, Currency.FromCode("USD"));
+        var provider = CultureInfo.InvariantCulture;
+        string expected = money.ToString("c", provider);
+        Span<char> destination = stackalloc char[64];
+
+        // Act
+        bool result = money.TryFormat(destination, out int charsWritten, "c".AsSpan(), provider);
+
+        // Assert
+        result.Should().BeTrue();
+        destination.Slice(0, charsWritten).ToString().Should().Be(expected);
+    }
 }
