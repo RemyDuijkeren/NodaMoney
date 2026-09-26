@@ -10,7 +10,7 @@ namespace NodaMoney.Context;
 /// or where rounding would lead to incorrect results in downstream processes.
 /// </remarks>
 /// <seealso cref="IRoundingStrategy"/>
-public record NoRounding : IRoundingStrategy
+public sealed record NoRounding : IRoundingStrategy
 {
     /// <inheritdoc cref="IRoundingStrategy.Round"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

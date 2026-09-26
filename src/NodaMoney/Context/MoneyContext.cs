@@ -10,6 +10,20 @@ namespace NodaMoney.Context;
 // explicitly fail or resolve using a context-driven priority list.
 // Handle zero currency check? Strict vs Relaxed. Make this an option? See also #107
 
+/// <summary>Identifies which rounding implementation a <see cref="MoneyContext"/> carries, precomputed so hot paths
+/// can switch on a byte instead of type-testing the <see cref="IRoundingStrategy"/> instance.</summary>
+internal enum RoundingKind : byte
+{
+    /// <summary>The context uses <see cref="Context.NoRounding"/>; the amount is never rounded.</summary>
+    None = 0,
+
+    /// <summary>The context uses the sealed <see cref="Context.StandardRounding"/>.</summary>
+    Standard = 1,
+
+    /// <summary>The context uses a custom <see cref="IRoundingStrategy"/> implementation.</summary>
+    Custom = 2
+}
+
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 public sealed record MoneyContext
 {
@@ -37,6 +51,13 @@ public sealed record MoneyContext
     /// rounding, which may vary based on business context, regulatory requirements, or currency-specific needs.
     /// </remarks>
     public IRoundingStrategy RoundingStrategy => Options.RoundingStrategy;
+
+    /// <summary>Gets the precomputed rounding kind for <see cref="RoundingStrategy"/>, used by hot paths to avoid a type test.</summary>
+    internal RoundingKind Kind { get; }
+
+    /// <summary>Gets the <see cref="MidpointRounding"/> mode of <see cref="RoundingStrategy"/> when <see cref="Kind"/> is
+    /// <see cref="RoundingKind.Standard"/>. Undefined for any other kind.</summary>
+    internal MidpointRounding Mode { get; }
 
     /// <summary>Get the total number of significant digits available for numerical values in the context.</summary>
     public int Precision => Options.Precision;
@@ -78,21 +99,21 @@ public sealed record MoneyContext
         // MidpointRounding enum values! This ensures that their indices align with the enum values for fast lookup.
 
         var toEvenContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
-        Trace.Assert(toEvenContext.Index == (byte)MidpointRounding.ToEven, $"Index of ToEven context should be 0, but is {toEvenContext.Index}");
+        Debug.Assert(toEvenContext.Index == (byte)MidpointRounding.ToEven, $"Index of ToEven context should be 0, but is {toEvenContext.Index}");
         s_defaultThreadContext = toEvenContext; // Set default context to ToEven
 
         var awayFromZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero) });
-        Trace.Assert(awayFromZeroContext.Index == (byte)MidpointRounding.AwayFromZero, $"Index of AwayFromZero context should be 1, but is {awayFromZeroContext.Index}");
+        Debug.Assert(awayFromZeroContext.Index == (byte)MidpointRounding.AwayFromZero, $"Index of AwayFromZero context should be 1, but is {awayFromZeroContext.Index}");
 
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
         var toZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToZero) });
-        Trace.Assert(toZeroContext.Index == (byte)MidpointRounding.ToZero, $"Index of ToZero context should be 2, but is {toZeroContext.Index}");
+        Debug.Assert(toZeroContext.Index == (byte)MidpointRounding.ToZero, $"Index of ToZero context should be 2, but is {toZeroContext.Index}");
 
         var toNegInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToNegativeInfinity) });
-        Trace.Assert(toNegInfContext.Index == (byte)MidpointRounding.ToNegativeInfinity, $"Index of ToNegativeInfinity context should be 3, but is {toNegInfContext.Index}");
+        Debug.Assert(toNegInfContext.Index == (byte)MidpointRounding.ToNegativeInfinity, $"Index of ToNegativeInfinity context should be 3, but is {toNegInfContext.Index}");
 
         var toPosInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
-        Trace.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
+        Debug.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
 #endif
         FastMoney = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven), Precision = 19, MaxScale = 4 });
         NoRounding = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
@@ -100,8 +121,23 @@ public sealed record MoneyContext
 
     private MoneyContext(MoneyContextOptions options)
     {
-        Trace.Assert(options is not null, $"{nameof(options)} must not be null");
+        Debug.Assert(options is not null, $"{nameof(options)} must not be null");
         Options = options!;
+
+        // Precompute the rounding kind so hot paths can switch on a byte instead of a type test.
+        switch (Options.RoundingStrategy)
+        {
+            case Context.NoRounding:
+                Kind = RoundingKind.None;
+                break;
+            case Context.StandardRounding standard:
+                Kind = RoundingKind.Standard;
+                Mode = standard.Mode;
+                break;
+            default:
+                Kind = RoundingKind.Custom;
+                break;
+        }
 
         // Automatically register this context
         Index = RegisterContext(this);

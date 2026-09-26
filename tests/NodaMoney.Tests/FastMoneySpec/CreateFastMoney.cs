@@ -1,9 +1,49 @@
 using NodaMoney.Context;
+using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.FastMoneySpec;
 
 public class CreateFastMoney
 {
+    [Fact]
+    public void WithCustomRoundingStrategy_ShouldCallStrategyAndStoreResult()
+    {
+        // Arrange
+        var strategy = new RecordingRoundingStrategy(9.99m);
+        MoneyContext context = MoneyContext.Create(options =>
+        {
+            options.MaxScale = 4;
+            options.Precision = 19;
+            options.RoundingStrategy = strategy;
+        });
+
+        // Act
+        var money = new FastMoney(1.2345m, "EUR", context);
+
+        // Assert
+        strategy.CallCount.Should().Be(1);
+        money.Amount.Should().Be(9.99m);
+    }
+
+    [Fact]
+    public void WithToEvenRoundingAndMaxScaleFour_ShouldSkipStrategyAndRelyOnToOACurrency()
+    {
+        // Arrange
+        var strategy = new StandardRounding(MidpointRounding.ToEven);
+        MoneyContext context = MoneyContext.Create(options =>
+        {
+            options.MaxScale = 4;
+            options.Precision = 19;
+            options.RoundingStrategy = strategy;
+        });
+
+        // Act
+        var money = new FastMoney(1.23455m, "EUR", context);
+
+        // Assert: ToOACurrency itself rounds to 4 decimals using ToEven, so the amount is still rounded correctly
+        money.Amount.Should().Be(1.2346m);
+    }
+
     [Fact]
     public void WithDifferentContext()
     {

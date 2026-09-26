@@ -143,7 +143,8 @@ public readonly partial record struct FastMoney
 
     bool TryOACurrencyAmountToLongWithRounding(out long int64)
     {
-        if (Context.RoundingStrategy is StandardRounding sr)
+        MoneyContext context = Context;
+        if (context.Kind == RoundingKind.Standard)
         {
             long q = OACurrencyAmount / ScaleFactor; // truncates toward zero in .NET
             long r = OACurrencyAmount % ScaleFactor; // the remainder with sign of dividend
@@ -156,7 +157,7 @@ public readonly partial record struct FastMoney
 
             long absR = r >= 0 ? r : -r;
 
-            switch (sr.Mode)
+            switch (context.Mode)
             {
                 case MidpointRounding.ToEven:
                     if (absR > 5000)

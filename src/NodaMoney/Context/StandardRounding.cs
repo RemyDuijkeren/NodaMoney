@@ -10,7 +10,7 @@ namespace NodaMoney.Context;
 /// used in financial and accounting systems to reduce rounding bias over multiple calculations.
 /// </remarks>
 /// <seealso cref="IRoundingStrategy"/>
-public record StandardRounding(MidpointRounding Mode = MidpointRounding.ToEven) : IRoundingStrategy
+public sealed record StandardRounding(MidpointRounding Mode = MidpointRounding.ToEven) : IRoundingStrategy
 {
     /// <summary>Rounds the specified amount using the currency's rounding rules.</summary>
     /// <param name="amount">The amount to round.</param>

@@ -39,7 +39,7 @@ public readonly partial struct Money : IEquatable<Money>
     {
         // Use either provided context or the current global/thread-local context.
         context ??= MoneyContext.CurrentContext;
-        Trace.Assert(context is not null, "MoneyContext.CurrentContext should not be null");
+        Debug.Assert(context is not null, "MoneyContext.CurrentContext should not be null");
 
         // Fast-path: when the amount is zero
         if (amount == 0m)
@@ -53,10 +53,10 @@ public readonly partial struct Money : IEquatable<Money>
         }
 
         // Round the amount to the correct scale
-        amount = context!.RoundingStrategy switch
+        amount = context!.Kind switch
         {
-            NoRounding nr => nr.Round(amount, currency, context.MaxScale),
-            StandardRounding sr => sr.Round(amount, currency, context.MaxScale),
+            RoundingKind.None => amount,
+            RoundingKind.Standard => ((StandardRounding)context.RoundingStrategy).Round(amount, currency, context.MaxScale),
             _ => context.RoundingStrategy.Round(amount, currency, context.MaxScale)
         };
 
@@ -107,11 +107,12 @@ public readonly partial struct Money : IEquatable<Money>
         init
         {
             // Round the amount to the correct scale
-            var amount = Context.RoundingStrategy switch
+            MoneyContext context = Context;
+            var amount = context.Kind switch
             {
-                NoRounding nr => nr.Round(value, Currency, Context.MaxScale),
-                StandardRounding sr => sr.Round(value, Currency, Context.MaxScale),
-                _ => Context.RoundingStrategy.Round(value, Currency, Context.MaxScale)
+                RoundingKind.None => value,
+                RoundingKind.Standard => ((StandardRounding)context.RoundingStrategy).Round(value, Currency, context.MaxScale),
+                _ => context.RoundingStrategy.Round(value, Currency, context.MaxScale)
             };
 
             // Separate the Decimal bits during initialization
