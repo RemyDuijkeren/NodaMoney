@@ -15,12 +15,16 @@ static class CurrencyRegistry
     static readonly object s_lock = new();
     static FrozenDictionary<Currency, CurrencyInfo> s_lookupByCurrency;
     static FrozenDictionary<string, CurrencyInfo> s_lookupByCode;
+    static FrozenDictionary<string, CurrencyInfo[]> s_lookupByCodeAndSymbol;
+#if NET9_0_OR_GREATER
+    static FrozenDictionary<string, CurrencyInfo[]>.AlternateLookup<ReadOnlySpan<char>> s_lookupByCodeAndSymbolAlternate;
+#endif
 #else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
     static readonly ReaderWriterLockSlim s_lockSlim = new();
     static readonly Dictionary<Currency, CurrencyInfo> s_lookupByCurrency;
     static readonly Dictionary<string, CurrencyInfo> s_lookupByCode;
+    static Dictionary<string, CurrencyInfo[]> s_lookupByCodeAndSymbol;
 #endif
-    static ILookup<string, CurrencyInfo> s_lookupByCodeAndSymbol;
 
     static CurrencyRegistry()
     {
@@ -33,6 +37,9 @@ static class CurrencyRegistry
         s_lookupByCurrency = currencies.ToDictionary(ci => (Currency)ci, ci => ci);
 #endif
         s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+#if NET9_0_OR_GREATER
+        s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
+#endif
     }
 
     /// <summary>Gets the <see cref="CurrencyInfo"/> associated with the specified currency code.</summary>
@@ -132,13 +139,15 @@ static class CurrencyRegistry
     /// <returns>An <see cref="IReadOnlyList{CurrencyInfo}"/> of all registered currencies that matches.</returns>
     public static IReadOnlyList<CurrencyInfo> GetAllCurrencies(ReadOnlySpan<char> currencyChars)
     {
-#if NET8_0_OR_GREATER
-        return [.. s_lookupByCodeAndSymbol[currencyChars.ToString()]];
+#if NET9_0_OR_GREATER
+        return s_lookupByCodeAndSymbolAlternate.TryGetValue(currencyChars, out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
+#elif NET8_0_OR_GREATER
+        return s_lookupByCodeAndSymbol.TryGetValue(currencyChars.ToString(), out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
 #else
         s_lockSlim.EnterReadLock();
         try
         {
-            return [.. s_lookupByCodeAndSymbol[currencyChars.ToString()]];
+            return s_lookupByCodeAndSymbol.TryGetValue(currencyChars.ToString(), out var currencies) ? currencies : Array.Empty<CurrencyInfo>();
         }
         finally
         {
@@ -165,6 +174,9 @@ static class CurrencyRegistry
             s_lookupByCode = mutableDictionary.ToFrozenDictionary();
             s_lookupByCurrency = mutableDictionary.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);
             s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+#if NET9_0_OR_GREATER
+            s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
+#endif
 
             return true;
         }
@@ -204,6 +216,9 @@ static class CurrencyRegistry
             s_lookupByCode = mutableDictionary.ToFrozenDictionary();
             s_lookupByCurrency = mutableDictionary.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);
             s_lookupByCodeAndSymbol = CreateLookupByCodeAndSymbol();
+#if NET9_0_OR_GREATER
+            s_lookupByCodeAndSymbolAlternate = s_lookupByCodeAndSymbol.GetAlternateLookup<ReadOnlySpan<char>>();
+#endif
 
             return true;
         }
@@ -226,17 +241,35 @@ static class CurrencyRegistry
 #endif
     }
 
-    static ILookup<string, CurrencyInfo> CreateLookupByCodeAndSymbol() =>
-        s_lookupByCode.Values
-            .SelectMany(currency =>
-                new[]
-                    {
-                        new { Key = currency.Code, Currency = currency }, new { Key = currency.Symbol, Currency = currency },
-                        new { Key = currency.InternationalSymbol, Currency = currency },
-                    }
-                    .Concat(currency.AlternativeSymbols.Select(symbol => new { Key = symbol, Currency = currency }))
-                    .Distinct()) // Needed because Code, Symbol and InternationalSymbol can be the same
-            .ToLookup(item => item.Key, item => item.Currency);
+    /// <summary>Groups every currency under its code, symbol, international symbol and alternative symbols,
+    /// deduplicating keys that collide for the same currency (e.g. Symbol == InternationalSymbol).</summary>
+    static Dictionary<string, List<CurrencyInfo>> GroupByCodeAndSymbol()
+    {
+        var groups = new Dictionary<string, List<CurrencyInfo>>(StringComparer.Ordinal);
+        foreach (var currency in s_lookupByCode.Values)
+        {
+            var keys = new HashSet<string>(StringComparer.Ordinal) { currency.Code, currency.Symbol, currency.InternationalSymbol };
+            foreach (var symbol in currency.AlternativeSymbols)
+                keys.Add(symbol);
+
+            foreach (var key in keys)
+            {
+                if (!groups.TryGetValue(key, out var list))
+                    groups[key] = list = [];
+                list.Add(currency);
+            }
+        }
+
+        return groups;
+    }
+
+#if NET8_0_OR_GREATER
+    static FrozenDictionary<string, CurrencyInfo[]> CreateLookupByCodeAndSymbol() =>
+        GroupByCodeAndSymbol().ToFrozenDictionary(kv => kv.Key, kv => kv.Value.ToArray());
+#else
+    static Dictionary<string, CurrencyInfo[]> CreateLookupByCodeAndSymbol() =>
+        GroupByCodeAndSymbol().ToDictionary(kv => kv.Key, kv => kv.Value.ToArray());
+#endif
 
     // TODO: Move to resource file?
     static CurrencyInfo[] InitializeCurrencies() =>

@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyParsableSpec;
@@ -136,5 +137,47 @@ public class TryParseExplicitCurrency
         Money.TryParse("CHF -98’765", CurrencyInfo.FromCode("CHF"), out Money money).Should().BeTrue();
 
         money.Should().Be(new Money(-98_765m, "CHF"));
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenParsingUSDollarWithEuroCurrency_ThenReturnFalseWithoutFirstChanceException()
+    {
+        // single symbol match (EUR) mismatches the specified currency (USD)
+        int firstChanceExceptions = 0;
+        EventHandler<FirstChanceExceptionEventArgs> handler = (_, _) => firstChanceExceptions++;
+
+        AppDomain.CurrentDomain.FirstChanceException += handler;
+        try
+        {
+            Money.TryParse("€ -98.765,43", CurrencyInfo.FromCode("USD"), out Money money).Should().BeFalse();
+            money.Should().Be(new Money(0m, CurrencyInfo.NoCurrency));
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.FirstChanceException -= handler;
+        }
+
+        firstChanceExceptions.Should().Be(0);
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenParsingYenYuanWithEuroCurrency_ThenReturnFalseWithoutFirstChanceException()
+    {
+        // ¥ matches multiple currencies (JPY, CNY), none of which match the specified EUR
+        int firstChanceExceptions = 0;
+        EventHandler<FirstChanceExceptionEventArgs> handler = (_, _) => firstChanceExceptions++;
+
+        AppDomain.CurrentDomain.FirstChanceException += handler;
+        try
+        {
+            Money.TryParse("¥ -98,765", CurrencyInfo.FromCode("EUR"), out Money money).Should().BeFalse();
+            money.Should().Be(new Money(0m, CurrencyInfo.NoCurrency));
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.FirstChanceException -= handler;
+        }
+
+        firstChanceExceptions.Should().Be(0);
     }
 }

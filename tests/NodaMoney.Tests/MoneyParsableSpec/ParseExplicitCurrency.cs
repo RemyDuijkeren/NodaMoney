@@ -97,7 +97,18 @@ public class ParseExplicitCurrency
     {
         Action action = () => Money.Parse("€ -98.765,43", CurrencyInfo.FromCode("USD"));
 
-        action.Should().Throw<FormatException>("given provider always overrule, even current culture");
+        action.Should().Throw<FormatException>("given provider always overrule, even current culture")
+            .WithMessage("*matches with EUR, but doesn't match the specified USD*");
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenParsingYenYuanWithEuroCurrency_ThenThisShouldFail()
+    {
+        // ¥ matches multiple currencies (JPY, CNY), none of which match the specified EUR
+        Action action = () => Money.Parse("¥ -98,765", CurrencyInfo.FromCode("EUR"));
+
+        action.Should().Throw<FormatException>()
+            .WithMessage("*matches with multiple currencies, but none match with specified EUR*");
     }
 
     [Fact, UseCulture("nl-NL")]

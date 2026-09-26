@@ -103,42 +103,37 @@ public partial struct Money
     /// <summary>Tries to parse span of characters into a <see cref="Money"/>.</summary>
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result)
     {
-        try
+        if (s.IsEmpty || s.IsWhiteSpace())
         {
-            if (s.IsEmpty || s.IsWhiteSpace())
-            {
-                result = new Money(0, CurrencyInfo.NoCurrency);
-                return false;
-            }
+            result = new Money(0, CurrencyInfo.NoCurrency);
+            return false;
+        }
 
-            ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
+        ReadOnlySpan<char> currencySymbol = ParseCurrencySymbol(s);
+        CurrencyInfo? specifiedCurrency = provider as CurrencyInfo;
 
-            CurrencyInfo currencyInfo = provider is CurrencyInfo ci
-                ? ParseCurrencyInfo(currencySymbol, ci)
-                : ParseCurrencyInfo(currencySymbol);
+        if (!TryParseCurrencyInfo(currencySymbol, specifiedCurrency, out CurrencyInfo? currencyInfo, out _, out _))
+        {
+            result = new Money(0, CurrencyInfo.NoCurrency);
+            return false;
+        }
 
-            ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
-            NumberFormatInfo nfi = GetNumberFormatInfo(provider);
+        ReadOnlySpan<char> numericInput = RemoveCurrencySymbol(s, currencySymbol);
+        NumberFormatInfo nfi = GetNumberFormatInfo(provider);
 
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, nfi, out decimal amount);
+        bool isParsed = decimal.TryParse(numericInput, ParseNumberStyle, nfi, out decimal amount);
 #else
-            bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, nfi, out decimal amount);
+        bool isParsed = decimal.TryParse(numericInput.ToString(), ParseNumberStyle, nfi, out decimal amount);
 #endif
-            if (isParsed)
-            {
-                result = new Money(amount, currencyInfo);
-                return true;
-            }
-
-            result = new Money(0, CurrencyInfo.NoCurrency);
-            return false;
-        }
-        catch (FormatException)
+        if (isParsed)
         {
-            result = new Money(0, CurrencyInfo.NoCurrency);
-            return false;
+            result = new Money(amount, currencyInfo);
+            return true;
         }
+
+        result = new Money(0, CurrencyInfo.NoCurrency);
+        return false;
     }
 
 #if NET7_0_OR_GREATER
@@ -166,45 +161,116 @@ public partial struct Money
     }
 #endif
 
+    /// <summary>The reason <see cref="TryParseCurrencyInfo"/> could not resolve a single matching currency.</summary>
+    private enum CurrencyParseFailure
+    {
+        /// <summary>No currency succeeded.</summary>
+        None = 0,
+
+        /// <summary>No currency matches the symbol or code.</summary>
+        UnknownSymbol = 1,
+
+        /// <summary>Multiple currencies match the symbol, and none of them is the specified or current currency.</summary>
+        AmbiguousSymbol = 2,
+
+        /// <summary>Exactly one currency matches the symbol, but it doesn't match the specified currency.</summary>
+        SingleMatchMismatch = 3,
+
+        /// <summary>Multiple currencies match the symbol, but none of them matches the specified currency.</summary>
+        MultipleMatchesMismatch = 4,
+    }
+
     /// <summary>Parses the currency information from the given span of characters, optionally using a specified currency.</summary>
     /// <param name="currencyChars">A span of characters containing the input string to parse for currency information.</param>
     /// <param name="specifiedCurrency">An optional currency to use when resolving the currency information.</param>
     /// <returns>The parsed <see cref="CurrencyInfo"/> representing the currency information found in the input.</returns>
     /// <exception cref="FormatException">Thrown when no matching currency symbol or code can be resolved from the input.</exception>
-    /// <exception cref="IndexOutOfRangeException"></exception>
     internal static CurrencyInfo ParseCurrencyInfo(ReadOnlySpan<char> currencyChars, CurrencyInfo? specifiedCurrency = null)
     {
+        if (TryParseCurrencyInfo(currencyChars, specifiedCurrency, out CurrencyInfo? currencyInfo, out CurrencyParseFailure failure, out CurrencyInfo? singleMatch))
+            return currencyInfo;
+
+        string symbol = currencyChars.ToString();
+        throw failure switch
+        {
+            CurrencyParseFailure.UnknownSymbol =>
+                new FormatException($"Currency symbol {symbol} is an unknown currency symbol or code!"),
+            CurrencyParseFailure.SingleMatchMismatch =>
+                new FormatException($"Currency symbol {symbol} matches with {singleMatch!.Code}, but doesn't match the specified {specifiedCurrency!.Code}!"),
+            CurrencyParseFailure.MultipleMatchesMismatch =>
+                new FormatException($"Currency symbol {symbol} matches with multiple currencies, but none match with specified {specifiedCurrency!.Code}!"),
+            _ => new FormatException($"Currency symbol {symbol} matches with multiple currencies! Specify currency or culture explicitly."),
+        };
+    }
+
+    /// <summary>Non-throwing core of currency parsing: resolves the matching <see cref="CurrencyInfo"/> or reports why it could not.</summary>
+    /// <param name="currencyChars">A span of characters containing the input string to parse for currency information.</param>
+    /// <param name="specifiedCurrency">An optional currency to use when resolving the currency information.</param>
+    /// <param name="currencyInfo">The resolved currency when this method returns <b>true</b>; otherwise <b>null</b>.</param>
+    /// <param name="failure">The reason resolution failed when this method returns <b>false</b>; otherwise <see cref="CurrencyParseFailure.None"/>.</param>
+    /// <param name="singleMatch">The single currency that matched but mismatched <paramref name="specifiedCurrency"/>, only set for <see cref="CurrencyParseFailure.SingleMatchMismatch"/>.</param>
+    /// <returns><b>true</b> if a currency was resolved; otherwise <b>false</b>.</returns>
+    private static bool TryParseCurrencyInfo(ReadOnlySpan<char> currencyChars, CurrencyInfo? specifiedCurrency,
+        [NotNullWhen(true)] out CurrencyInfo? currencyInfo, out CurrencyParseFailure failure, out CurrencyInfo? singleMatch)
+    {
+        singleMatch = null;
+
         if (currencyChars.IsEmpty)
-            return specifiedCurrency ?? MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency;
+        {
+            failure = CurrencyParseFailure.None;
+            currencyInfo = specifiedCurrency ?? MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency;
+            return true;
+        }
 
         // try to find a match
         var matchedCurrencies = CurrencyInfo.GetAllCurrencies(currencyChars);
         switch (matchedCurrencies.Count)
         {
             case 0:
-                throw new FormatException($"Currency symbol {currencyChars.ToString()} is an unknown currency symbol or code!");
+                currencyInfo = null;
+                failure = CurrencyParseFailure.UnknownSymbol;
+                return false;
             case 1:
                 if (specifiedCurrency is not null && matchedCurrencies[0] != specifiedCurrency)
-                    throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with {matchedCurrencies[0].Code}, but doesn't match the specified {specifiedCurrency.Code}!");
+                {
+                    currencyInfo = null;
+                    singleMatch = matchedCurrencies[0];
+                    failure = CurrencyParseFailure.SingleMatchMismatch;
+                    return false;
+                }
 
-                return matchedCurrencies[0];
-            case > 1:
+                currencyInfo = matchedCurrencies[0];
+                failure = CurrencyParseFailure.None;
+                return true;
+            default:
                 // If specifiedCurrency matches, prioritize it and return immediately
                 var matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == specifiedCurrency);
-                if (matchedCurrency is not null) return matchedCurrency;
+                if (matchedCurrency is not null)
+                {
+                    currencyInfo = matchedCurrency;
+                    failure = CurrencyParseFailure.None;
+                    return true;
+                }
 
                 if (specifiedCurrency is null)
                 {
                     // If the current currency matches, prioritize it and return immediately
                     matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == MoneyContext.CurrentContext.DefaultCurrency || ci == CurrencyInfo.CurrentCurrency);
-                    if (matchedCurrency is not null) return matchedCurrency;
+                    if (matchedCurrency is not null)
+                    {
+                        currencyInfo = matchedCurrency;
+                        failure = CurrencyParseFailure.None;
+                        return true;
+                    }
 
-                    throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies! Specify currency or culture explicitly.");
+                    currencyInfo = null;
+                    failure = CurrencyParseFailure.AmbiguousSymbol;
+                    return false;
                 }
 
-                throw new FormatException($"Currency symbol {currencyChars.ToString()} matches with multiple currencies, but none match with specified {specifiedCurrency.Code}!");
-            default:
-                throw new IndexOutOfRangeException($"MatchedCurrencies.Count {matchedCurrencies.Count} has to be 0, 1 or > 1!"); // Should never happen
+                currencyInfo = null;
+                failure = CurrencyParseFailure.MultipleMatchesMismatch;
+                return false;
         }
     }
 

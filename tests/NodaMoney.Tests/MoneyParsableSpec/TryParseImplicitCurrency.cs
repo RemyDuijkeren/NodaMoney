@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using NodaMoney.Tests.Helpers;
 
@@ -131,5 +132,70 @@ public class TryParseImplicitCurrency
         Money.TryParse("", out money).Should().BeFalse();
 
         money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenCurrencyIsUnknown_ThenReturnFalseWithoutFirstChanceException()
+    {
+        int firstChanceExceptions = 0;
+        EventHandler<FirstChanceExceptionEventArgs> handler = (_, _) => firstChanceExceptions++;
+
+        AppDomain.CurrentDomain.FirstChanceException += handler;
+        try
+        {
+            Money.TryParse("XYZ 765,43", out Money money).Should().BeFalse();
+            money.Should().Be(new Money(0m, CurrencyInfo.NoCurrency));
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.FirstChanceException -= handler;
+        }
+
+        firstChanceExceptions.Should().Be(0);
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenParsingYenYuanInNetherlands_ThenReturnFalseWithoutFirstChanceException()
+    {
+        // ¥ symbol is ambiguous between Japanese yen and Chinese yuan
+        int firstChanceExceptions = 0;
+        EventHandler<FirstChanceExceptionEventArgs> handler = (_, _) => firstChanceExceptions++;
+
+        AppDomain.CurrentDomain.FirstChanceException += handler;
+        try
+        {
+            Money.TryParse("¥ -98,765", out Money money).Should().BeFalse();
+            money.Should().Be(new Money(0m, Currency.FromCode("XXX")));
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.FirstChanceException -= handler;
+        }
+
+        firstChanceExceptions.Should().Be(0);
+    }
+
+    [Fact, UseCulture("nl-NL")]
+    public void WhenCurrencyRegisteredAfterFirstParse_ThenSymbolIsFoundOnNextParse()
+    {
+        // Arrange: symbol doesn't match any registered currency yet
+        Money.TryParse("ZQX 1", out Money before).Should().BeFalse();
+        before.Should().Be(new Money(0m, CurrencyInfo.NoCurrency));
+
+        CurrencyInfo custom = CurrencyInfo.Create("ZZZ") with { Symbol = "ZQX" };
+        CurrencyInfo.Register(custom);
+        try
+        {
+            // Act
+            bool parsed = Money.TryParse("ZQX 1", out Money after);
+
+            // Assert
+            parsed.Should().BeTrue();
+            after.Should().Be(new Money(1m, custom));
+        }
+        finally
+        {
+            CurrencyInfo.Unregister("ZZZ"); // cleanup
+        }
     }
 }
