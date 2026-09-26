@@ -13,17 +13,16 @@ namespace NodaMoney.Context;
 /// <summary>Represents the financial and rounding configuration context for monetary operations.</summary>
 public sealed record MoneyContext
 {
+    private static readonly object s_lock = new();
+    private static readonly MoneyContext?[] s_activeContexts = new MoneyContext?[128];
 #if NET8_0_OR_GREATER // In .NET 8 or higher, we use FrozenDictionary for optimal immutability and performance
-    static readonly object s_lock = new();
-    private static FrozenDictionary<byte, MoneyContext> s_activeContexts = new Dictionary<byte, MoneyContext>(6).ToFrozenDictionary();
     private static FrozenDictionary<string, byte> s_namedContexts = new Dictionary<string, byte>(6, StringComparer.OrdinalIgnoreCase).ToFrozenDictionary();
 #else // In .NET Standard 2.0, we use Dictionary with ReaderWriterLockSlim for thread safety
     private static readonly ReaderWriterLockSlim s_contextLock = new();
-    private static readonly Dictionary<byte, MoneyContext> s_activeContexts = [];
     private static readonly Dictionary<string, byte> s_namedContexts = new(6, StringComparer.OrdinalIgnoreCase);
 #endif
 
-    private static readonly AsyncLocal<MoneyContextIndex?> s_threadLocalContext = new();
+    private static readonly AsyncLocal<MoneyContext?> s_threadLocalContext = new();
     private static MoneyContext s_defaultThreadContext;
     private MoneyContextOptions Options { get; }
 
@@ -115,35 +114,15 @@ public sealed record MoneyContext
         if (options.MaxScale < 0) throw new ArgumentOutOfRangeException(nameof(options.MaxScale), "MaxScale cannot be negative");
         if (options.MaxScale > options.Precision) throw new ArgumentException("MaxScale cannot be greater than precision");
 
-#if NET8_0_OR_GREATER
-        // Look for an equivalent context in the dictionary
-        foreach (MoneyContext ctx in s_activeContexts.Values)
+        // Look for an equivalent context in the array
+        foreach (MoneyContext? ctx in s_activeContexts)
         {
-            if (ctx.Options.Equals(options))
+            if (ctx?.Options.Equals(options) == true)
             {
                 AddNamedContext(ctx);
                 return ctx; // Return existing equivalent context
             }
         }
-#else
-        s_contextLock.EnterReadLock();
-        try
-        {
-            // Look for an equivalent context in the dictionary
-            foreach (MoneyContext ctx in s_activeContexts.Values)
-            {
-                if (ctx.Options.Equals(options))
-                {
-                    AddNamedContext(ctx);
-                    return ctx; // Return existing equivalent context
-                }
-            }
-        }
-        finally
-        {
-            s_contextLock.ExitReadLock();
-        }
-#endif
 
         // Create and register a new context if no match is found
         MoneyContext context = new(options);
@@ -187,25 +166,11 @@ public sealed record MoneyContext
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static MoneyContext Create(MidpointRounding mode)
     {
-#if NET8_0_OR_GREATER
         // This is a fast path that avoids creating a new context for standard rounding modes
-        if (s_activeContexts.TryGetValue((byte)mode, out var context)) return context;
+        var context = Volatile.Read(ref s_activeContexts[(byte)mode]);
+        if (context is not null) return context;
         // Fallback for any future rounding modes that might be added in the future.
         return Create(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
-#else
-        s_contextLock.EnterReadLock(); // Allow parallel reads
-        try
-        {
-            // This is a fast path that avoids creating a new context for standard rounding modes
-            if (s_activeContexts.TryGetValue((MoneyContextIndex)(byte)mode, out var context)) return context;
-            // Fallback for any future rounding modes that might be added in the future.
-            return Create(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
-        }
-        finally
-        {
-            s_contextLock.ExitReadLock();
-        }
-#endif
     }
 
     public static MoneyContext CreateAndSetDefault(MoneyContextOptions options, string? name = null)
@@ -243,8 +208,8 @@ public sealed record MoneyContext
     /// </remarks>
     public static MoneyContext? ThreadContext
     {
-        get => s_threadLocalContext.Value.HasValue ? Get(s_threadLocalContext.Value.Value) : null;
-        set => s_threadLocalContext.Value = value?.Index;
+        get => s_threadLocalContext.Value;
+        set => s_threadLocalContext.Value = value;
     }
 
     /// <summary>
@@ -260,21 +225,9 @@ public sealed record MoneyContext
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static MoneyContext Get(byte index)
     {
-#if NET8_0_OR_GREATER
-        if (s_activeContexts.TryGetValue(index, out var context)) return context;
+        var context = Volatile.Read(ref s_activeContexts[index]);
+        if (context is not null) return context;
         throw new ArgumentException($"Invalid MoneyContext index: {index}");
-#else
-        s_contextLock.EnterReadLock(); // Allow parallel reads
-        try
-        {
-            if (s_activeContexts.TryGetValue(index, out var context)) return context;
-            throw new ArgumentException($"Invalid MoneyContext index: {index}");
-        }
-        finally
-        {
-            s_contextLock.ExitReadLock();
-        }
-#endif
     }
 
     /// <summary>Retrieves a <see cref="MoneyContext"/> instance by its registered name, if available.</summary>
@@ -307,46 +260,20 @@ public sealed record MoneyContext
 
     private static MoneyContextIndex RegisterContext(MoneyContext context)
     {
-#if NET8_0_OR_GREATER
         lock (s_lock)
         {
-            foreach (MoneyContext ctx in s_activeContexts.Values)
+            foreach (MoneyContext? ctx in s_activeContexts)
             {
-                if (ctx.Options.Equals(context.Options))
+                if (ctx?.Options.Equals(context.Options) == true)
                 {
                     return ctx.Index; // Return existing equivalent context index
                 }
             }
 
             var newIndex = MoneyContextIndex.New(); // Max index is 127 (128 contexts)
-
-            var mutableDictionary = s_activeContexts.ToDictionary();
-            mutableDictionary[newIndex] = context;
-            s_activeContexts = mutableDictionary.ToFrozenDictionary();
-
+            Volatile.Write(ref s_activeContexts[newIndex], context);
             return newIndex; // Return new index
         }
-#else
-        s_contextLock.EnterWriteLock(); // Ensure write exclusivity
-        try
-        {
-            foreach (MoneyContext ctx in s_activeContexts.Values)
-            {
-                if (ctx.Options.Equals(context.Options))
-                {
-                    return ctx.Index; // Return existing equivalent context index
-                }
-            }
-
-            var newIndex = MoneyContextIndex.New(); // Max index is 127 (128 contexts)
-            s_activeContexts[newIndex] = context;
-            return newIndex;
-        }
-        finally
-        {
-            s_contextLock.ExitWriteLock();
-        }
-#endif
     }
 
     /// <summary>Creates a scoped context for monetary operations with the specified configuration. When the context is disposed of, the previous context is restored.</summary>
