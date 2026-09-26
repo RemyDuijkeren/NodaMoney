@@ -121,48 +121,8 @@ public partial struct Money
 
         long divisor = Pow10ForFastConversion[scale];
         long signedMantissa = (long)mantissa;
-        long quotient = signedMantissa / divisor;
-        long remainder = signedMantissa % divisor;
         bool isNegative = (_flags & SignMask) != 0;
-
-        if (remainder != 0)
-        {
-            switch (context.Mode)
-            {
-                case MidpointRounding.ToEven:
-                    long twiceRemainder = remainder * 2;
-                    if (twiceRemainder > divisor || (twiceRemainder == divisor && (quotient & 1) != 0))
-                        quotient++;
-                    break;
-                case MidpointRounding.AwayFromZero:
-                    if (remainder * 2 >= divisor)
-                        quotient++;
-                    break;
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
-                case MidpointRounding.ToZero:
-                    // Truncation toward zero already achieved by integer division.
-                    break;
-                case MidpointRounding.ToNegativeInfinity:
-                    // Floor: for a negative value, a nonzero remainder means the magnitude rounds away from zero.
-                    if (isNegative)
-                        quotient++;
-                    break;
-                case MidpointRounding.ToPositiveInfinity:
-                    // Ceiling: for a positive value, a nonzero remainder means the magnitude rounds away from zero.
-                    if (!isNegative)
-                        quotient++;
-                    break;
-#endif
-                default:
-                    // A mode this build does not know (the netstandard legs lack the directional modes at compile
-                    // time, but a newer runtime can still pass them): leave it to the decimal path.
-                    value = 0;
-                    return false;
-            }
-        }
-
-        value = isNegative ? -quotient : quotient;
-        return true;
+        return IntegerRounding.TryRound(signedMantissa / divisor, signedMantissa % divisor, divisor, context.Mode, isNegative, out value);
     }
 
     /// <summary>Converts the value of this instance to minor units.</summary>

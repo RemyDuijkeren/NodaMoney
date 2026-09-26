@@ -163,65 +163,16 @@ public readonly partial record struct FastMoney
     bool TryOACurrencyAmountToLongWithRounding(out long int64)
     {
         MoneyContext context = Context;
-        if (context.Kind == RoundingKind.Standard)
+        if (context.Kind != RoundingKind.Standard)
         {
-            long q = OACurrencyAmount / ScaleFactor; // truncates toward zero in .NET
-            long r = OACurrencyAmount % ScaleFactor; // the remainder with sign of dividend
-
-            if (r == 0)
-            {
-                int64 = q;
-                return true;
-            }
-
-            long absR = r >= 0 ? r : -r;
-
-            switch (context.Mode)
-            {
-                case MidpointRounding.ToEven:
-                    if (absR > 5000)
-                    {
-                        q += r > 0 ? 1 : -1;
-                    }
-                    else if (absR == 5000)
-                    {
-                        // Tie -> go to even
-                        bool qIsEven = (q & 1) == 0;
-                        if (!qIsEven)
-                            q += r > 0 ? 1 : -1;
-                    }
-
-                    int64 = q;
-                    return true;
-
-                case MidpointRounding.AwayFromZero:
-                    if (absR >= 5000)
-                        q += r > 0 ? 1 : -1;
-                    int64 = q;
-                    return true;
-
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
-                case MidpointRounding.ToZero:
-                    // Truncation toward zero already achieved by integer division
-                    int64 = q;
-                    return true;
-
-                case MidpointRounding.ToNegativeInfinity:
-                    // Floor: if remainder negative, step down by 1 (since q truncates toward zero)
-                    if (r < 0) q--;
-                    int64 = q;
-                    return true;
-
-                case MidpointRounding.ToPositiveInfinity:
-                    // Ceiling: if remainder positive, step up by 1
-                    if (r > 0) q++;
-                    int64 = q;
-                    return true;
-#endif
-            }
+            int64 = 0;
+            return false;
         }
 
-        int64 = 0;
-        return false;
+        // Work on the magnitude; long.MinValue's magnitude still fits a ulong.
+        long ticks = OACurrencyAmount;
+        bool isNegative = ticks < 0;
+        ulong magnitude = isNegative ? unchecked((ulong)(-ticks)) : (ulong)ticks;
+        return IntegerRounding.TryRound((long)(magnitude / (ulong)ScaleFactor), (long)(magnitude % (ulong)ScaleFactor), ScaleFactor, context.Mode, isNegative, out int64);
     }
 }
