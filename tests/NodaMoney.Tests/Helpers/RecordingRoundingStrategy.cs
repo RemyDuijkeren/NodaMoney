@@ -7,9 +7,12 @@ public sealed class RecordingRoundingStrategy(decimal result) : IRoundingStrateg
 {
     public int CallCount { get; private set; }
 
+    public int? LastDecimals { get; private set; }
+
     public decimal Round(decimal amount, Currency currency, int? decimals)
     {
         CallCount++;
+        LastDecimals = decimals;
         return result;
     }
 }

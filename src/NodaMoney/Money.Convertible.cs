@@ -1,7 +1,20 @@
-﻿namespace NodaMoney;
+﻿using System.Runtime.CompilerServices;
+using NodaMoney.Context;
+
+namespace NodaMoney;
 
 public partial struct Money
 {
+    /// <summary>Powers of ten for scales 0 to 18, used by the integer-conversion fast path below. 10^18 is the
+    /// largest power that still fits comfortably under long.MaxValue (~9.22e18) so the scaled-up remainder never
+    /// overflows.</summary>
+    private static readonly long[] Pow10ForFastConversion =
+    [
+        1L, 10L, 100L, 1_000L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L, 1_000_000_000L,
+        10_000_000_000L, 100_000_000_000L, 1_000_000_000_000L, 10_000_000_000_000L, 100_000_000_000_000L,
+        1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L, 1_000_000_000_000_000_000L
+    ];
+
     /// <summary>Performs an explicit conversion from <see cref="Money"/> to <see cref="double"/>.</summary>
     /// <param name="money">The instance of <see cref="Money"/> to convert.</param>
     /// <returns>The resulting <see cref="double"/> value.</returns>
@@ -54,6 +67,8 @@ public partial struct Money
     /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="int"/> value.</exception>
     public int ToInt32()
     {
+        if (TryConvertMantissaToInt64WithRounding(out long fast)) return checked((int)fast);
+
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((int)rounded);
     }
@@ -65,8 +80,89 @@ public partial struct Money
     /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>
     public long ToInt64()
     {
+        if (TryConvertMantissaToInt64WithRounding(out long fast)) return fast;
+
         var rounded = Context.RoundingStrategy.Round(Amount, CurrencyInfo.GetInstance(Currency), 0);
         return checked((long)rounded);
+    }
+
+    /// <summary>Rounds the mantissa directly to an integer <see cref="long"/> when it fits in 64 bits, mirroring
+    /// <see cref="StandardRounding.Round(decimal, CurrencyInfo, int?)"/> at zero decimals without the intermediate
+    /// <see cref="decimal"/> round-trip. Applies only for the standard rounding kind and a currency whose rounding
+    /// is plain decimal-digit rounding (excludes <see cref="MinorUnit.NotApplicable"/> and <see cref="MinorUnit.OneFifth"/>).</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool TryConvertMantissaToInt64WithRounding(out long value)
+    {
+        MoneyContext context = Context;
+        byte scale = Scale;
+        if (context.Kind != RoundingKind.Standard || _high != 0 || scale > 18)
+        {
+            value = 0;
+            return false;
+        }
+
+        Currency currency = Currency;
+        if (!currency.IsMinorUnit2)
+        {
+            CurrencyInfo currencyInfo = CurrencyInfo.GetInstance(currency);
+            if (!currencyInfo.MinorUnitIsDecimalBased || currencyInfo.MinorUnit == MinorUnit.NotApplicable)
+            {
+                value = 0;
+                return false;
+            }
+        }
+
+        ulong mantissa = ((ulong)_mid << 32) | _low;
+        if (mantissa > (ulong)long.MaxValue)
+        {
+            value = 0;
+            return false;
+        }
+
+        long divisor = Pow10ForFastConversion[scale];
+        long signedMantissa = (long)mantissa;
+        long quotient = signedMantissa / divisor;
+        long remainder = signedMantissa % divisor;
+        bool isNegative = (_flags & SignMask) != 0;
+
+        if (remainder != 0)
+        {
+            switch (context.Mode)
+            {
+                case MidpointRounding.ToEven:
+                    long twiceRemainder = remainder * 2;
+                    if (twiceRemainder > divisor || (twiceRemainder == divisor && (quotient & 1) != 0))
+                        quotient++;
+                    break;
+                case MidpointRounding.AwayFromZero:
+                    if (remainder * 2 >= divisor)
+                        quotient++;
+                    break;
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+                case MidpointRounding.ToZero:
+                    // Truncation toward zero already achieved by integer division.
+                    break;
+                case MidpointRounding.ToNegativeInfinity:
+                    // Floor: for a negative value, a nonzero remainder means the magnitude rounds away from zero.
+                    if (isNegative)
+                        quotient++;
+                    break;
+                case MidpointRounding.ToPositiveInfinity:
+                    // Ceiling: for a positive value, a nonzero remainder means the magnitude rounds away from zero.
+                    if (!isNegative)
+                        quotient++;
+                    break;
+#endif
+                default:
+                    // A mode this build does not know (the netstandard legs lack the directional modes at compile
+                    // time, but a newer runtime can still pass them): leave it to the decimal path.
+                    value = 0;
+                    return false;
+            }
+        }
+
+        value = isNegative ? -quotient : quotient;
+        return true;
     }
 
     /// <summary>Converts the value of this instance to minor units.</summary>
