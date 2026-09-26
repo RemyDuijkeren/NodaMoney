@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using NodaMoney.Context;
 
 namespace NodaMoney;
@@ -99,7 +100,7 @@ public partial struct Money
         money1.ThrowIfContextMismatch(money2);
         try
         {
-            return new Money(checked(money1.Amount + money2.Amount), money1.Currency, money1.Context);
+            return BuildAddOrSubtractResult(checked(money1.Amount + money2.Amount), money1);
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -141,7 +142,7 @@ public partial struct Money
         money1.ThrowIfContextMismatch(money2);
         try
         {
-            return new Money(checked(money1.Amount - money2.Amount), money1.Currency, money1.Context);
+            return BuildAddOrSubtractResult(checked(money1.Amount - money2.Amount), money1);
         }
         catch (OverflowException ex) when (ex.Message == "Value was either too large or too small for a Decimal.")
         {
@@ -216,4 +217,44 @@ public partial struct Money
         decimal remainder = decimal.Remainder(money1.Amount, money2.Amount);
         return new Money(remainder, money1.Currency, money1.Context);
     }
+
+    /// <summary>Builds the result of an addition or subtraction. Skips the rounding pass and packs the sum's bits
+    /// directly when the context needs no rounding, or when the sum's scale is already within the context's target
+    /// scale for the currency; otherwise falls back to the full rounding constructor (KTD6).</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Money BuildAddOrSubtractResult(decimal sum, in Money money1)
+    {
+        MoneyContext context = money1.Context;
+
+#if NET7_0_OR_GREATER
+        int resultScale = sum.Scale;
+#else
+        int[] bits = decimal.GetBits(sum);
+        int resultScale = (bits[3] >> 16) & 0x7F;
+#endif
+
+        bool canSkipRounding = context.Kind switch
+        {
+            RoundingKind.None => true,
+            RoundingKind.Standard => resultScale <= TargetScale(money1.Currency, context),
+            _ => false
+        };
+
+        if (!canSkipRounding)
+            return new Money(sum, money1.Currency, context);
+
+#if NET7_0_OR_GREATER
+        Span<int> bits = stackalloc int[4];
+        decimal.GetBits(sum, bits);
+#endif
+        bool isNegative = (bits[3] & unchecked((int)0x80000000)) != 0;
+        return new Money(bits[0], bits[1], bits[2], isNegative, (byte)resultScale, money1.Currency, context.Index);
+    }
+
+    /// <summary>Gets the number of decimals an addition or subtraction result must not exceed to skip rounding: the
+    /// context's <see cref="MoneyContext.MaxScale"/> when set, otherwise 2 for a currency with a 2-decimal minor
+    /// unit, otherwise the currency's registered number of decimal digits.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int TargetScale(Currency currency, MoneyContext context) =>
+        context.MaxScale ?? (currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(currency).DecimalDigits);
 }
