@@ -185,8 +185,6 @@ static class CurrencyRegistry
 #endif
     }
 
-    /// <summary>Groups every currency under its code, symbol, international symbol and alternative symbols,
-    /// deduplicating keys that collide for the same currency (e.g. Symbol == InternationalSymbol).</summary>
     /// <summary>Publishes a new code map and rebuilds the currency and code-and-symbol maps from it. Called under the
     /// registration lock; the code map is published first because the code-and-symbol map is derived from it.</summary>
     static void PublishLookups(Dictionary<string, CurrencyInfo> byCode)
@@ -205,6 +203,8 @@ static class CurrencyRegistry
 #endif
     }
 
+    /// <summary>Groups every currency under its code, symbol, international symbol and alternative symbols,
+    /// deduplicating keys that collide for the same currency (e.g. Symbol == InternationalSymbol).</summary>
     static Dictionary<string, List<CurrencyInfo>> GroupByCodeAndSymbol()
     {
         var groups = new Dictionary<string, List<CurrencyInfo>>(StringComparer.Ordinal);

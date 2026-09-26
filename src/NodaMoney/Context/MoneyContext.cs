@@ -96,27 +96,34 @@ public sealed record MoneyContext
     {
         // Pre-initialize contexts for all standard rounding modes. Create contexts in the exact same order as the
         // MidpointRounding enum values! This ensures that their indices align with the enum values for fast lookup.
-
-        var toEvenContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven) });
-        Debug.Assert(toEvenContext.Index == (byte)MidpointRounding.ToEven, $"Index of ToEven context should be 0, but is {toEvenContext.Index}");
-        s_defaultThreadContext = toEvenContext; // Set default context to ToEven
-
-        var awayFromZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.AwayFromZero) });
-        Debug.Assert(awayFromZeroContext.Index == (byte)MidpointRounding.AwayFromZero, $"Index of AwayFromZero context should be 1, but is {awayFromZeroContext.Index}");
-
+        s_defaultThreadContext = Reserve(MidpointRounding.ToEven); // Set default context to ToEven
+        Reserve(MidpointRounding.AwayFromZero);
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
-        var toZeroContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToZero) });
-        Debug.Assert(toZeroContext.Index == (byte)MidpointRounding.ToZero, $"Index of ToZero context should be 2, but is {toZeroContext.Index}");
-
-        var toNegInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToNegativeInfinity) });
-        Debug.Assert(toNegInfContext.Index == (byte)MidpointRounding.ToNegativeInfinity, $"Index of ToNegativeInfinity context should be 3, but is {toNegInfContext.Index}");
-
-        var toPosInfContext = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToPositiveInfinity) });
-        Debug.Assert(toPosInfContext.Index == (byte)MidpointRounding.ToPositiveInfinity, $"Index of ToPositiveInfinity context should be 4, but is {toPosInfContext.Index}");
+        Reserve(MidpointRounding.ToZero);
+        Reserve(MidpointRounding.ToNegativeInfinity);
+        Reserve(MidpointRounding.ToPositiveInfinity);
 #endif
         FastMoney = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(MidpointRounding.ToEven), Precision = 19, MaxScale = 4 });
         NoRounding = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new NoRounding() });
+
+        static MoneyContext Reserve(MidpointRounding mode)
+        {
+            var context = new MoneyContext(new MoneyContextOptions { RoundingStrategy = new StandardRounding(mode) });
+            return context.Index == (byte)mode
+                ? context
+                : throw new InvalidOperationException($"Index of {mode} context should be {(byte)mode}, but is {context.Index}. The reserved indices must align with the MidpointRounding enum.");
+        }
     }
+
+    /// <summary>Rounds <paramref name="amount"/> with this context's strategy, switching on <see cref="Kind"/> so the
+    /// built-in strategies avoid the interface call.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal decimal Round(decimal amount, Currency currency) => Kind switch
+    {
+        RoundingKind.None => amount,
+        RoundingKind.Standard => ((StandardRounding)RoundingStrategy).Round(amount, currency, MaxScale),
+        _ => RoundingStrategy.Round(amount, currency, MaxScale)
+    };
 
     private MoneyContext(MoneyContextOptions options)
     {

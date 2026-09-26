@@ -94,15 +94,12 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <summary>Single-entry cache for <see cref="CurrentCurrency"/>, keyed on the <see cref="CultureInfo.CurrentCulture"/>
-    /// reference. Culture and currency live in one immutable entry so a reader never pairs a new culture with an old currency.</summary>
-    private sealed class CurrentCurrencyEntry(CultureInfo culture, CurrencyInfo currency)
-    {
-        public CultureInfo Culture { get; } = culture;
-        public CurrencyInfo Currency { get; } = currency;
-    }
-
-    private static CurrentCurrencyEntry? s_currentCurrencyEntry;
+    /// <summary>Caches the ISO currency code derived from a <see cref="CultureInfo"/> instance, keyed by culture
+    /// reference. Only the (cheap-to-derive) ISO code is cached, not the resolved <see cref="CurrencyInfo"/>, so
+    /// <see cref="CurrentCurrency"/> always resolves through <see cref="FromCode"/> and reflects a live
+    /// <see cref="CurrencyRegistry"/> mutation. Keying on the culture instance (a <see cref="ConditionalWeakTable{TKey,TValue}"/>)
+    /// avoids re-deriving the ISO code for every call while never pinning cultures in memory or growing unbounded.</summary>
+    private static readonly ConditionalWeakTable<CultureInfo, string> s_cultureToIsoCode = new();
 #endif
 
     /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -116,19 +113,18 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
             // See also use of ICU libs https://learn.microsoft.com/en-us/dotnet/core/compatibility/globalization/5.0/icu-globalization-api#currency-symbol
             var currentCulture = CultureInfo.CurrentCulture;
-            CurrentCurrencyEntry? entry = s_currentCurrencyEntry;
-            if (entry is not null && ReferenceEquals(currentCulture, entry.Culture))
-            {
-                return entry.Currency;
-            }
 
             // no region information can be extracted for the invariant culture
-            CurrencyInfo currency = Equals(currentCulture, CultureInfo.InvariantCulture)
-                ? NoCurrency
-                : FromCulture(currentCulture);
+            if (Equals(currentCulture, CultureInfo.InvariantCulture))
+                return NoCurrency;
 
-            s_currentCurrencyEntry = new CurrentCurrencyEntry(currentCulture, currency);
-            return currency;
+            if (!s_cultureToIsoCode.TryGetValue(currentCulture, out string? isoCode))
+            {
+                isoCode = new RegionInfo(currentCulture.Name).ISOCurrencySymbol;
+                s_cultureToIsoCode.AddOrUpdate(currentCulture, isoCode);
+            }
+
+            return FromCode(isoCode);
 #else
             RegionInfo currentRegion = RegionInfo.CurrentRegion;
             return currentRegion.Name == "IV" ? NoCurrency : GetInstance(currentRegion);

@@ -306,6 +306,8 @@ public class TryFormat
     [InlineData("C")]
     [InlineData("C0")]
     [InlineData("G")]
+    [InlineData("I")]
+    [InlineData("I0")]
     [InlineData("N2")]
     [InlineData("F")]
     public void TryFormat_ShouldWriteSameCharactersAsToString_ForCurrencyStyleSpecifiers(string format)
@@ -328,6 +330,7 @@ public class TryFormat
     [Theory]
     [InlineData("C")]
     [InlineData("G")]
+    [InlineData("I")]
     [InlineData("N2")]
     [InlineData("F")]
     public void TryFormat_ShouldFailWithZeroCharsWritten_WhenBufferTooSmallForCurrencyStyleSpecifiers(string format)

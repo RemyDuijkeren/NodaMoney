@@ -197,4 +197,87 @@ public class AddAndSubtractWithoutReRounding
         result.Amount.Should().Be(0.010m);
         result.Scale.Should().Be(3);
     }
+
+    [Fact]
+    public void SubtractOperator_SameValueFromItself_ReturnsNormalizedZero()
+    {
+        // Arrange
+        Money money1 = new(3.00m, "EUR");
+        Money money2 = new(3.00m, "EUR");
+
+        // Act
+        Money result = money1 - money2;
+
+        // Assert
+        result.Should().Be(new Money(0m, "EUR"));
+        result.Scale.Should().Be(0);
+        result.Amount.ToString().Should().Be("0");
+    }
+
+    [Fact]
+    public void SubtractOperator_NegativeValueFromItself_ReturnsNormalizedZeroWithoutSignBit()
+    {
+        // Arrange
+        Money money1 = new(-3.00m, "EUR");
+        Money money2 = new(-3.00m, "EUR");
+
+        // Act
+        Money result = money1 - money2;
+
+        // Assert
+        result.Should().Be(new Money(0m, "EUR"));
+        result.Scale.Should().Be(0);
+        Money.IsNegative(result).Should().BeFalse();
+        result.Amount.ToString().Should().Be("0");
+    }
+
+    [Fact]
+    public void AddOperator_ValueAndItsNegation_ReturnsNormalizedZero()
+    {
+        // Arrange
+        Money money1 = new(3.00m, "EUR");
+        Money money2 = new(-3.00m, "EUR");
+
+        // Act
+        Money result = money1 + money2;
+
+        // Assert
+        result.Should().Be(new Money(0m, "EUR"));
+        result.Scale.Should().Be(0);
+        Money.IsNegative(result).Should().BeFalse();
+        result.Amount.ToString().Should().Be("0");
+    }
+
+    [Fact]
+    public void AddOperator_ZeroDecimalCurrencyWholeAmounts_ReturnsSumWithScale0()
+    {
+        // Arrange
+        Money money1 = new(100m, "JPY");
+        Money money2 = new(250m, "JPY");
+
+        // Act
+        Money result = money1 + money2;
+
+        // Assert
+        result.Amount.Should().Be(350m);
+        result.Scale.Should().Be(0);
+        result.ContextIndex.Should().Be(money1.ContextIndex);
+    }
+
+    [Fact]
+    public void AddOperator_ThreeDecimalCurrency_ReturnsSumWithScale3AndOperandsContext()
+    {
+        // Arrange
+        CurrencyInfo.FromCode("BHD").DecimalDigits.Should().Be(3);
+        Money money1 = new(1.234m, "BHD");
+        Money money2 = new(2.345m, "BHD");
+
+        // Act
+        Money result = money1 + money2;
+
+        // Assert
+        result.Amount.Should().Be(3.579m);
+        result.Scale.Should().Be(3);
+        result.ContextIndex.Should().Be(money1.ContextIndex);
+    }
 }

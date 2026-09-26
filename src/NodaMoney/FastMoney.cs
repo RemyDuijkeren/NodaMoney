@@ -84,14 +84,11 @@ public readonly partial record struct FastMoney // TODO add interface IMoney or 
         }
 
         // Round the amount to the correct scale
-        amount = context!.Kind switch
+        // Fast path: ToOACurrency() rounds to 4 decimals using MidpointRounding.ToEven! So we can skip the rounding here.
+        if (context!.Kind != RoundingKind.Standard || context.Mode != MidpointRounding.ToEven || context.MaxScale != 4)
         {
-            RoundingKind.None => amount,
-            // Fast path: ToOACurrency() rounds to 4 decimals using MidpointRounding.ToEven! So we can skip the rounding here.
-            RoundingKind.Standard when context.Mode == MidpointRounding.ToEven && context.MaxScale == 4 => amount,
-            RoundingKind.Standard => ((StandardRounding)context.RoundingStrategy).Round(amount, currency, context.MaxScale),
-            _ => context.RoundingStrategy.Round(amount, currency, context.MaxScale)
-        };
+            amount = context.Round(amount, currency);
+        }
 
         ContextIndex = context.Index;
         try

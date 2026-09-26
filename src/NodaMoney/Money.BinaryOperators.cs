@@ -224,6 +224,10 @@ public partial struct Money
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Money BuildAddOrSubtractResult(decimal sum, in Money money1)
     {
+        // An exact zero must go through the constructor's own zero fast path, so it normalizes to Scale 0
+        // without a sign bit, like every other Money zero.
+        if (sum == 0m) return new Money(sum, money1.Currency, money1.Context);
+
         MoneyContext context = money1.Context;
 
 #if NET7_0_OR_GREATER

@@ -103,4 +103,51 @@ public class AddAndSubtractFastMoney
         action.Should().Throw<OverflowException>()
             .WithMessage("Value was either too large or too small for a FastMoney.");
     }
+
+    [Fact]
+    public void DecrementOperator_MinValue_ThrowOverflowExceptionWithFastMoneyMessage()
+    {
+        // Arrange
+        FastMoney minValue = FastMoney.MinValue;
+
+        // Act
+        Action action = () => { var result = --minValue; };
+
+        // Assert
+        action.Should().Throw<OverflowException>()
+            .WithMessage("Value was either too large or too small for a FastMoney.")
+            .WithInnerException<OverflowException>();
+    }
+
+    [Fact]
+    public void AddOperator_MaxValueEurPlusOneDecimal_ThrowOverflowExceptionWithFastMoneyMessage()
+    {
+        // Arrange
+        Currency eur = CurrencyInfo.FromCode("EUR");
+        FastMoney maxValueEur = FastMoney.MaxValue with { Currency = eur };
+
+        // Act
+        Action action = () => { var result = maxValueEur + 1m; };
+
+        // Assert
+        action.Should().Throw<OverflowException>()
+            .WithMessage("Value was either too large or too small for a FastMoney.")
+            .WithInnerException<OverflowException>();
+    }
+
+    [Fact]
+    public void SubtractOperator_MinValueEurMinusOneDecimal_ThrowOverflowExceptionWithFastMoneyMessage()
+    {
+        // Arrange
+        Currency eur = CurrencyInfo.FromCode("EUR");
+        FastMoney minValueEur = FastMoney.MinValue with { Currency = eur };
+
+        // Act
+        Action action = () => { var result = minValueEur - 1m; };
+
+        // Assert
+        action.Should().Throw<OverflowException>()
+            .WithMessage("Value was either too large or too small for a FastMoney.")
+            .WithInnerException<OverflowException>();
+    }
 }

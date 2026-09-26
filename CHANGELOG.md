@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `FastMoney` construction accepts the full documented range, -922,337,203,685,477.5808 to 922,337,203,685,477.5807. It
   previously rejected any amount beyond the whole-unit cutoff 922,337,203,685,477, so amounts within that last fraction
   no longer throw `ArgumentOutOfRangeException`.
+- `CurrencyInfo.GetFormat(typeof(NumberFormatInfo))` and the formatting paths that use it now return a shared, read-only
+  `NumberFormatInfo` when the source culture is read-only (the default current culture and `CultureInfo.GetCultureInfo`
+  instances), instead of a fresh mutable clone per call. Mutating the returned instance throws `InvalidOperationException`.
+  A mutable culture or a caller-owned `NumberFormatInfo` still gets a per-call clone.
 - Performance of the `Money` and `FastMoney` hot paths, measured on Linux against the 2.8 report
   (`tests/Benchmark/PerformanceReportV2.8-linux.md`): the `MoneyContext` registry is an array lookup instead of a
   dictionary; rounding dispatches on a precomputed kind instead of type tests; `Negate`, `Abs`, `++` and `--` edit the
