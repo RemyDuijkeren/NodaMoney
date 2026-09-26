@@ -35,13 +35,16 @@ public partial struct Money
     public static Money NegativeOne => new(-1m, Currency.NoCurrency);
 
     /// <inheritdoc cref="INumberBase{TSelf}.Abs(TSelf)" />
-    public static Money Abs(Money value) => new(Math.Abs(value.Amount), value.Currency);
+    /// <remarks>Preserves the operand's <see cref="Context"/>, currency and scale; only the sign bit changes.</remarks>
+    public static Money Abs(Money value) => new(value._flags & ~SignMask, value._low, value._mid, value._high);
 
     /// <inheritdoc cref="INumberBase{TSelf}.IsNegative(TSelf)" />
-    public static bool IsNegative(Money value) => value.Amount < 0;
+    public static bool IsNegative(Money value) =>
+        (value._low | value._mid | value._high) != 0u && (value._flags & SignMask) != 0;
 
     /// <inheritdoc cref="INumberBase{TSelf}.IsPositive(TSelf)" />
-    public static bool IsPositive(Money value) => value.Amount >= 0;
+    public static bool IsPositive(Money value) =>
+        (value._low | value._mid | value._high) == 0u || (value._flags & SignMask) == 0;
 
     /// <inheritdoc cref="INumberBase{TSelf}.IsZero(TSelf)" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

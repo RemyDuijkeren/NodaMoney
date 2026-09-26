@@ -76,7 +76,7 @@ public readonly partial struct Money : IEquatable<Money>
                  | (bits[3] & (ScaleMask | SignMask)); // Preserve Scale Factor (16–23) and Sign (31)
     }
 
-    internal Money(int lo, int mid, int hi, bool isNegative, byte scale, Currency currency, MoneyContext context)
+    internal Money(int lo, int mid, int hi, bool isNegative, byte scale, Currency currency, MoneyContextIndex index)
     {
         if (scale > 28)
             throw new ArgumentOutOfRangeException(nameof(scale), "Scale must be within 0 to 28.");
@@ -86,10 +86,20 @@ public readonly partial struct Money : IEquatable<Money>
         _high = (uint)hi;
         _flags = (currency.EncodedValue & CurrencyMask) // Store Currency in bits 0–15
                  | ((scale << 16) & ScaleMask) // Store Scale Factor (16–23)
-                 | ((context.Index << 24) & IndexMask); // Store Index in bits 24–30
+                 | ((index << 24) & IndexMask); // Store Index in bits 24–30
 
         if (isNegative)
             _flags |= SignMask; // Store Sign (31)
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="Money"/> struct from the raw flags word and mantissa
+    /// words. Performs no validation; only for use where the bits are already known valid.</summary>
+    private Money(int flags, uint low, uint mid, uint high)
+    {
+        _flags = flags;
+        _low = low;
+        _mid = mid;
+        _high = high;
     }
 
     /// <summary>Gets the amount of money.</summary>

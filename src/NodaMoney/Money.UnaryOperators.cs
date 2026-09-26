@@ -45,16 +45,8 @@ public partial struct Money
         if ((money._low | money._mid | money._high) == 0u)
             return money; // -0 == +0
 
-        // Flip sign by reconstructing with the same magnitude and inverted sign bit
-        bool isNegative = (money._flags & SignMask) != 0;
-        return new Money(
-            unchecked((int)money._low),
-            unchecked((int)money._mid),
-            unchecked((int)money._high),
-            !isNegative,
-            money.Scale,
-            money.Currency,
-            money.Context);
+        // Flip the sign bit only; magnitude, scale, currency and context index stay the same
+        return new Money(money._flags ^ SignMask, money._low, money._mid, money._high);
     }
 
     /// <summary>Increments the specified money.</summary>
@@ -90,6 +82,6 @@ public partial struct Money
         bool isNegative = (flags & unchecked((int)0x80000000)) != 0;
         byte scale = (byte)((flags >> 16) & 0x7F);
 
-        return new Money(lo, mid, hi, isNegative, scale, money.Currency, money.Context);
+        return new Money(lo, mid, hi, isNegative, scale, money.Currency, money.ContextIndex);
     }
 }
