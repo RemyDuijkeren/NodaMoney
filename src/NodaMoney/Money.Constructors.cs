@@ -11,7 +11,15 @@ public readonly partial struct Money
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public Money(decimal amount) : this(amount, MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency) { }
+    public Money(decimal amount) : this(amount, ResolveDefaultCurrency(out var context), context) { }
+
+    /// <summary>Reads <see cref="MoneyContext.CurrentContext"/> once and returns its default currency, so the caller
+    /// can pass the same context through without a second <see cref="MoneyContext.CurrentContext"/> read.</summary>
+    private static Currency ResolveDefaultCurrency(out MoneyContext context)
+    {
+        context = MoneyContext.CurrentContext;
+        return context.DefaultCurrency ?? CurrencyInfo.CurrentCurrency;
+    }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

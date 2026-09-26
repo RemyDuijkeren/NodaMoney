@@ -17,7 +17,16 @@ public readonly partial record struct FastMoney
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</remarks>
-    public FastMoney(decimal amount) : this(amount, MoneyContext.CurrentContext.DefaultCurrency ?? CurrencyInfo.CurrentCurrency) { }
+    public FastMoney(decimal amount) : this(amount, ResolveDefaultCurrency()) { }
+
+    /// <summary>Reads <see cref="MoneyContext.CurrentContext"/> once and returns its default currency. Unlike
+    /// <see cref="Money"/>, <see cref="FastMoney"/> does not use this context as its own context (it falls back to
+    /// <see cref="MoneyContext.FastMoney"/> when none is supplied), so only the currency is passed through.</summary>
+    private static Currency ResolveDefaultCurrency()
+    {
+        MoneyContext context = MoneyContext.CurrentContext;
+        return context.DefaultCurrency ?? CurrencyInfo.CurrentCurrency;
+    }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

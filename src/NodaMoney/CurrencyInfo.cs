@@ -36,6 +36,27 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     readonly string? _internationalSymbol;
 
+    /// <summary>Lazily caches the <see cref="Currency"/> encoding of this instance, without affecting record equality.</summary>
+    /// <remarks>
+    /// <see cref="CurrencyInfo"/> is a record with compiler-generated equality, so a plain cache field would make two
+    /// structurally equal instances compare unequal once only one of them had been converted to a <see cref="Currency"/>.
+    /// This holder's <see cref="Equals(object)"/> always returns <see langword="true"/> and its <see cref="GetHashCode"/>
+    /// is constant, so the field never affects the record's equality or hash code. The <see cref="Code"/> and
+    /// <see cref="MinorUnit"/> init accessors replace it with a fresh, empty holder; other <c>with</c>-copies keep
+    /// sharing the still-valid one.
+    /// </remarks>
+    sealed class CurrencyCache
+    {
+        /// <summary>The encoded <see cref="Currency"/> value plus one, so zero means "not computed yet". A single
+        /// word is written atomically, which keeps concurrent readers from observing a half-initialized cache.</summary>
+        public int EncodedPlusOne;
+
+        public override bool Equals(object? obj) => true;
+        public override int GetHashCode() => 0;
+    }
+
+    CurrencyCache _currencyCache = new();
+
     // TODO: use MoneyContext for this?
     // [ThreadStatic] static CurrencyInfo? s_currentThreadCurrency;
     //
@@ -71,6 +92,18 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
 
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <summary>Single-entry cache for <see cref="CurrentCurrency"/>, keyed on the <see cref="CultureInfo.CurrentCulture"/>
+    /// reference. Culture and currency live in one immutable entry so a reader never pairs a new culture with an old currency.</summary>
+    private sealed class CurrentCurrencyEntry(CultureInfo culture, CurrencyInfo currency)
+    {
+        public CultureInfo Culture { get; } = culture;
+        public CurrencyInfo Currency { get; } = currency;
+    }
+
+    private static CurrentCurrencyEntry? s_currentCurrencyEntry;
+#endif
+
     /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
     /// <value>The Currency that represents the country/region used by the current thread.</value>
     public static CurrencyInfo CurrentCurrency
@@ -82,12 +115,19 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             // Windows settings. See also https://github.com/xunit/samples.xunit/pull/18
             // See also use of ICU libs https://learn.microsoft.com/en-us/dotnet/core/compatibility/globalization/5.0/icu-globalization-api#currency-symbol
             var currentCulture = CultureInfo.CurrentCulture;
-            if (Equals(currentCulture, CultureInfo.InvariantCulture)) // no region information can be extracted
+            CurrentCurrencyEntry? entry = s_currentCurrencyEntry;
+            if (entry is not null && ReferenceEquals(currentCulture, entry.Culture))
             {
-                return NoCurrency;
+                return entry.Currency;
             }
 
-            return FromCulture(currentCulture);
+            // no region information can be extracted for the invariant culture
+            CurrencyInfo currency = Equals(currentCulture, CultureInfo.InvariantCulture)
+                ? NoCurrency
+                : FromCulture(currentCulture);
+
+            s_currentCurrencyEntry = new CurrentCurrencyEntry(currentCulture, currency);
+            return currency;
 #else
             RegionInfo currentRegion = RegionInfo.CurrentRegion;
             return currentRegion.Name == "IV" ? NoCurrency : GetInstance(currentRegion);
@@ -96,7 +136,15 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     }
 
     /// <summary>The (ISO-4217) three-character code of the currency.</summary>
-    public string Code { get; init; }
+    public string Code
+    {
+        get;
+        init
+        {
+            field = value;
+            _currencyCache = new CurrencyCache();
+        }
+    }
 
     /// <summary>The (ISO-4217) number of the currency.</summary>
     public short Number { get; init; } = -1;
@@ -147,7 +195,15 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public string NumericCode => Number.ToString("D3", CultureInfo.InvariantCulture);
 
     /// <summary>The minor unit, as an exponent of base 10, by which the currency unit can be divided in.</summary>
-    public MinorUnit MinorUnit { get; init; }
+    public MinorUnit MinorUnit
+    {
+        get;
+        init
+        {
+            field = value;
+            _currencyCache = new CurrencyCache();
+        }
+    }
 
     /// <summary>Gets the number of digits after the decimal separator.</summary>
     /// <remarks>
@@ -238,7 +294,18 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     /// <summary>Defines an implicit conversion operator from <see cref="CurrencyInfo"/> to <see cref="Currency"/>.</summary>
     /// <param name="currencyInfo">The currency information from which a <see cref="Currency"/> instance will be created.</param>
     /// <returns>A new instance of <see cref="Currency"/> initialized with the provided <see cref="CurrencyInfo"/>.</returns>
-    public static implicit operator Currency(CurrencyInfo currencyInfo) => new(currencyInfo.Code.AsSpan(), currencyInfo.MinorUnit == MinorUnit.Two);
+    public static implicit operator Currency(CurrencyInfo currencyInfo)
+    {
+        CurrencyCache cache = currencyInfo._currencyCache;
+        int encodedPlusOne = cache.EncodedPlusOne;
+        if (encodedPlusOne == 0)
+        {
+            encodedPlusOne = new Currency(currencyInfo.Code.AsSpan(), currencyInfo.MinorUnit == MinorUnit.Two).EncodedValue + 1;
+            cache.EncodedPlusOne = encodedPlusOne;
+        }
+
+        return new Currency((ushort)(encodedPlusOne - 1));
+    }
 
     /// <summary>Creates a new instance of <see cref="CurrencyInfo"/> with the specified three-character currency code.</summary>
     /// <param name="code">The (ISO-4217) three-character currency code.</param>
