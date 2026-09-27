@@ -78,12 +78,13 @@ public class DefaultFormat
     [UseCulture("de-CH")]
     public void WhenToStringAndCurrentCultureDeCH_ThenDecimalsFollowsCurrencyAndAmountFollowsCurrentCultureFR()
     {
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
         Thread.CurrentThread.CurrentCulture.Name.Should().Be("de-CH");
-        _yen.ToString().Should().Be("¥-98’765");
-        _euro.ToString().Should().Be("€-98’765.43");
-        _dollar.ToString().Should().Be("$-98’765.43");
-        _dinar.ToString().Should().Be("BD-98’765.432");
-        _swissFranc.ToString().Should().Be("Fr.-98’765.43");
+        _yen.ToString().Should().Be($"¥-98{g}765");
+        _euro.ToString().Should().Be($"€-98{g}765.43");
+        _dollar.ToString().Should().Be($"$-98{g}765.43");
+        _dinar.ToString().Should().Be($"BD-98{g}765.432");
+        _swissFranc.ToString().Should().Be($"Fr.-98{g}765.43");
     }
 
     [Fact]

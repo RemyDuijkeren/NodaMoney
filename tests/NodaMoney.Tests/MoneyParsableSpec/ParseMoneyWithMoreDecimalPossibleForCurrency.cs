@@ -1,3 +1,4 @@
+using System.Globalization;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyParsableSpec;
@@ -24,10 +25,11 @@ public class ParseMoneyWithMoreDecimalPossibleForCurrency
     [Fact, UseCulture("de-CH")]
     public void WhenParsingSwissFranc_ThenThisShouldBeRoundedUp()
     {
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
         // CHF 98.765,45 : Period (.) as the thousands separator (common in everyday usage)
         // CHF 98’765.45 : Apostrophe (’) as the thousands separator (formal and financial contexts)
 
-        var money = Money.Parse("CHF 98’765.475");
+        var money = Money.Parse($"CHF 98{g}765.475");
 
         money.Should().Be(new Money(98765.48m, "CHF"));
     }

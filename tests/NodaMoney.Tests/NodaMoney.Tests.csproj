@@ -48,7 +48,6 @@
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Xunit.SkippableFact" Version="1.5.61" />
   </ItemGroup>
 
 </Project>

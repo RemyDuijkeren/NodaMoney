@@ -1,3 +1,4 @@
+using System.Globalization;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyParsableSpec;
@@ -95,7 +96,8 @@ public class ParseImplicitCurrency
     [Fact, UseCulture("de-CH")]
     public void WhenParsingChfSymbolInSwitzerlandGermanSpeaking_ThenThisShouldReturnSwissFranc()
     {
-        var money = Money.Parse("-98’765.23 Fr.");
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        var money = Money.Parse($"-98{g}765.23 Fr.");
 
         money.Should().Be(new Money(-98_765.23m, "CHF"));
     }
@@ -103,7 +105,8 @@ public class ParseImplicitCurrency
     [Fact, UseCulture("de-CH")]
     public void WhenParsingChfInternationalSymbolInSwitzerlandGermanSpeaking_ThenThisShouldReturnSwissFranc()
     {
-        var money = Money.Parse("-98’765.23 CHF");
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        var money = Money.Parse($"-98{g}765.23 CHF");
 
         money.Should().Be(new Money(-98_765.23m, "CHF"));
     }

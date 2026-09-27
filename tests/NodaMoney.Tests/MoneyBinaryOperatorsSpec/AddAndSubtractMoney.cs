@@ -41,6 +41,11 @@ public class AddAndSubtractMoney
         [-10, 0, -10]
     ];
 
+    /// <summary>The rows of <see cref="TestData"/> without a zero: zero is currency and context neutral in add and
+    /// subtract, so those rows would not throw. Zero has its own cases above.</summary>
+    public static IEnumerable<object[]> TestDataWithoutZero =>
+        TestData.Where(row => row.All(v => Convert.ToDecimal(v) != 0));
+
     [Theory, MemberData(nameof(TestData))]
     public void DecimalAdd_ValidateTestData(decimal value1, decimal value2, decimal expected)
     {
@@ -269,11 +274,9 @@ public class AddAndSubtractMoney
     }
 
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void AddOperator_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -285,11 +288,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void AddMethod_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -301,11 +302,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void SubtractOperator_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal expected, decimal value2, decimal value1)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -317,11 +316,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void SubtractMethod_WithDifferentCurrency_ThrowInvalidCurrencyException(decimal expected, decimal value2, decimal value1)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "USD");
@@ -333,11 +330,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void AddOperator_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
@@ -349,11 +344,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void AddMethod_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
@@ -365,11 +358,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void SubtractOperator_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);
@@ -381,11 +372,9 @@ public class AddAndSubtractMoney
         action.Should().Throw<MoneyContextMismatchException>().WithMessage("MoneyContext mismatch*");
     }
 
-    [SkippableTheory, MemberData(nameof(TestData))]
+    [Theory, MemberData(nameof(TestDataWithoutZero))]
     public void SubtractMethod_WithDifferentContext_ThrowMoneyContextMismatchException(decimal value1, decimal value2, decimal expected)
     {
-        Skip.If(value1 == 0 || value2 == 0, "Skip for 0 values");
-
         // Arrange
         var money1 = new Money(value1, "EUR");
         var money2 = new Money(value2, "EUR", MoneyContext.NoRounding);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using NodaMoney.Tests.Helpers;
 
 namespace NodaMoney.Tests.MoneyParsableSpec;
@@ -62,7 +63,8 @@ public class ParseNegativeMoney
     [Fact, UseCulture("de-CH")]
     public void WhenMinusSignBeforeChfSign_ThenThisShouldSucceed()
     {
-        var money = Money.Parse("-CHF 98’765.43");
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        var money = Money.Parse($"-CHF 98{g}765.43");
 
         money.Should().Be(new Money(-98765.43, "CHF"));
     }
@@ -70,7 +72,8 @@ public class ParseNegativeMoney
     [Fact, UseCulture("de-CH")]
     public void WhenMinusSignAfterCHFSign_ThenThisShouldSucceed()
     {
-        var money = Money.Parse("CHF -98’765.43");
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        var money = Money.Parse($"CHF -98{g}765.43");
 
         money.Should().Be(new Money(-98765.43, "CHF"));
     }
@@ -78,7 +81,8 @@ public class ParseNegativeMoney
     [Fact, UseCulture("de-CH")]
     public void WhenChfWithParentheses_ThenThisShouldSucceed()
     {
-        var money = Money.Parse("(CHF 98’765.43)");
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        var money = Money.Parse($"(CHF 98{g}765.43)");
 
         money.Should().Be(new Money(-98765.43, "CHF"));
     }

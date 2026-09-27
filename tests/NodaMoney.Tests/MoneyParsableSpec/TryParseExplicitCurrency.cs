@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.ExceptionServices;
 using NodaMoney.Tests.Helpers;
 
@@ -134,7 +135,8 @@ public class TryParseExplicitCurrency
     [Fact, UseCulture("de-CH")]
     public void WhenParsingSwissFrancInSwitzerlandGermanSpeaking_ThenThisShouldSucceed()
     {
-        Money.TryParse("CHF -98’765", CurrencyInfo.FromCode("CHF"), out Money money).Should().BeTrue();
+        string g = CultureInfo.CurrentCulture.NumberFormat.CurrencyGroupSeparator; // U+2019 or U+0027 depending on the ICU version
+        Money.TryParse($"CHF -98{g}765", CurrencyInfo.FromCode("CHF"), out Money money).Should().BeTrue();
 
         money.Should().Be(new Money(-98_765m, "CHF"));
     }
