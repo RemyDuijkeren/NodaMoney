@@ -69,50 +69,70 @@
 | fEqualOrBigger    | 1.1878 ns | 0.0211 ns |    841,869,698.3 |  0.35 |         - |          NA |
 | fBigger           | 1.2312 ns | 0.0047 ns |    812,209,340.0 |  0.37 |         - |          NA |
 
-## MoneyOperations
+## AdditiveOperations
 ### v2.8-linux
 | Method                  | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
 |------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
 | Add                     | 20.689 ns | 0.3419 ns |  48,333,857.1 | 15.81 |         - |          NA |
 | Subtract                | 20.123 ns | 0.0814 ns |  49,693,933.0 | 15.38 |         - |          NA |
-| Multiple                | 18.819 ns | 0.3971 ns |  53,138,659.5 | 14.38 |         - |          NA |
-| Divide                  | 61.429 ns | 0.8173 ns |  16,278,848.1 | 46.94 |         - |          NA |
 | Increment               |  9.589 ns | 0.1794 ns | 104,283,243.7 |  7.33 |         - |          NA |
 | Decrement               |  9.581 ns | 0.0612 ns | 104,378,673.5 |  7.32 |         - |          NA |
 | Remainder               | 18.224 ns | 0.0914 ns |  54,871,257.8 | 13.92 |         - |          NA |
 | fAdd                    |  1.309 ns | 0.0130 ns | 763,999,716.2 |  1.00 |         - |          NA |
 | fSubtract               |  1.198 ns | 0.0079 ns | 834,544,475.5 |  0.92 |         - |          NA |
+| fIncrement              |  5.160 ns | 0.0120 ns | 193,802,443.1 |  3.94 |         - |          NA |
+| fDecrement              |  5.196 ns | 0.0139 ns | 192,461,021.5 |  3.97 |         - |          NA |
+| fRemainder              |  1.693 ns | 0.0101 ns | 590,631,414.4 |  1.29 |         - |          NA |
+### v2.9-linux
+| Method        | Categories | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|-------------- |----------- |----------:|----------:|--------------:|------:|----------:|------------:|
+| dAdd          | Add        |  4.710 ns | 0.0272 ns | 212,325,381.4 |  1.00 |         - |          NA |
+| Add           | Add        | 20.450 ns | 0.3294 ns |  48,900,147.4 |  4.34 |         - |          NA |
+| AddMixedScale | Add        | 21.137 ns | 0.3584 ns |  47,311,440.8 |  4.49 |         - |          NA |
+| fAdd          | Add        |  1.205 ns | 0.0060 ns | 829,906,284.6 |  0.26 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dDecrement    | Decrement  | 15.180 ns | 0.0280 ns |  65,874,027.7 |  1.00 |         - |          NA |
+| Decrement     | Decrement  |  7.709 ns | 0.0477 ns | 129,720,770.9 |  0.51 |         - |          NA |
+| fDecrement    | Decrement  |  2.722 ns | 0.0044 ns | 367,424,321.8 |  0.18 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dIncrement    | Increment  | 15.199 ns | 0.0583 ns |  65,792,880.2 |  1.00 |         - |          NA |
+| Increment     | Increment  |  7.986 ns | 0.0529 ns | 125,222,272.8 |  0.53 |         - |          NA |
+| fIncrement    | Increment  |  2.775 ns | 0.0232 ns | 360,297,734.6 |  0.18 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dRemainder    | Remainder  |  5.863 ns | 0.0330 ns | 170,559,640.2 |  1.00 |         - |          NA |
+| Remainder     | Remainder  | 19.347 ns | 0.0283 ns |  51,688,077.5 |  3.30 |         - |          NA |
+| fRemainder    | Remainder  |  1.751 ns | 0.0117 ns | 571,165,916.4 |  0.30 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dSubtract     | Subtract   |  4.719 ns | 0.0103 ns | 211,895,163.8 |  1.00 |         - |          NA |
+| Subtract      | Subtract   | 21.321 ns | 0.1095 ns |  46,901,410.1 |  4.52 |         - |          NA |
+| fSubtract     | Subtract   |  1.212 ns | 0.0117 ns | 824,780,116.9 |  0.26 |         - |          NA |
+
+## MultiplicativeOperations
+### v2.8-linux
+| Method                  | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
+| Multiple                | 18.819 ns | 0.3971 ns |  53,138,659.5 | 14.38 |         - |          NA |
+| Divide                  | 61.429 ns | 0.8173 ns |  16,278,848.1 | 46.94 |         - |          NA |
 | fMultipleDec            | 15.800 ns | 0.1004 ns |  63,289,385.3 | 12.07 |         - |          NA |
 | fMultipleDecWholeNumber |  7.692 ns | 0.0166 ns | 130,010,288.7 |  5.88 |         - |          NA |
 | fMultipleLong           |  2.254 ns | 0.0124 ns | 443,601,922.4 |  1.72 |         - |          NA |
 | fDivideDec              | 50.625 ns | 0.3219 ns |  19,752,911.9 | 38.68 |         - |          NA |
 | fDivideDecWholeNumber   |  8.713 ns | 0.1105 ns | 114,777,109.5 |  6.66 |         - |          NA |
 | fDivideLong             |  2.294 ns | 0.0387 ns | 435,944,300.4 |  1.75 |         - |          NA |
-| fIncrement              |  5.160 ns | 0.0120 ns | 193,802,443.1 |  3.94 |         - |          NA |
-| fDecrement              |  5.196 ns | 0.0139 ns | 192,461,021.5 |  3.97 |         - |          NA |
-| fRemainder              |  1.693 ns | 0.0101 ns | 590,631,414.4 |  1.29 |         - |          NA |
 ### v2.9-linux
-| Method                  | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
-|------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
-| Add                     | 19.971 ns | 0.0534 ns |  50,072,718.9 | 16.50 |         - |          NA |
-| AddMixedScale           | 20.761 ns | 0.0920 ns |  48,167,101.3 | 17.15 |         - |          NA |
-| Subtract                | 21.168 ns | 0.0732 ns |  47,240,300.0 | 17.49 |         - |          NA |
-| Multiple                | 19.556 ns | 0.0462 ns |  51,136,142.4 | 16.16 |         - |          NA |
-| Divide                  | 59.976 ns | 0.1724 ns |  16,673,415.6 | 49.55 |         - |          NA |
-| Increment               |  8.025 ns | 0.0922 ns | 124,617,806.9 |  6.63 |         - |          NA |
-| Decrement               |  7.720 ns | 0.0718 ns | 129,534,340.6 |  6.38 |         - |          NA |
-| Remainder               | 18.490 ns | 0.0928 ns |  54,082,394.4 | 15.28 |         - |          NA |
-| fAdd                    |  1.211 ns | 0.0296 ns | 825,757,923.4 |  1.00 |         - |          NA |
-| fSubtract               |  1.186 ns | 0.0036 ns | 843,171,122.2 |  0.98 |         - |          NA |
-| fMultipleDec            | 16.366 ns | 0.0840 ns |  61,103,935.9 | 13.52 |         - |          NA |
-| fMultipleDecWholeNumber |  7.972 ns | 0.0355 ns | 125,432,887.3 |  6.59 |         - |          NA |
-| fMultipleLong           |  1.911 ns | 0.0074 ns | 523,339,752.7 |  1.58 |         - |          NA |
-| fDivideDec              | 15.994 ns | 0.0250 ns |  62,522,065.8 | 13.21 |         - |          NA |
-| fDivideDecWholeNumber   |  9.992 ns | 0.0340 ns | 100,082,422.3 |  8.25 |         - |          NA |
-| fDivideLong             |  1.891 ns | 0.0180 ns | 528,798,404.7 |  1.56 |         - |          NA |
-| fIncrement              |  2.739 ns | 0.0090 ns | 365,109,462.2 |  2.26 |         - |          NA |
-| fDecrement              |  2.727 ns | 0.0044 ns | 366,650,376.8 |  2.25 |         - |          NA |
-| fRemainder              |  1.726 ns | 0.0058 ns | 579,418,505.3 |  1.43 |         - |          NA |
+| Method                  | Categories | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|------------------------ |----------- |----------:|----------:|--------------:|------:|----------:|------------:|
+| dDivide                 | Divide     | 21.912 ns | 0.1356 ns |  45,637,121.5 |  1.00 |         - |          NA |
+| Divide                  | Divide     | 60.264 ns | 0.2817 ns |  16,593,767.7 |  2.75 |         - |          NA |
+| fDivideDec              | Divide     | 15.989 ns | 0.0617 ns |  62,542,817.2 |  0.73 |         - |          NA |
+| fDivideDecWholeNumber   | Divide     |  9.956 ns | 0.1152 ns | 100,439,560.5 |  0.45 |         - |          NA |
+| fDivideLong             | Divide     |  1.913 ns | 0.0295 ns | 522,692,893.0 |  0.09 |         - |          NA |
+|                         |            |           |           |               |       |           |             |
+| dMultiple               | Multiply   |  4.414 ns | 0.0134 ns | 226,540,894.2 |  1.00 |         - |          NA |
+| Multiple                | Multiply   | 25.940 ns | 0.1680 ns |  38,550,511.0 |  5.88 |         - |          NA |
+| fMultipleDec            | Multiply   | 16.470 ns | 0.0893 ns |  60,715,435.0 |  3.73 |         - |          NA |
+| fMultipleDecWholeNumber | Multiply   |  8.088 ns | 0.0226 ns | 123,632,465.2 |  1.83 |         - |          NA |
+| fMultipleLong           | Multiply   |  1.933 ns | 0.0329 ns | 517,446,379.5 |  0.44 |         - |          NA |
 
 ## MoneyFormatting
 ### v2.8-linux
