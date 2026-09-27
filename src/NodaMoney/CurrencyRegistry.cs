@@ -189,6 +189,24 @@ static class CurrencyRegistry
     /// registration lock; the code map is published first because the code-and-symbol map is derived from it.</summary>
     static void PublishLookups(Dictionary<string, CurrencyInfo> byCode)
     {
+        try
+        {
+            PublishMaps(byCode);
+        }
+        finally
+        {
+            Interlocked.Increment(ref s_version); // after the maps, so a reader that sees the new version also sees the new maps
+        }
+    }
+
+    static int s_version;
+
+    /// <summary>Changes whenever the registry is mutated. Caches that hold a resolved <see cref="CurrencyInfo"/> compare
+    /// it to find out whether their entry is still current.</summary>
+    internal static int Version => Volatile.Read(ref s_version);
+
+    static void PublishMaps(Dictionary<string, CurrencyInfo> byCode)
+    {
 #if NET8_0_OR_GREATER
         s_lookupByCode = byCode.ToFrozenDictionary();
         s_lookupByCurrency = byCode.ToFrozenDictionary(pair => (Currency)pair.Value, pair => pair.Value);

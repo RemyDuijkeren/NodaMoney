@@ -94,12 +94,37 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
     public static readonly CurrencyInfo NoCurrency = new("XXX", 999, MinorUnit.NotApplicable, "No Currency");
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <summary>Caches the ISO currency code derived from a <see cref="CultureInfo"/> instance, keyed by culture
-    /// reference. Only the (cheap-to-derive) ISO code is cached, not the resolved <see cref="CurrencyInfo"/>, so
-    /// <see cref="CurrentCurrency"/> always resolves through <see cref="FromCode"/> and reflects a live
-    /// <see cref="CurrencyRegistry"/> mutation. Keying on the culture instance (a <see cref="ConditionalWeakTable{TKey,TValue}"/>)
-    /// avoids re-deriving the ISO code for every call while never pinning cultures in memory or growing unbounded.</summary>
-    private static readonly ConditionalWeakTable<CultureInfo, string> s_cultureToIsoCode = new();
+    /// <summary>Per-culture entry for <see cref="CurrentCurrency"/>: the ISO code derived once from the culture's region,
+    /// plus the resolved <see cref="CurrencyInfo"/> stamped with the <see cref="CurrencyRegistry.Version"/> it was
+    /// resolved under, so a registry mutation is picked up on the next call without a lookup on every call.</summary>
+    private sealed class CultureCurrencyEntry(CultureInfo culture, string isoCode)
+    {
+        public readonly CultureInfo Culture = culture;
+        private volatile Resolved? _resolved;
+
+        public CurrencyInfo Resolve()
+        {
+            int version = CurrencyRegistry.Version;
+            Resolved? resolved = _resolved;
+            if (resolved is null || resolved.Version != version)
+            {
+                resolved = new Resolved(version, FromCode(isoCode));
+                _resolved = resolved;
+            }
+
+            return resolved.Currency;
+        }
+
+        private sealed record Resolved(int Version, CurrencyInfo Currency);
+    }
+
+    /// <summary>Entries keyed by culture instance (a <see cref="ConditionalWeakTable{TKey,TValue}"/>, so cultures are
+    /// never pinned and the table never grows unbounded).</summary>
+    private static readonly ConditionalWeakTable<CultureInfo, CultureCurrencyEntry> s_cultureCurrencies = new();
+
+    /// <summary>The entry used by the last call. The common case, one culture per process, is then a reference compare
+    /// instead of a weak-table lookup. Pins that one culture, which is fine.</summary>
+    private static volatile CultureCurrencyEntry? s_lastCultureCurrency;
 #endif
 
     /// <summary>Gets the Currency that represents the country/region used by the current thread.</summary>
@@ -114,17 +139,23 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
             // See also use of ICU libs https://learn.microsoft.com/en-us/dotnet/core/compatibility/globalization/5.0/icu-globalization-api#currency-symbol
             var currentCulture = CultureInfo.CurrentCulture;
 
-            // no region information can be extracted for the invariant culture
-            if (Equals(currentCulture, CultureInfo.InvariantCulture))
-                return NoCurrency;
-
-            if (!s_cultureToIsoCode.TryGetValue(currentCulture, out string? isoCode))
+            CultureCurrencyEntry? entry = s_lastCultureCurrency;
+            if (entry is null || !ReferenceEquals(entry.Culture, currentCulture))
             {
-                isoCode = new RegionInfo(currentCulture.Name).ISOCurrencySymbol;
-                s_cultureToIsoCode.AddOrUpdate(currentCulture, isoCode);
+                // no region information can be extracted for the invariant culture
+                if (Equals(currentCulture, CultureInfo.InvariantCulture))
+                    return NoCurrency;
+
+                if (!s_cultureCurrencies.TryGetValue(currentCulture, out entry))
+                {
+                    entry = new CultureCurrencyEntry(currentCulture, new RegionInfo(currentCulture.Name).ISOCurrencySymbol);
+                    s_cultureCurrencies.AddOrUpdate(currentCulture, entry);
+                }
+
+                s_lastCultureCurrency = entry;
             }
 
-            return FromCode(isoCode);
+            return entry.Resolve();
 #else
             RegionInfo currentRegion = RegionInfo.CurrentRegion;
             return currentRegion.Name == "IV" ? NoCurrency : GetInstance(currentRegion);
@@ -454,6 +485,13 @@ public record CurrencyInfo : IFormatProvider, ICustomFormatter
                 : arg?.ToString() ?? string.Empty;
         }
 
+        return Format(format, in money, formatProvider);
+    }
+
+    /// <summary>Formats <paramref name="money"/> without boxing it; <see cref="Money.ToString()"/> and its overloads
+    /// come in here directly, the <see cref="ICustomFormatter"/> overload unboxes once and delegates.</summary>
+    internal string Format(string? format, in Money money, IFormatProvider? formatProvider)
+    {
         // TODO: CLDR-data: https://github.com/unicode-org/cldr-json/tree/main/cldr-json/cldr-numbers-full
         // For example USD in NL
         // "USD": {

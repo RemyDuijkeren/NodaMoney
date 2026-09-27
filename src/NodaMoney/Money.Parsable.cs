@@ -243,24 +243,32 @@ public partial struct Money
                 failure = CurrencyParseFailure.None;
                 return true;
             default:
+                // Plain loops instead of lambdas: a lambda capturing specifiedCurrency would allocate its closure on
+                // every parse, also on the single-match path above.
                 // If specifiedCurrency matches, prioritize it and return immediately
-                var matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == specifiedCurrency);
-                if (matchedCurrency is not null)
+                for (int i = 0; i < matchedCurrencies.Count; i++)
                 {
-                    currencyInfo = matchedCurrency;
-                    failure = CurrencyParseFailure.None;
-                    return true;
+                    if (matchedCurrencies[i] == specifiedCurrency)
+                    {
+                        currencyInfo = matchedCurrencies[i];
+                        failure = CurrencyParseFailure.None;
+                        return true;
+                    }
                 }
 
                 if (specifiedCurrency is null)
                 {
                     // If the current currency matches, prioritize it and return immediately
-                    matchedCurrency = matchedCurrencies.FirstOrDefault(ci => ci == MoneyContext.CurrentContext.DefaultCurrency || ci == CurrencyInfo.CurrentCurrency);
-                    if (matchedCurrency is not null)
+                    CurrencyInfo? defaultCurrency = MoneyContext.CurrentContext.DefaultCurrency;
+                    CurrencyInfo currentCurrency = CurrencyInfo.CurrentCurrency;
+                    for (int i = 0; i < matchedCurrencies.Count; i++)
                     {
-                        currencyInfo = matchedCurrency;
-                        failure = CurrencyParseFailure.None;
-                        return true;
+                        if (matchedCurrencies[i] == defaultCurrency || matchedCurrencies[i] == currentCurrency)
+                        {
+                            currencyInfo = matchedCurrencies[i];
+                            failure = CurrencyParseFailure.None;
+                            return true;
+                        }
                     }
 
                     currencyInfo = null;

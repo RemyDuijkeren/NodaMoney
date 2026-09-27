@@ -37,10 +37,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FastMoney` construction validates once (22.9 to 12.7 ns), divides by a non-integer `decimal` in fixed point (50.6 to
   16.2 ns), converts to and from `SqlMoney` by TDS ticks without a decimal round trip (13 ns to under 1 ns) and converts
   to and from `Money` on the integer mantissa instead of through a `decimal` (17.0 to 9.5 ns and 9.0 to 4.8 ns); formatting caches a
-  read-only `NumberFormatInfo` per currency (384 to 72 B per call) and `TryFormat(Span<char>)` no longer allocates for
-  the `C`, `G`, `I`, `N` and `F` specifiers; parsing looks up symbols without allocating a string or a list (160 to 24 B
-  per call) and `TryParse` no longer throws and catches internally. On the netstandard legs the currency and named
-  context registries read without taking a lock.
+  read-only `NumberFormatInfo` per currency and no longer boxes the `Money` on the way to the formatter (384 B to the
+  result string only, 40 B, per call) and `TryFormat(Span<char>)` no longer allocates for the `C`, `G`, `I`, `N` and
+  `F` specifiers; parsing looks up symbols without allocating a string, a list or a closure (160 to 0 B per call on
+  .NET 9 and later) and `TryParse` no longer throws and catches internally. `MoneyContext.CurrentContext` skips the
+  `AsyncLocal` read until a thread context has been set once in the process (6 ns to under 1 ns), and
+  `CurrencyInfo.CurrentCurrency` caches the resolved currency per culture, stamped with the registry version so a
+  registered or unregistered currency is still picked up on the next call. On the netstandard legs the currency and
+  named context registries read without taking a lock.
 
 ### Removed
 -

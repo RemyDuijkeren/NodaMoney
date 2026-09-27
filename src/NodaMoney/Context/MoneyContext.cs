@@ -36,6 +36,9 @@ public sealed record MoneyContext
 #endif
 
     private static readonly AsyncLocal<MoneyContext?> s_threadLocalContext = new();
+    /// <summary>One-way latch: until a thread context has been set once in the process, every read of the AsyncLocal
+    /// would return null, so <see cref="CurrentContext"/> skips the (5 ns) AsyncLocal lookup and answers with the default.</summary>
+    private static volatile bool s_threadContextEverSet;
     private static MoneyContext s_defaultThreadContext;
     private MoneyContextOptions Options { get; }
 
@@ -246,8 +249,12 @@ public sealed record MoneyContext
     /// </remarks>
     public static MoneyContext? ThreadContext
     {
-        get => s_threadLocalContext.Value;
-        set => s_threadLocalContext.Value = value;
+        get => s_threadContextEverSet ? s_threadLocalContext.Value : null;
+        set
+        {
+            s_threadContextEverSet = true;
+            s_threadLocalContext.Value = value;
+        }
     }
 
     /// <summary>
