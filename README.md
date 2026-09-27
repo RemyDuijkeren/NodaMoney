@@ -543,12 +543,23 @@ See the [NodaMoney.DependencyInjection README](src/NodaMoney.DependencyInjection
 
 ## Performance
 -----------
-NodaMoney is highly optimized for performance, as precision and speed are critical for financial calculations.
+Performance is a design goal of NodaMoney, not an afterthought. The yardstick for `Money` is the native `decimal`: the
+same size, no heap allocations, and as little extra time per operation as a currency check and a rounding step cost.
+Every release is measured against that yardstick with [BenchmarkDotNet](https://benchmarkdotnet.org/); the suite lives
+in `tests/Benchmark` and the reports per release in `tests/Benchmark/PerformanceReport*.md`.
 
-- **Optimized Core**: The `Money` type is designed to be as fast as a raw `decimal` while providing currency safety.
-- **Benchmarks**: We maintain a comprehensive suite of benchmark tests using [BenchmarkDotNet](https://benchmarkdotnet.org/) to track performance across different .NET versions.
-- **Continuous Monitoring**: Benchmarks are executed for every release to make sure performance doesn't downgrade.
-- **FastMoney**: For high-throughput scenarios where every nanosecond counts, we offer the `FastMoney` type. It uses 64-bit integer arithmetic (fixed 4-decimal scale) and is even faster than the standard `Money` type.
+How it shows:
+
+- `Money` is 16 bytes, exactly the size of a `decimal`. The currency, scale, sign and `MoneyContext` are packed into the
+  flags word of the decimal layout, so a `Money` costs no more memory than the amount alone. `FastMoney` is 12 bytes.
+- Construction, arithmetic, comparison, conversion and parsing do not allocate. Formatting allocates only the result
+  string.
+- The time over a raw `decimal` is the currency check plus the rounding to the currency's minor unit. Rounding is
+  skipped when the result is already within scale, and the common two-decimal case is handled inline.
+
+`FastMoney` goes past `decimal` for add, subtract, compare and integer multiply and divide (1 to 2 ns) by using 64-bit
+integer arithmetic at a fixed 4-decimal scale. Use it for high-throughput calculations where that precision is enough,
+and `Money` everywhere else.
 
 ## Compatibility
 

@@ -6,48 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
-### Added
-- `tests/Benchmark/PerformanceReportV2.9-linux.md` with the benchmark results after the hot-path performance work, in the
-  same layout as the 2.8 report, plus three new benchmark cases: a `Money` construction that needs a real rounding step,
-  a mixed-scale `Money` addition, and `FastMoney` from `SqlMoney`.
-
 ### Changed
-- **Breaking**: `StandardRounding` and `NoRounding` are now `sealed`. Deriving from either record no longer compiles
-  (`CS0509`) and an assembly that derived from them fails at type load against this version. `IRoundingStrategy` remains
-  the extension point for custom rounding.
-- `Money.Abs` now returns a value in the operand's `MoneyContext`. It previously rebuilt the value under the current
-  thread context, so inside a `MoneyContext.CreateScope` the result could carry a different context than its operand.
-- `FastMoney` arithmetic that overflows now throws `OverflowException` with the message "Value was either too large or
-  too small for a FastMoney." and the arithmetic overflow as inner exception. The previous message filter never matched a
-  `long` overflow, so callers saw the bare "Arithmetic operation resulted in an overflow." message, and `++`/`--` had no
-  handler at all.
-- `FastMoney` construction accepts the full documented range, -922,337,203,685,477.5808 to 922,337,203,685,477.5807. It
-  previously rejected any amount beyond the whole-unit cutoff 922,337,203,685,477, so amounts within that last fraction
-  no longer throw `ArgumentOutOfRangeException`.
-- `CurrencyInfo.GetFormat(typeof(NumberFormatInfo))` and the formatting paths that use it now return a shared, read-only
-  `NumberFormatInfo` when the source culture is read-only (the default current culture and `CultureInfo.GetCultureInfo`
-  instances), instead of a fresh mutable clone per call. Mutating the returned instance throws `InvalidOperationException`.
-  A mutable culture or a caller-owned `NumberFormatInfo` still gets a per-call clone.
-- Performance of the `Money` and `FastMoney` hot paths, measured on Linux against the 2.8 report
-  (`tests/Benchmark/PerformanceReportV2.8-linux.md`): the `MoneyContext` registry is an array lookup instead of a
-  dictionary; rounding dispatches on a precomputed kind instead of type tests; `Negate`, `Abs`, `++` and `--` edit the
-  sign bit without resolving the context; `Money` addition and subtraction skip re-rounding when the result is already
-  within scale (20.7 to 16.4 ns); `ToInt32`/`ToInt64` round on the integer mantissa (28 to about 3 ns); `CurrencyInfo`
-  caches its `Currency` encoding and the current culture's currency (`new Money(6.54m)` 58 to 15.6 ns, no allocation);
-  `FastMoney` construction validates once (22.9 to 12.7 ns), divides by a non-integer `decimal` in fixed point (50.6 to
-  16.2 ns), converts to and from `SqlMoney` by TDS ticks without a decimal round trip (13 ns to under 1 ns) and converts
-  to and from `Money` on the integer mantissa instead of through a `decimal` (17.0 to 9.5 ns and 9.0 to 4.8 ns); formatting caches a
-  read-only `NumberFormatInfo` per currency and no longer boxes the `Money` on the way to the formatter (384 B to the
-  result string only, 40 B, per call) and `TryFormat(Span<char>)` no longer allocates for the `C`, `G`, `I`, `N` and
-  `F` specifiers; parsing looks up symbols without allocating a string, a list or a closure (160 to 0 B per call on
-  .NET 9 and later) and `TryParse` no longer throws and catches internally. `MoneyContext.CurrentContext` skips the
-  `AsyncLocal` read until a thread context has been set once in the process (6 ns to under 1 ns), and
-  `CurrencyInfo.CurrentCurrency` caches the resolved currency per culture, stamped with the registry version so a
-  registered or unregistered currency is still picked up on the next call. On the netstandard legs the currency and
-  named context registries read without taking a lock.
-
-### Removed
--
+- **Breaking**: `StandardRounding` and `NoRounding` are now `sealed`. `IRoundingStrategy` remains the extension point
+  for custom rounding.
+- `Money.Abs` returns a value in the operand's `MoneyContext` instead of the current thread context.
+- `FastMoney` arithmetic that overflows, including `++` and `--`, throws `OverflowException` with the message "Value was
+  either too large or too small for a FastMoney." and the arithmetic overflows as an inner exception.
+- `FastMoney` construction accepts the full range, -922,337,203,685,477.5808 to 922,337,203,685,477.5807. Amounts in the
+  last fraction above 922,337,203,685,477 no longer throw `ArgumentOutOfRangeException`.
+- `CurrencyInfo.GetFormat(typeof(NumberFormatInfo))` returns a shared, read-only `NumberFormatInfo` when the source
+  culture is read-only. Mutating it throws `InvalidOperationException`. A mutable culture or a caller-owned
+  `NumberFormatInfo` still gets a per-call clone.
+- Improved `Money` performance: construction 58 to 15.6 ns with no allocation, addition and subtraction 20.7 to 16.4 ns,
+  `ToInt32`/`ToInt64` 28 to about 3 ns, `MoneyContext.CurrentContext` 6 to under 1 ns.
+- Improved `FastMoney` performance: construction 22.9 to 12.7 ns, division by a non-integer `decimal` 50.6 to 16.2 ns,
+  `SqlMoney` conversion 13 ns to under 1 ns, conversion to and from `Money` about 2x.
+- Improved formatting and parsing: formatting allocates only the result string (384 to 40 B) and `TryFormat(Span<char>)`
+  is allocation-free for `C`, `G`, `I`, `N` and `F`; parsing is allocation-free on .NET 9 and later (160 to 0 B) and
+  `TryParse` no longer throws internally.
 
 ## [2.8.0]
 
