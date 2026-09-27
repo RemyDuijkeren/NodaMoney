@@ -14,10 +14,94 @@ public readonly partial record struct FastMoney
     public static explicit operator FastMoney(Money money) => new(money);
     public Money ToMoney()
     {
-        // Convert to decimal and delegate to the standard constructor to ensure rounding is applied using
-        // the provided context (strategy and max scale, currency rules).
+        // The Money is created in the ambient context (not this instance's context), so it is rounded the same way
+        // as a Money constructed from the same amount would be.
+        MoneyContext context = MoneyContext.CurrentContext;
+        if (TryBuildMoneyFromTicks(context, out Money money))
+            return money;
+
+        // Fallback: convert to decimal and delegate to the standard constructor so rounding is applied using the
+        // context (strategy and max scale, currency rules).
         decimal amount = decimal.FromOACurrency(OACurrencyAmount);
-        return new Money(amount, Currency);
+        return new Money(amount, Currency, context);
+    }
+
+    /// <summary>Builds the <see cref="Money"/> straight from the OA currency ticks, reproducing what
+    /// <see cref="decimal.FromOACurrency"/> followed by the <see cref="Money"/> constructor would produce: trailing
+    /// zeros are stripped from the scale and a standard rounding context rounds the remaining digits to the target
+    /// scale on the integer mantissa. Applies only to the standard and no-rounding kinds and to currencies whose
+    /// rounding is plain decimal-digit rounding; everything else takes the decimal path.</summary>
+    private bool TryBuildMoneyFromTicks(MoneyContext context, out Money money)
+    {
+        long ticks = OACurrencyAmount;
+        Currency currency = Currency;
+        if (ticks == 0)
+        {
+            money = new Money(0, 0, 0, false, 0, currency, context.Index); // same as the constructor's zero fast path
+            return true;
+        }
+
+        if (context.Kind == RoundingKind.Custom || ticks == long.MinValue)
+        {
+            money = default;
+            return false;
+        }
+
+        bool isNegative = ticks < 0;
+        long magnitude = isNegative ? -ticks : ticks;
+
+        // decimal.FromOACurrency strips trailing zeros from the 4-decimal scale; do the same to end up with the same scale.
+        int scale = 4;
+        while (scale > 0 && magnitude % 10 == 0)
+        {
+            scale--;
+            magnitude /= 10;
+        }
+
+        if (context.Kind == RoundingKind.Standard)
+        {
+            // Same target as StandardRounding.Round: 2 for two-decimal currencies unless MaxScale overrides it, no
+            // rounding for currencies without a minor unit, and the decimal path for non-decimal minor units (MGA, MRU).
+            int targetScale;
+            if (currency.IsMinorUnit2 && context.MaxScale is null or 2)
+            {
+                targetScale = 2;
+            }
+            else
+            {
+                CurrencyInfo currencyInfo = CurrencyInfo.GetInstance(currency);
+                if (currencyInfo.MinorUnit == MinorUnit.NotApplicable)
+                {
+                    targetScale = scale;
+                }
+                else if (!currencyInfo.MinorUnitIsDecimalBased)
+                {
+                    money = default;
+                    return false;
+                }
+                else
+                {
+                    targetScale = context.MaxScale ?? currencyInfo.DecimalDigits;
+                }
+            }
+
+            if (scale > targetScale)
+            {
+                long divisor = IntegerRounding.Pow10[scale - targetScale];
+                if (!IntegerRounding.TryRound(magnitude / divisor, magnitude % divisor, divisor, context.Mode, isNegative, out long rounded))
+                {
+                    money = default;
+                    return false;
+                }
+
+                // A value rounded away to zero keeps its sign and the target scale, exactly like decimal.Round does.
+                magnitude = isNegative ? -rounded : rounded;
+                scale = targetScale;
+            }
+        }
+
+        money = new Money(unchecked((int)(uint)magnitude), unchecked((int)(uint)((ulong)magnitude >> 32)), 0, isNegative, (byte)scale, currency, context.Index);
+        return true;
     }
 
     // FastMoney <-> minor units

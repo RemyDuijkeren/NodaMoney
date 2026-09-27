@@ -115,6 +115,40 @@ public partial struct Money
         return IntegerRounding.TryRound(signedMantissa / divisor, signedMantissa % divisor, divisor, context.Mode, isNegative, out value);
     }
 
+    /// <summary>Rescales the mantissa to OA currency ticks (scale 4, rounded to even like
+    /// <see cref="decimal.ToOACurrency"/>) without the decimal round trip. Fails when the mantissa does not fit in
+    /// 64 bits, the rescaled value would overflow, or the scale is too large for the integer helper.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool TryGetOACurrencyTicks(out long ticks)
+    {
+        ulong mantissa = ((ulong)_mid << 32) | _low;
+        byte scale = Scale;
+        if (_high != 0 || mantissa > (ulong)long.MaxValue || scale > 22)
+        {
+            ticks = 0;
+            return false;
+        }
+
+        long signedMantissa = (long)mantissa;
+        bool isNegative = (_flags & SignMask) != 0;
+        if (scale <= 4)
+        {
+            long factor = IntegerRounding.Pow10[4 - scale];
+            if (signedMantissa > long.MaxValue / factor)
+            {
+                ticks = 0;
+                return false;
+            }
+
+            long magnitude = signedMantissa * factor;
+            ticks = isNegative ? -magnitude : magnitude;
+            return true;
+        }
+
+        long divisor = IntegerRounding.Pow10[scale - 4];
+        return IntegerRounding.TryRound(signedMantissa / divisor, signedMantissa % divisor, divisor, MidpointRounding.ToEven, isNegative, out ticks);
+    }
+
     /// <summary>Converts the value of this instance to minor units.</summary>
     /// <returns>The value of the <see cref="Money"/> instance, converted to minor units (e.g., cents, yen, etc.).</returns>
     /// <exception cref="OverflowException">The value of this instance is outside the range of a <see cref="long"/> value.</exception>

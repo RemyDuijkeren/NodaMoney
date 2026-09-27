@@ -8,7 +8,23 @@ public readonly partial record struct FastMoney
     /// <param name="money">An instance of <see cref="Money"/> containing the amount and currency to initialize the <see cref="FastMoney"/> struct.</param>
     /// <remarks>The <see cref="FastMoney"/> struct is optimized for performance and memory usage by using 64 bits (8 bytes) for representation,
     /// in contrast to the 128 bits (16 bytes) used by the <see cref="decimal"/> type. This struct maintains compatibility with the <see cref="Money"/> type.</remarks>
-    public FastMoney(Money money) : this(money.Amount, money.Currency) { }
+    public FastMoney(Money money) : this()
+    {
+        // Rescale the Money mantissa to ticks directly when it fits and store the fields without the copy a factory
+        // would cost; the decimal path handles the rest, including the range error for amounts outside the FastMoney range.
+        Currency currency = money.Currency;
+        if (money.TryGetOACurrencyTicks(out long ticks))
+        {
+            ValidateCurrency(currency);
+            OACurrencyAmount = ticks;
+            ContextIndex = MoneyContext.FastMoney.Index; // the library's own context, no validation needed
+            _currency = currency;
+        }
+        else
+        {
+            this = new FastMoney(money.Amount, currency);
+        }
+    }
 
     /// <summary>Initializes a new instance of the <see cref="FastMoney"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="decimal"/>.</param>

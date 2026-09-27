@@ -35,7 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   within scale (20.7 to 16.4 ns); `ToInt32`/`ToInt64` round on the integer mantissa (28 to about 3 ns); `CurrencyInfo`
   caches its `Currency` encoding and the current culture's currency (`new Money(6.54m)` 58 to 15.6 ns, no allocation);
   `FastMoney` construction validates once (22.9 to 12.7 ns), divides by a non-integer `decimal` in fixed point (50.6 to
-  16.2 ns) and converts to and from `SqlMoney` by TDS ticks without a decimal round trip (13 ns to under 1 ns); formatting caches a
+  16.2 ns), converts to and from `SqlMoney` by TDS ticks without a decimal round trip (13 ns to under 1 ns) and converts
+  to and from `Money` on the integer mantissa instead of through a `decimal` (17.0 to 9.5 ns and 9.0 to 4.8 ns); formatting caches a
   read-only `NumberFormatInfo` per currency (384 to 72 B per call) and `TryFormat(Span<char>)` no longer allocates for
   the `C`, `G`, `I`, `N` and `F` specifiers; parsing looks up symbols without allocating a string or a list (160 to 24 B
   per call) and `TryParse` no longer throws and catches internally. On the netstandard legs the currency and named

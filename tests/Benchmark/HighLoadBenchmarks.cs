@@ -30,7 +30,7 @@ public class HighLoadBenchmarks
         return currencies;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public Money[] Create1MMoney()
     {
         Money[] money = new Money[Count];
@@ -84,7 +84,7 @@ public class HighLoadBenchmarks
         return money[0];
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public decimal Create1MDecimal()
     {
         decimal[] decimals = new decimal[Count];
