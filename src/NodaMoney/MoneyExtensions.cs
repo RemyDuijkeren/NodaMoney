@@ -32,8 +32,7 @@ public static class MoneyExtensions
 
             IEnumerable<Money> DistributeIterator()
             {
-                int currencyDecimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
-                int decimals = Math.Min(money.Context.MaxScale ?? currencyDecimals, currencyDecimals); // a coarser context would re-round shares and break the sum
+                int decimals = money.Context.MaxScale ?? (money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits);
                 decimal shareAmount = Math.Round(money.Amount / shares, decimals, rounding);
                 decimal remainder = money.Amount;
 
@@ -74,8 +73,7 @@ public static class MoneyExtensions
 
             IEnumerable<Money> DistributeIterator()
             {
-                int currencyDecimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
-                int decimals = Math.Min(money.Context.MaxScale ?? currencyDecimals, currencyDecimals); // a coarser context would re-round shares and break the sum
+                int decimals = money.Context.MaxScale ?? (money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits);
                 long totalRatios = ratios.Sum();
                 decimal remainder = money.Amount;
 

@@ -103,6 +103,16 @@ public class SplitMoney
         }
 
     [Fact]
+    public void WhenContextMaxScaleIsFinerThanCurrency_ThenSharesShouldUseContextMaxScale()
+    {
+            MoneyContext context = MoneyContext.Create(options => options.MaxScale = 4);
+            var money = new Money(1m, "EUR", context);
+
+            money.Split(3).Select(m => m.Amount).Should().Equal(0.3333m, 0.3333m, 0.3334m);
+            money.Split([1, 1, 1]).Select(m => m.Amount).Should().Equal(0.3333m, 0.3333m, 0.3334m);
+        }
+
+    [Fact]
     public void WhenDividingByMinus1_ThrowArgumentOutOfRangeException()
     {
             Action action = () => _euro1.Split(-1).ToList();
