@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using NodaMoney.Context;
 
 namespace NodaMoney.Tests.MoneyExtensionsSplitSpec;
 
@@ -79,6 +80,26 @@ public class SplitMoney
                 });
 
             enumerable.Sum(m => m.Amount).Should().Be(_euro1.Amount);
+        }
+
+    [Fact]
+    public void WhenMoneyHasNonDefaultContext_ThenSharesShouldKeepThatContext()
+    {
+            MoneyContext context = MoneyContext.Create(options => options.MaxScale = 4);
+            var money = new Money(1.0m, "EUR", context);
+
+            money.Split(3).Should().OnlyContain(m => m.Context == context);
+            money.Split([2, 3, 3]).Should().OnlyContain(m => m.Context == context);
+        }
+
+    [Fact]
+    public void WhenContextMaxScaleIsCoarserThanCurrency_ThenSharesShouldStillAddUpToTotal()
+    {
+            MoneyContext context = MoneyContext.Create(options => options.MaxScale = 0);
+            var money = new Money(10m, "EUR", context);
+
+            money.Split(3).Sum(m => m.Amount).Should().Be(10m);
+            money.Split([1, 1, 1]).Sum(m => m.Amount).Should().Be(10m);
         }
 
     [Fact]

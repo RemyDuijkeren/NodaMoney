@@ -32,17 +32,18 @@ public static class MoneyExtensions
 
             IEnumerable<Money> DistributeIterator()
             {
-                int decimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
+                int currencyDecimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
+                int decimals = Math.Min(money.Context.MaxScale ?? currencyDecimals, currencyDecimals); // a coarser context would re-round shares and break the sum
                 decimal shareAmount = Math.Round(money.Amount / shares, decimals, rounding);
                 decimal remainder = money.Amount;
 
                 for (int i = 0; i < shares - 1; i++)
                 {
                     remainder -= shareAmount;
-                    yield return new Money(shareAmount, money.Currency);
+                    yield return new Money(shareAmount, money.Currency, money.Context);
                 }
 
-                yield return new Money(remainder, money.Currency);
+                yield return new Money(remainder, money.Currency, money.Context);
             }
         }
 
@@ -73,7 +74,8 @@ public static class MoneyExtensions
 
             IEnumerable<Money> DistributeIterator()
             {
-                int decimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
+                int currencyDecimals = money.Currency.IsMinorUnit2 ? 2 : CurrencyInfo.GetInstance(money.Currency).DecimalDigits;
+                int decimals = Math.Min(money.Context.MaxScale ?? currencyDecimals, currencyDecimals); // a coarser context would re-round shares and break the sum
                 long totalRatios = ratios.Sum();
                 decimal remainder = money.Amount;
 
@@ -82,10 +84,10 @@ public static class MoneyExtensions
                     decimal ratioAmount = Math.Round(money.Amount * ratios[i] / totalRatios, decimals, rounding);
                     remainder -= ratioAmount;
 
-                    yield return new Money(ratioAmount, money.Currency);
+                    yield return new Money(ratioAmount, money.Currency, money.Context);
                 }
 
-                yield return new Money(remainder, money.Currency);
+                yield return new Money(remainder, money.Currency, money.Context);
             }
         }
 
