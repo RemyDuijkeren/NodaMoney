@@ -373,7 +373,7 @@ static class CurrencyRegistry
             new ("RSD", 941, MinorUnit.Two, "Serbian dinar", "дин.") { AlternativeSymbols = ["din."] },
             new ("RUB", 643, MinorUnit.Two, "Russian rouble", "₽"),
             new ("RWF", 646, MinorUnit.Zero, "Rwandan franc", "RFw") { AlternativeSymbols = ["RF", "R₣"]},
-            new ("SAR", 682, MinorUnit.Two, "Saudi riyal", "ر.س") { AlternativeSymbols = ["SR"] },
+            new ("SAR", 682, MinorUnit.Two, "Saudi riyal", "⃁") { AlternativeSymbols = ["SR", "ر.س."] }, // ["⃁"] new Saudi Riyal symbol in Unicode 17.0, https://blog.unicode.org/2025/03/support-for-new-saudi-riyal-currency.html
             new ("SBD", 090, MinorUnit.Two, "Solomon Islands dollar", "$") { InternationalSymbol = "SI$"},
             new ("SCR", 690, MinorUnit.Two, "Seychelles rupee", "Rs") { AlternativeSymbols = ["Re", "Rs.", "Re."] },
             new ("SDG", 938, MinorUnit.Two, "Sudanese pound", "ج.س."),
