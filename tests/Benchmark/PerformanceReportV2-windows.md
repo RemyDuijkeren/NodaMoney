@@ -16,6 +16,12 @@
 | CurrencyFromCode        | 11.641 ns | 0.2240 ns |  85,904,593.4 |         - |
 | CurrencyInfoFromCode    |  6.260 ns | 0.0540 ns | 159,742,874.9 |         - |
 | CurrencyInfoTryFromCode |  5.785 ns | 0.0682 ns | 172,864,355.0 |         - |
+### v2.9
+| Method                  | Mean     | Error     | Op/s          | Allocated |
+|------------------------ |---------:|----------:|--------------:|----------:|
+| CurrencyFromCode        | 6.580 ns | 0.1301 ns | 151,980,328.3 |         - |
+| CurrencyInfoFromCode    | 6.826 ns | 0.1887 ns | 146,491,033.5 |         - |
+| CurrencyInfoTryFromCode | 6.064 ns | 0.1527 ns | 164,908,180.6 |         - |
 
 ## InitializingMoney
 #### v2
@@ -55,6 +61,20 @@
 | ImplicitCurrencyByConstructor | 66.292 ns | 0.1979 ns |  15,084,665.3 |  2.90 | 0.0038 |      32 B |          NA |
 | ImplicitCurrencyByCasting     | 66.602 ns | 0.4217 ns |  15,014,561.8 |  2.91 | 0.0038 |      32 B |          NA |
 | Deconstruct                   |  1.089 ns | 0.0481 ns | 918,181,035.2 |  0.05 |      - |         - |          NA |
+### v2.9
+| Method                        | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|------------------------------ |----------:|----------:|--------------:|------:|----------:|------------:|
+| CurrencyCode                  | 15.715 ns | 0.2721 ns |  63,631,634.8 |  1.00 |         - |          NA |
+| CurrencyCodeNeedsRounding     | 17.374 ns | 0.1947 ns |  57,556,437.0 |  1.11 |         - |          NA |
+| fCurrencyCode                 | 14.544 ns | 0.1980 ns |  68,756,321.4 |  0.93 |         - |          NA |
+| CurrencyCodeAndRoundingMode   | 17.577 ns | 0.2575 ns |  56,892,108.6 |  1.12 |         - |          NA |
+| CurrencyCodeAndContext        | 18.506 ns | 0.1692 ns |  54,037,419.7 |  1.18 |         - |          NA |
+| CurrencyFromCode              | 15.909 ns | 0.2117 ns |  62,858,859.8 |  1.01 |         - |          NA |
+| CurrencyInfoFromCode          | 15.725 ns | 0.1855 ns |  63,591,190.1 |  1.00 |         - |          NA |
+| ExtensionMethodEuro           | 15.915 ns | 0.2424 ns |  62,835,214.8 |  1.01 |         - |          NA |
+| ImplicitCurrencyByConstructor | 11.871 ns | 0.0855 ns |  84,238,857.6 |  0.76 |         - |          NA |
+| ImplicitCurrencyByCasting     | 12.043 ns | 0.1188 ns |  83,037,147.5 |  0.77 |         - |          NA |
+| Deconstruct                   |  1.792 ns | 0.0107 ns | 558,127,069.8 |  0.11 |         - |          NA |
 
 ## MoneyEquals
 #### v2
@@ -89,6 +109,27 @@
 | fNotEqualCurrency | 0.2100 ns | 0.0071 ns | 4,761,835,015.6 |  0.06 |         - |          NA |
 | fEqualOrBigger    | 1.2527 ns | 0.0175 ns |   798,295,401.4 |  0.34 |         - |          NA |
 | fBigger           | 1.2608 ns | 0.0093 ns |   793,134,653.9 |  0.34 |         - |          NA |
+#### v2.9
+| Method            | Categories     | Mean      | Error     | Op/s            | Ratio | Allocated | Alloc Ratio |
+|------------------ |--------------- |----------:|----------:|----------------:|------:|----------:|------------:|
+| dEqual            | Equal          | 4.0965 ns | 0.0342 ns |   244,107,903.2 |  1.00 |         - |          NA |
+| Equal             | Equal          | 3.5335 ns | 0.0349 ns |   283,006,546.1 |  0.86 |         - |          NA |
+| fEqual            | Equal          | 0.2323 ns | 0.0097 ns | 4,304,694,988.3 |  0.06 |         - |          NA |
+|                   |                |           |           |                 |       |           |             |
+| dBigger           | Greater        | 1.5864 ns | 0.0183 ns |   630,367,179.1 |  1.00 |         - |          NA |
+| Bigger            | Greater        | 5.1941 ns | 0.0439 ns |   192,525,636.8 |  3.27 |         - |          NA |
+| fBigger           | Greater        | 1.3026 ns | 0.0277 ns |   767,679,014.3 |  0.82 |         - |          NA |
+|                   |                |           |           |                 |       |           |             |
+| dEqualOrBigger    | GreaterOrEqual | 1.6041 ns | 0.0242 ns |   623,414,106.0 |  1.00 |         - |          NA |
+| EqualOrBigger     | GreaterOrEqual | 5.4964 ns | 0.1379 ns |   181,938,843.2 |  3.43 |         - |          NA |
+| fEqualOrBigger    | GreaterOrEqual | 1.3996 ns | 0.0583 ns |   714,488,904.5 |  0.87 |         - |          NA |
+|                   |                |           |           |                 |       |           |             |
+| dNotEqualValue    | NotEqual       | 4.1488 ns | 0.0462 ns |   241,031,510.2 |  1.00 |         - |          NA |
+| NotEqualValue     | NotEqual       | 2.5861 ns | 0.0752 ns |   386,688,246.0 |  0.62 |         - |          NA |
+| NotEqualCurrency  | NotEqual       | 0.4843 ns | 0.0327 ns | 2,064,963,203.0 |  0.12 |         - |          NA |
+| fNotEqualValue    | NotEqual       | 0.2824 ns | 0.0166 ns | 3,540,703,533.1 |  0.07 |         - |          NA |
+| fNotEqualCurrency | NotEqual       | 0.2080 ns | 0.0158 ns | 4,807,108,689.7 |  0.05 |         - |          NA |
+
 
 ## MoneyOperations
 #### v2
@@ -140,6 +181,44 @@
 | fIncrement              |  2.121 ns | 0.0395 ns | 471,373,585.9 |  1.10 |         - |          NA |
 | fDecrement              |  2.258 ns | 0.0263 ns | 442,806,522.0 |  1.17 |         - |          NA |
 | fRemainder              |  1.957 ns | 0.0510 ns | 511,023,677.5 |  1.01 |         - |          NA |
+### v2.9
+| Method        | Categories | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|-------------- |----------- |----------:|----------:|--------------:|------:|----------:|------------:|
+| dAdd          | Add        |  6.491 ns | 0.1268 ns | 154,067,888.1 |  1.00 |         - |          NA |
+| Add           | Add        | 32.342 ns | 0.9832 ns |  30,919,931.1 |  4.98 |         - |          NA |
+| AddMixedScale | Add        | 31.892 ns | 0.6638 ns |  31,355,997.8 |  4.92 |         - |          NA |
+| fAdd          | Add        |  1.692 ns | 0.0636 ns | 590,991,719.6 |  0.26 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dDecrement    | Decrement  | 18.426 ns | 0.3922 ns |  54,271,069.1 |  1.00 |         - |          NA |
+| Decrement     | Decrement  |  9.880 ns | 0.3091 ns | 101,214,594.8 |  0.54 |         - |          NA |
+| fDecrement    | Decrement  |  3.711 ns | 0.1521 ns | 269,450,308.7 |  0.20 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dIncrement    | Increment  | 17.744 ns | 0.3364 ns |  56,358,141.6 |  1.00 |         - |          NA |
+| Increment     | Increment  |  8.930 ns | 0.2070 ns | 111,979,129.6 |  0.50 |         - |          NA |
+| fIncrement    | Increment  |  4.104 ns | 0.1092 ns | 243,668,923.7 |  0.23 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dRemainder    | Remainder  |  8.272 ns | 0.1928 ns | 120,886,136.9 |  1.00 |         - |          NA |
+| Remainder     | Remainder  | 21.249 ns | 0.4135 ns |  47,060,459.9 |  2.57 |         - |          NA |
+| fRemainder    | Remainder  |  1.944 ns | 0.0443 ns | 514,476,105.2 |  0.24 |         - |          NA |
+|               |            |           |           |               |       |           |             |
+| dSubtract     | Subtract   |  6.066 ns | 0.1296 ns | 164,866,430.4 |  1.00 |         - |          NA |
+| Subtract      | Subtract   | 29.681 ns | 0.6208 ns |  33,691,090.2 |  4.89 |         - |          NA |
+| fSubtract     | Subtract   |  1.395 ns | 0.0410 ns | 716,598,492.2 |  0.23 |         - |          NA |
+
+| Method                  | Categories | Mean      | Error     | Op/s          | Ratio | Allocated | Alloc Ratio |
+|------------------------ |----------- |----------:|----------:|--------------:|------:|----------:|------------:|
+| dDivide                 | Divide     | 27.410 ns | 0.2901 ns |  36,482,624.5 |  1.00 |         - |          NA |
+| Divide                  | Divide     | 63.216 ns | 0.8563 ns |  15,818,656.8 |  2.31 |         - |          NA |
+| fDivideDec              | Divide     | 17.048 ns | 0.2619 ns |  58,659,503.8 |  0.62 |         - |          NA |
+| fDivideDecWholeNumber   | Divide     | 10.488 ns | 0.0830 ns |  95,345,661.6 |  0.38 |         - |          NA |
+| fDivideLong             | Divide     |  1.970 ns | 0.0221 ns | 507,683,919.8 |  0.07 |         - |          NA |
+|                         |            |           |           |               |       |           |             |
+| dMultiple               | Multiply   |  5.366 ns | 0.0338 ns | 186,360,814.1 |  1.00 |         - |          NA |
+| Multiple                | Multiply   | 20.872 ns | 0.2810 ns |  47,910,544.7 |  3.89 |         - |          NA |
+| fMultipleDec            | Multiply   | 22.797 ns | 0.1739 ns |  43,865,491.2 |  4.25 |         - |          NA |
+| fMultipleDecWholeNumber | Multiply   |  9.410 ns | 0.0988 ns | 106,268,909.8 |  1.75 |         - |          NA |
+| fMultipleLong           | Multiply   |  2.209 ns | 0.0189 ns | 452,610,757.1 |  0.41 |         - |          NA |
+
 
 ## MoneyFormatting
 #### v2
@@ -169,6 +248,24 @@
 | CompactFormat                  | 226.5 ns | 2.41 ns | 4,415,271.6 | 0.0572 |     480 B |
 | GeneralFormat                  | 166.3 ns | 3.38 ns | 6,011,911.3 | 0.0842 |     704 B |
 | RondTripFormat                 | 120.5 ns | 2.32 ns | 8,301,989.0 | 0.0515 |     432 B |
+### v2.9
+| Method                         | Categories           | Mean      | Error    | Op/s         | Ratio | Gen0   | Allocated | Alloc Ratio |
+|------------------------------- |--------------------- |----------:|---------:|-------------:|------:|-------:|----------:|------------:|
+| dCurrencyFormat                | Currency             |  40.38 ns | 0.445 ns | 24,762,649.8 |  1.00 | 0.0048 |      40 B |        1.00 |
+| DefaultFormat                  | Currency             |  63.66 ns | 1.037 ns | 15,708,316.2 |  1.58 | 0.0048 |      40 B |        1.00 |
+| FormatWithPrecision            | Currency             |  63.90 ns | 1.060 ns | 15,649,464.6 |  1.58 | 0.0048 |      40 B |        1.00 |
+| CompactFormat                  | Currency             |  98.60 ns | 0.946 ns | 10,141,797.3 |  2.44 | 0.0076 |      64 B |        1.60 |
+|                                |                      |           |          |              |       |        |           |             |
+| dCurrencyFormatProvider        | CurrencyWithProvider |  46.23 ns | 1.207 ns | 21,631,281.8 |  1.00 | 0.0048 |      40 B |        1.00 |
+| FormatProvider                 | CurrencyWithProvider | 108.67 ns | 1.954 ns |  9,202,328.4 |  2.36 | 0.0421 |     352 B |        8.80 |
+| FormatWithPrecisionAndProvider | CurrencyWithProvider | 112.49 ns | 1.357 ns |  8,889,552.5 |  2.45 | 0.0421 |     352 B |        8.80 |
+|                                |                      |           |          |              |       |        |           |             |
+| dGeneralFormat                 | General              |  36.34 ns | 0.558 ns | 27,514,220.5 |  1.00 | 0.0048 |      40 B |        1.00 |
+| GeneralFormat                  | General              |  91.31 ns | 1.736 ns | 10,951,195.5 |  2.51 | 0.0057 |      48 B |        1.20 |
+|                                |                      |           |          |              |       |        |           |             |
+| dRoundTripFormat               | RoundTrip            |  36.36 ns | 0.752 ns | 27,501,256.5 |  1.00 | 0.0048 |      40 B |        1.00 |
+| RondTripFormat                 | RoundTrip            |  70.48 ns | 1.457 ns | 14,188,816.2 |  1.94 | 0.0105 |      88 B |        2.20 |
+
 
 ## MoneyParsing
 #### v2
@@ -198,6 +295,19 @@
 | ExplicitAsSpan    | 188.0 ns | 2.27 ns | 5,319,105.3 | 0.0191 |     160 B |
 | ExplicitTry       | 171.5 ns | 0.76 ns | 5,831,963.5 | 0.0191 |     160 B |
 | ExplicitTryAsSpan | 191.9 ns | 1.00 ns | 5,210,301.6 | 0.0191 |     160 B |
+### v2.9
+| Method            | Categories | Mean      | Error    | Op/s         | Ratio | Allocated | Alloc Ratio |
+|------------------ |----------- |----------:|---------:|-------------:|------:|----------:|------------:|
+| dParse            | Parse      |  45.90 ns | 0.682 ns | 21,788,392.4 |  1.00 |         - |          NA |
+| Implicit          | Parse      |  97.94 ns | 1.479 ns | 10,210,620.5 |  2.13 |         - |          NA |
+| Explicit          | Parse      | 108.45 ns | 1.167 ns |  9,221,063.5 |  2.36 |         - |          NA |
+| ExplicitAsSpan    | Parse      | 109.05 ns | 2.017 ns |  9,170,109.3 |  2.38 |         - |          NA |
+|                   |            |           |          |              |       |           |             |
+| dTryParse         | TryParse   |  45.96 ns | 0.533 ns | 21,757,239.5 |  1.00 |         - |          NA |
+| ImplicitTry       | TryParse   | 104.71 ns | 1.342 ns |  9,550,365.6 |  2.28 |         - |          NA |
+| ExplicitTry       | TryParse   | 106.35 ns | 1.404 ns |  9,402,627.3 |  2.31 |         - |          NA |
+| ExplicitTryAsSpan | TryParse   | 109.68 ns | 1.460 ns |  9,117,818.7 |  2.39 |         - |          NA |
+
 
 ## MoneyConversion
 ### v2.5
@@ -230,6 +340,36 @@
 | fToMoney      | 13.8061 ns | 0.2356 ns |      72,431,737.3 | 16.676 |         - |          NA |
 | fToSqlMoney   | 16.1934 ns | 0.2113 ns |      61,753,597.3 | 19.559 |         - |          NA |
 | fToAOCurrency |  0.0016 ns | 0.0029 ns | 606,844,783,584.0 |  0.002 |         - |          NA |
+### v2.9
+| Method        | Categories     | Mean       | Error     | Op/s              | Ratio | Allocated | Alloc Ratio |
+|-------------- |--------------- |-----------:|----------:|------------------:|------:|----------:|------------:|
+| dFromSqlMoney | FromSqlMoney   |  0.7173 ns | 0.0435 ns |   1,394,045,994.9 |  1.03 |         - |          NA |
+| fFromSqlMoney | FromSqlMoney   |  8.6456 ns | 0.2006 ns |     115,665,112.1 | 12.40 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| ToFastMoney   | MoneyFastMoney |  5.5350 ns | 0.1353 ns |     180,668,618.3 |  1.00 |         - |          NA |
+| fToMoney      | MoneyFastMoney |  9.0951 ns | 0.1455 ns |     109,948,887.5 |  1.65 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| ToDecimal     | ToDecimal      |  1.5545 ns | 0.0559 ns |     643,293,218.6 |  1.00 |         - |          NA |
+| fToDecimal    | ToDecimal      |  2.9487 ns | 0.0462 ns |     339,126,801.0 |  1.90 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| dToDouble     | ToDouble       |  1.0189 ns | 0.0241 ns |     981,439,102.8 |  1.00 |         - |          NA |
+| ToDouble      | ToDouble       |  2.7580 ns | 0.0473 ns |     362,577,363.0 |  2.71 |         - |          NA |
+| fToDouble     | ToDouble       |  3.7288 ns | 0.0651 ns |     268,185,753.6 |  3.66 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| dToInt32      | ToInt32        |  7.3440 ns | 0.1001 ns |     136,164,780.9 |  1.00 |         - |          NA |
+| ToIn32        | ToInt32        |  2.9882 ns | 0.0594 ns |     334,647,375.8 |  0.41 |         - |          NA |
+| fToIn32       | ToInt32        |  2.5305 ns | 0.0356 ns |     395,173,062.5 |  0.34 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| dToInt64      | ToInt64        |  7.4271 ns | 0.0997 ns |     134,642,085.2 |  1.00 |         - |          NA |
+| ToInt64       | ToInt64        |  4.4478 ns | 0.1160 ns |     224,832,036.1 |  0.60 |         - |          NA |
+| fToInt64      | ToInt64        |  2.3040 ns | 0.0570 ns |     434,037,039.4 |  0.31 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| dToOACurrency | ToOACurrency   |  1.7126 ns | 0.0248 ns |     583,914,337.6 | 1.000 |         - |          NA |
+| fToAOCurrency | ToOACurrency   |  0.0075 ns | 0.0135 ns | 134,196,400,357.8 | 0.004 |         - |          NA |
+|               |                |            |           |                   |       |           |             |
+| dToSqlMoney   | ToSqlMoney     | 13.9321 ns | 0.2328 ns |      71,776,606.8 | 1.000 |         - |          NA |
+| fToSqlMoney   | ToSqlMoney     |  0.1382 ns | 0.0105 ns |   7,236,771,608.4 | 0.010 |         - |          NA |
+
 
 ## HighLoad
 #### v2
@@ -254,6 +394,15 @@
 | Create1MFastMoney | 22.517 ms | 0.3951 ms |  44.41 |  0.65 | 500.0000 | 500.0000 | 500.0000 |  11.44 MB |        0.75 |
 | Create1MSqlMoney  | 17.019 ms | 0.1556 ms |  58.76 |  0.49 | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |        1.00 |
 | Create1MDecimal   |  3.677 ms | 0.0964 ms | 271.96 |  0.11 | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |        1.00 |
+### v2.9
+| Method            | Mean      | Error     | Op/s   | Ratio | Gen0     | Gen1     | Gen2     | Allocated | Alloc Ratio |
+|------------------ |----------:|----------:|-------:|------:|---------:|---------:|---------:|----------:|------------:|
+| Create1MCurrency  |  8.173 ms | 0.0812 ms | 122.35 |  2.99 | 484.3750 | 484.3750 | 484.3750 |   1.91 MB |        0.13 |
+| Create1MMoney     | 25.029 ms | 0.1986 ms |  39.95 |  9.16 | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |        1.00 |
+| Create1MFastMoney | 20.876 ms | 0.2735 ms |  47.90 |  7.64 | 500.0000 | 500.0000 | 500.0000 |  11.44 MB |        0.75 |
+| Create1MSqlMoney  | 17.153 ms | 0.3368 ms |  58.30 |  6.28 | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |        1.00 |
+| Create1MDecimal   |  2.732 ms | 0.0324 ms | 366.08 |  1.00 | 500.0000 | 500.0000 | 500.0000 |  15.26 MB |        1.00 |
+
 
 // * Legends *
 Mean        : Arithmetic mean of all measurements
