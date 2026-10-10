@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Next]
+## [2.9.0]
 
 ### Changed
 - **Breaking**: `StandardRounding` and `NoRounding` are now `sealed`. `IRoundingStrategy` remains the extension point
   for custom rounding.
 - `Money.Abs` returns a value in the operand's `MoneyContext` instead of the current thread context.
+- `Split` returns shares in the source value's `MoneyContext` instead of the current thread context, and rounds shares to
+  the context's `MaxScale` when set, falling back to the currency's decimal digits. Splitting EUR in a context with
+  `MaxScale` 4 now yields shares at 4 decimals. The shares still sum to the original amount.
+- The Saudi riyal (SAR) symbol is the Unicode 17.0 sign `⃁`. `ر.س.` and `SR` are alternative symbols.
 - `FastMoney` arithmetic that overflows, including `++` and `--`, throws `OverflowException` with the message "Value was
   either too large or too small for a FastMoney." and the arithmetic overflows as an inner exception.
 - `FastMoney` construction accepts the full range, -922,337,203,685,477.5808 to 922,337,203,685,477.5807. Amounts in the
@@ -17,13 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CurrencyInfo.GetFormat(typeof(NumberFormatInfo))` returns a shared, read-only `NumberFormatInfo` when the source
   culture is read-only. Mutating it throws `InvalidOperationException`. A mutable culture or a caller-owned
   `NumberFormatInfo` still gets a per-call clone.
-- Improved `Money` performance: construction 58 to 15.6 ns with no allocation, addition and subtraction 20.7 to 16.4 ns,
-  `ToInt32`/`ToInt64` 28 to about 3 ns, `MoneyContext.CurrentContext` 6 to under 1 ns.
-- Improved `FastMoney` performance: construction 22.9 to 12.7 ns, division by a non-integer `decimal` 50.6 to 16.2 ns,
-  `SqlMoney` conversion 13 ns to under 1 ns, conversion to and from `Money` about 2x.
-- Improved formatting and parsing: formatting allocates only the result string (384 to 40 B) and `TryFormat(Span<char>)`
-  is allocation-free for `C`, `G`, `I`, `N` and `F`; parsing is allocation-free on .NET 9 and later (160 to 0 B) and
-  `TryParse` no longer throws internally.
+- Improved `Money` performance: construction 73% faster with no allocation, addition and subtraction 21% faster,
+  `ToInt32`/`ToInt64` about 89% faster, `MoneyContext.CurrentContext` over 83% faster.
+- Improved `FastMoney` performance: construction 45% faster, division by a non-integer `decimal` 68% faster, `SqlMoney`
+  conversion over 92% faster, conversion to and from `Money` about 50% faster.
+- Improved formatting and parsing: formatting allocates only the result string (90% less memory) and
+  `TryFormat(Span<char>)` is allocation-free for `C`, `G`, `I`, `N` and `F`; parsing is allocation-free on .NET 9 and
+  later and `TryParse` no longer throws internally.
 
 ## [2.8.0]
 
