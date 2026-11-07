@@ -4,9 +4,13 @@ namespace NodaMoney.Tests.MoneyRoundingSpec;
 
 public class DivisionMultiplicationWithRemainder
 {
-    [Theory]
-    [InlineData(100, "XXX", 100)] // XXX does not do rounding
-    [InlineData(100, "EUR", 99.99)] // EUR does rounding in every step
+    public static TheoryData<decimal, string, decimal> RoundingTestData => new()
+    {
+        { 100m, "XXX", 100m }, // XXX does not do rounding
+        { 100m, "EUR", 99.99m }, // EUR does rounding in every step
+    };
+
+    [Theory, MemberData(nameof(RoundingTestData))]
     public void ByDefaultEveryOperationDoesRounding(decimal amount, string currency, decimal expectedResult)
     {
         // Arrange

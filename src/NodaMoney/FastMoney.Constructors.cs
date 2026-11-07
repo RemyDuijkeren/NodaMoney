@@ -60,9 +60,9 @@ public readonly partial record struct FastMoney
     /// <param name="context">The <see cref="MoneyContext"/> to apply to this instance.</param>
     public FastMoney(decimal amount, string code, MoneyContext context) : this(amount, CurrencyInfo.FromCode(code), context) { }
 
-    public FastMoney(double amount) : this((decimal)amount) { }
-    public FastMoney(double amount, Currency currency) : this((decimal)amount, currency) { }
-    public FastMoney(double amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
+    public FastMoney(double amount) : this(DoubleConversion.ToDecimal(amount)) { }
+    public FastMoney(double amount, Currency currency) : this(DoubleConversion.ToDecimal(amount), currency) { }
+    public FastMoney(double amount, string code) : this(DoubleConversion.ToDecimal(amount), CurrencyInfo.FromCode(code)) { }
 
     public FastMoney(long amount) : this((decimal)amount) { }
     public FastMoney(long amount, Currency currency) : this((decimal)amount, currency) { }

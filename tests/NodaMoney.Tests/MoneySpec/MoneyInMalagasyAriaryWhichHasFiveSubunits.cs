@@ -2,36 +2,40 @@ namespace NodaMoney.Tests.MoneySpec;
 
 public class MoneyInMalagasyAriaryWhichHasFiveSubunits
 {
-    [Theory]
-    [InlineData(0.01, 0.0)]
-    [InlineData(0.09, 0.0)]
-    [InlineData(0.10, 0.0)]
-    [InlineData(0.15, 0.2)]
-    [InlineData(0.22, 0.2)]
-    [InlineData(0.29, 0.2)]
-    [InlineData(0.30, 0.4)]
-    [InlineData(0.33, 0.4)]
-    [InlineData(0.38, 0.4)]
-    [InlineData(0.40, 0.4)]
-    [InlineData(0.41, 0.4)]
-    [InlineData(0.45, 0.4)]
-    [InlineData(0.46, 0.4)]
-    [InlineData(0.50, 0.4)]
-    [InlineData(0.54, 0.6)]
-    [InlineData(0.57, 0.6)]
-    [InlineData(0.60, 0.6)]
-    [InlineData(0.68, 0.6)]
-    [InlineData(0.70, 0.8)]
-    [InlineData(0.74, 0.8)]
-    [InlineData(0.77, 0.8)]
-    [InlineData(0.80, 0.8)]
-    [InlineData(0.83, 0.8)]
-    [InlineData(0.85, 0.8)]
-    [InlineData(0.86, 0.8)]
-    [InlineData(0.90, 0.8)]
-    [InlineData(0.91, 1.0)]
-    [InlineData(0.95, 1.0)]
-    [InlineData(0.99, 1.0)]
+    public static TheoryData<decimal, decimal> TestData => new()
+    {
+        { 0.01m, 0.0m },
+        { 0.09m, 0.0m },
+        { 0.10m, 0.0m },
+        { 0.15m, 0.2m },
+        { 0.22m, 0.2m },
+        { 0.29m, 0.2m },
+        { 0.30m, 0.4m },
+        { 0.33m, 0.4m },
+        { 0.38m, 0.4m },
+        { 0.40m, 0.4m },
+        { 0.41m, 0.4m },
+        { 0.45m, 0.4m },
+        { 0.46m, 0.4m },
+        { 0.50m, 0.4m },
+        { 0.54m, 0.6m },
+        { 0.57m, 0.6m },
+        { 0.60m, 0.6m },
+        { 0.68m, 0.6m },
+        { 0.70m, 0.8m },
+        { 0.74m, 0.8m },
+        { 0.77m, 0.8m },
+        { 0.80m, 0.8m },
+        { 0.83m, 0.8m },
+        { 0.85m, 0.8m },
+        { 0.86m, 0.8m },
+        { 0.90m, 0.8m },
+        { 0.91m, 1.0m },
+        { 0.95m, 1.0m },
+        { 0.99m, 1.0m },
+    };
+
+    [Theory, MemberData(nameof(TestData))]
     public void WhenOnlyAmount_ThenItShouldRoundUp(decimal input, decimal expected)
     {
         // 1 MGA = 5 iraimbilanja

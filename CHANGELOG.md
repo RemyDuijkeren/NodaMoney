@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Creating `Money`, `FastMoney` or `ExchangeRate` from a `double` rounds it to 15 significant digits on every runtime, as
+  documented. From .NET 11 the runtime's own conversion keeps the full binary value, so `Money.USDollar(10.005)` became
+  10.01 instead of 10.00, `new Money(0.1, "XXX")` kept the binary noise and `new ExchangeRate(EUR, USD, 1.2524)` printed
+  as `1.252400`.
+
 ## [2.9.0]
 
 ### Changed
