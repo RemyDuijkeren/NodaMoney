@@ -45,6 +45,9 @@ public class CreateMoneyWithDoubleValue
         { 0.1 + 0.2, "XXX", 0.3m },
         { 1E-20, "XXX", 0.00000000000000000001m },
         { 1234567890123456789d, "XXX", 1234567890123460000m },
+        { -1234567890123456789d, "XXX", -1234567890123460000m },
+        { 7.9E+28, "XXX", 79000000000000000000000000000m },
+        { 1E-29, "XXX", 0m }, // below the smallest decimal
     };
 
     [Theory, MemberData(nameof(SignificantDigitsTestData))]
@@ -53,5 +56,34 @@ public class CreateMoneyWithDoubleValue
         var money = new Money(input, code);
 
         money.Amount.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    [InlineData(1E+29)]
+    public void WhenValueIsDoubleOutsideTheDecimalRange_ThenItShouldThrow(double input)
+    {
+        Action action = () => _ = new Money(input, "XXX");
+
+        action.Should().Throw<OverflowException>();
+    }
+
+    [Fact]
+    public void WhenValueIsDouble_ThenAmountShouldEqualTheDecimalCastOfRuntimesBeforeNet11()
+    {
+        // Up to .NET 10 the runtime cast is the reference for the 15 significant digits rounding. From .NET 11 the
+        // cast keeps the full binary value, so there is nothing to compare against.
+        if (Environment.Version.Major >= 11)
+            return;
+
+        var random = new Random(42);
+        for (int i = 0; i < 10_000; i++)
+        {
+            double input = (random.NextDouble() - 0.5) * Math.Pow(10, random.Next(-6, 13));
+
+            new Money(input, "XXX").Amount.Should().Be((decimal)input);
+        }
     }
 }

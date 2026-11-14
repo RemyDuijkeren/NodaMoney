@@ -6,18 +6,18 @@ namespace NodaMoney;
 /// <c>0.3300000000000000155431223448</c> and a decimal midpoint like <c>10.005</c> stops rounding as a midpoint. Shared by
 /// the double constructors of <see cref="Money"/>, <see cref="FastMoney"/> and <see cref="Exchange.ExchangeRate"/>, so
 /// they keep their documented behavior on every runtime.</summary>
-/// <remarks>See https://learn.microsoft.com/dotnet/core/compatibility/core-libraries/11/decimal-biginteger-floating-point-conversions.</remarks>
+/// <remarks>This is the algorithm of the .NET 10 runtime (VarDecFromR8 in System.Decimal.DecCalc, MIT licensed), so the
+/// result is bit-for-bit what <c>(decimal)value</c> returned up to .NET 10. See
+/// https://learn.microsoft.com/dotnet/core/compatibility/core-libraries/11/decimal-biginteger-floating-point-conversions.</remarks>
 internal static class DoubleConversion
 {
-    private const int SignificantDigits = 15;
-    private const int MaxExponent = 28;
+    private const int MaxScale = 28;
 
-    /// <summary>Powers of ten from 10^-28 to 10^28, indexed by exponent + 28.</summary>
-    private static readonly decimal[] s_powersOfTen = CreatePowersOfTen();
-
-    /// <summary>Whether the runtime converts to the exact binary value, as .NET 11 and later do. Detected once, so the
-    /// older runtimes, which already round to 15 significant digits, skip the extra work.</summary>
-    private static readonly bool s_runtimeConvertsExactly = ConvertsExactly(0.1);
+    private static readonly double[] s_powersOfTen =
+    [
+        1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19,
+        1e20, 1e21, 1e22, 1e23, 1e24, 1e25, 1e26, 1e27, 1e28,
+    ];
 
     /// <summary>Converts <paramref name="value"/> to a <see cref="decimal"/> rounded to 15 significant digits, without
     /// trailing zeros.</summary>
@@ -27,69 +27,56 @@ internal static class DoubleConversion
     /// <see cref="decimal"/>.</exception>
     public static decimal ToDecimal(double value)
     {
-        decimal result = (decimal)value;
-        if (!s_runtimeConvertsExactly || result == decimal.Zero)
-            return result;
+        // Binary exponent, so 2^(exponent - 1) <= |value| < 2^exponent.
+        int exponent = (int)((BitConverter.DoubleToInt64Bits(value) >> 52) & 0x7FF) - 1022;
+        if (exponent < -94)
+            return decimal.Zero; // below 0.5 * 10^-28, rounds to zero
 
-        // Find the exponent of the leading digit, so 10^exponent <= |result| < 10^(exponent + 1). Log10 on the double
-        // can be one off next to a power of ten, so settle it against the decimal.
-        decimal magnitude = Math.Abs(result);
-        int exponent = Math.Max(-MaxExponent, Math.Min(MaxExponent, (int)Math.Floor(Math.Log10(Math.Abs(value)))));
-        while (exponent < MaxExponent && magnitude >= PowerOfTen(exponent + 1))
-            exponent++;
-        while (exponent > -MaxExponent && magnitude < PowerOfTen(exponent))
-            exponent--;
+        if (exponent > 96)
+            return (decimal)value; // NaN, infinity or too large: every runtime throws the OverflowException here
 
-        int decimals = SignificantDigits - 1 - exponent;
-        if (decimals < 0)
+        // Scale to a 15-digit integer. The decimal exponent is estimated as exponent * log10(2), in fixed point.
+        double scaled = Math.Abs(value);
+        int scale = 14 - ((exponent * 19728) >> 16);
+        if (scale >= 0)
         {
-            // More than 15 integer digits: round away the trailing integer digits, like 1234567890123456789 to
-            // 1234567890123460000.
-            decimal factor = PowerOfTen(-decimals);
-            return decimal.Round(result / factor, 0, MidpointRounding.ToEven) * factor;
+            scale = Math.Min(scale, MaxScale);
+            scaled *= s_powersOfTen[scale];
+        }
+        else if (scale != -1 || scaled >= 1E15)
+        {
+            scaled /= s_powersOfTen[-scale];
+        }
+        else
+        {
+            scale = 0;
         }
 
-        return StripTrailingZeros(decimal.Round(result, Math.Min(decimals, MaxExponent), MidpointRounding.ToEven));
-    }
-
-    /// <summary>Round keeps the scale, so 0.33 comes back as 0.3300000000000000. Strip the trailing zeros like the old
-    /// runtime conversion did. With at most 16 significant digits left the mantissa fits in 64 bits, which is cheaper
-    /// than normalizing through a decimal division.</summary>
-    private static decimal StripTrailingZeros(decimal value)
-    {
-#if NET5_0_OR_GREATER
-        Span<int> bits = stackalloc int[4];
-        decimal.GetBits(value, bits);
-#else
-        int[] bits = decimal.GetBits(value);
-#endif
-        ulong mantissa = ((ulong)(uint)bits[1] << 32) | (uint)bits[0];
-        int scale = (bits[3] >> 16) & 0xFF;
-        while (scale > 0 && mantissa % 10 == 0)
+        if (scaled < 1E14 && scale < MaxScale)
         {
-            mantissa /= 10;
-            scale--;
+            scaled *= 10;
+            scale++;
         }
 
-        return new decimal((int)mantissa, (int)(mantissa >> 32), 0, bits[3] < 0, (byte)scale);
-    }
+        ulong mantissa = (ulong)Math.Round(scaled); // midpoints to even
+        if (mantissa == 0)
+            return decimal.Zero;
 
-    private static decimal PowerOfTen(int exponent) => s_powersOfTen[exponent + MaxExponent];
-
-    private static bool ConvertsExactly(double probe) => (decimal)probe != 0.1m;
-
-    private static decimal[] CreatePowersOfTen()
-    {
-        var powers = new decimal[(2 * MaxExponent) + 1];
-        decimal power = 1m;
-        for (int exponent = 0; exponent <= MaxExponent; exponent++)
+        if (scale < 0)
         {
-            powers[MaxExponent - exponent] = new decimal(1, 0, 0, false, (byte)exponent);
-            powers[MaxExponent + exponent] = power;
-            if (exponent < MaxExponent)
-                power *= 10m;
+            // More than 15 integer digits, like 1234567890123456789 to 1234567890123460000.
+            decimal integer = mantissa * (decimal)(ulong)s_powersOfTen[-scale];
+            return value < 0 ? -integer : integer;
         }
 
-        return powers;
+        // Strip the trailing zeros, so 0.33 does not come back as 0.330000000000000. At most 14, like the runtime did:
+        // a mantissa that rounded up to 10^15 keeps one zero.
+        int zeros = Math.Min(scale, 14);
+        if (zeros >= 8 && mantissa % 100_000_000 == 0) { mantissa /= 100_000_000; zeros -= 8; scale -= 8; }
+        if (zeros >= 4 && mantissa % 10_000 == 0) { mantissa /= 10_000; zeros -= 4; scale -= 4; }
+        if (zeros >= 2 && mantissa % 100 == 0) { mantissa /= 100; zeros -= 2; scale -= 2; }
+        if (zeros >= 1 && mantissa % 10 == 0) { mantissa /= 10; scale--; }
+
+        return new decimal((int)mantissa, (int)(mantissa >> 32), 0, value < 0, (byte)scale);
     }
 }
