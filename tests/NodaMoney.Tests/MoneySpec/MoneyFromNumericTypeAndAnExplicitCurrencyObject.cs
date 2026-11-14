@@ -104,13 +104,17 @@ public class MoneyFromNumericTypeAndAnExplicitCurrencyObject
         money.Amount.Should().Be(800m);
     }
 
-    [Theory]
-    [InlineData(0.03, 0.03)]
-    [InlineData(0.3333333333333333, 0.33)]
-    [InlineData(251426433.75935, 251426433.76)]
-    [InlineData(7922816251426433.7593543950335, 7922816251426433.76)]
-    [InlineData(79228162514264337593543.950335, 79228162514264337593543.95)]
-    [InlineData(0.0079228162514264337593543950335, 0.01)]
+    public static TheoryData<decimal, decimal> DecimalTestData => new()
+    {
+        { 0.03m, 0.03m },
+        { 0.3333333333333333m, 0.33m },
+        { 251426433.75935m, 251426433.76m },
+        { 7922816251426433.7593543950335m, 7922816251426433.76m },
+        { 79228162514264337593543.950335m, 79228162514264337593543.95m },
+        { 0.0079228162514264337593543950335m, 0.01m },
+    };
+
+    [Theory, MemberData(nameof(DecimalTestData))]
     public void WhenValueIsDecimal_ThenCreatingShouldSucceed(decimal input, decimal expected)
     {
         var money = new Money(input, _euro);

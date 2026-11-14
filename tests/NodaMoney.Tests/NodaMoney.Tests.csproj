@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net10.0;net9.0;net8.0;net48;net6.0</TargetFrameworks>
+    <!-- .NET 11 changed the double to decimal conversion, so test on it whenever the SDK can build it. -->
+    <TargetFrameworks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '11.0'))">net11.0;$(TargetFrameworks)</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
 <!--    <Nullable>enable</Nullable>-->

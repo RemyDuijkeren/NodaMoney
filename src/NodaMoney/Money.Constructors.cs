@@ -74,7 +74,7 @@ public readonly partial struct Money
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
-    public Money(double amount) : this((decimal)amount) { }
+    public Money(double amount) : this(DoubleConversion.ToDecimal(amount)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on an ISO 4217 Currency code.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
@@ -87,7 +87,7 @@ public readonly partial struct Money
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
-    public Money(double amount, string code) : this((decimal)amount, CurrencyInfo.FromCode(code)) { }
+    public Money(double amount, string code) : this(DoubleConversion.ToDecimal(amount), CurrencyInfo.FromCode(code)) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct.</summary>
     /// <param name="amount">The Amount of money as <see langword="double"/> or <see langword="float"/> (float is implicitly
@@ -100,7 +100,7 @@ public readonly partial struct Money
     /// (<see cref="System.MidpointRounding"/>). The behavior of this method follows IEEE Standard 754, section 4. This
     /// kind of rounding is sometimes called rounding to nearest, or banker's rounding. It minimizes rounding errors that
     /// result from consistently rounding a midpoint value in a single direction.</para></remarks>
-    public Money(double amount, Currency currency) : this((decimal)amount, currency) { }
+    public Money(double amount, Currency currency) : this(DoubleConversion.ToDecimal(amount), currency) { }
 
     /// <summary>Initializes a new instance of the <see cref="Money"/> struct, based on the current culture.</summary>
     /// <param name="amount">The Amount of money as <see langword="long"/>, <see langword="int"/>, <see langword="short"/> or<see cref="byte"/>.</param>

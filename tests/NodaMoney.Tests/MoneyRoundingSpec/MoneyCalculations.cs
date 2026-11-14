@@ -49,9 +49,13 @@ public class MoneyCalculations
         value.Amount.Should().Be(101m); // Expect exact addition without accumulative error
     }
 
-    [Theory]
-    [InlineData(1234.56789, "XXX", 0.00001, 1234.56788)]
-    [InlineData(1234.56789, "EUR", 0.00001, 1234.57)]
+    public static TheoryData<decimal, string, decimal, decimal> CloseValuesTestData => new()
+    {
+        { 1234.56789m, "XXX", 0.00001m, 1234.56788m },
+        { 1234.56789m, "EUR", 0.00001m, 1234.57m },
+    };
+
+    [Theory, MemberData(nameof(CloseValuesTestData))]
     public void SubtractionWithCloseValues(decimal amount, string currency, decimal smallDifference, decimal expectedResult)
     {
         // Arrange

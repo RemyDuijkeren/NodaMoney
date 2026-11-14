@@ -38,7 +38,7 @@ public readonly record struct ExchangeRate
     /// <param name="rate">The rate of the exchange.</param>
     /// <param name="numberOfDecimals">The number of decimals to round the exchange rate to.</param>
     public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, double rate, int numberOfDecimals = 6)
-        : this(baseCurrency, quoteCurrency, Math.Round((decimal)rate, numberOfDecimals))
+        : this(baseCurrency, quoteCurrency, Math.Round(DoubleConversion.ToDecimal(rate), numberOfDecimals))
     {
     }
 

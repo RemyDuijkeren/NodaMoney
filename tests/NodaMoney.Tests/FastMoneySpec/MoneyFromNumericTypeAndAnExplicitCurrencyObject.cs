@@ -104,13 +104,17 @@ public class MoneyFromNumericTypeAndAnExplicitCurrencyObject
         money.Amount.Should().Be(800m);
     }
 
-    [Theory]
-    [InlineData(0.03, 0.03)]
-    [InlineData(0.3333333333333333, 0.3333)]
-    [InlineData(251426433.75935, 251426433.7594)]
-    //[InlineData(7922816251426433.7593543950335, 7922816251426433.76)] // OverflowException
-    //[InlineData(79228162514264337593543.950335, 79228162514264337593543.95)] // OverflowException
-    [InlineData(0.0079228162514264337593543950335, 0.0079)]
+    public static TheoryData<decimal, decimal> DecimalTestData => new()
+    {
+        { 0.03m, 0.03m },
+        { 0.3333333333333333m, 0.3333m },
+        { 251426433.75935m, 251426433.7594m },
+        //{ 7922816251426433.7593543950335m, 7922816251426433.76m }, // OverflowException
+        //{ 79228162514264337593543.950335m, 79228162514264337593543.95m }, // OverflowException
+        { 0.0079228162514264337593543950335m, 0.0079m },
+    };
+
+    [Theory, MemberData(nameof(DecimalTestData))]
     public void WhenValueIsDecimal_ThenCreatingShouldSucceed(decimal input, decimal expected)
     {
         var money = new FastMoney(input, _euro);
