@@ -50,6 +50,9 @@ public partial struct Money
     }
 
 #if NET7_0_OR_GREATER
+    /// <summary>Largest UTF-8 input, in bytes, that is decoded on the stack; longer input uses a pooled buffer.</summary>
+    private const int MaxStackallocChars = 256;
+
     /// <summary>Parse the UTF-8 encoded text to <see cref="Money"/>.</summary>
     /// <param name="utf8Text">The UTF-8 encoded text to parse.</param>
     /// <param name="provider">An object that provides culture-specific formatting information, or <c>null</c> to use the current culture.</param>
@@ -57,19 +60,26 @@ public partial struct Money
     /// <exception cref="System.FormatException">The input is not a valid UTF-8 encoded text or cannot be parsed as a monetary value.</exception>
     static Money IUtf8SpanParsable<Money>.Parse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider)
     {
-        // Attempt to decode UTF8 text directly to a char span without intermediate string allocation
-        Span<char> charBuffer = stackalloc char[utf8Text.Length]; // Allocate on the stack
-
-        // Decode UTF-8 to UTF-16 (char) directly
-        if (Utf8.ToUtf16(utf8Text, charBuffer, out _, out int charsWritten, replaceInvalidSequences: true) != OperationStatus.Done)
+        // Decode UTF-8 to UTF-16 without a string allocation: on the stack for normal input, pooled for long input so
+        // the caller's input length cannot overflow the stack.
+        char[]? rented = null;
+        Span<char> charBuffer = utf8Text.Length <= MaxStackallocChars
+            ? stackalloc char[MaxStackallocChars]
+            : (rented = ArrayPool<char>.Shared.Rent(utf8Text.Length));
+        try
         {
-            throw new FormatException("The input is not a valid UTF-8 encoded text.");
+            if (Utf8.ToUtf16(utf8Text, charBuffer, out _, out int charsWritten, replaceInvalidSequences: true) != OperationStatus.Done)
+            {
+                throw new FormatException("The input is not a valid UTF-8 encoded text.");
+            }
+
+            // Delegate work to the existing ReadOnlySpan<char>-based Parse
+            return Parse(charBuffer[..charsWritten], provider);
         }
-
-        ReadOnlySpan<char> charSpan = charBuffer[..charsWritten];
-
-        // Delegate work to the existing ReadOnlySpan<char>-based Parse
-        return Parse(charSpan, provider);
+        finally
+        {
+            if (rented is not null) ArrayPool<char>.Shared.Return(rented);
+        }
     }
 #endif
 
@@ -144,20 +154,26 @@ public partial struct Money
     /// <returns><c>true</c> if the text was successfully parsed; otherwise, <c>false</c>.</returns>
     static bool IUtf8SpanParsable<Money>.TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Money result)
     {
-        // Decode UTF-8 encoded bytes to a char span
-        Span<char> charBuffer = stackalloc char[utf8Text.Length]; // Allocate stack buffer
-
-        if (Utf8.ToUtf16(utf8Text, charBuffer, out _, out int charsWritten, replaceInvalidSequences: true) != OperationStatus.Done)
+        // Decode UTF-8 to UTF-16: on the stack for normal input, pooled for long input (see Parse above)
+        char[]? rented = null;
+        Span<char> charBuffer = utf8Text.Length <= MaxStackallocChars
+            ? stackalloc char[MaxStackallocChars]
+            : (rented = ArrayPool<char>.Shared.Rent(utf8Text.Length));
+        try
         {
-            result = default; // Set default result on failure
-            return false;     // Invalid UTF-8 text
+            if (Utf8.ToUtf16(utf8Text, charBuffer, out _, out int charsWritten, replaceInvalidSequences: true) != OperationStatus.Done)
+            {
+                result = default; // Set default result on failure
+                return false;     // Invalid UTF-8 text
+            }
+
+            // Delegate to the TryParse(charSpan, ...) API
+            return TryParse(charBuffer[..charsWritten], provider, out result);
         }
-
-        // Get the decoded char span
-        ReadOnlySpan<char> charSpan = charBuffer[..charsWritten];
-
-        // Delegate to the TryParse(charSpan, ...) API
-        return TryParse(charSpan, provider, out result);
+        finally
+        {
+            if (rented is not null) ArrayPool<char>.Shared.Return(rented);
+        }
     }
 #endif
 
