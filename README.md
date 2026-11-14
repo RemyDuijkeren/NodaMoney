@@ -563,9 +563,9 @@ and `Money` everywhere else.
 
 ## Compatibility
 
-- Core library (NodaMoney): net10.0, net9.0; net8.0; netstandard2.0; netstandard2.1
-- DI package (NodaMoney.DependencyInjection): net10.0, net9.0; net8.0; netstandard2.0; netstandard2.1
-- AOT: compatible on .NET 8/9/10
+- Core library (NodaMoney): net11.0; net10.0; net9.0; net8.0; netstandard2.0; netstandard2.1
+- DI package (NodaMoney.DependencyInjection): net11.0; net10.0; net9.0; net8.0; netstandard2.0; netstandard2.1
+- AOT: compatible on .NET 8/9/10/11
 - Packages ship with SourceLink and symbol packages;
 
 ## Releases
