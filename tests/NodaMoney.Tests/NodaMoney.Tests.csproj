@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'" >
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" PrivateAssets="true" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="true" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
@@ -29,7 +29,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net48'">
     <PackageReference Include="System.Text.Json" Version="10.0.5" />
-    <PackageReference Include="RavenDB.TestDriver" Version="7.2.0" />
+    <PackageReference Include="RavenDB.TestDriver" Version="7.2.7" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net48'">
@@ -43,9 +43,12 @@
 
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.analyzers" PrivateAssets="true" Version="1.27.0" />
-    <PackageReference Include="coverlet.collector" Version="8.0.0"/>
-    <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="xunit.analyzers" PrivateAssets="true" Version="2.3.0" />
+    <PackageReference Include="coverlet.collector" Version="10.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="8.11.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
