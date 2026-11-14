@@ -9,7 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `net11.0` target for `NodaMoney` and `NodaMoney.DependencyInjection`.
 
+### Changed
+- On .NET 11, converting `Money` or `FastMoney` to `double` (`ToDouble()` and the explicit cast) returns the nearest
+  `double`, following the runtime's corrected `decimal` to `double` conversion. Earlier runtimes can be off in the last
+  digits for amounts with 16 or more significant digits: `9895985413.759941` converts to `9895985413.75994` there and
+  to `9895985413.759941` on .NET 11. Amounts up to 15 significant digits convert the same on every runtime.
+
 ### Fixed
+- Parsing `Money` from UTF-8 text (`IUtf8SpanParsable<Money>`) no longer sizes its stack buffer by the input length. Very
+  long input could overflow the stack; it now uses a pooled buffer.
 - Creating `Money`, `FastMoney` or `ExchangeRate` from a `double` rounds it to 15 significant digits on every runtime, as
   documented. From .NET 11 the runtime's own conversion keeps the full binary value, so `Money.USDollar(10.005)` became
   10.01 instead of 10.00, `new Money(0.1, "XXX")` kept the binary noise and `new ExchangeRate(EUR, USD, 1.2524)` printed

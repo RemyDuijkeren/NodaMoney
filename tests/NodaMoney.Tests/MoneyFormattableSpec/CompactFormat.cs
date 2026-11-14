@@ -117,6 +117,19 @@ public class CompactFormat
     }
 
     [Fact]
+    [UseCulture("en-US")]
+    public void WhenJustBelowThousandWithOneSignificantDigit_ShouldRoundUpToOneThousand()
+    {
+        // Rounds to 1000, so it compacts with a scaled value below 1. The one-digit path then goes through a double
+        // power of 0.1, which .NET 11 converts back to decimal with its binary noise.
+        var usd = CurrencyInfo.FromCode("USD");
+
+        new Money(999.50m, usd).ToString("c1", CultureInfo.CurrentCulture).Should().Be("$1K");
+        new Money(999.99m, usd).ToString("c1", CultureInfo.CurrentCulture).Should().Be("$1K");
+        new Money(-999.99m, usd).ToString("c1", CultureInfo.CurrentCulture).Should().Be("-$1K");
+    }
+
+    [Fact]
     [UseCulture("fr-FR")]
     public void WhenUsingLowercase_g_InFrCulture_ShouldPlaceCodeAfterNumber()
     {
