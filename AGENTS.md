@@ -17,14 +17,14 @@ dotnet pack -c Release -o ./artifacts/
 Non-obvious build facts:
 
 - **Lock files are committed.** `src/*` set `RestorePackagesWithLockFile` and CI runs in locked mode. After adding or bumping a package, regenerate with `dotnet restore --force-evaluate` and commit the `packages.lock.json` changes, otherwise CI restore fails.
-- **`net48` needs Windows.** Test projects target `net10.0;net9.0;net8.0;net6.0;net48`. A bare `dotnet test` on Linux fails on the `net48` leg. CI runs on ubuntu and tests net6.0, net8.0, net9.0, net10.0 only. The `net6.0` and `net48` legs exist to exercise the `netstandard2.1` and `netstandard2.0` code paths.
+- **`net48` needs Windows.** Test projects target `net11.0;net10.0;net9.0;net8.0;net6.0;net48`. A bare `dotnet test` on Linux fails on the `net48` leg. CI runs on ubuntu and tests net6.0, net8.0, net9.0, net10.0, net11.0 only. The `net6.0` and `net48` legs exist to exercise the `netstandard2.1` and `netstandard2.0` code paths.
 - **Versioning is MinVer**, driven by git tags. No version in the csproj.
 - `EnforceCodeStyleInBuild` is on with Roslynator plus the Microsoft quality analyzers. The build must be warning-free before a PR.
-- `global.json` pins nothing beyond `rollForward: latestMajor`, no prerelease SDKs.
+- `global.json` pins SDK `11.0.100` with `rollForward: latestFeature`, so local and CI restores produce the same lock files.
 
 ## Architecture
 
-Two packages: `src/NodaMoney` (core) and `src/NodaMoney.DependencyInjection` (Microsoft.Extensions integration). Both target `net10.0;net9.0;net8.0;netstandard2.0;netstandard2.1`, AOT-compatible on the .NET 8/9/10 legs. `netstandard` legs pull in `System.Text.Json` and use `#if NET5_0_OR_GREATER` / `DotNetCompatibility.cs` shims, so any new code touching spans, frozen collections or `decimal.GetBits(Span<int>)` needs a fallback.
+Two packages: `src/NodaMoney` (core) and `src/NodaMoney.DependencyInjection` (Microsoft.Extensions integration). Both target `net11.0;net10.0;net9.0;net8.0;netstandard2.0;netstandard2.1`, AOT-compatible on the .NET 8/9/10/11 legs. `netstandard` legs pull in `System.Text.Json` and use `#if NET5_0_OR_GREATER` / `DotNetCompatibility.cs` shims, so any new code touching spans, frozen collections or `decimal.GetBits(Span<int>)` needs a fallback.
 
 ### The bit-packing contract (read this before touching Money, Currency or MoneyContext)
 

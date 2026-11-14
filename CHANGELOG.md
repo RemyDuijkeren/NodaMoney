@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `net11.0` target for `NodaMoney` and `NodaMoney.DependencyInjection`.
+
 ### Fixed
 - Creating `Money`, `FastMoney` or `ExchangeRate` from a `double` rounds it to 15 significant digits on every runtime, as
   documented. From .NET 11 the runtime's own conversion keeps the full binary value, so `Money.USDollar(10.005)` became
