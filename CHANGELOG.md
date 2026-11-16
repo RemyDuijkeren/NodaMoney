@@ -6,22 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-11-16
+
 ### Added
-- `net11.0` target for `NodaMoney` and `NodaMoney.DependencyInjection`.
+
+- `NodaMoney` and `NodaMoney.DependencyInjection` target `net11.0`.
 
 ### Changed
-- On .NET 11, converting `Money` or `FastMoney` to `double` (`ToDouble()` and the explicit cast) returns the nearest
-  `double`, following the runtime's corrected `decimal` to `double` conversion. Earlier runtimes can be off in the last
-  digits for amounts with 16 or more significant digits: `9895985413.759941` converts to `9895985413.75994` there and
-  to `9895985413.759941` on .NET 11. Amounts up to 15 significant digits convert the same on every runtime.
+
+- On .NET 11, converting `Money` or `FastMoney` to `double` (`ToDouble()` and the explicit cast) returns the nearest `double`, following the runtime's corrected `decimal` to `double` conversion. Amounts with 16 or more significant digits can differ in the last digit from earlier runtimes; amounts up to 15 significant digits convert the same everywhere.
 
 ### Fixed
-- Parsing `Money` from UTF-8 text (`IUtf8SpanParsable<Money>`) no longer sizes its stack buffer by the input length. Very
-  long input could overflow the stack; it now uses a pooled buffer.
-- Creating `Money`, `FastMoney` or `ExchangeRate` from a `double` rounds it to 15 significant digits on every runtime, as
-  documented. From .NET 11 the runtime's own conversion keeps the full binary value, so `Money.USDollar(10.005)` became
-  10.01 instead of 10.00, `new Money(0.1, "XXX")` kept the binary noise and `new ExchangeRate(EUR, USD, 1.2524)` printed
-  as `1.252400`.
+
+- Creating `Money`, `FastMoney` or `ExchangeRate` from a `double` rounds it to 15 significant digits on every runtime, as documented. On .NET 11 the full binary value was kept, so `Money.USDollar(10.005)` became 10.01 instead of 10.00. (#122 by @slang25)
+- Parsing `Money` from very long UTF-8 input no longer overflows the stack.
 
 ## [2.9.0]
 
@@ -281,3 +279,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Projects are converted to .NET Core, which shouldn't be a problem, but nevertheless it is a big change which can cause unexpected problems.
+
+[Unreleased]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.10.0...HEAD
+[2.10.0]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.9.0...2.10.0
