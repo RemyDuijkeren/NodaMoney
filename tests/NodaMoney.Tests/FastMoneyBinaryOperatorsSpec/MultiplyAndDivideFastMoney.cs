@@ -189,4 +189,18 @@ public class MultiplyAndDivideFastMoney
         // Assert
         result.Should().Be(new FastMoney(decimal.Divide(money.Amount, operand), money.Currency));
     }
+
+    [Fact]
+    public void WhenDividingFastMoneyByFastMoneyWithDifferentCurrencies_ShouldThrowInvalidCurrencyException()
+    {
+        // Arrange
+        var euro = new FastMoney(10, "EUR");
+        var dollar = new FastMoney(5, "USD");
+
+        // Act
+        Action act = () => { var ratio = euro / dollar; };
+
+        // Assert
+        act.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
 }

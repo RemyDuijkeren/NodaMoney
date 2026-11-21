@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Dividing `Money` by `Money`, or `FastMoney` by `FastMoney`, throws `InvalidCurrencyException` when the currencies differ, as it did before 2.5.0. It returned the ratio of the two amounts without checking. (#123, reported by @mikernet)
+
 ## [2.10.0] - 2026-11-16
 
 ### Added

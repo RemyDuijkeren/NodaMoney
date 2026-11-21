@@ -344,4 +344,18 @@ public class MultiplyAndDivideMoney
         result.Should().BeOfType(typeof(decimal));
         result.Should().Be(expected); // ratio
     }
+
+    [Fact]
+    public void WhenDividingMoneyByMoneyWithDifferentCurrencies_ShouldThrowInvalidCurrencyException()
+    {
+        // Arrange
+        var euro = Money.Euro(10);
+        var dollar = Money.USDollar(5);
+
+        // Act
+        Action act = () => { var ratio = euro / dollar; };
+
+        // Assert
+        act.Should().Throw<InvalidCurrencyException>().WithMessage("Currency mismatch*");
+    }
 }

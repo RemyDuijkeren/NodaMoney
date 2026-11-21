@@ -204,7 +204,11 @@ public partial struct Money
     /// <param name="money2">The divider.</param>
     /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
-    public static decimal Divide(in Money money1, in Money money2) => checked(money1.Amount / money2.Amount);
+    public static decimal Divide(in Money money1, in Money money2)
+    {
+        money1.ThrowIfCurrencyMismatch(money2);
+        return checked(money1.Amount / money2.Amount);
+    }
 
     /// <summary>Computes the <see cref="Money"/> remainder after dividing two <see cref="Money"/> values.</summary>
     /// <param name="money1">The <see cref="Money"/> dividend.</param>

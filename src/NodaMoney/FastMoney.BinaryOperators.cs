@@ -334,7 +334,11 @@ public readonly partial record struct FastMoney
     /// <param name="money2">The divider.</param>
     /// <returns>The <see cref="decimal"/> result of dividing left with right.</returns>
     /// <remarks>Division of Money by Money means the unit is lost, so the result will be Decimal.</remarks>
-    public static decimal Divide(in FastMoney money1, in FastMoney money2) => decimal.Divide(money1.Amount, money2.Amount);
+    public static decimal Divide(in FastMoney money1, in FastMoney money2)
+    {
+        money1.ThrowIfCurrencyMismatch(money2);
+        return decimal.Divide(money1.Amount, money2.Amount);
+    }
 
     /// <summary>Computes the <see cref="FastMoney"/> remainder after dividing two <see cref="Money"/> values.</summary>
     /// <param name="money1">The <see cref="FastMoney"/> dividend.</param>
