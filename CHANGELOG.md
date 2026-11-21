@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ExchangeRate.FromAmounts(baseAmount, quoteAmount)` creates the exchange rate implied by two amounts, such as what was paid and what was received. Use it instead of dividing `Money` values of different currencies.
+
 ### Fixed
 
 - Dividing `Money` by `Money`, or `FastMoney` by `FastMoney`, throws `InvalidCurrencyException` when the currencies differ, as it did before 2.5.0. It returned the ratio of the two amounts without checking. (#123, reported by @mikernet)

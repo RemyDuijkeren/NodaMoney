@@ -279,6 +279,9 @@ var usd = rate.Convert(eur);   // -> USD 127.16 (rounded to cents)
 
 // Converting back uses the same rate
 var eurAgain = rate.Convert(usd); // -> EUR 100.99
+
+// Rate implied by what was paid and what was received
+var implied = ExchangeRate.FromAmounts(Money.Euro(100m), Money.USDollar(108.25m)); // -> EUR/USD 1.0825
 ```
 
 ## FastMoney

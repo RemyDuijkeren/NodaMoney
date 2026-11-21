@@ -61,6 +61,21 @@ public readonly record struct ExchangeRate
     {
     }
 
+    /// <summary>Creates the exchange rate implied by two amounts of equal worth, such as the amount paid and the amount received.</summary>
+    /// <param name="baseAmount">The amount in the base currency.</param>
+    /// <param name="quoteAmount">The amount in the quote currency that <paramref name="baseAmount"/> was exchanged for.</param>
+    /// <returns>An <see cref="ExchangeRate"/> from the base to the quote currency, with the unrounded rate quoteAmount / baseAmount.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">An amount is zero or negative, or the currencies are equal and the amounts differ.</exception>
+    public static ExchangeRate FromAmounts(Money baseAmount, Money quoteAmount)
+    {
+        if (baseAmount.Amount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(baseAmount), "Amount must be greater than zero!");
+        if (quoteAmount.Amount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quoteAmount), "Amount must be greater than zero!");
+
+        return new ExchangeRate(baseAmount.Currency, quoteAmount.Currency, quoteAmount.Amount / baseAmount.Amount);
+    }
+
     /// <summary>Deconstruct the current instance into its components.</summary>
     /// <param name="baseCurrency">The base currency.</param>
     /// <param name="quoteCurrency">The quote currency.</param>
