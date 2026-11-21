@@ -24,7 +24,7 @@ public readonly record struct ExchangeRate
     {
         if (baseCurrency == quoteCurrency && rate != 1M)
             throw new ArgumentOutOfRangeException(nameof(rate), "When the base and quote currency are equal, the only allowed rate is 1!");
-        if (rate < 0)
+        if (rate <= 0)
             throw new ArgumentOutOfRangeException(nameof(rate), "Rate must be greater than zero!");
 
         BaseCurrency = baseCurrency;

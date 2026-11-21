@@ -8,7 +8,7 @@ public class CompareExchangeRates
     public static IEnumerable<object[]> TestData => new[]
     {
         new object[] { new ExchangeRate("EUR", "USD", 1.2591), new ExchangeRate("EUR", "USD", 1.2591), true },
-        new object[] { new ExchangeRate("EUR", "USD", 0.0), new ExchangeRate("EUR", "USD", 0.0), true },
+        new object[] { new ExchangeRate("EUR", "USD", 0.5), new ExchangeRate("EUR", "USD", 0.5), true },
         new object[] { new ExchangeRate("EUR", "USD", 1.2591), new ExchangeRate("EUR", "USD", 1.600), false },
         new object[] { new ExchangeRate("EUR", "USD", 1.2591), new ExchangeRate("EUR", "AFN", 1.2591), false },
         new object[] { new ExchangeRate("AFN", "USD", 1.2591), new ExchangeRate("EUR", "USD", 1.2591), false }

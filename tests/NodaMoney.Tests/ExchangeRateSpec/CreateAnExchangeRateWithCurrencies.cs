@@ -79,6 +79,16 @@ public class CreateAnExchangeRateWithCurrencies
     }
 
     [Fact]
+    public void WhenRateIsZero_ThenThrowException()
+    {
+        // Arrange, Act
+        Action action = () => new ExchangeRate(_euro, _dollar, 0M);
+
+        // Assert
+        action.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
     public void WhenBaseCurrencyIsDefault_ThenCreatingShouldSucceed()
     {
         var fx = new ExchangeRate(default, _dollar, 1.2591M);
