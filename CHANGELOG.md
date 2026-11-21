@@ -6,13 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.11.0] - 2026-11-21
+
 ### Added
 
 - `ExchangeRate.FromAmounts(baseAmount, quoteAmount)` creates the exchange rate implied by two amounts, such as what was paid and what was received. Use it instead of dividing `Money` values of different currencies.
 
 ### Fixed
 
-- Dividing `Money` by `Money`, or `FastMoney` by `FastMoney`, throws `InvalidCurrencyException` when the currencies differ, as it did before 2.5.0. It returned the ratio of the two amounts without checking. (#123, reported by @mikernet)
+- Dividing `Money` by `Money`, or `FastMoney` by `FastMoney`, throws `InvalidCurrencyException` when the currencies differ, as it did before 2.5.0. It returned the ratio of the two amounts without checking. (#123 by @mikernet)
 - Creating an `ExchangeRate` with a rate of zero throws `ArgumentOutOfRangeException`, as documented. It was accepted, and converting from the quote currency then divided by zero.
 
 ## [2.10.0] - 2026-11-16
@@ -289,5 +291,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Projects are converted to .NET Core, which shouldn't be a problem, but nevertheless it is a big change which can cause unexpected problems.
 
-[Unreleased]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.10.0...HEAD
+[Unreleased]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.11.0...HEAD
+[2.11.0]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.10.0...2.11.0
 [2.10.0]: https://github.com/RemyDuijkeren/NodaMoney/compare/2.9.0...2.10.0
